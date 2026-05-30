@@ -1,0 +1,5 @@
+# Replace crm.yourdomain.com with your real domain (must match SERVER_URL in .env).
+# Caddy automatically provisions and renews a Let's Encrypt TLS certificate.
+crm.yourdomain.com {
+    reverse_proxy server:3000
+}
