@@ -23,20 +23,24 @@ services:
       DISABLE_CRON_JOBS_REGISTRATION: ${DISABLE_CRON_JOBS_REGISTRATION}
 
       STORAGE_TYPE: ${STORAGE_TYPE:-local}
-      STORAGE_S3_REGION: ${STORAGE_S3_REGION}
-      STORAGE_S3_NAME: ${STORAGE_S3_NAME}
-      STORAGE_S3_ENDPOINT: ${STORAGE_S3_ENDPOINT}
+      # S3 storage — uncomment and set STORAGE_TYPE=s3 in .env to use.
+      # Leave commented for local storage; passing blank values fails validation.
+      # STORAGE_S3_REGION: ${STORAGE_S3_REGION}
+      # STORAGE_S3_NAME: ${STORAGE_S3_NAME}
+      # STORAGE_S3_ENDPOINT: ${STORAGE_S3_ENDPOINT}
 
       ENCRYPTION_KEY: ${ENCRYPTION_KEY}
       FALLBACK_ENCRYPTION_KEY: ${FALLBACK_ENCRYPTION_KEY}
 
-      EMAIL_FROM_ADDRESS: ${EMAIL_FROM_ADDRESS}
-      EMAIL_FROM_NAME: ${EMAIL_FROM_NAME}
-      EMAIL_DRIVER: ${EMAIL_DRIVER}
-      EMAIL_SMTP_HOST: ${EMAIL_SMTP_HOST}
-      EMAIL_SMTP_PORT: ${EMAIL_SMTP_PORT}
-      EMAIL_SMTP_USER: ${EMAIL_SMTP_USER}
-      EMAIL_SMTP_PASSWORD: ${EMAIL_SMTP_PASSWORD}
+      # Email — defaults to the LOGGER driver (logs emails) when unset.
+      # Uncomment and set these in .env to send real email via SMTP.
+      # EMAIL_FROM_ADDRESS: ${EMAIL_FROM_ADDRESS}
+      # EMAIL_FROM_NAME: ${EMAIL_FROM_NAME}
+      # EMAIL_DRIVER: ${EMAIL_DRIVER}
+      # EMAIL_SMTP_HOST: ${EMAIL_SMTP_HOST}
+      # EMAIL_SMTP_PORT: ${EMAIL_SMTP_PORT}
+      # EMAIL_SMTP_USER: ${EMAIL_SMTP_USER}
+      # EMAIL_SMTP_PASSWORD: ${EMAIL_SMTP_PASSWORD}
     depends_on:
       db:
         condition: service_healthy
@@ -62,20 +66,24 @@ services:
       DISABLE_CRON_JOBS_REGISTRATION: "true" # cron registration runs on the server container
 
       STORAGE_TYPE: ${STORAGE_TYPE:-local}
-      STORAGE_S3_REGION: ${STORAGE_S3_REGION}
-      STORAGE_S3_NAME: ${STORAGE_S3_NAME}
-      STORAGE_S3_ENDPOINT: ${STORAGE_S3_ENDPOINT}
+      # S3 storage — uncomment and set STORAGE_TYPE=s3 in .env to use.
+      # Leave commented for local storage; passing blank values fails validation.
+      # STORAGE_S3_REGION: ${STORAGE_S3_REGION}
+      # STORAGE_S3_NAME: ${STORAGE_S3_NAME}
+      # STORAGE_S3_ENDPOINT: ${STORAGE_S3_ENDPOINT}
 
       ENCRYPTION_KEY: ${ENCRYPTION_KEY}
       FALLBACK_ENCRYPTION_KEY: ${FALLBACK_ENCRYPTION_KEY}
 
-      EMAIL_FROM_ADDRESS: ${EMAIL_FROM_ADDRESS}
-      EMAIL_FROM_NAME: ${EMAIL_FROM_NAME}
-      EMAIL_DRIVER: ${EMAIL_DRIVER}
-      EMAIL_SMTP_HOST: ${EMAIL_SMTP_HOST}
-      EMAIL_SMTP_PORT: ${EMAIL_SMTP_PORT}
-      EMAIL_SMTP_USER: ${EMAIL_SMTP_USER}
-      EMAIL_SMTP_PASSWORD: ${EMAIL_SMTP_PASSWORD}
+      # Email — defaults to the LOGGER driver (logs emails) when unset.
+      # Uncomment and set these in .env to send real email via SMTP.
+      # EMAIL_FROM_ADDRESS: ${EMAIL_FROM_ADDRESS}
+      # EMAIL_FROM_NAME: ${EMAIL_FROM_NAME}
+      # EMAIL_DRIVER: ${EMAIL_DRIVER}
+      # EMAIL_SMTP_HOST: ${EMAIL_SMTP_HOST}
+      # EMAIL_SMTP_PORT: ${EMAIL_SMTP_PORT}
+      # EMAIL_SMTP_USER: ${EMAIL_SMTP_USER}
+      # EMAIL_SMTP_PASSWORD: ${EMAIL_SMTP_PASSWORD}
     depends_on:
       db:
         condition: service_healthy
