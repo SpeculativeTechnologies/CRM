@@ -22,6 +22,8 @@ export default defineConfig(({ mode }) => {
   const {
     VITE_BUILD_SOURCEMAP,
     VITE_HOST,
+    VITE_ALLOWED_HOSTS,
+    VITE_PROXY_API_TO,
     SSL_CERT_PATH,
     SSL_KEY_PATH,
     REACT_APP_PORT,
@@ -31,6 +33,41 @@ export default defineConfig(({ mode }) => {
   const port = isNonEmptyString(REACT_APP_PORT)
     ? parseInt(REACT_APP_PORT)
     : 3001;
+
+  // When VITE_PROXY_API_TO is set, the dev server forwards backend routes to it
+  // so the frontend and API share a single origin (needed to expose dev through
+  // one tunnel, and for clean OAuth callbacks). Prefixes are the backend's
+  // controller/GraphQL routes; everything else falls through to Vite (the SPA).
+  // Regex keys avoid collisions with frontend routes that share a prefix:
+  // `^/auth(/|$)` excludes the SPA's `/authorize`, and `^/s/` excludes `/sync`
+  // and `/settings`.
+  const buildApiProxy = (target: string) => {
+    const prefixes = [
+      '/metadata',
+      '/admin-panel',
+      '/client-config',
+      '/rest',
+      '/oauth',
+      '/apps',
+      '/app/billing',
+      '/webhooks',
+      '/healthz',
+      '/mcp',
+      '/files',
+      '/file',
+      '/public-assets',
+      '/.well-known',
+    ];
+    const proxy: Record<string, { target: string; changeOrigin: boolean; ws?: boolean }> = {
+      '/graphql': { target, changeOrigin: true, ws: true },
+      '^/auth(/|$)': { target, changeOrigin: true },
+      '^/s/': { target, changeOrigin: true },
+    };
+    for (const prefix of prefixes) {
+      proxy[prefix] = { target, changeOrigin: true };
+    }
+    return proxy;
+  };
 
   const CHUNK_SIZE_WARNING_LIMIT = 1024 * 1024; // 1MB
   // Please don't increase this limit for main index chunk
@@ -51,6 +88,19 @@ export default defineConfig(({ mode }) => {
     server: {
       port: port,
       ...(VITE_HOST ? { host: VITE_HOST } : {}),
+      // Comma-separated hostnames allowed to reach the dev server (e.g. when
+      // proxied through a tunnel/reverse proxy). Use "true" to allow any host.
+      ...(isNonEmptyString(VITE_ALLOWED_HOSTS)
+        ? {
+            allowedHosts:
+              VITE_ALLOWED_HOSTS === 'true'
+                ? true
+                : VITE_ALLOWED_HOSTS.split(',').map((host) => host.trim()),
+          }
+        : {}),
+      ...(isNonEmptyString(VITE_PROXY_API_TO)
+        ? { proxy: buildApiProxy(VITE_PROXY_API_TO) }
+        : {}),
       ...(SSL_KEY_PATH && SSL_CERT_PATH
         ? {
             protocol: 'https',
@@ -70,7 +120,48 @@ export default defineConfig(({ mode }) => {
       },
     },
 
+    // `vite preview` serves the production build (bundled -> few requests, so it
+    // streams cleanly over a tunnel, unlike dev mode's ~1900 module requests).
+    // Runs on its own port so the public/tunnelled build and a local dev server
+    // can coexist, both proxying the API to the same backend.
+    preview: {
+      port: isNonEmptyString(env.VITE_PREVIEW_PORT)
+        ? parseInt(env.VITE_PREVIEW_PORT)
+        : 3010,
+      ...(VITE_HOST ? { host: VITE_HOST } : {}),
+      ...(isNonEmptyString(VITE_ALLOWED_HOSTS)
+        ? {
+            allowedHosts:
+              VITE_ALLOWED_HOSTS === 'true'
+                ? true
+                : VITE_ALLOWED_HOSTS.split(',').map((host) => host.trim()),
+          }
+        : {}),
+      ...(isNonEmptyString(VITE_PROXY_API_TO)
+        ? { proxy: buildApiProxy(VITE_PROXY_API_TO) }
+        : {}),
+    },
+
     plugins: [
+      // In dev, Vite serves index.html with an empty window._env_ placeholder
+      // (it is only populated by the server/inject script in prod). When the
+      // app is reached via a non-localhost host (e.g. a tunnel), getDefaultUrl()
+      // would resolve the API to the same origin and 404. Inject the configured
+      // server base URL so the frontend hits the right backend.
+      {
+        name: 'inject-runtime-env-dev',
+        transformIndexHtml(html: string) {
+          if (!isNonEmptyString(env.REACT_APP_SERVER_BASE_URL)) {
+            return html;
+          }
+          return html.replace(
+            /<script id="twenty-env-config">[\s\S]*?<\/script>/,
+            `<script id="twenty-env-config">window._env_ = ${JSON.stringify(
+              { REACT_APP_SERVER_BASE_URL: env.REACT_APP_SERVER_BASE_URL },
+            )};</script>`,
+          );
+        },
+      },
       react({
         plugins: [['@lingui/swc-plugin', {}]],
       }),
