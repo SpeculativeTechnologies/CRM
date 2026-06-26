@@ -1,27 +1,66 @@
 import { ViewFilterOperand, ViewType, defineView } from 'twenty-sdk/define';
 
 import {
-  PARTNER_APPLICATIONS_VIEW_UNIVERSAL_IDENTIFIER,
-  PARTNER_OBJECT_UNIVERSAL_IDENTIFIER,
-} from 'src/constants/universal-identifiers';
+  PARTNER_COUNTRY_FIELD_UNIVERSAL_IDENTIFIER,
+  PARTNER_CREATED_AT_FIELD_UNIVERSAL_IDENTIFIER,
+  PARTNER_INTRODUCTION_FIELD_UNIVERSAL_IDENTIFIER,
+  PARTNER_NAME_FIELD_UNIVERSAL_IDENTIFIER,
+  PARTNER_VALIDATION_STAGE_FIELD_UNIVERSAL_IDENTIFIER,
+} from 'src/constants/partner-field-universal-identifiers';
+import { PARTNER_OBJECT_UNIVERSAL_IDENTIFIER } from 'src/constants/universal-identifiers';
+import { PARTNER_USER_ON_PARTNER_FIELD_ID } from 'src/fields/partner-user-on-partner.field';
 
-// Partners still in the application stage (not yet validated).
+export const PARTNER_APPLICATIONS_VIEW_UNIVERSAL_IDENTIFIER =
+  '8d8fc77b-77df-4eeb-9e0c-6409efd30a9c';
+
+// Naming: partner onboarding applicants — distinct from the Application object's "Applications" view.
 export default defineView({
   universalIdentifier: PARTNER_APPLICATIONS_VIEW_UNIVERSAL_IDENTIFIER,
-  name: 'Partner applications',
-  icon: 'IconUserPlus',
+  name: 'Partner Applications',
+  icon: 'IconInbox',
   objectUniversalIdentifier: PARTNER_OBJECT_UNIVERSAL_IDENTIFIER,
   type: ViewType.TABLE,
+  position: 2,
   fields: [
-    { universalIdentifier: 'b4f505d7-3849-4a74-a27f-1c91733702b5', fieldMetadataUniversalIdentifier: 'a0000001-0000-4000-8000-000000000001', position: 0, isVisible: true },
-    { universalIdentifier: '8a39e510-e533-4cd7-9b65-5e16b5f773d0', fieldMetadataUniversalIdentifier: '2ca9856f-f54a-4326-9ff3-668fd7da0b50', position: 1, isVisible: true },
-    { universalIdentifier: 'b92d7fd4-4a24-4333-89fe-5d726634d428', fieldMetadataUniversalIdentifier: 'd4fa6461-37b6-49ee-9181-dd482e74a70b', position: 2, isVisible: true },
-    { universalIdentifier: '2c34a120-b0f8-421b-9546-6483f1202d9f', fieldMetadataUniversalIdentifier: 'a77d7fa6-c398-47db-af0f-036a5c719f20', position: 3, isVisible: true },
+    {
+      universalIdentifier: 'cc7286fd-b37a-467a-a21a-47140f910137',
+      fieldMetadataUniversalIdentifier: PARTNER_NAME_FIELD_UNIVERSAL_IDENTIFIER,
+      position: 0,
+      isVisible: true,
+      size: 200,
+    },
+    {
+      universalIdentifier: 'c145da29-b040-4070-a726-562460b315c3',
+      fieldMetadataUniversalIdentifier: PARTNER_COUNTRY_FIELD_UNIVERSAL_IDENTIFIER,
+      position: 1,
+      isVisible: true,
+    },
+    {
+      universalIdentifier: '2d198c8a-0199-4b9f-ae07-255172ab6e7e',
+      fieldMetadataUniversalIdentifier: PARTNER_INTRODUCTION_FIELD_UNIVERSAL_IDENTIFIER,
+      position: 2,
+      isVisible: true,
+      size: 280,
+    },
+    {
+      universalIdentifier: '835c9a7e-72ec-46c5-8d90-39a02998f561',
+      fieldMetadataUniversalIdentifier: PARTNER_CREATED_AT_FIELD_UNIVERSAL_IDENTIFIER,
+      position: 3,
+      isVisible: true,
+      size: 180,
+    },
+    {
+      universalIdentifier: '0175e169-377c-4ff5-b0f0-c3359cac48d9',
+      fieldMetadataUniversalIdentifier: PARTNER_USER_ON_PARTNER_FIELD_ID,
+      position: 4,
+      isVisible: true,
+      size: 200,
+    },
   ],
   filters: [
     {
-      universalIdentifier: '210deb57-cfca-4086-b9da-ca346fbd3126',
-      fieldMetadataUniversalIdentifier: '2ca9856f-f54a-4326-9ff3-668fd7da0b50',
+      universalIdentifier: 'a1ef0bcd-6f2c-44fc-ab3d-11df2523a952',
+      fieldMetadataUniversalIdentifier: PARTNER_VALIDATION_STAGE_FIELD_UNIVERSAL_IDENTIFIER,
       operand: ViewFilterOperand.IS,
       value: ['APPLICATION'],
     },

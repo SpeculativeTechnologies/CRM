@@ -1,16 +1,17 @@
 import { Logger, Scope } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
+import { isNonEmptyString } from '@sniptt/guards';
 import { createUIMessageStream } from 'ai';
 import type {
   CodeExecutionData,
   ExtendedUIMessage,
   ExtendedUIMessagePart,
 } from 'twenty-shared/ai';
+import { isDefined } from 'twenty-shared/utils';
 import { Repository } from 'typeorm';
+import { v4 } from 'uuid';
 
-import { InjectWorkspaceScopedRepository } from 'src/engine/twenty-orm/workspace-scoped-repository/inject-workspace-scoped-repository.decorator';
-import { WorkspaceScopedRepository } from 'src/engine/twenty-orm/workspace-scoped-repository/workspace-scoped-repository';
 import { Process } from 'src/engine/core-modules/message-queue/decorators/process.decorator';
 import { Processor } from 'src/engine/core-modules/message-queue/decorators/processor.decorator';
 import { MessageQueue } from 'src/engine/core-modules/message-queue/message-queue.constants';
@@ -28,6 +29,8 @@ import { AgentChatService } from 'src/engine/metadata-modules/ai/ai-chat/service
 import { ChatExecutionService } from 'src/engine/metadata-modules/ai/ai-chat/services/chat-execution.service';
 import { getCancelChannel } from 'src/engine/metadata-modules/ai/ai-chat/utils/get-cancel-channel.util';
 import type { AiModelConfig } from 'src/engine/metadata-modules/ai/ai-models/types/ai-model-config.type';
+import { InjectWorkspaceScopedRepository } from 'src/engine/twenty-orm/workspace-scoped-repository/inject-workspace-scoped-repository.decorator';
+import { WorkspaceScopedRepository } from 'src/engine/twenty-orm/workspace-scoped-repository/workspace-scoped-repository';
 
 import { STREAM_AGENT_CHAT_JOB_NAME } from './stream-agent-chat-job-name.constant';
 import { type StreamAgentChatJobData } from './stream-agent-chat-job.types';
@@ -182,6 +185,8 @@ export class StreamAgentChatJob {
     abortSignal: AbortSignal;
   }): Promise<void> {
     return new Promise<void>((resolve, reject) => {
+      const assistantMessageId = v4();
+
       let streamUsage = {
         inputTokens: 0,
         outputTokens: 0,
@@ -228,6 +233,7 @@ export class StreamAgentChatJob {
             await this.chatExecutionService.streamChat({
               workspace,
               userWorkspaceId: data.userWorkspaceId,
+              threadId: data.threadId,
               messages: data.messages,
               browsingContext: data.browsingContext,
               modelId: data.modelId,
@@ -256,7 +262,8 @@ export class StreamAgentChatJob {
 
                 return error instanceof Error ? error.message : String(error);
               },
-              sendStart: false,
+              sendStart: true,
+              generateMessageId: () => assistantMessageId,
               messageMetadata: ({ part }) => {
                 return this.computeMessageMetadata({
                   part,
@@ -274,10 +281,14 @@ export class StreamAgentChatJob {
                   },
                 });
               },
-              onFinish: async ({ responseMessage }) => {
+              onFinish: async ({ responseMessage, isAborted }) => {
                 try {
                   await this.handleStreamFinish({
+                    assistantMessageId,
                     responseMessage,
+                    isAborted,
+                    streamError,
+                    outOfCredits: checkHasNoMoreAvailableCredits(),
                     threadId: data.threadId,
                     workspaceId: data.workspaceId,
                     userWorkspaceId: data.userWorkspaceId,
@@ -329,7 +340,10 @@ export class StreamAgentChatJob {
             await this.eventPublisherService.publish({
               threadId: data.threadId,
               workspaceId: data.workspaceId,
-              event: { type: 'message-persisted', messageId: data.threadId },
+              event: {
+                type: 'message-persisted',
+                messageId: assistantMessageId,
+              },
             });
             resolve();
           }
@@ -353,7 +367,6 @@ export class StreamAgentChatJob {
       type: string;
       usage?: {
         inputTokens?: number;
-        inputTokenDetails?: { cacheReadTokens?: number };
       };
       totalUsage?: {
         inputTokens?: number;
@@ -378,13 +391,12 @@ export class StreamAgentChatJob {
   }) {
     if (part.type === 'finish-step') {
       const stepInput = part.usage?.inputTokens ?? 0;
-      const stepCached = part.usage?.inputTokenDetails?.cacheReadTokens ?? 0;
       const stepCacheCreation = extractCacheCreationTokens(
         part.providerMetadata,
       );
 
       onUpdateCacheCreationTokens(totalCacheCreationTokens + stepCacheCreation);
-      onUpdateConversationSize(stepInput + stepCached + stepCacheCreation);
+      onUpdateConversationSize(stepInput);
     }
 
     if (part.type === 'finish') {
@@ -431,7 +443,11 @@ export class StreamAgentChatJob {
   }
 
   private async handleStreamFinish({
+    assistantMessageId,
     responseMessage,
+    isAborted,
+    streamError,
+    outOfCredits,
     threadId,
     workspaceId,
     userWorkspaceId,
@@ -441,7 +457,11 @@ export class StreamAgentChatJob {
     modelConfig,
     userMessagePromise,
   }: {
+    assistantMessageId: string;
     responseMessage: Omit<ExtendedUIMessage, 'id'>;
+    isAborted: boolean;
+    streamError: unknown;
+    outOfCredits: boolean;
     threadId: string;
     workspaceId: string;
     userWorkspaceId: string;
@@ -457,6 +477,23 @@ export class StreamAgentChatJob {
     modelConfig: AiModelConfig;
     userMessagePromise: Promise<{ turnId: string | null }>;
   }): Promise<void> {
+    const hasText = responseMessage.parts.some(
+      (part) => part.type === 'text' && isNonEmptyString(part.text),
+    );
+
+    if (isAborted || !hasText) {
+      this.logAssistantTurnWithoutText({
+        responseMessage,
+        isAborted,
+        streamError,
+        outOfCredits,
+        hasText,
+        threadId,
+        workspaceId,
+        streamUsage,
+      });
+    }
+
     if (responseMessage.parts.length === 0) {
       return;
     }
@@ -472,9 +509,20 @@ export class StreamAgentChatJob {
 
     const userMessage = await userMessagePromise;
 
+    if (
+      isDefined(userMessage.turnId) &&
+      (await this.agentChatService.hasAssistantMessageForTurn({
+        turnId: userMessage.turnId,
+        workspaceId,
+      }))
+    ) {
+      return;
+    }
+
     await this.agentChatService.addMessage({
       threadId,
       uiMessage: responseMessage,
+      id: assistantMessageId,
       turnId: userMessage.turnId ?? undefined,
       workspaceId,
     });
@@ -505,5 +553,58 @@ export class StreamAgentChatJob {
       userWorkspaceId,
       workspaceId,
     });
+  }
+
+  private logAssistantTurnWithoutText({
+    responseMessage,
+    isAborted,
+    streamError,
+    outOfCredits,
+    hasText,
+    threadId,
+    workspaceId,
+    streamUsage,
+  }: {
+    responseMessage: Omit<ExtendedUIMessage, 'id'>;
+    isAborted: boolean;
+    streamError: unknown;
+    outOfCredits: boolean;
+    hasText: boolean;
+    threadId: string;
+    workspaceId: string;
+    streamUsage: {
+      inputTokens: number;
+      outputTokens: number;
+    };
+  }): void {
+    const reason = isAborted
+      ? 'user-cancelled'
+      : streamError
+        ? 'stream-error'
+        : outOfCredits
+          ? 'credits-exhausted'
+          : 'empty-completion';
+
+    const errorDetail =
+      streamError instanceof Error
+        ? `${streamError.name}: ${streamError.message}`
+        : isDefined(streamError)
+          ? String(streamError)
+          : 'none';
+
+    this.logger.warn(
+      `[AI_CHAT_NO_TEXT] Assistant turn ended without a text reply — ` +
+        `reason=${reason}, threadId=${threadId}, workspaceId=${workspaceId}, ` +
+        `isAborted=${isAborted}, outOfCredits=${outOfCredits}, hasText=${hasText}, ` +
+        `streamError=${errorDetail}, ` +
+        `inputTokens=${streamUsage.inputTokens},` +
+        `responseMessage.parts=${JSON.stringify(responseMessage.parts)}`,
+    );
+
+    if (streamError instanceof Error && isDefined(streamError.stack)) {
+      this.logger.warn(
+        `[AI_CHAT_NO_TEXT] streamError stack — threadId=${threadId}: ${streamError.stack}`,
+      );
+    }
   }
 }

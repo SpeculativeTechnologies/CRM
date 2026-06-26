@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 
+import { isNonEmptyString, isObject } from '@sniptt/guards';
 import {
   convertToModelMessages,
   type LanguageModelUsage,
@@ -12,12 +13,12 @@ import {
   type UIMessage,
   type UITools,
 } from 'ai';
+import { type APP_LOCALES } from 'twenty-shared/translations';
 import { AppPath } from 'twenty-shared/types';
 import { getAppPath, isDefined } from 'twenty-shared/utils';
 
 import { MetricsService } from 'src/engine/core-modules/metrics/metrics.service';
 import { MetricsKeys } from 'src/engine/core-modules/metrics/types/metrics-keys.type';
-import { type ToolOutput } from 'src/engine/core-modules/tool/types/tool-output.type';
 import { UsageOperationType } from 'src/engine/core-modules/usage/enums/usage-operation-type.enum';
 
 import { type CodeExecutionStreamEmitter } from 'src/engine/core-modules/tool-provider/interfaces/code-execution-stream-emitter.type';
@@ -25,7 +26,6 @@ import { type CodeExecutionStreamEmitter } from 'src/engine/core-modules/tool-pr
 import { CodeInterpreterService } from 'src/engine/core-modules/code-interpreter/code-interpreter.service';
 import { WorkspaceDomainsService } from 'src/engine/core-modules/domain/workspace-domains/services/workspace-domains.service';
 import { ExceptionHandlerService } from 'src/engine/core-modules/exception-handler/exception-handler.service';
-import { NativeToolBinderService } from 'src/engine/metadata-modules/ai/ai-models/services/native-tool-binder.service';
 import { ToolRegistryService } from 'src/engine/core-modules/tool-provider/services/tool-registry.service';
 import {
   createExecuteToolTool,
@@ -35,6 +35,10 @@ import {
   LEARN_TOOLS_TOOL_NAME,
   LOAD_SKILL_TOOL_NAME,
 } from 'src/engine/core-modules/tool-provider/tools';
+import { estimateToolOutputTokens } from 'src/engine/core-modules/tool-provider/utils/estimate-tool-output-tokens.util';
+import { getToolMetricName } from 'src/engine/core-modules/tool-provider/utils/get-tool-metric-name.util';
+import { isToolOutputSuccessful } from 'src/engine/core-modules/tool-provider/utils/is-tool-output-successful.util';
+import { resolveToolName } from 'src/engine/core-modules/tool-provider/utils/resolve-tool-name.util';
 import { type WorkspaceEntity } from 'src/engine/core-modules/workspace/workspace.entity';
 import { AgentActorContextService } from 'src/engine/metadata-modules/ai/ai-agent-execution/services/agent-actor-context.service';
 import { AGENT_CONFIG } from 'src/engine/metadata-modules/ai/ai-agent/constants/agent-config.const';
@@ -56,11 +60,12 @@ import {
 } from 'src/engine/metadata-modules/ai/ai-chat/utils/extract-code-interpreter-files.util';
 import {
   getCacheProviderOptions,
-  getCallLevelCacheProviderOptions,
+  getCallLevelProviderOptions,
   injectCacheBreakpoint,
-} from 'src/engine/metadata-modules/ai/ai-chat/utils/inject-cache-breakpoint.util';
+} from 'src/engine/metadata-modules/ai/ai-chat/utils/provider-options.util';
 import { AI_TELEMETRY_CONFIG } from 'src/engine/metadata-modules/ai/ai-models/constants/ai-telemetry.const';
 import { AiModelRegistryService } from 'src/engine/metadata-modules/ai/ai-models/services/ai-model-registry.service';
+import { NativeToolBinderService } from 'src/engine/metadata-modules/ai/ai-models/services/native-tool-binder.service';
 import { type AiModelConfig } from 'src/engine/metadata-modules/ai/ai-models/types/ai-model-config.type';
 import { getNativeModelCapabilities } from 'src/engine/metadata-modules/ai/ai-models/utils/get-native-model-capabilities.util';
 import { SkillService } from 'src/engine/metadata-modules/skill/skill.service';
@@ -68,6 +73,7 @@ import { SkillService } from 'src/engine/metadata-modules/skill/skill.service';
 export type ChatExecutionOptions = {
   workspace: WorkspaceEntity;
   userWorkspaceId: string;
+  threadId?: string;
   messages: UIMessage<unknown, UIDataTypes, UITools>[];
   browsingContext: BrowsingContextType | null;
   onCodeExecutionUpdate?: CodeExecutionStreamEmitter;
@@ -105,6 +111,7 @@ export class ChatExecutionService {
   async streamChat({
     workspace,
     userWorkspaceId,
+    threadId,
     messages,
     browsingContext,
     onCodeExecutionUpdate,
@@ -119,19 +126,23 @@ export class ChatExecutionService {
         workspace.id,
       );
 
+    const locale = userContext.locale as keyof typeof APP_LOCALES;
+
     const toolContext = {
       workspaceId: workspace.id,
       roleId,
       actorContext,
       userId,
       userWorkspaceId,
+      threadId,
+      locale,
       onCodeExecutionUpdate,
     };
 
     const toolCatalog = await this.toolRegistry.buildToolIndex(
       workspace.id,
       roleId,
-      { userId, userWorkspaceId },
+      { userId, userWorkspaceId, locale },
     );
 
     const skillCatalog = await this.skillService.findAllFlatSkills(
@@ -145,7 +156,7 @@ export class ChatExecutionService {
     const preloadedTools = await this.toolRegistry.getToolsByName(
       AI_CHAT_TOOL_NAMES_TO_PRELOAD,
       toolContext,
-      { compactOutput: true },
+      { compactOutput: true, spillLargeOutput: true },
     );
 
     const resolvedModelId = modelId ?? workspace.smartModel;
@@ -168,7 +179,7 @@ export class ChatExecutionService {
     const nativeCapabilities = getNativeModelCapabilities(
       registeredModel.sdkPackage,
     );
-    const nativeBinding = this.nativeToolBinder.bind(registeredModel, {
+    const nativeTools = this.nativeToolBinder.bind(registeredModel, {
       webSearch: nativeCapabilities?.webSearch === true,
       twitterSearch: nativeCapabilities?.twitterSearch === true,
     });
@@ -178,12 +189,12 @@ export class ChatExecutionService {
     // serialized). execute_tool routes discovered tools through the registry.
     const directTools: ToolSet = {
       ...preloadedTools,
-      ...nativeBinding.tools,
+      ...nativeTools,
     };
 
     const preloadedToolNames = [
       ...Object.keys(preloadedTools),
-      ...Object.keys(nativeBinding.tools),
+      ...Object.keys(nativeTools),
     ];
 
     // ToolSet is constant for the entire conversation — no mutation.
@@ -197,7 +208,7 @@ export class ChatExecutionService {
       [EXECUTE_TOOL_TOOL_NAME]: createExecuteToolTool(
         this.toolRegistry,
         toolContext,
-        { compactOutput: true },
+        { compactOutput: true, spillLargeOutput: true },
       ),
       [LOAD_SKILL_TOOL_NAME]: createLoadSkillTool(
         (skillNames) =>
@@ -288,6 +299,7 @@ export class ChatExecutionService {
     const streamStartedAt = performance.now();
     let stepStartedAt = streamStartedAt;
     let ttftRecorded = false;
+    let stepIndex = 0;
 
     const emitTurnUsageEvent = async (steps: StepResult<ToolSet>[]) => {
       const usage = steps.reduce<LanguageModelUsage>(
@@ -399,10 +411,11 @@ export class ChatExecutionService {
       stopWhen: (step) =>
         stepCountIs(AGENT_CONFIG.MAX_STEPS)(step) || hasNoMoreAvailableCredits,
       experimental_telemetry: AI_TELEMETRY_CONFIG,
-      providerOptions: {
-        ...nativeBinding.providerOptions,
-        ...getCallLevelCacheProviderOptions(registeredModel.sdkPackage),
-      },
+      providerOptions: getCallLevelProviderOptions({
+        sdkPackage: registeredModel.sdkPackage,
+        providerOptions: undefined,
+        promptCacheKey: threadId,
+      }),
       prepareStep: ({ messages }) => {
         stepStartedAt = performance.now();
 
@@ -448,20 +461,95 @@ export class ChatExecutionService {
           hasNoMoreAvailableCredits = true;
         }
 
-        for (const toolResult of step.toolResults) {
-          const output = toolResult.output as ToolOutput | undefined;
+        this.logger.log(
+          `[AI_CHAT_TOKENS] step #${++stepIndex} — ` +
+            `toolCallIds=[${step.toolCalls.map((toolCall) => toolCall.toolCallId).join(', ')}]: ` +
+            `outputTokens=${step.usage.outputTokens ?? 0}, ` +
+            `reasoningTokens=${step.usage.outputTokenDetails?.reasoningTokens ?? 0}, ` +
+            `inputTokens(fullContext)=${step.usage.inputTokens ?? 0}, ` +
+            `cacheReadTokens=${step.usage.inputTokenDetails?.cacheReadTokens ?? 0}, ` +
+            `cacheWriteTokens=${step.usage.inputTokenDetails?.cacheWriteTokens ?? 0}, ` +
+            `cacheCreationTokens=${extractCacheCreationTokens(step.providerMetadata)}, ` +
+            `totalTokens=${step.usage.totalTokens ?? 0}`,
+        );
 
-          if (!isDefined(output?.success)) {
+        for (const part of step.content) {
+          if (part.type !== 'tool-result' && part.type !== 'tool-error') {
             continue;
           }
 
-          void this.metricsService.incrementCounterForEvent({
-            key: output.success
+          const succeeded =
+            part.type === 'tool-result' && isToolOutputSuccessful(part.output);
+
+          const outputTokens = estimateToolOutputTokens(
+            part.type === 'tool-result' ? part.output : part.error,
+          );
+
+          const executionAttributes = {
+            model: registeredModel.modelId,
+            tool: getToolMetricName(resolveToolName(part)),
+          };
+
+          this.metricsService.incrementCounterBy({
+            key: succeeded
               ? MetricsKeys.AiChatToolExecutionSucceeded
               : MetricsKeys.AiChatToolExecutionFailed,
-            attributes: { model: registeredModel.modelId },
-            shouldStoreInCache: false,
+            amount: 1,
+            attributes: executionAttributes,
           });
+
+          this.metricsService.recordHistogram({
+            key: MetricsKeys.AiChatToolOutputTokens,
+            value: outputTokens,
+            unit: 'token',
+            attributes: executionAttributes,
+          });
+
+          const { input } = part;
+
+          if (part.toolName === LEARN_TOOLS_TOOL_NAME) {
+            const learntToolNames =
+              isObject(input) && 'toolNames' in input
+                ? input.toolNames
+                : undefined;
+
+            for (const learntToolName of Array.isArray(learntToolNames)
+              ? learntToolNames.filter(isNonEmptyString)
+              : []) {
+              this.metricsService.incrementCounterBy({
+                key: succeeded
+                  ? MetricsKeys.AiChatToolLearnedSucceeded
+                  : MetricsKeys.AiChatToolLearnedFailed,
+                amount: 1,
+                attributes: {
+                  model: registeredModel.modelId,
+                  tool: getToolMetricName(learntToolName),
+                },
+              });
+            }
+          }
+
+          if (part.toolName === LOAD_SKILL_TOOL_NAME) {
+            const loadedSkillNames =
+              isObject(input) && 'skillNames' in input
+                ? input.skillNames
+                : undefined;
+
+            for (const loadedSkillName of Array.isArray(loadedSkillNames)
+              ? loadedSkillNames.filter(isNonEmptyString)
+              : []) {
+              this.metricsService.incrementCounterBy({
+                key: succeeded
+                  ? MetricsKeys.AiChatSkillLoadedSucceeded
+                  : MetricsKeys.AiChatSkillLoadedFailed,
+                amount: 1,
+                attributes: {
+                  model: registeredModel.modelId,
+                  skill: loadedSkillName,
+                },
+              });
+            }
+          }
         }
       },
       onAbort: async ({ steps }) => {

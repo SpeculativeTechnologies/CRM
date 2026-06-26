@@ -409,6 +409,7 @@
               "pages": [
                 "developers/extend/apps/logic/overview",
                 "developers/extend/apps/logic/logic-functions",
+                "developers/extend/apps/logic/key-value-store",
                 "developers/extend/apps/logic/skills-and-agents",
                 "developers/extend/apps/logic/connections"
               ]
@@ -431,6 +432,7 @@
               "pages": [
                 "developers/extend/apps/operations/overview",
                 "developers/extend/apps/operations/cli",
+                "developers/extend/apps/operations/sync-and-recovery",
                 "developers/extend/apps/operations/testing",
                 "developers/extend/apps/operations/publishing"
               ]
@@ -453,7 +455,6 @@
             "developers/self-host/capabilities/docker-compose",
             "developers/self-host/capabilities/setup",
             "developers/self-host/capabilities/upgrade-guide",
-            "developers/self-host/capabilities/cloud-providers",
             "developers/self-host/capabilities/troubleshooting"
           ]
         },

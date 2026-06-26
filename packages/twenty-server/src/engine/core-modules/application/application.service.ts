@@ -258,6 +258,21 @@ export class ApplicationService {
     });
   }
 
+  async findPrimaryPublicDomainName({
+    applicationId,
+    workspaceId,
+  }: {
+    applicationId: string;
+    workspaceId: string;
+  }): Promise<string | null> {
+    const application = await this.applicationRepository.findOne({
+      where: { id: applicationId, workspaceId },
+      relations: ['primaryPublicDomain'],
+    });
+
+    return application?.primaryPublicDomain?.domain ?? null;
+  }
+
   async findByUniversalIdentifier({
     universalIdentifier,
     workspaceId,
@@ -320,6 +335,15 @@ export class ApplicationService {
     },
     queryRunner?: QueryRunner,
   ) {
+    const existingApplication = await this.findByUniversalIdentifier({
+      universalIdentifier: TWENTY_STANDARD_APPLICATION.universalIdentifier,
+      workspaceId,
+    });
+
+    if (isDefined(existingApplication)) {
+      return existingApplication;
+    }
+
     const defaultPackageFields = await getDefaultApplicationPackageFields();
 
     const twentyStandardApplication = await this.create(
