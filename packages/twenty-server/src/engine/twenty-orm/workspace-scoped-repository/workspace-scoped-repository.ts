@@ -11,6 +11,7 @@ import {
   type SelectQueryBuilder,
   type UpdateResult,
 } from 'typeorm';
+import { isDefined } from 'twenty-shared/utils';
 import { type QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
 import { type UpsertOptions } from 'typeorm/repository/UpsertOptions';
 
@@ -104,8 +105,8 @@ export class WorkspaceScopedRepository<T extends WorkspaceScopedEntity> {
   ): Promise<number | null> {
     this.assertWorkspaceId(workspaceId);
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return this.repository.maximum(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       columnName as any,
       where
         ? this.mergeWorkspaceIdIntoCriteria(workspaceId, where)
@@ -208,6 +209,31 @@ export class WorkspaceScopedRepository<T extends WorkspaceScopedEntity> {
       this.stampWorkspaceIdOnEntities(workspaceId, entity),
       conflictPathsOrOptions,
     );
+  }
+
+  upsertAndReturnOne(
+    workspaceId: string,
+    entity: QueryDeepPartialEntity<T>,
+    conflictPaths: string[],
+  ): Promise<T> {
+    this.assertWorkspaceId(workspaceId);
+
+    return this.repository
+      .upsert(this.stampWorkspaceIdOnEntities(workspaceId, entity), {
+        conflictPaths,
+        returning: '*',
+      })
+      .then(({ generatedMaps }) => {
+        const [persistedRow] = generatedMaps;
+
+        if (!isDefined(persistedRow)) {
+          throw new Error(
+            'WorkspaceScopedRepository.upsertAndReturnOne: upsert returned no row.',
+          );
+        }
+
+        return this.repository.create(persistedRow as DeepPartial<T>);
+      });
   }
 
   save<E extends DeepPartial<T>>(
