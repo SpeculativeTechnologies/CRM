@@ -71,7 +71,9 @@ export const useCommandMenuHotKeys = () => {
     focusId: SIDE_PANEL_FOCUS_ID,
     dependencies: [goBackFromSidePanel],
     options: {
-      enableOnFormTags: false,
+      // Allow Escape while the search input is focused so it closes the
+      // command menu / search instead of being swallowed by the form tag.
+      enableOnFormTags: true,
     },
   });
 
