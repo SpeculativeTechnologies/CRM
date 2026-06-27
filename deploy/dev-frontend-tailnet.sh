@@ -8,7 +8,7 @@
 # with hot reload and view it from another computer on your tailnet.
 #
 # On the other computer: install Tailscale + log into the same account, then open
-#     http://spectech-llm-1.tail7ba35e.ts.net:3001
+#     http://spectech-llm.tail7ba35e.ts.net:3001
 #
 # Edits hot-reload live. API is proxied to the always-on backend (:3000).
 # Runs the dev server bound to the Tailscale IP only (not your LAN).
@@ -22,5 +22,5 @@ cd /Users/ben/Projects/twenty
 TSIP="$(/Applications/Tailscale.app/Contents/MacOS/Tailscale ip -4 2>/dev/null | head -1)"
 TSIP="${TSIP:-0.0.0.0}"
 echo "Serving live dev frontend on http://${TSIP}:3001 (tailnet) ..."
-echo "Open from another tailnet device: http://spectech-llm-1.tail7ba35e.ts.net:3001"
+echo "Open from another tailnet device: http://spectech-llm.tail7ba35e.ts.net:3001"
 exec npx nx start twenty-front -- --host "$TSIP"
