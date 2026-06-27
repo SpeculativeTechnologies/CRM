@@ -46,6 +46,90 @@
     </script>
     <!-- END: Twenty Config -->
 
+    <!-- Resilient chunk loading: when served behind a relay tunnel (e.g.
+         Tailscale Funnel) the cold-load burst of JS chunks can have a few
+         requests dropped, which silently fails a dynamic import() and leaves a
+         blank page. Reload once on such failures — already-fetched chunks are
+         cached, so the retry requests only the few that failed and succeeds.
+         Guarded so a genuinely broken deploy can't reload-loop forever. -->
+    <script>
+      (function () {
+        var KEY = 'twentyChunkReload';
+        var MAX = 3;
+        var WINDOW_MS = 30000;
+        function readState() {
+          try {
+            return JSON.parse(sessionStorage.getItem(KEY)) || { n: 0, t: 0 };
+          } catch (e) {
+            return { n: 0, t: 0 };
+          }
+        }
+        function recover() {
+          var s = readState();
+          if (Date.now() - s.t > WINDOW_MS) s = { n: 0, t: 0 };
+          if (s.n >= MAX) return;
+          try {
+            sessionStorage.setItem(
+              KEY,
+              JSON.stringify({ n: s.n + 1, t: Date.now() }),
+            );
+          } catch (e) {}
+          window.location.reload();
+        }
+        function clearState() {
+          try {
+            sessionStorage.removeItem(KEY);
+          } catch (e) {}
+        }
+        function isChunkError(msg) {
+          return (
+            typeof msg === 'string' &&
+            /dynamically imported module|module script failed|loading chunk|importing a module/i.test(
+              msg,
+            )
+          );
+        }
+        // Vite dispatches this when a dynamically-imported chunk fails to load.
+        window.addEventListener('vite:preloadError', function (event) {
+          if (event && event.preventDefault) event.preventDefault();
+          recover();
+        });
+        // Failed <script>/<link> resource loads fire a non-bubbling error event,
+        // so listen in the capture phase and match our hashed asset URLs.
+        window.addEventListener(
+          'error',
+          function (e) {
+            var target = e && e.target;
+            var url = target && (target.src || target.href);
+            if (url && url.indexOf('/assets/') !== -1) {
+              recover();
+              return;
+            }
+            if (e && isChunkError(e.message)) recover();
+          },
+          true,
+        );
+        window.addEventListener('unhandledrejection', function (e) {
+          var reason = e && e.reason;
+          if (reason && isChunkError(reason.message || String(reason)))
+            recover();
+        });
+        // Safety net: if the app still hasn't mounted shortly after load, a
+        // chunk was almost certainly dropped — reload (cached chunks make the
+        // retry small). Clears the guard once the app mounts successfully.
+        window.addEventListener('load', function () {
+          setTimeout(function () {
+            var root = document.getElementById('root');
+            if (root && root.childElementCount > 0) {
+              clearState();
+              return;
+            }
+            recover();
+          }, 9000);
+        });
+      })();
+    </script>
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script type="module">
       const disableInputAutoZoom = () => {
