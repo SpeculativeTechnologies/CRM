@@ -59,7 +59,13 @@ proxy.on('error', (err, _req, res) => {
 });
 
 const serve = sirv(BUILD_DIR, {
-  dev: false,
+  // dev:true makes sirv stat files per-request instead of snapshotting the
+  // directory listing once at startup. The build dir is rewritten in place by
+  // publish-frontend.sh (new content-hashed /assets/* names each build); with
+  // dev:false this long-running server kept serving its startup snapshot and
+  // 404'd every new asset -> blank page on fresh loads. Per-request stat is
+  // negligible on this single-user stack and makes rebuilds self-healing.
+  dev: true,
   etag: true,
   single: true, // SPA fallback: serve index.html for unknown routes (/invite/...)
   setHeaders(res, pathname) {
