@@ -4,7 +4,7 @@ Twenty runs on this Mac and is reachable on the public internet at a stable URL
 via **Tailscale Funnel**, with the frontend served as a production build (which
 streams cleanly over a tunnel; live Vite dev mode does not — see below).
 
-Public URL: **https://spectech-llm-1.tail7ba35e.ts.net**
+Public URL: **https://spectech-llm.tail7ba35e.ts.net**
 (Sign in with the prefilled demo creds: `tim@apple.dev` / `Applecar2025`.)
 
 ## Architecture
@@ -78,6 +78,29 @@ volume. A **named Cloudflare tunnel** would give live hot-reload on a stable
 **crm.spec.tech** with no build-to-publish step — but it requires moving the
 `spec.tech` zone to Cloudflare (touches live Google email + Vercel site;
 reversible). See `deploy/setup-tunnel.sh` and the notes in git history.
+
+## Keeping in sync after a pull/merge (prevents the blank-screen bug)
+
+After merging `upstream/main`, the backend can declare new **non-nullable**
+GraphQL fields whose DB columns / cached metadata don't exist yet — the app then
+boots to a **blank screen** with `Cannot return null for non-nullable field
+View.isActive` (or `CommandMenuItem.isActive`, etc.). Fixing it needs two steps:
+
+```bash
+bash deploy/update-after-merge.sh
+```
+which runs (1) `database:migrate` to apply pending instance-command migrations
+(adds the columns) **and** (2) `cache:flat-cache-invalidate --all-metadata` to
+drop stale flat-entity maps in Redis (the migration alone is not enough — the
+"overridable" entities like View/CommandMenuItem are served from cache and keep
+returning null until invalidated). The always-on backend picks up the new schema
+on the next request — no restart needed.
+
+This runs **automatically** via the git `post-merge` hook
+(`.git/hooks/post-merge`) whenever a pull/merge touches server entities or
+instance-command migrations. (The hook is local to this clone — `.git/hooks` is
+not version-controlled — so after a re-clone reinstall it with
+`cp deploy/git-hooks/post-merge .git/hooks/post-merge`.)
 
 ## Env files
 - `packages/twenty-front/.env`: `VITE_HOST=127.0.0.1` (so the tunnel can reach

@@ -27,12 +27,24 @@ until pg_isready -h localhost -p 5432 -q 2>/dev/null; do sleep 2; done
 until redis-cli -h localhost -p 6379 ping 2>/dev/null | grep -q PONG; do sleep 2; done
 echo "[serve-public] datastores up; starting services"
 
+WKPID=""
 npx nx run twenty-server:start & SVPID=$!
-npx nx run twenty-server:worker & WKPID=$!
-( cd packages/twenty-front && npx vite preview ) & PVPID=$!
+node deploy/serve-frontend.mjs & PVPID=$!
 
 # Tear down all children when this script is told to stop.
 trap 'kill $SVPID $WKPID $PVPID 2>/dev/null' EXIT INT TERM
+
+# Start the worker only AFTER the API server has finished `rimraf dist` + build
+# and is listening on :3000. The server (start) and worker both compile into the
+# SAME dist/, and the server's `rimraf dist` wipes the worker's freshly-built
+# files mid-run -> MODULE_NOT_FOUND crash-loop. Sequencing avoids that race.
+echo "[serve-public] waiting for backend :3000 before starting worker..."
+until curl -sf -o /dev/null --max-time 3 http://127.0.0.1:3000/healthz 2>/dev/null; do
+  kill -0 $SVPID 2>/dev/null || { echo "[serve-public] backend died during startup; exiting so launchd restarts"; exit 1; }
+  sleep 3
+done
+echo "[serve-public] backend up; starting worker"
+npx nx run twenty-server:worker & WKPID=$!
 
 # If any component dies, exit so launchd (KeepAlive) restarts the whole stack.
 # (macOS ships bash 3.2, which lacks `wait -n`, so poll the PIDs.)

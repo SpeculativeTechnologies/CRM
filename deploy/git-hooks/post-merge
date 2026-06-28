@@ -1,0 +1,20 @@
+#!/bin/bash
+# Auto-sync the local backend DB schema + metadata cache after a pull/merge,
+# whenever the merge touched server entities or instance-command migrations.
+# Prevents the post-merge BLANK SCREEN caused by newly non-nullable GraphQL
+# fields whose columns/flat-cache don't exist yet
+# ("Cannot return null for non-nullable field ...").
+# See deploy/update-after-merge.sh and deploy/LOCAL-DEV.md.
+set -uo pipefail
+REPO_ROOT="/Users/ben/Projects/twenty"
+
+# Files changed by this merge (pre-merge HEAD is ORIG_HEAD).
+changed="$(git diff-tree -r --name-only --no-commit-id ORIG_HEAD HEAD 2>/dev/null || true)"
+
+if printf '%s\n' "$changed" | grep -qE 'packages/twenty-server/src/database/commands/upgrade-version-command/|\.entity\.ts$|packages/twenty-server/src/database/typeorm/'; then
+  echo "[post-merge] backend schema files changed — syncing DB + metadata cache (deploy/update-after-merge.sh)"
+  bash "$REPO_ROOT/deploy/update-after-merge.sh" \
+    || echo "[post-merge] sync reported an error; run it manually: bash deploy/update-after-merge.sh"
+else
+  echo "[post-merge] no backend schema changes in this merge — skipping DB sync"
+fi
