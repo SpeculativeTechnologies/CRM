@@ -1,35 +1,55 @@
+import { isNonEmptyString } from '@sniptt/guards';
 import { type ObjectRecord } from 'twenty-shared/types';
 import { isDefined } from 'twenty-shared/utils';
 
-import { hasRecordFieldValue } from 'src/engine/api/graphql/graphql-query-runner/utils/has-record-field-value.util';
-
-// The person avatar lives across two fields: avatarUrl (deprecated, still the image identifier)
-// and avatarFile. They must stay consistent, so we always carry both from the same source record.
+// The person avatar lives across two fields, but only avatarFile is rendered (see getAvatarUrl
+// on the frontend, which returns avatarFile[0].url for people); avatarUrl is deprecated. We still
+// carry both from the same source record so the merged record stays internally consistent.
 export const PERSON_AVATAR_FIELD_NAMES = ['avatarUrl', 'avatarFile'] as const;
 
-// When merging people, the avatar comes from the most recently updated record that has one,
-// regardless of which record was chosen as the merge priority.
+// A person shows placeholder initials unless avatarFile holds an actual file, so that is what
+// distinguishes a real image from a placeholder. avatarUrl is ignored on purpose: a record with
+// only avatarUrl set still renders as a placeholder.
+const hasDisplayableAvatarImage = (record: ObjectRecord): boolean => {
+  const avatarFile = record.avatarFile;
+
+  if (!Array.isArray(avatarFile) || avatarFile.length === 0) {
+    return false;
+  }
+
+  const firstFile = avatarFile[0];
+
+  return (
+    isDefined(firstFile) &&
+    (isNonEmptyString(firstFile.fileId) || isNonEmptyString(firstFile.url))
+  );
+};
+
+// When merging people, keep the avatar from the most recently updated record that has an actual
+// image, regardless of which record was chosen as the merge priority. Records showing only
+// placeholder initials are ignored, so an older real photo always wins over a newer placeholder.
 export const getNewestPersonAvatarFieldValues = (
   recordsToMerge: ObjectRecord[],
 ): Partial<ObjectRecord> => {
-  const recordsWithAvatar = recordsToMerge.filter((record) =>
-    PERSON_AVATAR_FIELD_NAMES.some((fieldName) =>
-      hasRecordFieldValue(record[fieldName]),
-    ),
+  const recordsWithAvatarImage = recordsToMerge.filter(
+    hasDisplayableAvatarImage,
   );
 
-  if (recordsWithAvatar.length === 0) {
+  if (recordsWithAvatarImage.length === 0) {
     return {};
   }
 
-  const newestRecordWithAvatar = recordsWithAvatar.reduce((newest, candidate) =>
-    getUpdatedAtTime(candidate) > getUpdatedAtTime(newest) ? candidate : newest,
+  const newestRecordWithAvatarImage = recordsWithAvatarImage.reduce(
+    (newest, candidate) =>
+      getUpdatedAtTime(candidate) > getUpdatedAtTime(newest)
+        ? candidate
+        : newest,
   );
 
   return Object.fromEntries(
     PERSON_AVATAR_FIELD_NAMES.map((fieldName) => [
       fieldName,
-      newestRecordWithAvatar[fieldName] ?? null,
+      newestRecordWithAvatarImage[fieldName] ?? null,
     ]),
   );
 };
