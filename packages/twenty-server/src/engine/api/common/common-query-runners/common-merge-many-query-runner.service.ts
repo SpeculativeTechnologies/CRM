@@ -533,12 +533,21 @@ export class CommonMergeManyQueryRunnerService extends CommonBaseQueryRunnerServ
 
   async processQueryResult(
     queryResult: ObjectRecord,
-    _flatObjectMetadata: FlatObjectMetadata,
-    _flatObjectMetadataMaps: FlatEntityMaps<FlatObjectMetadata>,
-    _flatFieldMetadataMaps: FlatEntityMaps<FlatFieldMetadata>,
-    _authContext: WorkspaceAuthContext,
+    flatObjectMetadata: FlatObjectMetadata,
+    flatObjectMetadataMaps: FlatEntityMaps<FlatObjectMetadata>,
+    flatFieldMetadataMaps: FlatEntityMaps<FlatFieldMetadata>,
+    authContext: WorkspaceAuthContext,
   ): Promise<ObjectRecord> {
-    return queryResult;
+    // Run the shared result getters (like every other mutation) so FILES fields such as the
+    // person avatarFile get their signed url resolved; without this the merged record carries
+    // only a fileId and the UI falls back to placeholder initials.
+    return this.commonResultGettersService.processRecord(
+      queryResult,
+      flatObjectMetadata,
+      flatObjectMetadataMaps,
+      flatFieldMetadataMaps,
+      authContext.workspace.id,
+    );
   }
 
   async validate(
