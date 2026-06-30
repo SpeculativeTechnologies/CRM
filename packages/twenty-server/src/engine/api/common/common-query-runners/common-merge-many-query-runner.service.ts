@@ -31,6 +31,10 @@ import {
 } from 'src/engine/api/common/types/common-query-args.type';
 import { buildColumnsToReturn } from 'src/engine/api/graphql/graphql-query-runner/utils/build-columns-to-return';
 import { buildColumnsToSelect } from 'src/engine/api/graphql/graphql-query-runner/utils/build-columns-to-select';
+import {
+  PERSON_AVATAR_FIELD_NAMES,
+  getNewestPersonAvatarFieldValues,
+} from 'src/engine/api/graphql/graphql-query-runner/utils/get-newest-person-avatar-field-values.util';
 import { hasRecordFieldValue } from 'src/engine/api/graphql/graphql-query-runner/utils/has-record-field-value.util';
 import { mergeFieldValues } from 'src/engine/api/graphql/graphql-query-runner/utils/merge-field-values.util';
 import { WorkspaceAuthContext } from 'src/engine/core-modules/auth/types/workspace-auth-context.type';
@@ -167,13 +171,23 @@ export class CommonMergeManyQueryRunnerService extends CommonBaseQueryRunnerServ
     context: CommonExtendedQueryRunnerContext,
     args: CommonExtendedInput<MergeManyQueryArgs>,
   ): Promise<ObjectRecord[]> {
-    const columnsToSelect = buildColumnsToSelect({
+    const columnsToSelect: Record<string, boolean> = buildColumnsToSelect({
       select: args.selectedFieldsResult.select,
       relations: args.selectedFieldsResult.relations,
       flatObjectMetadata: context.flatObjectMetadata,
       flatObjectMetadataMaps: context.flatObjectMetadataMaps,
       flatFieldMetadataMaps: context.flatFieldMetadataMaps,
     });
+
+    // The avatar fields are system fields excluded from the normal merge, so we select them
+    // (and updatedAt) explicitly to keep the newest person's avatar. See performDeepMerge.
+    if (this.isPersonObject(context.flatObjectMetadata)) {
+      columnsToSelect.updatedAt = true;
+
+      for (const avatarFieldName of PERSON_AVATAR_FIELD_NAMES) {
+        columnsToSelect[avatarFieldName] = true;
+      }
+    }
 
     const fetchedRecords = (await context.repository.find({
       where: { id: In(args.ids) },
@@ -312,7 +326,18 @@ export class CommonMergeManyQueryRunnerService extends CommonBaseQueryRunnerServ
       }
     });
 
+    if (this.isPersonObject(flatObjectMetadata)) {
+      Object.assign(
+        mergedResult,
+        getNewestPersonAvatarFieldValues(recordsToMerge),
+      );
+    }
+
     return mergedResult;
+  }
+
+  private isPersonObject(flatObjectMetadata: FlatObjectMetadata): boolean {
+    return flatObjectMetadata.nameSingular === 'person';
   }
 
   private shouldExcludeFieldFromMerge(
