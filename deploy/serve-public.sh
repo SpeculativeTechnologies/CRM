@@ -46,6 +46,16 @@ done
 echo "[serve-public] backend up; starting worker"
 npx nx run twenty-server:worker & WKPID=$!
 
+# Register all background cron jobs (messaging/calendar sync, trash cleanup,
+# webhook-subscription renewal, workflow crons, ...). The worker PROCESSES queued
+# jobs but does NOT schedule them; without this, repeatable crons never get
+# registered in Redis (bull:cron-queue:repeat empty) and Gmail/Calendar sync
+# stalls after the first batch ("Importing" forever). Run against the prebuilt
+# dist (NOT `nx run … command`, which rebuilds dist and trips the rimraf race).
+echo "[serve-public] registering background cron jobs..."
+( cd "$REPO_ROOT/packages/twenty-server" && node dist/command/command cron:register:all ) \
+  || echo "[serve-public] WARN: cron:register:all failed — sync/cleanup crons not scheduled"
+
 # If any component dies, exit so launchd (KeepAlive) restarts the whole stack.
 # (macOS ships bash 3.2, which lacks `wait -n`, so poll the PIDs.)
 while kill -0 $SVPID 2>/dev/null && kill -0 $WKPID 2>/dev/null && kill -0 $PVPID 2>/dev/null; do
