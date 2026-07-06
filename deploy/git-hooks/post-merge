@@ -11,7 +11,10 @@ REPO_ROOT="$(git rev-parse --show-toplevel)"
 # Files changed by this merge (pre-merge HEAD is ORIG_HEAD).
 changed="$(git diff-tree -r --name-only --no-commit-id ORIG_HEAD HEAD 2>/dev/null || true)"
 
-if printf '%s\n' "$changed" | grep -qE 'packages/twenty-server/src/database/commands/upgrade-version-command/|\.entity\.ts$|packages/twenty-server/src/database/typeorm/'; then
+# Herestring, NOT a pipe: `grep -q` exits at first match, and under pipefail a
+# SIGPIPE'd printf made the whole pipeline "fail" -> schema merges were
+# silently classified as no-schema and the DB sync skipped (bit us 2026-07-06).
+if grep -qE 'packages/twenty-server/src/database/commands/upgrade-version-command/|\.entity\.ts$|packages/twenty-server/src/database/typeorm/' <<<"$changed"; then
   echo "[post-merge] backend schema files changed — syncing DB + metadata cache (deploy/update-after-merge.sh)"
   bash "$REPO_ROOT/deploy/update-after-merge.sh" \
     || echo "[post-merge] sync reported an error; run it manually: bash deploy/update-after-merge.sh"
