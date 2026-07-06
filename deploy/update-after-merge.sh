@@ -30,7 +30,7 @@ export PATH="/opt/homebrew/bin:/opt/homebrew/opt/postgresql@16/bin:$PATH"
 eval "$(fnm env --shell bash)" 2>/dev/null || true
 fnm use 24.5.0 >/dev/null 2>&1 || true
 
-REPO_ROOT="/Users/ben/Projects/twenty"
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$REPO_ROOT"
 
 # Datastores must be up; if not, bail with a clear message instead of hanging.

@@ -15,7 +15,10 @@ import { createServer } from 'node:http';
 import httpProxy from 'http-proxy';
 import sirv from 'sirv';
 
-const BUILD_DIR = '/Users/ben/Projects/twenty/packages/twenty-front/build';
+const BUILD_DIR = new URL(
+  '../packages/twenty-front/build',
+  import.meta.url,
+).pathname;
 const PORT = Number(process.env.VITE_PREVIEW_PORT ?? 3010);
 const HOST = '127.0.0.1';
 const API_TARGET = process.env.VITE_PROXY_API_TO ?? 'http://127.0.0.1:3000';

@@ -6,7 +6,7 @@
 # ("Cannot return null for non-nullable field ...").
 # See deploy/update-after-merge.sh and deploy/LOCAL-DEV.md.
 set -uo pipefail
-REPO_ROOT="/Users/ben/Projects/twenty"
+REPO_ROOT="$(git rev-parse --show-toplevel)"
 
 # Files changed by this merge (pre-merge HEAD is ORIG_HEAD).
 changed="$(git diff-tree -r --name-only --no-commit-id ORIG_HEAD HEAD 2>/dev/null || true)"

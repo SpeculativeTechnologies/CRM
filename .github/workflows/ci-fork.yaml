@@ -1,0 +1,87 @@
+name: CI Fork
+
+# Slim, self-contained PR checks for SpeculativeTechnologies/CRM.
+# The upstream twentyhq workflows (ci-front, ci-server, ...) assume paid
+# 8-core runner labels and twentyhq-specific secrets, so they are disabled on
+# this fork. The `ci-fork-status-check` job below is the single required
+# status check for merging into main.
+#
+# push:main runs are near no-ops (affected base == HEAD) but populate the
+# node_modules cache that all PR branches restore from.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-fork-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+jobs:
+  checks:
+    timeout-minutes: 40
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          fetch-depth: 0
+      - name: Install dependencies
+        uses: ./.github/actions/yarn-install
+      - name: Resolve affected base
+        run: echo "NX_BASE=$(git merge-base origin/main HEAD)" >> "$GITHUB_ENV"
+      - name: Build shared packages
+        run: npx nx run-many -t build -p twenty-shared twenty-ui
+      - name: Typecheck affected
+        run: npx nx affected --nxBail -t typecheck --parallel=2 --base=$NX_BASE
+      - name: Lint affected
+        run: npx nx affected --nxBail -t lint --parallel=2 --base=$NX_BASE
+      # twenty-front unit tests run sharded in their own job below.
+      - name: Unit-test affected (except twenty-front)
+        run: npx nx affected --nxBail -t test --exclude=twenty-front --parallel=1 --base=$NX_BASE
+
+  front-tests:
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3]
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          fetch-depth: 0
+      - name: Install dependencies
+        uses: ./.github/actions/yarn-install
+      - name: Check whether twenty-front is affected
+        id: front-affected
+        run: |
+          NX_BASE=$(git merge-base origin/main HEAD)
+          if npx nx show projects --affected --base=$NX_BASE | grep -qx twenty-front; then
+            echo "affected=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "affected=false" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Build shared packages
+        if: steps.front-affected.outputs.affected == 'true'
+        run: npx nx run-many -t build -p twenty-shared twenty-ui
+      - name: Front / Write .env
+        if: steps.front-affected.outputs.affected == 'true'
+        run: npx nx reset:env twenty-front
+      - name: Unit-test twenty-front (shard ${{ matrix.shard }}/3)
+        if: steps.front-affected.outputs.affected == 'true'
+        run: npx nx test twenty-front --shard=${{ matrix.shard }}/3
+
+  # Single stable name to mark as the required status check on main.
+  ci-fork-status-check:
+    if: always() && !cancelled()
+    timeout-minutes: 5
+    runs-on: ubuntu-latest
+    needs: [checks, front-tests]
+    steps:
+      - name: Fail if any needed job failed
+        if: contains(needs.*.result, 'failure')
+        run: exit 1

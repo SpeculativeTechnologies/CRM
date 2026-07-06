@@ -19,7 +19,9 @@ export PATH="/opt/homebrew/bin:/opt/homebrew/opt/postgresql@16/bin:$PATH"
 eval "$(fnm env --shell bash)" 2>/dev/null || true
 fnm use 24.5.0 >/dev/null 2>&1 || true
 
-REPO_ROOT="/Users/ben/Projects/twenty"
+# Resolve the repo this script lives in, so the same script works from any
+# clone (dev checkout, ~/Deploy/twenty, ...). The deploy clone is canonical.
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$REPO_ROOT"
 
 echo "[serve-public] waiting for postgres + redis..."
@@ -28,7 +30,8 @@ until redis-cli -h localhost -p 6379 ping 2>/dev/null | grep -q PONG; do sleep 2
 echo "[serve-public] datastores up; starting services"
 
 WKPID=""
-npx nx run twenty-server:start & SVPID=$!
+# 8GB heap: the default ~4GB has OOM'd under Gmail/Calendar sync + bulk imports.
+NODE_OPTIONS="--max-old-space-size=8192" npx nx run twenty-server:start & SVPID=$!
 node deploy/serve-frontend.mjs & PVPID=$!
 
 # Tear down all children when this script is told to stop.

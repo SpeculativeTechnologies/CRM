@@ -15,7 +15,7 @@ export PATH="/opt/homebrew/bin:$PATH"
 eval "$(fnm env --shell bash)" 2>/dev/null || true
 fnm use 24.5.0 >/dev/null 2>&1 || true
 
-REPO_ROOT="/Users/ben/Projects/twenty"
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$REPO_ROOT"
 
 echo "[publish] building frontend..."
