@@ -2,6 +2,15 @@
 
 How multiple people work on this fork without breaking the live instance.
 
+## Onboarding a new developer
+
+1. GitHub: invite to the `SpeculativeTechnologies` org (repo is public, but they
+   need write access to push branches).
+2. Tailscale: invite their device to the tailnet if they need to reach the
+   live CRM (it's served tailnet-only at https://spectech-llm.tail7ba35e.ts.net).
+3. They follow "Day-to-day development" below. CRM *user* accounts are separate
+   from all of this — invite via Settings → Members inside the app.
+
 ## The three copies of the code
 
 | Copy | Where | Purpose | Rule |
@@ -29,7 +38,14 @@ How multiple people work on this fork without breaking the live instance.
 
 ## PR rules
 
-- `main` is protected: no direct pushes, no force-pushes; PRs need CI green.
+- `main` is protected (active since 2026-07-05): no direct pushes, no
+  force-pushes; PRs can't merge until the `ci-fork-status-check` check passes.
+  No approval count is enforced — review obligations below are by convention.
+  Org admins can bypass in emergencies (`enforce_admins` is off).
+- "CI Fork" (`.github/workflows/ci-fork.yaml`) is the ONLY active workflow.
+  The 43 upstream twentyhq workflows are disabled — they need twentyhq's paid
+  runner labels and secrets, so they fail or queue forever here. Don't re-enable
+  them; extend ci-fork.yaml instead.
 - Anything touching these needs Ben's review before merge (highest blast
   radius — they run against the production database):
   - `*.entity.ts` files or migrations/instance commands
@@ -73,3 +89,11 @@ require the publish step. A full stack restart is only needed if
 `deploy/serve-public.sh` itself changed — see the restart procedure in
 `deploy/README.md` / serve-public-stack ops notes (kill ALL process patterns,
 verify :3000/:3010 are free, let keepalive relaunch).
+
+## Database backups
+
+The production database (`default` in local Postgres) is dumped nightly at
+3:30am by cron on Ben's Mac: `deploy/backup-db.sh` → `~/Backups/twenty/`
+(pg_restore custom format, 14-day retention, verified after each dump; log at
+`~/Backups/twenty/backup.log`). Restore instructions are in the script header.
+Dumps are on-box only — treat "the Mac died" as an unmitigated risk for now.
