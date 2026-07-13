@@ -28,7 +28,7 @@ import { Controller, type SubmitHandler, useForm } from 'react-hook-form';
 import { Key } from 'ts-key-enum';
 import { isDefined } from 'twenty-shared/utils';
 import { MainButton } from 'twenty-ui/input';
-import { themeCssVariables } from 'twenty-ui/theme-constants';
+import { MOBILE_VIEWPORT, themeCssVariables } from 'twenty-ui/theme-constants';
 import { z } from 'zod';
 
 const StyledForm = styled.div`
@@ -45,6 +45,11 @@ const StyledNameRow = styled.div`
   display: flex;
   gap: ${themeCssVariables.spacing[2]};
   width: 100%;
+
+  @media (max-width: ${MOBILE_VIEWPORT}px) {
+    align-items: stretch;
+    flex-direction: column;
+  }
 `;
 
 const StyledNameField = styled.div`
@@ -86,6 +91,8 @@ export const CreateProfile = () => {
     currentWorkspaceMembersState,
   );
   const { updateWorkspaceMemberSettings } = useUpdateWorkspaceMemberSettings();
+
+  const [isNavigating, setIsNavigating] = useState(false);
 
   const {
     control,
@@ -151,7 +158,9 @@ export const CreateProfile = () => {
         });
 
         setNextOnboardingStatus();
+        setIsNavigating(true);
       } catch (error: any) {
+        setIsNavigating(false);
         enqueueErrorSnackBar({
           apolloError: CombinedGraphQLErrors.is(error) ? error : undefined,
         });
@@ -279,7 +288,7 @@ export const CreateProfile = () => {
           <MainButton
             title={t`Continue`}
             onClick={handleSubmit(onSubmit)}
-            disabled={!isValid || isSubmitting}
+            disabled={!isValid || isSubmitting || isNavigating}
             fullWidth
           />
         </StyledButtonContainer>
