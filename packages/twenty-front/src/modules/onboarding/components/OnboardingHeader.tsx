@@ -1,12 +1,14 @@
-import { useOnboardingContentWidth } from '@/onboarding/hooks/useOnboardingContentWidth';
-import { useOnboardingMotionTransition } from '@/onboarding/hooks/useOnboardingMotionTransition';
+import { ONBOARDING_CONTENT_BLOCK_WIDTH } from '@/onboarding/constants/OnboardingContentBlockWidth';
 import { styled } from '@linaria/react';
-import { motion } from 'framer-motion';
 import { useLingui } from '@lingui/react/macro';
 import { isDefined } from 'twenty-shared/utils';
 import { IconChevronLeft, IconCoins, IconInfoCircle } from 'twenty-ui/icon';
 import { LightIconButton } from 'twenty-ui/input';
-import { themeCssVariables, useTheme } from 'twenty-ui/theme-constants';
+import {
+  MOBILE_VIEWPORT,
+  themeCssVariables,
+  useTheme,
+} from 'twenty-ui/theme-constants';
 
 const StyledHeader = styled.div`
   align-items: flex-start;
@@ -15,6 +17,10 @@ const StyledHeader = styled.div`
   justify-content: space-between;
   padding: ${themeCssVariables.spacing[8]} ${themeCssVariables.spacing[8]} 1px;
   width: 100%;
+
+  @media (max-width: ${MOBILE_VIEWPORT}px) {
+    padding: ${themeCssVariables.spacing[8]} ${themeCssVariables.spacing[4]} 1px;
+  }
 `;
 
 const StyledSide = styled.div`
@@ -28,14 +34,22 @@ const StyledSide = styled.div`
 const StyledLeftSide = styled(StyledSide)`
   justify-content: flex-end;
   padding-right: ${themeCssVariables.spacing[1]};
+
+  @media (max-width: ${MOBILE_VIEWPORT}px) {
+    justify-content: flex-start;
+  }
 `;
 
-const StyledCenter = styled.div<{ contentWidth: number }>`
+const StyledCenter = styled.div`
   align-items: center;
   display: flex;
-  flex: 0 1 ${({ contentWidth }) => `${contentWidth}px`};
+  flex: 0 1 ${ONBOARDING_CONTENT_BLOCK_WIDTH}px;
   justify-content: flex-start;
   min-width: 0;
+
+  @media (max-width: ${MOBILE_VIEWPORT}px) {
+    flex-basis: auto;
+  }
 `;
 
 const StyledRightSide = styled(StyledSide)`
@@ -43,15 +57,13 @@ const StyledRightSide = styled(StyledSide)`
   padding-left: ${themeCssVariables.spacing[1]};
 `;
 
-const StyledLogoBase = styled.div`
+const StyledLogo = styled.div`
   background-image: url('/images/integrations/twenty-logo.svg');
   background-size: cover;
   height: ${themeCssVariables.spacing[6]};
   opacity: 0.4;
   width: ${themeCssVariables.spacing[6]};
 `;
-
-const StyledLogo = motion.create(StyledLogoBase);
 
 const StyledFreeCredits = styled.div`
   align-items: center;
@@ -109,8 +121,6 @@ export const OnboardingHeader = ({
 }: OnboardingHeaderProps) => {
   const { t } = useLingui();
   const theme = useTheme();
-  const contentWidth = useOnboardingContentWidth();
-  const transition = useOnboardingMotionTransition();
 
   return (
     <StyledHeader>
@@ -125,8 +135,8 @@ export const OnboardingHeader = ({
           />
         )}
       </StyledLeftSide>
-      <StyledCenter contentWidth={contentWidth}>
-        <StyledLogo layout transition={transition} />
+      <StyledCenter>
+        <StyledLogo />
       </StyledCenter>
       <StyledRightSide>
         {isDefined(freeCredits) && (
