@@ -29,6 +29,22 @@ until pg_isready -h localhost -p 5432 -q 2>/dev/null; do sleep 2; done
 until redis-cli -h localhost -p 6379 ping 2>/dev/null | grep -q PONG; do sleep 2; done
 echo "[serve-public] datastores up; starting services"
 
+# twenty-shared is consumed through a node_modules symlink, and the server and
+# worker import its built entry bundles (dist/utils.cjs, dist/database-events.cjs,
+# ...). Nothing else in this script builds it, so a wiped or half-written dist
+# makes every generation die with MODULE_NOT_FOUND before :3000 ever binds --
+# and because we exit 1 on that, launchd restarts us into a tight loop.
+# (2026-07-21: 18 restarts, 328MB of log, site served only by a stale orphan.)
+# The nx build is cached, so this costs seconds when dist is already valid.
+echo "[serve-public] ensuring twenty-shared is built..."
+if ! npx nx build twenty-shared || [ ! -f packages/twenty-shared/dist/utils.cjs ]; then
+  echo "[serve-public] FATAL: twenty-shared build failed or dist is incomplete."
+  # Sleep before exiting: the supervisor restarts us immediately, and a fast
+  # exit here is what turns a build problem into a log-filling restart storm.
+  sleep 60
+  exit 1
+fi
+
 WKPID=""
 # 8GB heap: the default ~4GB has OOM'd under Gmail/Calendar sync + bulk imports.
 NODE_OPTIONS="--max-old-space-size=8192" npx nx run twenty-server:start & SVPID=$!
