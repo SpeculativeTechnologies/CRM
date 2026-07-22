@@ -1,20 +1,28 @@
+import { useStore } from 'jotai';
+
 import { useFirstConnectedAccount } from '@/activities/emails/hooks/useFirstConnectedAccount';
 import { useResolveDefaultEmailRecipient } from '@/activities/emails/hooks/useResolveDefaultEmailRecipient';
+import { massEmailPersonIdsState } from '@/activities/emails/mass-email/states/massEmailPersonIdsState';
 import { MAX_EMAIL_RECIPIENTS } from 'twenty-shared/constants';
 import { HeadlessEngineCommandWrapperEffect } from '@/command-menu-item/engine-command/components/HeadlessEngineCommandWrapperEffect';
 import { useHeadlessCommandContextApi } from '@/command-menu-item/engine-command/hooks/useHeadlessCommandContextApi';
 import { useFindManyRecords } from '@/object-record/hooks/useFindManyRecords';
 import { useOpenComposeEmailInSidePanel } from '@/side-panel/hooks/useOpenComposeEmailInSidePanel';
-import { useOpenMassEmailInSidePanel } from '@/side-panel/hooks/useOpenMassEmailInSidePanel';
-import { CoreObjectNameSingular, SettingsPath } from 'twenty-shared/types';
+import {
+  AppPath,
+  CoreObjectNameSingular,
+  SettingsPath,
+} from 'twenty-shared/types';
 import { isDefined } from 'twenty-shared/utils';
+import { useNavigateApp } from '~/hooks/useNavigateApp';
 import { useNavigateSettings } from '~/hooks/useNavigateSettings';
 
 export const ComposeEmailCommand = () => {
   const { connectedAccountId, loading: accountLoading } =
     useFirstConnectedAccount();
   const { openComposeEmailInSidePanel } = useOpenComposeEmailInSidePanel();
-  const { openMassEmailInSidePanel } = useOpenMassEmailInSidePanel();
+  const store = useStore();
+  const navigateApp = useNavigateApp();
   const navigateSettings = useNavigateSettings();
 
   const {
@@ -58,10 +66,11 @@ export const ComposeEmailCommand = () => {
     }
 
     if (isBulkPerson) {
-      openMassEmailInSidePanel({
-        connectedAccountId,
-        personIds: bulkPersonRecords.map((record) => record.id),
-      });
+      store.set(
+        massEmailPersonIdsState.atom,
+        bulkPersonRecords.map((record) => record.id),
+      );
+      navigateApp(AppPath.MassEmail);
 
       return;
     }

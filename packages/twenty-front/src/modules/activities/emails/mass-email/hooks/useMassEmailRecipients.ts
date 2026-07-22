@@ -17,6 +17,7 @@ export const useMassEmailRecipients = (personIds: string[]) => {
       id: true,
       name: true,
       emails: true,
+      avatarUrl: true,
       jobTitle: true,
       city: true,
       company: { id: true, name: true },
@@ -41,6 +42,8 @@ export const useMassEmailRecipients = (personIds: string[]) => {
         personId: record.id,
         email,
         displayName: placeholderValues.full_name || email,
+        avatarUrl:
+          typeof record.avatarUrl === 'string' ? record.avatarUrl : null,
         placeholderValues,
       },
     ];

@@ -106,6 +106,12 @@ export const useAdvancedTextEditor = (
       return marked.parse(defaultValue, { async: false }) as string;
     }
 
+    if (contentType === 'html') {
+      // TipTap parses HTML strings natively; the JSON-first fallback below
+      // would render the markup as literal text
+      return defaultValue;
+    }
+
     return getInitialAdvancedTextEditorContent(defaultValue);
   };
 

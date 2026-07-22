@@ -6,7 +6,6 @@ import { SidePanelAiChatThreadsPage } from '@/side-panel/pages/ai-chat-threads/c
 import { SidePanelAskAiPage } from '@/side-panel/pages/ask-ai/components/SidePanelAskAiPage';
 import { SidePanelCampaignComposerPage } from '@/side-panel/pages/compose-campaign/components/SidePanelCampaignComposerPage';
 import { SidePanelComposeEmailPage } from '@/side-panel/pages/compose-email/components/SidePanelComposeEmailPage';
-import { SidePanelMassEmailPage } from '@/side-panel/pages/mass-email/components/SidePanelMassEmailPage';
 import { SidePanelFrontComponentPage } from '@/side-panel/pages/front-component/components/SidePanelFrontComponentPage';
 import { SidePanelDashboardChartSettings } from '@/side-panel/pages/page-layout/components/dashboard/SidePanelDashboardChartSettings';
 import { SidePanelDashboardIframeSettings } from '@/side-panel/pages/page-layout/components/dashboard/SidePanelDashboardIframeSettings';
@@ -89,6 +88,5 @@ export const SIDE_PANEL_PAGES_CONFIG = new Map<SidePanelPages, React.ReactNode>(
     [SidePanelPages.CommandMenuEdit, <SidePanelCommandMenuItemEditPage />],
     [SidePanelPages.ComposeEmail, <SidePanelComposeEmailPage />],
     [SidePanelPages.ComposeCampaign, <SidePanelCampaignComposerPage />],
-    [SidePanelPages.MassEmail, <SidePanelMassEmailPage />],
   ],
 );

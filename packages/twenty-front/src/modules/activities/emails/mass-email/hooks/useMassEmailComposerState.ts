@@ -37,13 +37,16 @@ export const useMassEmailComposerState = ({
   );
   const [subjectTemplate, setSubjectTemplate] = useState('');
   const [bodyTemplate, setBodyTemplate] = useState('');
-  const [overrides, setOverrides] = useState<
-    Record<string, MassEmailOverride>
-  >({});
+  const [overrides, setOverrides] = useState<Record<string, MassEmailOverride>>(
+    {},
+  );
   const [excludedPersonIds, setExcludedPersonIds] = useState<string[]>([]);
 
-  const { recipients, skippedWithoutEmailCount, loading: recipientsLoading } =
-    useMassEmailRecipients(personIds);
+  const {
+    recipients,
+    skippedWithoutEmailCount,
+    loading: recipientsLoading,
+  } = useMassEmailRecipients(personIds);
 
   const { sendMassEmail, sending, sentCount } = useSendMassEmail();
 
@@ -84,8 +87,7 @@ export const useMassEmailComposerState = ({
             ...bodyResolution.missingPlaceholderKeys,
           ]),
         ],
-        isCustomized:
-          isDefined(override?.subject) || isDefined(override?.body),
+        isCustomized: isDefined(override?.subject) || isDefined(override?.body),
       };
     },
     [overrides, resolveBaseForRecipient],
@@ -119,10 +121,7 @@ export const useMassEmailComposerState = ({
 
         const nextOverrides = { ...previousOverrides };
 
-        if (
-          !isDefined(nextOverride.subject) &&
-          !isDefined(nextOverride.body)
-        ) {
+        if (!isDefined(nextOverride.subject) && !isDefined(nextOverride.body)) {
           delete nextOverrides[personId];
         } else {
           nextOverrides[personId] = nextOverride;
@@ -157,10 +156,7 @@ export const useMassEmailComposerState = ({
   }, []);
 
   const excludeRecipient = useCallback((personId: string) => {
-    setExcludedPersonIds((previousExcluded) => [
-      ...previousExcluded,
-      personId,
-    ]);
+    setExcludedPersonIds((previousExcluded) => [...previousExcluded, personId]);
   }, []);
 
   const canSend =
