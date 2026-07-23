@@ -29,7 +29,7 @@ const StyledEmptyState = styled.div`
 `;
 
 export const MassEmailPage = () => {
-  const personIds = useAtomStateValue(massEmailPersonIdsState);
+  const massEmailPersonIds = useAtomStateValue(massEmailPersonIdsState);
   const { connectedAccountId, loading: accountLoading } =
     useFirstConnectedAccount();
 
@@ -42,7 +42,7 @@ export const MassEmailPage = () => {
       objectNamePlural: CoreObjectNamePlural.Person,
     });
 
-  const hasRecipients = personIds.length > 0;
+  const hasRecipients = massEmailPersonIds.length > 0;
 
   return (
     <PageContainer>
@@ -75,7 +75,7 @@ export const MassEmailPage = () => {
       ) : (
         <MassEmailWorkspace
           connectedAccountId={connectedAccountId}
-          personIds={personIds}
+          personIds={massEmailPersonIds}
           onSent={goToPeople}
         />
       )}

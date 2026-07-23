@@ -154,7 +154,12 @@ export const MassEmailRecipientList = ({
           selected={selectedPersonId === null}
           onClick={() => onSelect(null)}
         >
-          <Avatar placeholder={t`Everyone`} Icon={IconUsers} size="lg" type="rounded" />
+          <Avatar
+            placeholder={t`Everyone`}
+            Icon={IconUsers}
+            size="lg"
+            type="rounded"
+          />
           <StyledRowText>
             <StyledRowTitle>{t`Everyone`}</StyledRowTitle>
             <StyledRowSubtitle>
@@ -163,9 +168,8 @@ export const MassEmailRecipientList = ({
           </StyledRowText>
         </StyledRow>
         {visibleRecipients.map((recipient) => {
-          const isCustomized = composerState.resolveForRecipient(
-            recipient,
-          ).isCustomized;
+          const isCustomized =
+            composerState.resolveForRecipient(recipient).isCustomized;
 
           return (
             <StyledRow

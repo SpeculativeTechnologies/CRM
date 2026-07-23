@@ -182,9 +182,7 @@ export const MassEmailComposeCard = ({
                 dropdownId="mass-email-from-account"
                 value={composerState.connectedAccountId}
                 options={accountOptions}
-                onChange={(value) =>
-                  composerState.setConnectedAccountId(value)
-                }
+                onChange={(value) => composerState.setConnectedAccountId(value)}
               />
             ) : (
               (currentAccountHandle ?? '')
@@ -210,7 +208,12 @@ export const MassEmailComposeCard = ({
               </>
             ) : (
               <>
-                <Avatar Icon={IconUsers} placeholder={t`Everyone`} size="sm" type="rounded" />
+                <Avatar
+                  Icon={IconUsers}
+                  placeholder={t`Everyone`}
+                  size="sm"
+                  type="rounded"
+                />
                 {t`Everyone`}
                 <StyledSecondaryText>
                   {t`${recipientCount} recipients`}
@@ -221,7 +224,9 @@ export const MassEmailComposeCard = ({
         </StyledFieldRow>
         <StyledSubjectInput
           value={
-            isDefined(resolved) ? resolved.subject : composerState.subjectTemplate
+            isDefined(resolved)
+              ? resolved.subject
+              : composerState.subjectTemplate
           }
           onChange={(event) => {
             if (isDefined(selectedRecipient)) {
