@@ -111,6 +111,12 @@ const StandalonePageLayoutPage = lazy(() =>
   })),
 );
 
+const MassEmailPage = lazy(() =>
+  import('~/pages/mass-email/MassEmailPage').then((module) => ({
+    default: module.MassEmailPage,
+  })),
+);
+
 const NotFound = lazy(() =>
   import('~/pages/not-found/NotFound').then((module) => ({
     default: module.NotFound,
@@ -163,6 +169,14 @@ const createWorkspaceAppRouter = (
                 element={
                   <LazyRoute>
                     <StandalonePageLayoutPage />
+                  </LazyRoute>
+                }
+              />
+              <Route
+                path={AppPath.MassEmail}
+                element={
+                  <LazyRoute>
+                    <MassEmailPage />
                   </LazyRoute>
                 }
               />
