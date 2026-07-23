@@ -280,6 +280,12 @@ msgstr "{0} hanno annullato l’iscrizione a questo argomento"
 msgid "{0} selected"
 msgstr "{0} selezionati"
 
+#. js-lingui-id: uE0AHs
+#. placeholder {0}: composerState.skippedWithoutEmailCount
+#: src/modules/activities/emails/mass-email/components/MassEmailRecipientList.tsx
+msgid "{0} selected people have no email address and were skipped."
+msgstr ""
+
 #. js-lingui-id: peiknr
 #. placeholder {0}: activeFilterLabels.length
 #. placeholder {0}: activeSortLabels.length
@@ -546,6 +552,11 @@ msgstr ""
 msgid "{positionLabel} record holds priority"
 msgstr "Il record {positionLabel} ha la priorità"
 
+#. js-lingui-id: M71PWW
+#: src/modules/activities/emails/mass-email/components/MassEmailComposeCard.tsx
+msgid "{recipientCount} recipients"
+msgstr ""
+
 #. js-lingui-id: 5d0hY6
 #: src/modules/settings/admin-panel/health-status/hooks/useRetryJobs.ts
 #: src/modules/settings/admin-panel/health-status/hooks/useRetryJobs.ts
@@ -606,6 +617,11 @@ msgstr "{stepCount, plural, one {# passaggio} other {# passaggi}}"
 #: src/pages/settings/accounts/SettingsAccountsConfigurationStepCalendar.tsx
 msgid "{stepNumber}. Calendar"
 msgstr "{stepNumber}. Calendario"
+
+#. js-lingui-id: NcsiO/
+#: src/modules/activities/emails/mass-email/hooks/useSendMassEmail.ts
+msgid "{successCount} emails sent"
+msgstr ""
 
 #. js-lingui-id: bI/mcH
 #: src/modules/settings/applications/hooks/useComputeApplicationContentForLayoutAndLogic.ts
@@ -4355,6 +4371,11 @@ msgstr "Connetti {providerDisplayName}"
 msgid "Connect a new account to your workspace"
 msgstr "Collega un nuovo account al tuo workspace"
 
+#. js-lingui-id: 2OzvqP
+#: src/pages/mass-email/MassEmailPage.tsx
+msgid "Connect account"
+msgstr ""
+
 #. js-lingui-id: CMrq4R
 #: src/modules/settings/mcp-and-apis/utils/buildMcpSetupCategories.tsx
 msgid "Connect additional MCP clients using install links or client docs."
@@ -4364,6 +4385,11 @@ msgstr "Collega ulteriori client MCP usando i link di installazione o la documen
 #: src/pages/settings/ai/components/SettingsAiOverviewTab.tsx
 msgid "Connect AI assistants like Claude or Cursor to your workspace via the Model Context Protocol"
 msgstr "Collega gli assistenti AI come Claude o Cursor al tuo spazio di lavoro tramite il Model Context Protocol"
+
+#. js-lingui-id: CcYWYM
+#: src/pages/mass-email/MassEmailPage.tsx
+msgid "Connect an email account to send emails."
+msgstr ""
 
 #. js-lingui-id: YLx3sC
 #: src/modules/settings/accounts/components/SettingsAccountsListEmptyStateCard.tsx
@@ -5406,6 +5432,11 @@ msgstr "Personalizza ciò che questo utente può visualizzare ed eseguire"
 #: src/modules/settings/security/components/SettingsSecuritySettings.tsx
 msgid "Customize your workspace security"
 msgstr "Personalizza la sicurezza del tuo workspace"
+
+#. js-lingui-id: xMd3+1
+#: src/modules/activities/emails/mass-email/components/MassEmailComposeCard.tsx
+msgid "Customized for this recipient"
+msgstr ""
 
 #. js-lingui-id: fFwMZv
 #: src/modules/settings/data-model/fields/forms/select/components/SettingsDataModelFieldSelectFormOptionRow.tsx
@@ -6709,6 +6740,12 @@ msgstr "Modifica tabella dei record"
 msgid "Edit Records on All Objects"
 msgstr "Modificare record su tutti gli oggetti"
 
+#. js-lingui-id: CvRD+4
+#. placeholder {0}: composerState.includedRecipients.length
+#: src/modules/activities/emails/mass-email/components/MassEmailRecipientList.tsx
+msgid "Edit template · {0} recipients"
+msgstr ""
+
 #. js-lingui-id: eMFB6/
 #: src/modules/views/view-picker/components/ViewPickerContentEditMode.tsx
 msgid "Edit view"
@@ -7638,6 +7675,10 @@ msgid "every minute"
 msgstr "ogni minuto"
 
 #. js-lingui-id: PsQmAw
+#: src/modules/activities/emails/mass-email/components/MassEmailComposeCard.tsx
+#: src/modules/activities/emails/mass-email/components/MassEmailComposeCard.tsx
+#: src/modules/activities/emails/mass-email/components/MassEmailRecipientList.tsx
+#: src/modules/activities/emails/mass-email/components/MassEmailRecipientList.tsx
 #: src/modules/object-record/object-options-dropdown/components/ObjectOptionsDropdownVisibilityContent.tsx
 msgid "Everyone"
 msgstr "Tutti"
@@ -8617,6 +8658,7 @@ msgstr "Francese"
 #. js-lingui-id: ejVYRQ
 #: src/modules/activities/emails/components/CampaignComposerFields.tsx
 #: src/modules/activities/emails/components/EmailComposerFields.tsx
+#: src/modules/activities/emails/mass-email/components/MassEmailComposeCard.tsx
 msgid "From"
 msgstr "Da"
 
@@ -8821,6 +8863,11 @@ msgstr "Vai al portale di fatturazione"
 #: src/modules/workflow/components/OverrideWorkflowDraftConfirmationModal.tsx
 msgid "Go to Draft"
 msgstr "Vai alla Bozza"
+
+#. js-lingui-id: MrE/Qb
+#: src/pages/mass-email/MassEmailPage.tsx
+msgid "Go to People"
+msgstr ""
 
 #. js-lingui-id: mT57+Q
 #: src/modules/object-record/record-table/empty-state/components/RecordTableEmptyStateRemote.tsx
@@ -11082,6 +11129,11 @@ msgstr "Marketplace"
 msgid "Marketplace catalog synchronization started."
 msgstr "Sincronizzazione del catalogo del marketplace avviata."
 
+#. js-lingui-id: EvNy5N
+#: src/pages/mass-email/MassEmailPage.tsx
+msgid "Mass email"
+msgstr ""
+
 #. js-lingui-id: 8r6vNs
 #. placeholder {0}: fieldLabel ?? ''
 #: src/modules/spreadsheet-import/steps/components/MatchColumnsStep/components/UnmatchColumn.tsx
@@ -11349,6 +11401,11 @@ msgstr "Minuti tra i trigger"
 #: src/modules/workflow/workflow-steps/workflow-actions/components/WorkflowEditActionCreateCalendarEvent.tsx
 msgid "Missing calendar permission."
 msgstr "Autorizzazione calendario mancante."
+
+#. js-lingui-id: kVXdHR
+#: src/modules/activities/emails/mass-email/components/MassEmailComposeCard.tsx
+msgid "Missing data for:"
+msgstr ""
 
 #. js-lingui-id: URVUmK
 #: src/modules/workflow/workflow-steps/workflow-actions/components/WorkflowEditActionEmailBase.tsx
@@ -12487,6 +12544,16 @@ msgstr "Nessun permesso configurato per questa applicazione."
 #: src/modules/settings/roles/role-permissions/object-level-permissions/components/SettingsRolePermissionsObjectLevelSection.tsx
 msgid "No permissions have been set for individual objects."
 msgstr "Nessuna autorizzazione è stata impostata per gli oggetti individuali."
+
+#. js-lingui-id: O9dD65
+#: src/modules/activities/emails/mass-email/components/MassEmailRecipientList.tsx
+msgid "No recipients match your search."
+msgstr ""
+
+#. js-lingui-id: JPmCmL
+#: src/pages/mass-email/MassEmailPage.tsx
+msgid "No recipients selected."
+msgstr ""
 
 #. js-lingui-id: 5sv+ia
 #: src/modules/activities/emails/hooks/useSendMessageCampaign.ts
@@ -13746,6 +13813,11 @@ msgstr "Permessi · {objectLabelSingular}"
 #: src/modules/activities/emails/recipients/components/EmailRecipientChipMenuContent.tsx
 msgid "Person created"
 msgstr "Persona creata"
+
+#. js-lingui-id: FaMom6
+#: src/modules/activities/emails/mass-email/components/MassEmailComposeCard.tsx
+msgid "Personalize for each recipient with placeholders:"
+msgstr ""
 
 #. js-lingui-id: zmwvG2
 #: src/modules/object-record/record-field/ui/meta-types/input/components/PhonesFieldInput.tsx
@@ -15374,6 +15446,7 @@ msgid "SDK"
 msgstr "SDK"
 
 #. js-lingui-id: A1taO8
+#: src/modules/activities/emails/mass-email/components/MassEmailRecipientList.tsx
 #: src/modules/command-menu-item/engine-command/constants/EngineComponentKeyHeadlessComponentMap.tsx
 #: src/modules/command-menu-item/engine-command/constants/EngineComponentKeyHeadlessComponentMap.tsx
 #: src/modules/navigation/components/MobileNavigationBar.tsx
@@ -16041,6 +16114,11 @@ msgstr "Seleziona la lingua preferita"
 msgid "Send"
 msgstr "Invia"
 
+#. js-lingui-id: zKE0So
+#: src/modules/activities/emails/mass-email/components/MassEmailComposeCard.tsx
+msgid "Send {recipientCount} emails"
+msgstr ""
+
 #. js-lingui-id: mjK8F3
 #: src/pages/settings/members/tabs/SettingsWorkspaceMembersInviteTab.tsx
 msgid "Send an invite email to your team"
@@ -16072,6 +16150,12 @@ msgstr "Spedisci email tramite account collegati"
 msgid "Send invitations"
 msgstr "Invia inviti"
 
+#. js-lingui-id: 34Qpoa
+#. placeholder {0}: composerState.sentCount
+#: src/modules/activities/emails/mass-email/components/MassEmailComposeCard.tsx
+msgid "Sending {0}/{recipientCount}…"
+msgstr ""
+
 #. js-lingui-id: ULtHaJ
 #: src/pages/settings/communications/SettingsWorkspaceCommunicationGroupChannelDetail.tsx
 msgid "Sending domain"
@@ -16098,6 +16182,13 @@ msgstr "Invio in corso..."
 #: src/modules/workflow/workflow-run/observability/WorkflowRunStepLogsEmailDetail.tsx
 msgid "Sent"
 msgstr "Inviato"
+
+#. js-lingui-id: 7/XV81
+#. placeholder {0}: emails.length
+#. placeholder {1}: failedRecipients.join(', ')
+#: src/modules/activities/emails/mass-email/hooks/useSendMassEmail.ts
+msgid "Sent {successCount} of {0} emails. Failed: {1}"
+msgstr ""
 
 #. js-lingui-id: hdVMzO
 #: src/modules/settings/accounts/components/SettingsAccountsMessageAutoCreationCard.tsx
@@ -16966,6 +17057,7 @@ msgstr ""
 #: src/modules/activities/emails/components/CampaignComposerFields.tsx
 #: src/modules/activities/emails/components/EmailComposerFields.tsx
 #: src/modules/activities/emails/components/EmailComposerFields.tsx
+#: src/modules/activities/emails/mass-email/components/MassEmailComposeCard.tsx
 #: src/modules/workflow/workflow-steps/workflow-actions/components/WorkflowEditActionEmailBase.tsx
 msgid "Subject"
 msgstr "Oggetto"
@@ -18039,6 +18131,7 @@ msgstr "Titolo"
 #. js-lingui-id: /jQctM
 #: src/modules/activities/emails/components/CampaignComposerFields.tsx
 #: src/modules/activities/emails/components/EmailComposerFields.tsx
+#: src/modules/activities/emails/mass-email/components/MassEmailComposeCard.tsx
 #: src/modules/workflow/workflow-run/observability/WorkflowRunStepLogsEmailDetail.tsx
 #: src/modules/workflow/workflow-steps/workflow-actions/components/WorkflowEditActionEmailBase.tsx
 msgid "To"
@@ -20196,6 +20289,11 @@ msgstr "Scrivi una descrizione"
 #: src/pages/settings/ai/forms/components/SettingsAiAgentForm.tsx
 msgid "Write a description for this agent"
 msgstr "Scrivi una descrizione per questo agente"
+
+#. js-lingui-id: gnkeuQ
+#: src/modules/activities/emails/mass-email/components/MassEmailComposeCard.tsx
+msgid "Write your email…"
+msgstr ""
 
 #. js-lingui-id: zeCIJi
 #: src/modules/settings/logic-functions/components/tabs/SettingsLogicFunctionCodeEditorTab.tsx
