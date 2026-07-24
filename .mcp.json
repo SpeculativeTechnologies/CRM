@@ -9,7 +9,7 @@
     "playwright": {
       "type": "stdio",
       "command": "npx",
-      "args": ["@playwright/mcp@latest", "--no-sandbox", "--headless"],
+      "args": ["@playwright/mcp@latest", "--no-sandbox", "--headless", "--browser", "chromium"],
       "env": {}
     },
     "context7": {
