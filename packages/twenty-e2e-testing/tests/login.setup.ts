@@ -27,10 +27,23 @@ test('Login test', async ({ loginPage, page }) => {
       await loginPage.clickSignInButton();
       await page.waitForLoadState('networkidle');
       await expect(page.getByText(/Welcome, .+/)).not.toBeVisible();
-      await expect(page.getByText('Choose a workspace')).toBeVisible();
-      await page.getByText('Apple', {exact: true}).click();
-      await page.waitForFunction(() => window.location.href.includes('verify'));
-      await page.waitForFunction(() => !window.location.href.includes('verify'));
+
+      const workspacePicker = page.getByText('Choose a workspace');
+      const appNavigation = page.getByRole('link', { name: 'Companies' });
+
+      await expect(workspacePicker.or(appNavigation)).toBeVisible();
+
+      if (await workspacePicker.isVisible()) {
+        await page.getByText('Apple', { exact: true }).click();
+        await page.waitForFunction(() =>
+          window.location.href.includes('verify'),
+        );
+        await page.waitForFunction(
+          () => !window.location.href.includes('verify'),
+        );
+      }
+
+      await expect(appNavigation).toBeVisible();
       process.env.LINK = page.url();
     },
   );

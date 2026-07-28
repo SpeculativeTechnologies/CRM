@@ -124,6 +124,7 @@ const getRecordSeedsBatches = (
   workspaceId: string,
   attachmentSeeds: RecordSeedConfig['recordSeeds'],
   _featureFlags?: Record<FeatureFlagKey, boolean>,
+  light = false,
 ): RecordSeedConfig[][] => {
   // Batch 1: No dependencies
   const batch1: RecordSeedConfig[] = [
@@ -232,7 +233,7 @@ const getRecordSeedsBatches = (
     {
       tableName: 'calendarEventParticipant',
       pgColumns: CALENDAR_EVENT_PARTICIPANT_DATA_SEED_COLUMNS,
-      recordSeeds: getCalendarEventParticipantDataSeeds(workspaceId),
+      recordSeeds: getCalendarEventParticipantDataSeeds(workspaceId, light),
     },
     {
       tableName: 'message',
@@ -251,7 +252,7 @@ const getRecordSeedsBatches = (
     {
       tableName: 'messageParticipant',
       pgColumns: MESSAGE_PARTICIPANT_DATA_SEED_COLUMNS,
-      recordSeeds: getMessageParticipantDataSeeds(workspaceId),
+      recordSeeds: getMessageParticipantDataSeeds(workspaceId, light),
     },
     {
       tableName: 'attachment',
@@ -375,6 +376,7 @@ export class DevSeederDataService {
       workspaceId,
       attachmentSeeds,
       featureFlags,
+      light,
     );
 
     // Process batches sequentially (respecting dependencies)

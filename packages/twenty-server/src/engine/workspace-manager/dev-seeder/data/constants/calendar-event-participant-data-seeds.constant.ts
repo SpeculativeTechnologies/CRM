@@ -4,6 +4,7 @@ import {
   WORKSPACE_MEMBER_DATA_SEED_IDS,
   getWorkspaceMemberDataSeeds,
 } from 'src/engine/workspace-manager/dev-seeder/data/constants/workspace-member-data-seeds.constant';
+import { getRecordSeedsForMode } from 'src/engine/workspace-manager/dev-seeder/data/utils/get-record-seeds-for-mode.util';
 import { CalendarEventParticipantResponseStatus } from 'src/modules/calendar/common/standard-objects/calendar-event-participant.workspace-entity';
 
 export type CalendarEventParticipantDataSeed = {
@@ -273,6 +274,7 @@ const CREATE_EVENT_PARTICIPANTS = (
 
 const GENERATE_CALENDAR_EVENT_PARTICIPANT_SEEDS = (
   workspaceId: string,
+  light: boolean,
 ): CalendarEventParticipantDataSeed[] => {
   const PARTICIPANT_SEEDS: CalendarEventParticipantDataSeed[] = [];
   let PARTICIPANT_INDEX = 1;
@@ -283,18 +285,21 @@ const GENERATE_CALENDAR_EVENT_PARTICIPANT_SEEDS = (
         key as keyof typeof CALENDAR_EVENT_DATA_SEED_IDS
       ],
   );
+  const EVENT_IDS_FOR_MODE = getRecordSeedsForMode(EVENT_IDS, light);
 
   const PERSON_IDS = Object.keys(PERSON_DATA_SEED_IDS).map(
     (key) => PERSON_DATA_SEED_IDS[key as keyof typeof PERSON_DATA_SEED_IDS],
   );
-  const WORKSPACE_MEMBER_IDS = getWorkspaceMemberDataSeeds(workspaceId).map(
-    (member) => member.id,
-  );
+  const PERSON_IDS_FOR_MODE = getRecordSeedsForMode(PERSON_IDS, light);
+  const WORKSPACE_MEMBER_IDS = getRecordSeedsForMode(
+    getWorkspaceMemberDataSeeds(workspaceId),
+    light,
+  ).map((member) => member.id);
 
-  for (const EVENT_ID of EVENT_IDS) {
+  for (const EVENT_ID of EVENT_IDS_FOR_MODE) {
     const RESULT = CREATE_EVENT_PARTICIPANTS(
       EVENT_ID,
-      PERSON_IDS,
+      PERSON_IDS_FOR_MODE,
       WORKSPACE_MEMBER_IDS,
       PARTICIPANT_INDEX,
     );
@@ -308,6 +313,7 @@ const GENERATE_CALENDAR_EVENT_PARTICIPANT_SEEDS = (
 
 export const getCalendarEventParticipantDataSeeds = (
   workspaceId: string,
+  light = false,
 ): CalendarEventParticipantDataSeed[] => {
-  return GENERATE_CALENDAR_EVENT_PARTICIPANT_SEEDS(workspaceId);
+  return GENERATE_CALENDAR_EVENT_PARTICIPANT_SEEDS(workspaceId, light);
 };

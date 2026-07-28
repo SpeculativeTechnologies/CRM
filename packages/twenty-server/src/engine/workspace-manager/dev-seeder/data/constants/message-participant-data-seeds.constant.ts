@@ -6,6 +6,7 @@ import {
   WORKSPACE_MEMBER_DATA_SEED_IDS,
   getWorkspaceMemberDataSeeds,
 } from 'src/engine/workspace-manager/dev-seeder/data/constants/workspace-member-data-seeds.constant';
+import { getRecordSeedsForMode } from 'src/engine/workspace-manager/dev-seeder/data/utils/get-record-seeds-for-mode.util';
 
 export type MessageParticipantDataSeed = {
   id: string;
@@ -274,6 +275,7 @@ const CREATE_MESSAGE_PARTICIPANTS = (
 
 const GENERATE_MESSAGE_PARTICIPANT_SEEDS = (
   workspaceId: string,
+  light: boolean,
 ): MessageParticipantDataSeed[] => {
   const PARTICIPANT_SEEDS: MessageParticipantDataSeed[] = [];
   let PARTICIPANT_INDEX = 1;
@@ -281,18 +283,21 @@ const GENERATE_MESSAGE_PARTICIPANT_SEEDS = (
   const MESSAGE_IDS = Object.keys(MESSAGE_DATA_SEED_IDS).map(
     (key) => MESSAGE_DATA_SEED_IDS[key as keyof typeof MESSAGE_DATA_SEED_IDS],
   );
+  const MESSAGE_IDS_FOR_MODE = getRecordSeedsForMode(MESSAGE_IDS, light);
 
   const PERSON_IDS = Object.keys(PERSON_DATA_SEED_IDS).map(
     (key) => PERSON_DATA_SEED_IDS[key as keyof typeof PERSON_DATA_SEED_IDS],
   );
-  const WORKSPACE_MEMBER_IDS = getWorkspaceMemberDataSeeds(workspaceId).map(
-    (member) => member.id,
-  );
+  const PERSON_IDS_FOR_MODE = getRecordSeedsForMode(PERSON_IDS, light);
+  const WORKSPACE_MEMBER_IDS = getRecordSeedsForMode(
+    getWorkspaceMemberDataSeeds(workspaceId),
+    light,
+  ).map((member) => member.id);
 
-  for (const MESSAGE_ID of MESSAGE_IDS) {
+  for (const MESSAGE_ID of MESSAGE_IDS_FOR_MODE) {
     const RESULT = CREATE_MESSAGE_PARTICIPANTS(
       MESSAGE_ID,
-      PERSON_IDS,
+      PERSON_IDS_FOR_MODE,
       WORKSPACE_MEMBER_IDS,
       PARTICIPANT_INDEX,
     );
@@ -306,6 +311,7 @@ const GENERATE_MESSAGE_PARTICIPANT_SEEDS = (
 
 export const getMessageParticipantDataSeeds = (
   workspaceId: string,
+  light = false,
 ): MessageParticipantDataSeed[] => {
-  return GENERATE_MESSAGE_PARTICIPANT_SEEDS(workspaceId);
+  return GENERATE_MESSAGE_PARTICIPANT_SEEDS(workspaceId, light);
 };
