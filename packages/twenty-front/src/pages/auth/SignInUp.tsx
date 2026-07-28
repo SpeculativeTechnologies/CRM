@@ -126,7 +126,7 @@ export const SignInUp = () => {
       return t`Welcome to your workspace`;
     }
 
-    return t`Welcome, ${workspaceName}.`;
+    return `${t`Welcome, ${workspaceName}.`}_TEST`;
   }, [
     workspaceInviteHash,
     signInUpStep,
