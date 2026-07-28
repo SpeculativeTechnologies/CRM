@@ -2,6 +2,14 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Fork workflow — mandatory
+
+This fork runs the live Speculative Technologies CRM; it is not a sandbox.
+Before modifying anything, read `AGENTS.md` and
+`deploy/LLM-LOCAL-DEV.md` in full. Treat `deploy/TEAM-WORKFLOW.md` as the
+authoritative promotion and review process. Never push directly to `main`,
+merge a pull request, or initiate staging or production deployment.
+
 ## Project Overview
 
 Twenty is an open-source CRM built with modern technologies in a monorepo structure. The codebase is organized as an Nx workspace with multiple packages.
@@ -199,18 +207,6 @@ IMPORTANT: Use Context7 for code generation, setup or configuration steps, or li
 - Use `@testing-library/user-event` for realistic interactions
 - Descriptive test names: "should [behavior] when [condition]"
 - Clear mocks between tests with `jest.clearAllMocks()`
-
-## Working on a developer machine
-
-Read `deploy/LLM-LOCAL-DEV.md` before changing anything in this fork. It covers
-environment boundaries (production runs from a different checkout on the owner's
-Mac), which dataset to install, how schema changes are verified and promoted,
-and how to handle the mirrored CRM data that local databases contain.
-
-Choosing a dataset: `bash deploy/local-data.sh seed` for UI work,
-`bash deploy/local-data.sh mirror` for anything touching entities, migrations,
-workspace upgrades, views, or search. The fixture lacks this fork's seven custom
-objects, so migrations that pass against it can still fail in production.
 
 ## Dev Environment Setup
 
