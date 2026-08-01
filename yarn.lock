@@ -5465,6 +5465,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@electric-sql/pglite@npm:0.2.17":
+  version: 0.2.17
+  resolution: "@electric-sql/pglite@npm:0.2.17"
+  checksum: 10c0/4358eccb2a3de5148b8995c7dbf3cad2d80a2a193885838ec19e0381ca204c0e37f721d006ad23fcad0b694ec6089a6786b82f2ad87f18344c82e059ff37017f
+  languageName: node
+  linkType: hard
+
 "@emnapi/core@npm:1.10.0":
   version: 1.10.0
   resolution: "@emnapi/core@npm:1.10.0"
@@ -49855,6 +49862,7 @@ __metadata:
     "@dagrejs/dagre": "npm:^1.1.8"
     "@dnd-kit/react": "npm:^0.3.2"
     "@dr.pogodin/react-helmet": "npm:^3.2.2"
+    "@electric-sql/pglite": "npm:0.2.17"
     "@floating-ui/react": "npm:^0.24.3"
     "@fontsource/dm-mono": "npm:^5.2.7"
     "@fontsource/inter": "npm:^5.2.8"
