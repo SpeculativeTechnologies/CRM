@@ -26,6 +26,7 @@ describe('people merge resolvers (integration)', () => {
   let createdNoteIdsForCleaning: string[] = [];
   let createdNoteTargetIdsForCleaning: string[] = [];
   let createdTimelineActivityIdsForCleaning: string[] = [];
+  let createdMessageListIdsForCleaning: string[] = [];
 
   afterEach(async () => {
     await deleteRecordsByIds(
@@ -34,6 +35,18 @@ describe('people merge resolvers (integration)', () => {
     );
     await deleteRecordsByIds('noteTarget', createdNoteTargetIdsForCleaning);
     await deleteRecordsByIds('note', createdNoteIdsForCleaning);
+
+    if (createdMessageListIdsForCleaning.length > 0) {
+      await global.testDataSource.query(
+        `DELETE FROM "${TEST_SCHEMA_NAME}"."messageListMember" WHERE "listId" = ANY($1)`,
+        [createdMessageListIdsForCleaning],
+      );
+      await global.testDataSource.query(
+        `DELETE FROM "${TEST_SCHEMA_NAME}"."messageList" WHERE "id" = ANY($1)`,
+        [createdMessageListIdsForCleaning],
+      );
+    }
+
     await deleteRecordsByIds('opportunity', createdOpportunityIdsForCleaning);
 
     if (createdPersonIdsForCleaning.length > 0) {
@@ -57,6 +70,7 @@ describe('people merge resolvers (integration)', () => {
     createdNoteTargetIdsForCleaning = [];
     createdTimelineActivityIdsForCleaning = [];
     createdPersonIdsForCleaning = [];
+    createdMessageListIdsForCleaning = [];
   });
 
   describe('merging composite fields', () => {
@@ -962,6 +976,72 @@ describe('people merge resolvers (integration)', () => {
       expect(
         findOpportunityResponse.body.data.opportunity.pointOfContactId,
       ).toBe(survivorPersonId);
+    });
+
+    it('should merge people who belong to the same message list', async () => {
+      const createPersonsOperation = createManyOperationFactory({
+        objectMetadataSingularName: 'person',
+        objectMetadataPluralName: 'people',
+        gqlFields: PERSON_GQL_FIELDS,
+        data: [
+          {
+            name: { firstName: 'List', lastName: 'Survivor' },
+            emails: {
+              primaryEmail: 'list-survivor@example.com',
+              additionalEmails: [],
+            },
+          },
+          {
+            name: { firstName: 'List', lastName: 'Absorbed' },
+            emails: {
+              primaryEmail: 'list-absorbed@example.com',
+              additionalEmails: [],
+            },
+          },
+        ],
+      });
+      const createResponse = await makeGraphqlAPIRequest(
+        createPersonsOperation,
+      );
+      const [survivorPersonId, absorbedPersonId] =
+        createResponse.body.data.createPeople.map(
+          ({ id }: { id: string }) => id,
+        );
+
+      createdPersonIdsForCleaning.push(survivorPersonId, absorbedPersonId);
+
+      const [messageList] = await global.testDataSource.query(
+        `INSERT INTO "${TEST_SCHEMA_NAME}"."messageList" ("name") VALUES ($1) RETURNING "id"`,
+        ['Shared merge list'],
+      );
+      const messageListId = messageList.id as string;
+
+      createdMessageListIdsForCleaning.push(messageListId);
+
+      await global.testDataSource.query(
+        `INSERT INTO "${TEST_SCHEMA_NAME}"."messageListMember" ("listId", "personId") VALUES ($1, $2), ($1, $3)`,
+        [messageListId, survivorPersonId, absorbedPersonId],
+      );
+
+      const mergeResponse = await makeGraphqlAPIRequest(
+        mergeManyOperationFactory({
+          objectMetadataPluralName: 'people',
+          gqlFields: PERSON_GQL_FIELDS,
+          ids: [survivorPersonId, absorbedPersonId],
+          conflictPriorityIndex: 0,
+        }),
+      );
+
+      expect(mergeResponse.body.errors).toBeUndefined();
+
+      const activeMemberships = await global.testDataSource.query(
+        `SELECT "personId" FROM "${TEST_SCHEMA_NAME}"."messageListMember" WHERE "listId" = $1 AND "deletedAt" IS NULL`,
+        [messageListId],
+      );
+
+      expect(activeMemberships).toEqual([
+        expect.objectContaining({ personId: survivorPersonId }),
+      ]);
     });
 
     it('should roll back relationship moves, deletion, and updates when the survivor update fails', async () => {

@@ -17,6 +17,7 @@ import { FindOptionsRelations, In, ObjectLiteral } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 
 import { CommonBaseQueryRunnerService } from 'src/engine/api/common/common-query-runners/common-base-query-runner.service';
+import { getDuplicateMessageListMembershipIds } from 'src/engine/api/common/common-query-runners/utils/get-duplicate-message-list-membership-ids.util';
 import {
   CommonQueryRunnerException,
   CommonQueryRunnerExceptionCode,
@@ -646,6 +647,20 @@ export class CommonMergeManyQueryRunnerService extends CommonBaseQueryRunnerServ
         context.authContext,
       );
 
+      // Before the repoint, not after: once the absorbed rows carry the
+      // survivor's id, two memberships of the same list are indistinguishable
+      // from one another and the unique index has already refused the update.
+      if (
+        relationField.objectMetadata.nameSingular === 'messageListMember' &&
+        relationField.joinColumnName === 'personId'
+      ) {
+        await this.releaseDuplicateMessageListMemberships(
+          repository,
+          fromIds,
+          toId,
+        );
+      }
+
       // The update builder refuses to touch more than QUERY_MAX_RECORDS rows at
       // once, and a person auto-created by email sync can carry thousands of
       // participants and timeline activities. Repoint in batches: each pass
@@ -770,6 +785,41 @@ export class CommonMergeManyQueryRunnerService extends CommonBaseQueryRunnerServ
       .delete()
       .whereInIds(redundantSourceRecordIds)
       .returning(['id'])
+      .execute();
+  }
+
+  private async releaseDuplicateMessageListMemberships(
+    repository: WorkspaceRepository<ObjectLiteral>,
+    sourcePersonIds: string[],
+    targetPersonId: string,
+  ): Promise<void> {
+    const memberships = await repository.find({
+      where: {
+        personId: In([...sourcePersonIds, targetPersonId]),
+      },
+      select: {
+        id: true,
+        listId: true,
+        personId: true,
+      },
+    });
+    const duplicateMembershipIds = getDuplicateMessageListMembershipIds(
+      memberships.map(({ id, listId, personId }) => ({
+        id: id as string,
+        listId: listId as string | null,
+        personId: personId as string | null,
+      })),
+      targetPersonId,
+    );
+
+    if (duplicateMembershipIds.length === 0) {
+      return;
+    }
+
+    await repository
+      .createQueryBuilder('messageListMember')
+      .softDelete()
+      .where({ id: In(duplicateMembershipIds) })
       .execute();
   }
 
