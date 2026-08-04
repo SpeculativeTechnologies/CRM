@@ -1,3 +1,4 @@
+import { CombinedGraphQLErrors } from '@apollo/client/errors';
 import { useMutation } from '@apollo/client/react';
 import { styled } from '@linaria/react';
 import { t } from '@lingui/core/macro';
@@ -423,19 +424,37 @@ export const PersonDuplicatesPage = () => {
       ({ id }) => !selectedPersonIds.has(id),
     );
 
+    let mergedPerson: ObjectRecord | null;
+
     try {
-      const mergedPerson = await mergeManyRecords({
+      mergedPerson = await mergeManyRecords({
         recordIds,
         mergeSettings: {
           conflictPriorityIndex: recordIds.indexOf(basePersonId),
         },
         overrideData,
       });
-
-      if (!mergedPerson) {
-        throw new Error('Merge returned no person.');
+    } catch (error) {
+      // The server names the conflicting field and record for a rejected merge,
+      // so show its reason instead of replacing it with a generic failure.
+      if (CombinedGraphQLErrors.is(error)) {
+        enqueueErrorSnackBar({ apolloError: error });
+      } else {
+        enqueueErrorSnackBar({ message: t`The people could not be merged.` });
       }
 
+      return;
+    }
+
+    if (!isDefined(mergedPerson)) {
+      enqueueErrorSnackBar({
+        message: t`The people could not be merged.`,
+      });
+
+      return;
+    }
+
+    try {
       if (excludedPeople.length > 0) {
         await keepSeparate({
           variables: {
@@ -448,15 +467,21 @@ export const PersonDuplicatesPage = () => {
       }
 
       await refetch();
-      enqueueSuccessSnackBar({
-        message: t`People merged. Absorbed records are available in Trash.`,
+    } catch {
+      // The merge is already committed here, so reporting it as a failed merge
+      // would send the reviewer looking for records that have already moved.
+      enqueueErrorSnackBar({
+        message: t`People merged, but the duplicate queue could not be refreshed. Reload the page.`,
       });
       setIsConfirmingMerge(false);
-    } catch {
-      enqueueErrorSnackBar({
-        message: t`The people could not be merged.`,
-      });
+
+      return;
     }
+
+    enqueueSuccessSnackBar({
+      message: t`People merged. Absorbed records are available in Trash.`,
+    });
+    setIsConfirmingMerge(false);
   };
 
   if (loading && groups.length === 0) {

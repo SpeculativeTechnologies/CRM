@@ -110,18 +110,14 @@ export class CommonMergeManyQueryRunnerService extends CommonBaseQueryRunnerServ
         })
       : null;
 
-    const updatedRecord =
-      await queryRunnerContext.workspaceDataSource.transaction(
-        (transactionManager: WorkspaceEntityManager) =>
-          this.executeMergeWithinTransaction(transactionManager, {
-            args,
-            queryRunnerContext,
-            idsToDelete,
-            priorityRecordId: priorityRecord.id,
-            mergedData,
-            personAvatarFileHandover,
-          }),
-      );
+    const updatedRecord = await this.runMergeTransaction({
+      args,
+      queryRunnerContext,
+      idsToDelete,
+      priorityRecordId: priorityRecord.id,
+      mergedData,
+      personAvatarFileHandover,
+    });
 
     if (this.isPersonObject(flatObjectMetadata)) {
       await this.recordPersonMergeProvenance({
@@ -138,6 +134,45 @@ export class CommonMergeManyQueryRunnerService extends CommonBaseQueryRunnerServ
     });
 
     return updatedRecord;
+  }
+
+  private async runMergeTransaction({
+    args,
+    queryRunnerContext,
+    idsToDelete,
+    priorityRecordId,
+    mergedData,
+    personAvatarFileHandover,
+  }: {
+    args: CommonExtendedInput<MergeManyQueryArgs>;
+    queryRunnerContext: CommonExtendedQueryRunnerContext;
+    idsToDelete: string[];
+    priorityRecordId: string;
+    mergedData: Partial<ObjectRecord>;
+    personAvatarFileHandover: PersonAvatarFileHandover | null;
+  }): Promise<ObjectRecord> {
+    try {
+      return await queryRunnerContext.workspaceDataSource.transaction(
+        (transactionManager: WorkspaceEntityManager) =>
+          this.executeMergeWithinTransaction(transactionManager, {
+            args,
+            queryRunnerContext,
+            idsToDelete,
+            priorityRecordId,
+            mergedData,
+            personAvatarFileHandover,
+          }),
+      );
+    } catch (error) {
+      // A rejected merge rolls back silently, which left no trace of which
+      // statement refused it. Record ids and the driver message only, never
+      // record values.
+      this.logger.error(
+        `Merge of ${queryRunnerContext.flatObjectMetadata.nameSingular} records ${idsToDelete.join(', ')} into ${priorityRecordId} failed: ${error instanceof Error ? error.message : String(error)}`,
+      );
+
+      throw error;
+    }
   }
 
   private async executeMergeWithinTransaction(
