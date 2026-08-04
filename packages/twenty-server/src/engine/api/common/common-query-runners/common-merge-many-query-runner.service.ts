@@ -17,12 +17,13 @@ import { FindOptionsRelations, In, ObjectLiteral } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 
 import { CommonBaseQueryRunnerService } from 'src/engine/api/common/common-query-runners/common-base-query-runner.service';
-import { getDuplicateMessageListMembershipIds } from 'src/engine/api/common/common-query-runners/utils/get-duplicate-message-list-membership-ids.util';
 import {
   CommonQueryRunnerException,
   CommonQueryRunnerExceptionCode,
 } from 'src/engine/api/common/common-query-runners/errors/common-query-runner.exception';
 import { STANDARD_ERROR_MESSAGE } from 'src/engine/api/common/common-query-runners/errors/standard-error-message.constant';
+import { getAbsorbedRecordUniqueColumnsToRelease } from 'src/engine/api/common/common-query-runners/utils/get-absorbed-record-unique-columns-to-release.util';
+import { getDuplicateMessageListMembershipIds } from 'src/engine/api/common/common-query-runners/utils/get-duplicate-message-list-membership-ids.util';
 import {
   type PersonAvatarFileHandover,
   getPersonAvatarFileHandover,
@@ -121,6 +122,7 @@ export class CommonMergeManyQueryRunnerService extends CommonBaseQueryRunnerServ
             priorityRecordId: priorityRecord.id,
             mergedData,
             personAvatarFileHandover,
+            recordsToMerge,
           }),
       );
 
@@ -150,6 +152,7 @@ export class CommonMergeManyQueryRunnerService extends CommonBaseQueryRunnerServ
       priorityRecordId,
       mergedData,
       personAvatarFileHandover,
+      recordsToMerge,
     }: {
       args: CommonExtendedInput<MergeManyQueryArgs>;
       queryRunnerContext: CommonExtendedQueryRunnerContext;
@@ -157,6 +160,7 @@ export class CommonMergeManyQueryRunnerService extends CommonBaseQueryRunnerServ
       priorityRecordId: string;
       mergedData: Partial<ObjectRecord>;
       personAvatarFileHandover: PersonAvatarFileHandover | null;
+      recordsToMerge: ObjectRecord[];
     },
   ): Promise<ObjectRecord> {
     const {
@@ -207,7 +211,12 @@ export class CommonMergeManyQueryRunnerService extends CommonBaseQueryRunnerServ
     if (this.isPersonObject(flatObjectMetadata)) {
       await this.releaseAbsorbedPersonUniqueValues(
         transactionRepository,
-        idsToDelete,
+        {
+          queryRunnerContext,
+          recordsToMerge,
+          priorityRecordId,
+          mergedData,
+        },
       );
     }
 
@@ -308,8 +317,22 @@ export class CommonMergeManyQueryRunnerService extends CommonBaseQueryRunnerServ
 
   private async releaseAbsorbedPersonUniqueValues(
     repository: WorkspaceRepository<ObjectLiteral>,
-    personIds: string[],
+    {
+      queryRunnerContext,
+      recordsToMerge,
+      priorityRecordId,
+      mergedData,
+    }: {
+      queryRunnerContext: CommonExtendedQueryRunnerContext;
+      recordsToMerge: ObjectRecord[];
+      priorityRecordId: string;
+      mergedData: Partial<ObjectRecord>;
+    },
   ): Promise<void> {
+    const personIds = recordsToMerge
+      .filter(({ id }) => id !== priorityRecordId)
+      .map(({ id }) => id);
+
     // Person emails remain subject to a workspace unique index after a soft
     // delete. Release them inside the merge transaction so a reviewed email
     // can be assigned to the survivor. Use null because PostgreSQL unique
@@ -327,6 +350,48 @@ export class CommonMergeManyQueryRunnerService extends CommonBaseQueryRunnerServ
       .where({ id: In(personIds) })
       .returning(['id'])
       .execute();
+
+    if (!isDefined(queryRunnerContext.flatIndexMaps)) {
+      return;
+    }
+
+    const priorityRecord = recordsToMerge.find(
+      ({ id }) => id === priorityRecordId,
+    );
+
+    if (!isDefined(priorityRecord)) {
+      return;
+    }
+
+    const uniqueColumnsToRelease =
+      getAbsorbedRecordUniqueColumnsToRelease({
+        recordsToMerge,
+        survivorRecordId: priorityRecordId,
+        finalRecordData: {
+          ...priorityRecord,
+          ...mergedData,
+        },
+        flatObjectMetadata: queryRunnerContext.flatObjectMetadata,
+        flatFieldMetadataMaps: queryRunnerContext.flatFieldMetadataMaps,
+        flatIndexMaps: queryRunnerContext.flatIndexMaps,
+        // The standard emails index is handled above, including clearing the
+        // non-indexed additional email values as promised by the merge UI.
+        excludedBaseFieldNames: ['emails'],
+      });
+
+    for (const { recordId, columnNames } of uniqueColumnsToRelease) {
+      await repository
+        .createQueryBuilder('person')
+        .update()
+        .set(
+          Object.fromEntries(
+            columnNames.map((columnName) => [columnName, null]),
+          ),
+        )
+        .where({ id: recordId })
+        .returning(['id'])
+        .execute();
+    }
   }
 
   private async fetchRecordsToMerge(

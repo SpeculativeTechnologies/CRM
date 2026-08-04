@@ -80,7 +80,7 @@ const computeConflictingPropertiesForIndexField = ({
   return [{ fullPath: flatFieldMetadata.name, column: flatFieldMetadata.name }];
 };
 
-const computeConflictingPropertiesForIndex = ({
+export const computeConflictingPropertiesForIndex = ({
   flatIndexFieldMetadatas,
   flatFieldMetadataMaps,
 }: {
