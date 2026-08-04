@@ -24,6 +24,7 @@ import { WorkspaceDeleteQueryBuilder } from 'src/engine/twenty-orm/repository/wo
 import { WorkspaceInsertQueryBuilder } from 'src/engine/twenty-orm/repository/workspace-insert-query-builder';
 import { WorkspaceSoftDeleteQueryBuilder } from 'src/engine/twenty-orm/repository/workspace-soft-delete-query-builder';
 import { WorkspaceUpdateQueryBuilder } from 'src/engine/twenty-orm/repository/workspace-update-query-builder';
+import { applyRoleRecordScope } from 'src/engine/twenty-orm/utils/apply-role-record-scope.util';
 import { applyRowLevelPermissionPredicates } from 'src/engine/twenty-orm/utils/apply-row-level-permission-predicates.util';
 import { formatResult } from 'src/engine/twenty-orm/utils/format-result.util';
 import { getObjectMetadataFromEntityTarget } from 'src/engine/twenty-orm/utils/get-object-metadata-from-entity-target.util';
@@ -341,6 +342,7 @@ export class WorkspaceSelectQueryBuilder<
 
   private validatePermissions(): void {
     this.applyRowLevelPermissionPredicates();
+    this.applyRoleRecordScope();
     validateQueryIsPermittedOrThrow({
       expressionMap: this.expressionMap,
       objectsPermissions: this.objectRecordsPermissions,
@@ -390,6 +392,28 @@ export class WorkspaceSelectQueryBuilder<
       internalContext: this.internalContext,
       authContext: this.authContext,
       featureFlagMap: this.featureFlagMap,
+    });
+  }
+
+  private applyRoleRecordScope(): void {
+    if (this.shouldBypassPermissionChecks) {
+      return;
+    }
+
+    if (this.expressionMap.mainAlias?.subQuery) {
+      return;
+    }
+
+    const objectMetadata = getObjectMetadataFromEntityTarget(
+      this.getMainAliasTarget(),
+      this.internalContext,
+    );
+
+    applyRoleRecordScope({
+      queryBuilder: this,
+      objectMetadata,
+      objectRecordsPermissions: this.objectRecordsPermissions,
+      internalContext: this.internalContext,
     });
   }
 }

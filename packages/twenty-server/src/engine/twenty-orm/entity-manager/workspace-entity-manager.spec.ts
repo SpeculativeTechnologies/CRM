@@ -286,6 +286,7 @@ describe('WorkspaceEntityManager', () => {
           restrictedFields: {},
           rowLevelPermissionPredicates: [],
           rowLevelPermissionPredicateGroups: [],
+          recordScopeFilter: null,
         },
       },
     };

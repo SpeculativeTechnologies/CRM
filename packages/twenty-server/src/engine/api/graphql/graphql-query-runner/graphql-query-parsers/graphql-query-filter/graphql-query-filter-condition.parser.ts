@@ -59,6 +59,7 @@ export class GraphqlQueryFilterConditionParser {
     outerQueryBuilder: WorkspaceSelectQueryBuilder<ObjectLiteral>,
     objectNameSingular: string,
     filter: Partial<ObjectRecordFilter>,
+    useDirectTableReference = false,
   ): void {
     Object.entries(filter).forEach(([key, value], index) => {
       this.parseKeyFilter(
@@ -68,6 +69,7 @@ export class GraphqlQueryFilterConditionParser {
         key,
         value,
         index === 0,
+        useDirectTableReference,
       );
     });
   }
@@ -80,6 +82,7 @@ export class GraphqlQueryFilterConditionParser {
     // oxlint-disable-next-line typescript/no-explicit-any
     value: any,
     isFirst = false,
+    useDirectTableReference = false,
   ): void {
     switch (key) {
       case 'and': {
@@ -95,6 +98,7 @@ export class GraphqlQueryFilterConditionParser {
                     subFilterkey,
                     subFilterValue,
                     index === 0,
+                    useDirectTableReference,
                   );
                 },
               );
@@ -128,6 +132,7 @@ export class GraphqlQueryFilterConditionParser {
                     subFilterkey,
                     subFilterValue,
                     index === 0,
+                    useDirectTableReference,
                   );
                 },
               );
@@ -160,6 +165,7 @@ export class GraphqlQueryFilterConditionParser {
                 subFilterkey,
                 subFilterValue,
                 index === 0,
+                useDirectTableReference,
               );
             },
           );
@@ -181,6 +187,7 @@ export class GraphqlQueryFilterConditionParser {
           key,
           value,
           isFirst,
+          useDirectTableReference,
         );
         break;
     }

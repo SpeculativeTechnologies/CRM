@@ -86,6 +86,7 @@ describe('FieldPermissionService', () => {
         restrictedFields: {},
         rowLevelPermissionPredicates: [],
         rowLevelPermissionPredicateGroups: [],
+        recordScopeFilter: null,
       },
       [fieldRelationMock.objectMetadataId]: {
         canReadObjectRecords: true,
@@ -95,6 +96,7 @@ describe('FieldPermissionService', () => {
         restrictedFields: {},
         rowLevelPermissionPredicates: [],
         rowLevelPermissionPredicateGroups: [],
+        recordScopeFilter: null,
       },
     },
   };

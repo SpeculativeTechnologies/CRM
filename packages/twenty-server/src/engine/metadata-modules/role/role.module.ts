@@ -15,6 +15,7 @@ import { ObjectMetadataEntity } from 'src/engine/metadata-modules/object-metadat
 import { FieldPermissionEntity } from 'src/engine/metadata-modules/object-permission/field-permission/field-permission.entity';
 import { ObjectPermissionEntity } from 'src/engine/metadata-modules/object-permission/object-permission.entity';
 import { ObjectPermissionModule } from 'src/engine/metadata-modules/object-permission/object-permission.module';
+import { RoleRecordScopeEntity } from 'src/engine/metadata-modules/role-record-scope/role-record-scope.entity';
 import { RolePermissionFlagEntity } from 'src/engine/metadata-modules/role-permission-flag/role-permission-flag.entity';
 import { RolePermissionFlagModule } from 'src/engine/metadata-modules/role-permission-flag/role-permission-flag.module';
 import { PermissionsModule } from 'src/engine/metadata-modules/permissions/permissions.module';
@@ -48,6 +49,7 @@ import { WorkspaceMigrationModule } from 'src/engine/workspace-manager/workspace
       ObjectMetadataEntity,
       RowLevelPermissionPredicateEntity,
       RowLevelPermissionPredicateGroupEntity,
+      RoleRecordScopeEntity,
     ]),
     UserRoleModule,
     AiAgentRoleModule,
@@ -79,6 +81,7 @@ import { WorkspaceMigrationModule } from 'src/engine/workspace-manager/workspace
     provideWorkspaceScopedRepository(FieldPermissionEntity),
     provideWorkspaceScopedRepository(RowLevelPermissionPredicateEntity),
     provideWorkspaceScopedRepository(RowLevelPermissionPredicateGroupEntity),
+    provideWorkspaceScopedRepository(RoleRecordScopeEntity),
   ],
   exports: [
     RoleService,

@@ -1,7 +1,23 @@
 import {
   type ObjectsPermissions,
+  type RecordGqlOperationFilter,
   type RestrictedFieldPermissions,
 } from 'twenty-shared/types';
+import { isDefined } from 'twenty-shared/utils';
+
+const computeRecordScopeFilterIntersection = (
+  recordScopeFilters: RecordGqlOperationFilter[],
+): RecordGqlOperationFilter | null => {
+  if (recordScopeFilters.length === 0) {
+    return null;
+  }
+
+  if (recordScopeFilters.length === 1) {
+    return recordScopeFilters[0];
+  }
+
+  return { and: recordScopeFilters };
+};
 
 export const computePermissionIntersection = (
   permissionsArray: ObjectsPermissions[],
@@ -30,6 +46,7 @@ export const computePermissionIntersection = (
     let canSoftDeleteObjectRecords = true;
     let canDestroyObjectRecords = true;
     const restrictedFields: Record<string, RestrictedFieldPermissions> = {};
+    const recordScopeFilters: RecordGqlOperationFilter[] = [];
 
     for (const permissions of permissionsArray) {
       const objPerm = permissions[objectMetadataId];
@@ -40,6 +57,10 @@ export const computePermissionIntersection = (
         canSoftDeleteObjectRecords = false;
         canDestroyObjectRecords = false;
         continue;
+      }
+
+      if (isDefined(objPerm.recordScopeFilter)) {
+        recordScopeFilters.push(objPerm.recordScopeFilter);
       }
 
       canReadObjectRecords =
@@ -87,6 +108,9 @@ export const computePermissionIntersection = (
       restrictedFields,
       rowLevelPermissionPredicates: [],
       rowLevelPermissionPredicateGroups: [],
+      // Every contributing scope must hold, so they intersect with AND
+      recordScopeFilter:
+        computeRecordScopeFilterIntersection(recordScopeFilters),
     };
   }
 

@@ -14,6 +14,7 @@ import { ObjectPermissionEntity } from 'src/engine/metadata-modules/object-permi
 import { RolePermissionFlagEntity } from 'src/engine/metadata-modules/role-permission-flag/role-permission-flag.entity';
 import { RoleEntity } from 'src/engine/metadata-modules/role/role.entity';
 import { WorkspaceRolesPermissionsCacheService } from 'src/engine/metadata-modules/role/services/workspace-roles-permissions-cache.service';
+import { RoleRecordScopeEntity } from 'src/engine/metadata-modules/role-record-scope/role-record-scope.entity';
 import { RowLevelPermissionPredicateGroupEntity } from 'src/engine/metadata-modules/row-level-permission-predicate/entities/row-level-permission-predicate-group.entity';
 import { RowLevelPermissionPredicateEntity } from 'src/engine/metadata-modules/row-level-permission-predicate/entities/row-level-permission-predicate.entity';
 import { getWorkspaceScopedRepositoryToken } from 'src/engine/twenty-orm/workspace-scoped-repository/get-workspace-scoped-repository-token.util';
@@ -50,6 +51,7 @@ const createBaseRole = (
     fieldPermissions: [],
     rowLevelPermissionPredicates: [],
     rowLevelPermissionPredicateGroups: [],
+    recordScopeFilter: null,
     ...overrides,
   }) as RoleEntity;
 
@@ -120,6 +122,9 @@ describe('WorkspaceRolesPermissionsCacheService', () => {
     const rowLevelPermissionPredicateGroupRepository = {
       find: jest.fn().mockResolvedValue([]),
     };
+    const roleRecordScopeRepository = {
+      find: jest.fn().mockResolvedValue([]),
+    };
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -155,6 +160,10 @@ describe('WorkspaceRolesPermissionsCacheService', () => {
             RowLevelPermissionPredicateGroupEntity,
           ),
           useValue: rowLevelPermissionPredicateGroupRepository,
+        },
+        {
+          provide: getWorkspaceScopedRepositoryToken(RoleRecordScopeEntity),
+          useValue: roleRecordScopeRepository,
         },
       ],
     }).compile();

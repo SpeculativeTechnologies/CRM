@@ -13,6 +13,7 @@ const agentRolePermissions = {
     restrictedFields: {},
     rowLevelPermissionPredicates: [],
     rowLevelPermissionPredicateGroups: [],
+    recordScopeFilter: null,
   },
 };
 
@@ -25,6 +26,7 @@ const defaultRolePermissions = {
     restrictedFields: {},
     rowLevelPermissionPredicates: [],
     rowLevelPermissionPredicateGroups: [],
+    recordScopeFilter: null,
   },
 };
 

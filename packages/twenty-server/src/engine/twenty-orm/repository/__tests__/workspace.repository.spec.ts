@@ -166,6 +166,7 @@ describe('WorkspaceRepository', () => {
         restrictedFields: {},
         rowLevelPermissionPredicates: [],
         rowLevelPermissionPredicateGroups: [],
+        recordScopeFilter: null,
       },
     };
     mockQueryRunner = {} as QueryRunner;

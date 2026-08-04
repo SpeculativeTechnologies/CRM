@@ -112,6 +112,7 @@ describe('RestToCommonSelectedFieldsHandler', () => {
         restrictedFields: options.restrictedFields || {},
         rowLevelPermissionPredicates: [],
         rowLevelPermissionPredicateGroups: [],
+        recordScopeFilter: null,
       };
 
       return acc;

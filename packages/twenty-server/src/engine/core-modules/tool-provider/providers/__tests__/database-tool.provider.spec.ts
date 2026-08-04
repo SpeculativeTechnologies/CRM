@@ -22,6 +22,7 @@ const allObjectPermissions: ObjectPermissions = {
   restrictedFields: {},
   rowLevelPermissionPredicates: [],
   rowLevelPermissionPredicateGroups: [],
+  recordScopeFilter: null,
 };
 
 const createFlatObject = (

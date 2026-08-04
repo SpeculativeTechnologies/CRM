@@ -22,6 +22,7 @@ import { ObjectPermissionEntity } from 'src/engine/metadata-modules/object-permi
 import { RolePermissionFlagEntity } from 'src/engine/metadata-modules/role-permission-flag/role-permission-flag.entity';
 import { RoleEntity } from 'src/engine/metadata-modules/role/role.entity';
 import { RowLevelPermissionPredicateGroupEntity } from 'src/engine/metadata-modules/row-level-permission-predicate/entities/row-level-permission-predicate-group.entity';
+import { RoleRecordScopeEntity } from 'src/engine/metadata-modules/role-record-scope/role-record-scope.entity';
 import { RowLevelPermissionPredicateEntity } from 'src/engine/metadata-modules/row-level-permission-predicate/entities/row-level-permission-predicate.entity';
 import { InjectWorkspaceScopedRepository } from 'src/engine/twenty-orm/workspace-scoped-repository/inject-workspace-scoped-repository.decorator';
 import { WorkspaceScopedRepository } from 'src/engine/twenty-orm/workspace-scoped-repository/workspace-scoped-repository';
@@ -54,6 +55,8 @@ export class WorkspaceRolesPermissionsCacheService extends WorkspaceCacheProvide
     private readonly rowLevelPermissionPredicateRepository: WorkspaceScopedRepository<RowLevelPermissionPredicateEntity>,
     @InjectWorkspaceScopedRepository(RowLevelPermissionPredicateGroupEntity)
     private readonly rowLevelPermissionPredicateGroupRepository: WorkspaceScopedRepository<RowLevelPermissionPredicateGroupEntity>,
+    @InjectWorkspaceScopedRepository(RoleRecordScopeEntity)
+    private readonly roleRecordScopeRepository: WorkspaceScopedRepository<RoleRecordScopeEntity>,
   ) {
     super();
   }
@@ -68,6 +71,7 @@ export class WorkspaceRolesPermissionsCacheService extends WorkspaceCacheProvide
       fieldPermissions,
       rowLevelPermissionPredicates,
       rowLevelPermissionPredicateGroups,
+      roleRecordScopesForWorkspace,
       workspaceObjectMetadataCollection,
     ] = await Promise.all([
       this.roleRepository.find(workspaceId),
@@ -81,6 +85,9 @@ export class WorkspaceRolesPermissionsCacheService extends WorkspaceCacheProvide
         where: { deletedAt: IsNull() },
       }),
       this.rowLevelPermissionPredicateGroupRepository.find(workspaceId, {
+        where: { deletedAt: IsNull() },
+      }),
+      this.roleRecordScopeRepository.find(workspaceId, {
         where: { deletedAt: IsNull() },
       }),
       this.getWorkspaceObjectMetadataCollection(workspaceId),
@@ -111,6 +118,15 @@ export class WorkspaceRolesPermissionsCacheService extends WorkspaceCacheProvide
         entities: rowLevelPermissionPredicateGroups,
         foreignKey: 'roleId',
       });
+    const roleRecordScopesByRoleId = new Map<string, RoleRecordScopeEntity[]>();
+
+    for (const roleRecordScope of roleRecordScopesForWorkspace) {
+      const scopesForRole =
+        roleRecordScopesByRoleId.get(roleRecordScope.roleId) ?? [];
+
+      scopesForRole.push(roleRecordScope);
+      roleRecordScopesByRoleId.set(roleRecordScope.roleId, scopesForRole);
+    }
 
     const permissionsByRoleId: ObjectsPermissionsByRoleId = {};
 
@@ -124,6 +140,7 @@ export class WorkspaceRolesPermissionsCacheService extends WorkspaceCacheProvide
         rowLevelPermissionPredicatesByRoleId.get(role.id) ?? [];
       const roleRowLevelPermissionPredicateGroups =
         rowLevelPermissionPredicateGroupsByRoleId.get(role.id) ?? [];
+      const roleRecordScopes = roleRecordScopesByRoleId.get(role.id) ?? [];
 
       const objectRecordsPermissions: ObjectsPermissions = {};
 
@@ -241,6 +258,11 @@ export class WorkspaceRolesPermissionsCacheService extends WorkspaceCacheProvide
                 rowLevelPermissionPredicateGroup.objectMetadataId ===
                 objectMetadataId,
             ),
+          recordScopeFilter:
+            roleRecordScopes.find(
+              (roleRecordScope) =>
+                roleRecordScope.objectMetadataId === objectMetadataId,
+            )?.filter ?? null,
         };
       }
 

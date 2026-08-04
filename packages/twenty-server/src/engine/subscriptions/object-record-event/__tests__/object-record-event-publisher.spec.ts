@@ -131,6 +131,7 @@ describe('ObjectRecordEventPublisher', () => {
         restrictedFields: {},
         rowLevelPermissionPredicates: [],
         rowLevelPermissionPredicateGroups: [],
+        recordScopeFilter: null,
       },
     },
   };
@@ -378,6 +379,7 @@ describe('ObjectRecordEventPublisher', () => {
             restrictedFields: {},
             rowLevelPermissionPredicates: [],
             rowLevelPermissionPredicateGroups: [],
+            recordScopeFilter: null,
           },
         },
       };
@@ -491,6 +493,7 @@ describe('ObjectRecordEventPublisher', () => {
             },
             rowLevelPermissionPredicates: [],
             rowLevelPermissionPredicateGroups: [],
+            recordScopeFilter: null,
           },
         },
       };
@@ -561,6 +564,7 @@ describe('ObjectRecordEventPublisher', () => {
             },
             rowLevelPermissionPredicates: [],
             rowLevelPermissionPredicateGroups: [],
+            recordScopeFilter: null,
           },
         },
       };
@@ -622,6 +626,7 @@ describe('ObjectRecordEventPublisher', () => {
             },
             rowLevelPermissionPredicates: [],
             rowLevelPermissionPredicateGroups: [],
+            recordScopeFilter: null,
           },
         },
       };
@@ -1401,6 +1406,7 @@ describe('ObjectRecordEventPublisher', () => {
               restrictedFields: {},
               rowLevelPermissionPredicates: [],
               rowLevelPermissionPredicateGroups: [],
+              recordScopeFilter: null,
             },
           },
         };
@@ -1439,6 +1445,7 @@ describe('ObjectRecordEventPublisher', () => {
               restrictedFields: {},
               rowLevelPermissionPredicates: [],
               rowLevelPermissionPredicateGroups: [],
+              recordScopeFilter: null,
             },
           },
         };

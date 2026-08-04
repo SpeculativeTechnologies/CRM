@@ -23,6 +23,7 @@ describe('computePermissionIntersection', () => {
           restrictedFields: {},
           rowLevelPermissionPredicates: [],
           rowLevelPermissionPredicateGroups: [],
+          recordScopeFilter: null,
         },
       };
 
@@ -43,6 +44,7 @@ describe('computePermissionIntersection', () => {
           restrictedFields: {},
           rowLevelPermissionPredicates: [],
           rowLevelPermissionPredicateGroups: [],
+          recordScopeFilter: null,
         },
       };
 
@@ -55,6 +57,7 @@ describe('computePermissionIntersection', () => {
           restrictedFields: {},
           rowLevelPermissionPredicates: [],
           rowLevelPermissionPredicateGroups: [],
+          recordScopeFilter: null,
         },
       };
 
@@ -71,6 +74,7 @@ describe('computePermissionIntersection', () => {
         restrictedFields: {},
         rowLevelPermissionPredicates: [],
         rowLevelPermissionPredicateGroups: [],
+        recordScopeFilter: null,
       });
     });
 
@@ -84,6 +88,7 @@ describe('computePermissionIntersection', () => {
           restrictedFields: {},
           rowLevelPermissionPredicates: [],
           rowLevelPermissionPredicateGroups: [],
+          recordScopeFilter: null,
         },
       };
 
@@ -96,6 +101,7 @@ describe('computePermissionIntersection', () => {
           restrictedFields: {},
           rowLevelPermissionPredicates: [],
           rowLevelPermissionPredicateGroups: [],
+          recordScopeFilter: null,
         },
       };
 
@@ -112,6 +118,7 @@ describe('computePermissionIntersection', () => {
         restrictedFields: {},
         rowLevelPermissionPredicates: [],
         rowLevelPermissionPredicateGroups: [],
+        recordScopeFilter: null,
       });
     });
 
@@ -125,6 +132,7 @@ describe('computePermissionIntersection', () => {
           restrictedFields: {},
           rowLevelPermissionPredicates: [],
           rowLevelPermissionPredicateGroups: [],
+          recordScopeFilter: null,
         },
       };
 
@@ -143,6 +151,7 @@ describe('computePermissionIntersection', () => {
         restrictedFields: {},
         rowLevelPermissionPredicates: [],
         rowLevelPermissionPredicateGroups: [],
+        recordScopeFilter: null,
       });
     });
   });
@@ -158,6 +167,7 @@ describe('computePermissionIntersection', () => {
           restrictedFields: {},
           rowLevelPermissionPredicates: [],
           rowLevelPermissionPredicateGroups: [],
+          recordScopeFilter: null,
         },
         [objectMetadataId2]: {
           canReadObjectRecords: true,
@@ -167,6 +177,7 @@ describe('computePermissionIntersection', () => {
           restrictedFields: {},
           rowLevelPermissionPredicates: [],
           rowLevelPermissionPredicateGroups: [],
+          recordScopeFilter: null,
         },
       };
 
@@ -179,6 +190,7 @@ describe('computePermissionIntersection', () => {
           restrictedFields: {},
           rowLevelPermissionPredicates: [],
           rowLevelPermissionPredicateGroups: [],
+          recordScopeFilter: null,
         },
         [objectMetadataId2]: {
           canReadObjectRecords: true,
@@ -188,6 +200,7 @@ describe('computePermissionIntersection', () => {
           restrictedFields: {},
           rowLevelPermissionPredicates: [],
           rowLevelPermissionPredicateGroups: [],
+          recordScopeFilter: null,
         },
       };
 
@@ -204,6 +217,7 @@ describe('computePermissionIntersection', () => {
         restrictedFields: {},
         rowLevelPermissionPredicates: [],
         rowLevelPermissionPredicateGroups: [],
+        recordScopeFilter: null,
       });
 
       expect(result[objectMetadataId2]).toEqual({
@@ -214,6 +228,7 @@ describe('computePermissionIntersection', () => {
         restrictedFields: {},
         rowLevelPermissionPredicates: [],
         rowLevelPermissionPredicateGroups: [],
+        recordScopeFilter: null,
       });
     });
   });
@@ -238,6 +253,7 @@ describe('computePermissionIntersection', () => {
           },
           rowLevelPermissionPredicates: [],
           rowLevelPermissionPredicateGroups: [],
+          recordScopeFilter: null,
         },
       };
 
@@ -259,6 +275,7 @@ describe('computePermissionIntersection', () => {
           },
           rowLevelPermissionPredicates: [],
           rowLevelPermissionPredicateGroups: [],
+          recordScopeFilter: null,
         },
       };
 
@@ -294,6 +311,7 @@ describe('computePermissionIntersection', () => {
           },
           rowLevelPermissionPredicates: [],
           rowLevelPermissionPredicateGroups: [],
+          recordScopeFilter: null,
         },
       };
 
@@ -311,6 +329,7 @@ describe('computePermissionIntersection', () => {
           },
           rowLevelPermissionPredicates: [],
           rowLevelPermissionPredicateGroups: [],
+          recordScopeFilter: null,
         },
       };
 
@@ -343,6 +362,7 @@ describe('computePermissionIntersection', () => {
           restrictedFields: {},
           rowLevelPermissionPredicates: [],
           rowLevelPermissionPredicateGroups: [],
+          recordScopeFilter: null,
         },
       };
 
@@ -355,6 +375,7 @@ describe('computePermissionIntersection', () => {
           restrictedFields: {},
           rowLevelPermissionPredicates: [],
           rowLevelPermissionPredicateGroups: [],
+          recordScopeFilter: null,
         },
       };
 
@@ -367,6 +388,7 @@ describe('computePermissionIntersection', () => {
           restrictedFields: {},
           rowLevelPermissionPredicates: [],
           rowLevelPermissionPredicateGroups: [],
+          recordScopeFilter: null,
         },
       };
 
@@ -380,7 +402,60 @@ describe('computePermissionIntersection', () => {
         restrictedFields: {},
         rowLevelPermissionPredicates: [],
         rowLevelPermissionPredicateGroups: [],
+        recordScopeFilter: null,
       });
+    });
+  });
+
+  describe('record scope filters', () => {
+    const buildPermissions = (
+      objectMetadataId: string,
+      recordScopeFilter: ObjectsPermissions[string]['recordScopeFilter'],
+    ): ObjectsPermissions => ({
+      [objectMetadataId]: {
+        canReadObjectRecords: true,
+        canUpdateObjectRecords: true,
+        canSoftDeleteObjectRecords: true,
+        canDestroyObjectRecords: true,
+        restrictedFields: {},
+        rowLevelPermissionPredicates: [],
+        rowLevelPermissionPredicateGroups: [],
+        recordScopeFilter,
+      },
+    });
+
+    it('should keep a single role scope untouched', () => {
+      const scope = { pipeline: { in: ['VN_LAB'] } };
+
+      const result = computePermissionIntersection([
+        buildPermissions('object-1', scope),
+        buildPermissions('object-1', null),
+      ]);
+
+      expect(result['object-1'].recordScopeFilter).toEqual(scope);
+    });
+
+    it('should AND scopes from several roles so neither can widen the other', () => {
+      const vnScope = { pipeline: { in: ['VN_LAB'] } };
+      const tierScope = { tier: { in: ['A'] } };
+
+      const result = computePermissionIntersection([
+        buildPermissions('object-1', vnScope),
+        buildPermissions('object-1', tierScope),
+      ]);
+
+      expect(result['object-1'].recordScopeFilter).toEqual({
+        and: [vnScope, tierScope],
+      });
+    });
+
+    it('should return null when no role carries a scope', () => {
+      const result = computePermissionIntersection([
+        buildPermissions('object-1', null),
+        buildPermissions('object-1', null),
+      ]);
+
+      expect(result['object-1'].recordScopeFilter).toBeNull();
     });
   });
 });
