@@ -44,8 +44,7 @@ export const getAbsorbedRecordUniqueColumnsToRelease = ({
   }).filter(
     (flatIndexMetadata) =>
       flatIndexMetadata.isUnique &&
-      flatIndexMetadata.indexWhereClause !==
-        ACTIVE_RECORDS_INDEX_WHERE_CLAUSE,
+      flatIndexMetadata.indexWhereClause !== ACTIVE_RECORDS_INDEX_WHERE_CLAUSE,
   );
 
   for (const uniqueIndex of uniqueIndexes) {

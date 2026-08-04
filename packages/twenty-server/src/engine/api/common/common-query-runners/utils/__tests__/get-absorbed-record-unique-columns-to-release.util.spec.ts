@@ -125,9 +125,7 @@ describe('getAbsorbedRecordUniqueColumnsToRelease', () => {
           externalId: 'source-value',
         },
       }),
-    ).toEqual([
-      { recordId: 'absorbed', columnNames: ['externalId'] },
-    ]);
+    ).toEqual([{ recordId: 'absorbed', columnNames: ['externalId'] }]);
   });
 
   it('preserves absorbed unique values that are not assigned to the survivor', () => {

@@ -209,15 +209,12 @@ export class CommonMergeManyQueryRunnerService extends CommonBaseQueryRunnerServ
     );
 
     if (this.isPersonObject(flatObjectMetadata)) {
-      await this.releaseAbsorbedPersonUniqueValues(
-        transactionRepository,
-        {
-          queryRunnerContext,
-          recordsToMerge,
-          priorityRecordId,
-          mergedData,
-        },
-      );
+      await this.releaseAbsorbedPersonUniqueValues(transactionRepository, {
+        queryRunnerContext,
+        recordsToMerge,
+        priorityRecordId,
+        mergedData,
+      });
     }
 
     const deleteQueryBuilder = transactionRepository.createQueryBuilder(
@@ -363,21 +360,20 @@ export class CommonMergeManyQueryRunnerService extends CommonBaseQueryRunnerServ
       return;
     }
 
-    const uniqueColumnsToRelease =
-      getAbsorbedRecordUniqueColumnsToRelease({
-        recordsToMerge,
-        survivorRecordId: priorityRecordId,
-        finalRecordData: {
-          ...priorityRecord,
-          ...mergedData,
-        },
-        flatObjectMetadata: queryRunnerContext.flatObjectMetadata,
-        flatFieldMetadataMaps: queryRunnerContext.flatFieldMetadataMaps,
-        flatIndexMaps: queryRunnerContext.flatIndexMaps,
-        // The standard emails index is handled above, including clearing the
-        // non-indexed additional email values as promised by the merge UI.
-        excludedBaseFieldNames: ['emails'],
-      });
+    const uniqueColumnsToRelease = getAbsorbedRecordUniqueColumnsToRelease({
+      recordsToMerge,
+      survivorRecordId: priorityRecordId,
+      finalRecordData: {
+        ...priorityRecord,
+        ...mergedData,
+      },
+      flatObjectMetadata: queryRunnerContext.flatObjectMetadata,
+      flatFieldMetadataMaps: queryRunnerContext.flatFieldMetadataMaps,
+      flatIndexMaps: queryRunnerContext.flatIndexMaps,
+      // The standard emails index is handled above, including clearing the
+      // non-indexed additional email values as promised by the merge UI.
+      excludedBaseFieldNames: ['emails'],
+    });
 
     for (const { recordId, columnNames } of uniqueColumnsToRelease) {
       await repository
