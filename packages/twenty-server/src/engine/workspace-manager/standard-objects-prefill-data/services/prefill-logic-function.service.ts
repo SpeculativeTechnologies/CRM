@@ -36,6 +36,24 @@ export class PrefillLogicFunctionService {
       });
 
       if (isDefined(existingLogicFunction)) {
+        const sourceCode =
+          await this.logicFunctionFromSourceService.getSourceCode({
+            id: definition.id,
+            workspaceId,
+          });
+
+        if (!isDefined(sourceCode)) {
+          await this.logicFunctionFromSourceService.updateOneFromSource({
+            workspaceId,
+            updateLogicFunctionFromSourceInput: {
+              id: definition.id,
+              update: {
+                sourceHandlerCode: definition.sourceHandlerCode,
+              },
+            },
+          });
+        }
+
         continue;
       }
 
