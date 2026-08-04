@@ -4,7 +4,6 @@ import { AllMetadataName } from 'twenty-shared/metadata';
 import { isDefined } from 'twenty-shared/utils';
 
 import { FlatApplicationCacheMaps } from 'src/engine/core-modules/application/types/flat-application-cache-maps.type';
-import { ALL_MANY_TO_ONE_METADATA_RELATIONS } from 'src/engine/metadata-modules/flat-entity/constant/all-many-to-one-metadata-relations.constant';
 import {
   FlatEntityMapsException,
   FlatEntityMapsExceptionCode,
@@ -17,8 +16,8 @@ import { getMetadataRelatedMetadataNamesForValidation } from 'src/engine/metadat
 import { getSubAllFlatEntityMapsByApplicationIdsOrThrow } from 'src/engine/metadata-modules/flat-entity/utils/get-sub-all-flat-entity-maps-by-application-ids-or-throw.util';
 import { MetadataSideEffectEngineService } from 'src/engine/metadata-modules/metadata-side-effect/services/metadata-side-effect-engine.service';
 import { WorkspaceCacheService } from 'src/engine/workspace-cache/services/workspace-cache.service';
-import { TWENTY_STANDARD_APPLICATION } from 'src/engine/workspace-manager/twenty-standard-application/constants/twenty-standard-applications';
 import { WORKSPACE_MIGRATION_ADDITIONAL_CACHE_DATA_MAPS_KEY } from 'src/engine/workspace-manager/workspace-migration/constant/workspace-migration-additional-cache-data-maps-key.constant';
+import { computeAllInvolvedApplicationIds } from 'src/engine/workspace-manager/workspace-migration/services/utils/compute-all-involved-application-ids.util';
 import { IdByUniversalIdentifierByMetadataName } from 'src/engine/workspace-manager/workspace-migration/services/utils/enrich-create-workspace-migration-action-with-ids.util';
 import { WorkspaceMigrationBuilderAdditionalCacheDataMaps } from 'src/engine/workspace-manager/workspace-migration/types/workspace-migration-builder-additional-cache-data-maps.type';
 import { FromToAllUniversalFlatEntityMaps } from 'src/engine/workspace-manager/workspace-migration/types/workspace-migration-orchestrator.type';
@@ -192,7 +191,7 @@ export class WorkspaceMigrationFlatEntityMapsService {
     allRelatedFlatEntityMaps,
     allMetadataNameCacheToCompute,
   }: ComputeFromToAllFlatEntityMapsAndBuildOptionsArgs) {
-    const applicationIds = this.computeAllInvolvedApplicationIds({
+    const applicationIds = computeAllInvolvedApplicationIds({
       allFlatEntityOperationRecordByMetadataName,
       flatApplicationMaps,
       applicationUniversalIdentifier,
@@ -222,122 +221,5 @@ export class WorkspaceMigrationFlatEntityMapsService {
       dependencyAllFlatEntityMaps,
       additionalCacheDataMaps,
     };
-  }
-
-  private computeAllInvolvedApplicationIds({
-    allFlatEntityOperationRecordByMetadataName,
-    flatApplicationMaps,
-    applicationUniversalIdentifier,
-    allRelatedFlatEntityMaps,
-  }: {
-    allFlatEntityOperationRecordByMetadataName: AllFlatEntityOperationRecordByMetadataName;
-    flatApplicationMaps: FlatApplicationCacheMaps;
-    applicationUniversalIdentifier: string;
-    allRelatedFlatEntityMaps: Partial<AllFlatEntityMaps>;
-  }): string[] {
-    const applicationIds = new Set<string>();
-
-    const applicationId =
-      flatApplicationMaps.idByUniversalIdentifier[
-        applicationUniversalIdentifier
-      ];
-
-    const twentyStandardApplicationId =
-      flatApplicationMaps.idByUniversalIdentifier[
-        TWENTY_STANDARD_APPLICATION.universalIdentifier
-      ];
-
-    if (!isDefined(twentyStandardApplicationId)) {
-      throw new FlatEntityMapsException(
-        'Twenty standard application not found in workspace',
-        FlatEntityMapsExceptionCode.ENTITY_NOT_FOUND,
-      );
-    }
-
-    if (isDefined(applicationId)) {
-      applicationIds.add(applicationId);
-    }
-
-    const isBuildingTwentyStandardApplication =
-      applicationUniversalIdentifier ===
-      TWENTY_STANDARD_APPLICATION.universalIdentifier;
-
-    if (!isBuildingTwentyStandardApplication) {
-      applicationIds.add(twentyStandardApplicationId);
-    }
-
-    for (const metadataName of Object.keys(
-      allFlatEntityOperationRecordByMetadataName,
-    ) as AllMetadataName[]) {
-      const flatEntityOperations =
-        allFlatEntityOperationRecordByMetadataName[metadataName];
-
-      if (!isDefined(flatEntityOperations)) {
-        continue;
-      }
-
-      const { flatEntityToCreate, flatEntityToUpdate, flatEntityToDelete } =
-        flatEntityOperations;
-
-      const relations = ALL_MANY_TO_ONE_METADATA_RELATIONS[metadataName];
-
-      for (const flatEntity of [
-        ...Object.values(flatEntityToCreate),
-        ...Object.values(flatEntityToUpdate),
-        ...Object.values(flatEntityToDelete),
-      ]) {
-        const entityApplicationId =
-          flatApplicationMaps.idByUniversalIdentifier[
-            flatEntity.applicationUniversalIdentifier
-          ];
-
-        if (isDefined(entityApplicationId)) {
-          applicationIds.add(entityApplicationId);
-        }
-
-        for (const relation of Object.values(relations) as ({
-          foreignKey: string;
-          metadataName: AllMetadataName;
-          isNullable: boolean;
-          universalForeignKey: string;
-        } | null)[]) {
-          if (!isDefined(relation)) {
-            continue;
-          }
-
-          const { universalForeignKey, metadataName: targetMetadataName } =
-            relation;
-
-          const referencedUniversalIdentifier =
-            flatEntity[universalForeignKey as keyof typeof flatEntity];
-
-          if (!isDefined(referencedUniversalIdentifier)) {
-            continue;
-          }
-
-          const targetFlatEntityMaps =
-            allRelatedFlatEntityMaps[
-              getMetadataFlatEntityMapsKey(
-                targetMetadataName as AllMetadataName,
-              )
-            ];
-
-          if (!isDefined(targetFlatEntityMaps)) {
-            continue;
-          }
-
-          const referencedEntity =
-            targetFlatEntityMaps.byUniversalIdentifier[
-              referencedUniversalIdentifier
-            ];
-
-          if (isDefined(referencedEntity)) {
-            applicationIds.add(referencedEntity.applicationId);
-          }
-        }
-      }
-    }
-
-    return [...applicationIds];
   }
 }
