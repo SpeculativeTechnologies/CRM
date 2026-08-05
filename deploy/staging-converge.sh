@@ -178,11 +178,22 @@ before deploying ${target_sha}"
   # Order matters. A server image newer than the database cannot pass its
   # healthcheck, so containers start without the health gate, the schema is
   # brought forward, and only then is health required.
-  if bash "$REPO_ROOT/deploy/staging.sh" up --no-wait &&
-    bash "$REPO_ROOT/deploy/staging.sh" migrate &&
-    bash "$REPO_ROOT/deploy/staging.sh" wait &&
-    bash "$REPO_ROOT/deploy/staging.sh" up &&
-    bash "$REPO_ROOT/deploy/staging.sh" test; then
+  #
+  # Stepped rather than chained with && so the reported failure can name the
+  # gate that refused. Without the name, a rollback loop is indistinguishable
+  # from a bad commit, a stale schema and an unpullable image, and the only
+  # thing that tells them apart lives in this host's log.
+  failed_step=""
+  for step in "up --no-wait" migrate wait up test; do
+    # Unquoted on purpose: "up --no-wait" has to split into two arguments.
+    # shellcheck disable=SC2086
+    if ! bash "$REPO_ROOT/deploy/staging.sh" $step; then
+      failed_step="$step"
+      break
+    fi
+  done
+
+  if [ -z "$failed_step" ]; then
     echo "$target_sha" >"$STATE_FILE"
     log "staging is now running ${target_sha}"
     report success "staging is running ${target_sha}"
@@ -194,16 +205,18 @@ before deploying ${target_sha}"
 
   # Roll back to the image and the tree that were serving before, so a bad
   # commit does not leave staging down until someone can get to the host.
-  log "convergence to ${target_sha} failed; restoring ${current_sha}"
+  log "convergence to ${target_sha} failed at '${failed_step}'; restoring ${current_sha}"
   write_image "$current_image"
   git checkout --quiet --detach "$current_head" ||
     log "WARNING: could not restore the checkout to ${current_head}"
   if bash "$REPO_ROOT/deploy/staging.sh" up; then
     log "restored ${current_sha}"
-    report failure "deploy of ${target_sha} failed; rolled back to ${current_sha}"
+    report failure \
+      "deploy of ${target_sha} failed at '${failed_step}'; rolled back to ${current_sha}"
   else
     log "ROLLBACK FAILED: staging is down and needs manual attention"
-    report error "deploy of ${target_sha} failed and rollback failed"
+    report error \
+      "deploy of ${target_sha} failed at '${failed_step}' and rollback failed"
   fi
   exit 1
 }
