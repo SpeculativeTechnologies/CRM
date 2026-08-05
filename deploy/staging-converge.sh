@@ -48,6 +48,36 @@ fail() {
   exit 1
 }
 
+# Every deploy pulls a multi-gigabyte image tagged with its commit SHA and
+# nothing ever removed the old ones, so the Colima disk filled and the pull
+# started failing with "no space left on device". Rollback needs the image it
+# is rolling back to, and the pull needs the one it is fetching; every other
+# tag of this repository is spent. Images held by a running container refuse to
+# be removed, which is the backstop that keeps this from taking staging down.
+prune_spent_staging_images() {
+  local image_repo="$1" keep_current="$2" keep_target="$3" image
+  local -a spent=()
+
+  while read -r image; do
+    [ -n "$image" ] || continue
+    case "$image" in
+      "$keep_current" | "$keep_target") continue ;;
+      # A dangling entry has no tag to remove it by, and this flow never
+      # produces one: each deploy tags a distinct SHA, so nothing is overwritten.
+      *:'<none>') continue ;;
+    esac
+    spent+=("$image")
+  done < <(docker images --format '{{.Repository}}:{{.Tag}}' "$image_repo" 2>/dev/null || true)
+
+  [ "${#spent[@]}" -gt 0 ] || return 0
+
+  log "removing ${#spent[@]} spent staging image(s) to reclaim disk"
+  for image in "${spent[@]}"; do
+    docker image rm "$image" >/dev/null 2>&1 ||
+      log "could not remove ${image}; it may still be in use"
+  done
+}
+
 write_image() {
   local image="$1" tmp
   tmp="$(mktemp)"
@@ -172,6 +202,10 @@ before deploying ${target_sha}"
   # to fast-forward. `git switch -` returns the host to a branch by hand.
   git checkout --quiet --detach "$target_sha" ||
     fail "cannot check out ${target_sha} in the staging checkout"
+
+  # Before the pull, not after: a full disk fails the pull itself, so a cleanup
+  # that only ran on success could never rescue a host already wedged.
+  prune_spent_staging_images "$image_repo" "$current_image" "$target_image"
 
   write_image "$target_image"
 
