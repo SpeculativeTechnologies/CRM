@@ -1,0 +1,154 @@
+name: ${CLOUD_PROJECT_NAME:?Set CLOUD_PROJECT_NAME (twenty-cloud-staging or twenty-cloud-production)}
+
+# Twenty on a cloud VM, reached only through a Cloudflare tunnel.
+#
+# One file serves both boxes; everything that differs between cloud staging and
+# cloud production comes from the env file (deploy/.env.cloud on the VM, owned by
+# root, mode 0600, outside any git clone).
+#
+# Safety properties, all load-bearing:
+# - NO published ports. Nothing binds a host interface, so the VM needs no
+#   external IP and there is no listener to scan. The tunnel reaches the server
+#   over the internal Compose network instead.
+# - Postgres and Redis are unpublished and Redis requires a password, so a
+#   compromised sidecar cannot reach them unauthenticated.
+# - Database and attachments live under DATA_ROOT, which is the mount point of a
+#   SEPARATE persistent disk with auto-delete off. Deleting the instance does not
+#   delete the data. See "Where the database lives" in deploy/ACCESS.md.
+# - An immutable commit-SHA image tag is required; `latest` would make the
+#   running code unidentifiable.
+#
+# Migrations are never run from the entrypoint. DISABLE_DB_MIGRATIONS stays true
+# and upgrades are driven explicitly, for the reason recorded in
+# compose.staging.yml: two concurrent `upgrade` processes read the same attempt
+# number, collide on UQ_upgrade_migration_workspace, and record a failure for a
+# command that actually succeeded.
+
+x-app-environment: &app-environment
+  PG_DATABASE_URL: postgres://postgres:${CLOUD_DATABASE_PASSWORD:?Set CLOUD_DATABASE_PASSWORD}@db:5432/${CLOUD_DATABASE_NAME:-twenty}
+  REDIS_URL: redis://:${CLOUD_REDIS_PASSWORD:?Set CLOUD_REDIS_PASSWORD}@redis:6379
+  SERVER_URL: ${CLOUD_SERVER_URL:?Set CLOUD_SERVER_URL (https://crm.spec.tech)}
+  FRONTEND_URL: ${CLOUD_SERVER_URL:?Set CLOUD_SERVER_URL (https://crm.spec.tech)}
+  # APP_SECRET only, deliberately: production has no ENCRYPTION_KEY set, so
+  # APP_SECRET is the encryption path for stored third-party credentials.
+  # Changing it invalidates sessions and breaks every Gmail/Calendar connection
+  # until each user reconnects. Cloud staging uses the same variable so it
+  # rehearses production's configuration rather than local staging's divergence.
+  APP_SECRET: ${CLOUD_APP_SECRET:?Set CLOUD_APP_SECRET (carry production's value forward)}
+  ENVIRONMENT_LABEL: ${CLOUD_ENVIRONMENT_LABEL:-staging}
+  # Behind the tunnel, so client IPs arrive in X-Forwarded-For. Without this,
+  # every logged request IP is the tunnel's.
+  TRUST_PROXY: "true"
+  # Explicit rather than relying on the image default, because this being true is
+  # the single worst thing that could reach the public internet.
+  SIGN_IN_PREFILLED: "false"
+  DISABLE_DB_MIGRATIONS: "true"
+  # Production needs cron jobs for Gmail/Calendar sync; staging sets this true so
+  # a restored copy does not start syncing real mailboxes.
+  DISABLE_CRON_JOBS_REGISTRATION: ${CLOUD_DISABLE_CRON_JOBS:-true}
+  STORAGE_TYPE: local
+  # Defaults to logger so a misconfigured staging box cannot email real people.
+  EMAIL_DRIVER: ${CLOUD_EMAIL_DRIVER:-logger}
+  EMAIL_SMTP_HOST: ${CLOUD_EMAIL_SMTP_HOST:-}
+  EMAIL_SMTP_PORT: ${CLOUD_EMAIL_SMTP_PORT:-}
+  EMAIL_SMTP_USER: ${CLOUD_EMAIL_SMTP_USER:-}
+  EMAIL_SMTP_PASSWORD: ${CLOUD_EMAIL_SMTP_PASSWORD:-}
+  EMAIL_FROM_ADDRESS: ${CLOUD_EMAIL_FROM_ADDRESS:-}
+  EMAIL_SYSTEM_ADDRESS: ${CLOUD_EMAIL_SYSTEM_ADDRESS:-}
+  AUTH_GOOGLE_ENABLED: ${CLOUD_AUTH_GOOGLE_ENABLED:-false}
+  AUTH_GOOGLE_CLIENT_ID: ${CLOUD_AUTH_GOOGLE_CLIENT_ID:-}
+  AUTH_GOOGLE_CLIENT_SECRET: ${CLOUD_AUTH_GOOGLE_CLIENT_SECRET:-}
+  AUTH_GOOGLE_CALLBACK_URL: ${CLOUD_AUTH_GOOGLE_CALLBACK_URL:-}
+  AUTH_GOOGLE_APIS_CALLBACK_URL: ${CLOUD_AUTH_GOOGLE_APIS_CALLBACK_URL:-}
+  CALENDAR_PROVIDER_GOOGLE_ENABLED: ${CLOUD_CALENDAR_PROVIDER_GOOGLE_ENABLED:-false}
+  MESSAGING_PROVIDER_GMAIL_ENABLED: ${CLOUD_MESSAGING_PROVIDER_GMAIL_ENABLED:-false}
+
+services:
+  server:
+    image: ${CLOUD_IMAGE:?Set CLOUD_IMAGE to a commit-SHA image tag}
+    platform: ${CLOUD_PLATFORM:-linux/arm64}
+    environment:
+      <<: *app-environment
+      NODE_PORT: 3000
+    volumes:
+      - ${CLOUD_DATA_ROOT:?Set CLOUD_DATA_ROOT to the data disk mount point}/attachments:/app/packages/twenty-server/.local-storage
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:3000/healthz"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+    restart: unless-stopped
+
+  worker:
+    image: ${CLOUD_IMAGE:?Set CLOUD_IMAGE to a commit-SHA image tag}
+    platform: ${CLOUD_PLATFORM:-linux/arm64}
+    command: ["yarn", "worker:prod"]
+    environment:
+      <<: *app-environment
+    volumes:
+      - ${CLOUD_DATA_ROOT:?Set CLOUD_DATA_ROOT to the data disk mount point}/attachments:/app/packages/twenty-server/.local-storage
+    depends_on:
+      db:
+        condition: service_healthy
+      server:
+        condition: service_healthy
+    restart: unless-stopped
+
+  db:
+    image: postgres:16
+    # Bind mount, not a named volume: the data must sit on the separate disk,
+    # visibly and verifiably, not wherever Docker's storage root happens to be.
+    volumes:
+      - ${CLOUD_DATA_ROOT:?Set CLOUD_DATA_ROOT to the data disk mount point}/postgres:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${CLOUD_DATABASE_PASSWORD:?Set CLOUD_DATABASE_PASSWORD}
+      POSTGRES_DB: ${CLOUD_DATABASE_NAME:-twenty}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d ${CLOUD_DATABASE_NAME:-twenty}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    restart: unless-stopped
+
+  redis:
+    image: redis:7
+    command:
+      - redis-server
+      - --maxmemory-policy
+      - noeviction
+      - --requirepass
+      - ${CLOUD_REDIS_PASSWORD:?Set CLOUD_REDIS_PASSWORD}
+    volumes:
+      - ${CLOUD_DATA_ROOT:?Set CLOUD_DATA_ROOT to the data disk mount point}/redis:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${CLOUD_REDIS_PASSWORD:?Set CLOUD_REDIS_PASSWORD}", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    restart: unless-stopped
+
+  # The only route in. A token-managed tunnel: its public hostnames and their
+  # Access policies are configured in Cloudflare, so rotating a route never
+  # touches the VM. It dials out, which is why no external IP or inbound
+  # firewall rule is needed. Stopping this service is the kill switch.
+  tunnel:
+    image: cloudflare/cloudflared:${CLOUD_CLOUDFLARED_VERSION:-2026.5.0}
+    command: ["tunnel", "--no-autoupdate", "run"]
+    environment:
+      TUNNEL_TOKEN: ${CLOUD_TUNNEL_TOKEN:?Set CLOUD_TUNNEL_TOKEN from the Cloudflare tunnel}
+      TUNNEL_METRICS: 0.0.0.0:2000
+    depends_on:
+      server:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "cloudflared", "--version"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped
