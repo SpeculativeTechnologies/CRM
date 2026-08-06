@@ -1,0 +1,31 @@
+# Ingress for the cloud STAGING tunnel.
+#
+# This file exists so the hostname-to-service mapping is reviewable in a diff
+# instead of living as dashboard state. Cloudflare's token-managed mode keeps
+# ingress in the dashboard, which is why this deployment uses a credentials file
+# instead.
+#
+# The tunnel UUID below is an identifier, not a secret. The secret is the
+# credentials JSON, which is placed on the VM by hand at
+# /etc/cloudflared/creds.json (root-owned, 0400) and never committed.
+
+tunnel: 770f7a6b-819d-40f3-88a8-eda91f10f059
+credentials-file: /etc/cloudflared/creds.json
+
+# No autoupdate: the version is pinned by the container image so that what runs
+# is what was reviewed.
+no-autoupdate: true
+
+ingress:
+  # cloudflared reaches the app over the internal Compose network. This is the
+  # reason the server publishes no host port at all.
+  - hostname: crm-staging.spec.tech
+    service: http://server:3000
+    originRequest:
+      # The origin is a container one hop away on a private bridge network, so a
+      # generous connect timeout would only mask a broken server.
+      connectTimeout: 10s
+      noHappyEyeballs: true
+
+  # Anything arriving on this tunnel for another hostname is not ours to answer.
+  - service: http_status:404

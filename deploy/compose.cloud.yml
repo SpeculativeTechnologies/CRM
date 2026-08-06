@@ -133,22 +133,27 @@ services:
       retries: 20
     restart: unless-stopped
 
-  # The only route in. A token-managed tunnel: its public hostnames and their
-  # Access policies are configured in Cloudflare, so rotating a route never
-  # touches the VM. It dials out, which is why no external IP or inbound
-  # firewall rule is needed. Stopping this service is the kill switch.
+  # The only route in. It dials out to Cloudflare, which is why the VM needs no
+  # external IP and no inbound firewall rule. Stopping this service is an
+  # instant, reversible kill switch.
+  #
+  # Config-file mode, not token mode. A token keeps the hostname-to-service
+  # mapping in the Cloudflare dashboard; mounting deploy/cloudflared/<env>.yml
+  # keeps it in git where a change shows up in a diff. The credentials JSON is
+  # the secret half and is placed on the VM by hand, never committed.
   tunnel:
-    image: cloudflare/cloudflared:${CLOUD_CLOUDFLARED_VERSION:-2026.5.0}
-    command: ["tunnel", "--no-autoupdate", "run"]
+    image: cloudflare/cloudflared:${CLOUD_CLOUDFLARED_VERSION:-2026.7.3}
+    command: ["tunnel", "--config", "/etc/cloudflared/config.yml", "run"]
+    volumes:
+      - ${CLOUD_TUNNEL_CONFIG:?Set CLOUD_TUNNEL_CONFIG to the ingress config for this environment}:/etc/cloudflared/config.yml:ro
+      - ${CLOUD_TUNNEL_CREDENTIALS:?Set CLOUD_TUNNEL_CREDENTIALS to the tunnel credentials JSON}:/etc/cloudflared/creds.json:ro
     environment:
-      TUNNEL_TOKEN: ${CLOUD_TUNNEL_TOKEN:?Set CLOUD_TUNNEL_TOKEN from the Cloudflare tunnel}
       TUNNEL_METRICS: 0.0.0.0:2000
     depends_on:
       server:
         condition: service_healthy
-    healthcheck:
-      test: ["CMD", "cloudflared", "--version"]
-      interval: 30s
-      timeout: 5s
-      retries: 3
+    # No healthcheck. The obvious one, `cloudflared --version`, proves the binary
+    # exists and nothing about whether the tunnel is connected, so it would report
+    # healthy through an outage. Real readiness is observable from Cloudflare's
+    # side and on the metrics port; a check that cannot fail is worse than none.
     restart: unless-stopped
