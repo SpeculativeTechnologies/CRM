@@ -176,9 +176,18 @@ verify() {
   id "$SERVICE_USER" >/dev/null && log "OK   service user $SERVICE_USER"
   command -v tailscale >/dev/null && log "OK   tailscale installed"
   # A box with an external IP is a box this design did not intend to exist.
-  if curl -sf -H 'Metadata-Flavor: Google' -o /dev/null \
-    'http://metadata.google.internal/computeMetadata/v1/instance/network-interfaces/0/access-configs/0/external-ip'; then
-    log "WARNING: this instance HAS an external IP. Phase C specifies none."
+  #
+  # The body is the signal, not curl's exit status. This metadata path answers
+  # 200 with an EMPTY body when the instance has no external IP, so `curl -sf`
+  # succeeds either way and warns on every correctly built box. A check that
+  # cries wolf is worse than no check, because it is the one that gets ignored
+  # on the day it is right.
+  local external_ip
+  external_ip="$(curl -s -H 'Metadata-Flavor: Google' \
+    'http://metadata.google.internal/computeMetadata/v1/instance/network-interfaces/0/access-configs/0/external-ip' \
+    2>/dev/null || true)"
+  if [ -n "$external_ip" ]; then
+    log "WARNING: this instance HAS an external IP ($external_ip). Phase C specifies none."
   else
     log "OK   no external IP"
   fi
