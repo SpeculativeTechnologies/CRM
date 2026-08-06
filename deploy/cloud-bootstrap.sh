@@ -15,12 +15,16 @@
 #   0600, outside any git clone.
 # - It never starts the stack. Bring-up is deliberate, after the env file exists
 #   and a dump has been restored.
-# - It never touches sshd's ListenAddress. Binding sshd to the tailnet IP looks
-#   appealing but fails closed if tailscaled has not assigned an address yet,
-#   which locks you out of a box that has no external IP and therefore no
-#   console-free recovery path. The perimeter is the absent external IP plus a
-#   default-deny VPC firewall; sshd hardening here is defence in depth, not the
+# - It never restricts which interface sshd listens on. The perimeter is the
+#   absent external IP plus a VPC firewall whose only ingress rule admits
+#   Google's IAP range; sshd hardening here is defence in depth, not the
 #   perimeter.
+# - It does not install Tailscale. Admin access is IAP TCP forwarding
+#   (`gcloud compute ssh --tunnel-through-iap`): no public listener, IAM-gated,
+#   audit-logged, and nothing extra running on the box. Break-glass is the serial
+#   console (`gcloud compute connect-to-serial-port`), which is also IAM-gated
+#   and, unlike a tailnet, still works when sshd itself is broken. Tailscale
+#   would only add a long-lived credential on a box holding CRM data.
 #
 # See deploy/ACCESS.md, Phase C, for where this sits in the sequence.
 # =============================================================================
@@ -119,18 +123,6 @@ install_docker() {
   systemctl enable --now docker
 }
 
-install_tailscale() {
-  if command -v tailscale >/dev/null 2>&1; then
-    log "tailscale already installed"
-    return
-  fi
-  log "installing tailscale"
-  curl -fsSL https://tailscale.com/install.sh | sh
-  # Left un-authenticated on purpose: `tailscale up` needs an interactive auth
-  # key. Run it by hand, or pass an ephemeral authkey, once the box is up.
-  log "run 'tailscale up --ssh' by hand to join the tailnet"
-}
-
 # --- hardening ---------------------------------------------------------------
 create_service_user() {
   if id "$SERVICE_USER" >/dev/null 2>&1; then
@@ -174,7 +166,8 @@ verify() {
   docker --version | sed 's/^/[bootstrap] OK   /'
   docker compose version --short | sed 's/^/[bootstrap] OK   compose /'
   id "$SERVICE_USER" >/dev/null && log "OK   service user $SERVICE_USER"
-  command -v tailscale >/dev/null && log "OK   tailscale installed"
+  command -v tailscale >/dev/null &&
+    log "WARNING: tailscale is installed. This design uses IAP; remove it."
   # A box with an external IP is a box this design did not intend to exist.
   #
   # The body is the signal, not curl's exit status. This metadata path answers
@@ -197,7 +190,6 @@ verify() {
 mount_data_disk
 install_base_packages
 install_docker
-install_tailscale
 create_service_user
 harden_ssh
 enable_unattended_upgrades
