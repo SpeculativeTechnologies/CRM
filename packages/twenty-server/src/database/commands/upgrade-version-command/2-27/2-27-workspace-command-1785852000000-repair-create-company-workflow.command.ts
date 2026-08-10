@@ -1,3 +1,4 @@
+import isEqual from 'lodash.isequal';
 import { Command } from 'nest-commander';
 import { STANDARD_OBJECTS } from 'twenty-shared/metadata';
 import { isDefined } from 'twenty-shared/utils';
@@ -290,10 +291,13 @@ export class RepairCreateCompanyWorkflowCommand extends ProvisionedWorkspaceComm
     );
   }
 
+  // Structural, not serialized: jsonb returns object keys ordered by length,
+  // never in the order the filter was built, so comparing stringified forms
+  // would report every already-repaired workflow as still needing the guard.
   private filtersAreEqual(
     left: DatabaseEventTriggerFilterSettings | undefined,
     right: DatabaseEventTriggerFilterSettings,
   ): boolean {
-    return JSON.stringify(left) === JSON.stringify(right);
+    return isEqual(left, right);
   }
 }
