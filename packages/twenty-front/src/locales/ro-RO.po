@@ -14260,6 +14260,11 @@ msgstr "Persoanele cărora le-am trimis emailuri și de la care am primit emailu
 msgid "People I’ve sent emails to."
 msgstr "Persoanele cărora le-am trimis emailuri."
 
+#. js-lingui-id: U2iZb4
+#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
+msgid "People merged, but the duplicate queue could not be refreshed. Reload the page."
+msgstr ""
+
 #. js-lingui-id: ly1vF8
 #: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
 msgid "People merged. Absorbed records are available in Trash."
@@ -18331,6 +18336,7 @@ msgid "The PDF is pre-signed by Twenty and executed with your legal entity and a
 msgstr "PDF-ul este pre-semnat de Twenty și executat cu entitatea dvs. juridică și semnatarul autorizat."
 
 #. js-lingui-id: JD8guD
+#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
 #: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
 msgid "The people could not be merged."
 msgstr ""

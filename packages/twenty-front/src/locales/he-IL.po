@@ -14260,6 +14260,11 @@ msgstr "אנשים שאני שותף דוא\"ל אליהם וקיבלתי ממנ
 msgid "People I’ve sent emails to."
 msgstr "אנשים ששלחתי אליהם דוא\"ל."
 
+#. js-lingui-id: U2iZb4
+#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
+msgid "People merged, but the duplicate queue could not be refreshed. Reload the page."
+msgstr ""
+
 #. js-lingui-id: ly1vF8
 #: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
 msgid "People merged. Absorbed records are available in Trash."
@@ -18331,6 +18336,7 @@ msgid "The PDF is pre-signed by Twenty and executed with your legal entity and a
 msgstr "ה-PDF נחתם מראש על ידי Twenty ומבוצע עם הישות המשפטית שלך והחותם המורשה שלך."
 
 #. js-lingui-id: JD8guD
+#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
 #: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
 msgid "The people could not be merged."
 msgstr ""

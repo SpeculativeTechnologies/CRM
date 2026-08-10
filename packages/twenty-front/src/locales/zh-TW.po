@@ -14237,6 +14237,11 @@ msgstr "我發送和接收電子郵件的人。"
 msgid "People I’ve sent emails to."
 msgstr "我發送電子郵件的人。"
 
+#. js-lingui-id: U2iZb4
+#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
+msgid "People merged, but the duplicate queue could not be refreshed. Reload the page."
+msgstr ""
+
 #. js-lingui-id: ly1vF8
 #: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
 msgid "People merged. Absorbed records are available in Trash."
@@ -18278,6 +18283,7 @@ msgid "The PDF is pre-signed by Twenty and executed with your legal entity and a
 msgstr "此 PDF 已由 Twenty 預先簽署，並與您的法人實體與授權簽署人共同生效。"
 
 #. js-lingui-id: JD8guD
+#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
 #: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
 msgid "The people could not be merged."
 msgstr ""
