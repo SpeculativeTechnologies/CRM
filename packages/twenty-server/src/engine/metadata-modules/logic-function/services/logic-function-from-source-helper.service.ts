@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 
-import { join } from 'path';
+import { posix } from 'path';
 
 import { ApplicationService } from 'src/engine/core-modules/application/application.service';
 import { WorkspaceManyOrAllFlatEntityMapsCacheService } from 'src/engine/metadata-modules/flat-entity/services/workspace-many-or-all-flat-entity-maps-cache.service';
@@ -57,12 +57,14 @@ export class LogicFunctionFromSourceHelperService {
     const logicFunctionSubfolder =
       getLogicFunctionSubfolderForFromSource(logicFunctionId);
 
+    // These are file storage resource keys, not filesystem paths, so they stay
+    // POSIX-style on every platform.
     return {
-      sourceHandlerPath: join(
+      sourceHandlerPath: posix.join(
         logicFunctionSubfolder,
         DEFAULT_SOURCE_HANDLER_PATH,
       ),
-      builtHandlerPath: join(
+      builtHandlerPath: posix.join(
         logicFunctionSubfolder,
         DEFAULT_BUILT_HANDLER_PATH,
       ),
