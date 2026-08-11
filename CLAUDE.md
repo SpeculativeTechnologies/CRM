@@ -242,6 +242,16 @@ private because it describes a live system; this repository is public.
   verification performed, failures or omissions, risk areas, and what Ben should
   validate on staging.
 
+### Live CRM API access
+
+- Requests to `https://crm-api.spec.tech` require both authentication layers
+  from the ignored root `.env`: `TWENTY_API_KEY` for Twenty and the
+  hyphenated `CF-Access-Client-Id` / `CF-Access-Client-Secret` service-token
+  entries for Cloudflare Access.
+- Send the service-token values as the `CF-Access-Client-Id` and
+  `CF-Access-Client-Secret` request headers. Never print, log, commit, or paste
+  any of these credential values.
+
 ### Hard safety rules
 
 - Work only in a developer checkout with developer-owned Postgres, Redis, and

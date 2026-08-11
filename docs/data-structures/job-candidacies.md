@@ -1,11 +1,18 @@
 # Job Candidacies configuration
 
-This proposed custom object represents a Person's candidacy for a specific
+This custom object represents a Person's candidacy for a specific
 role at Spectech. It tracks the hiring process and outcome without duplicating
 the Person's canonical CRM profile.
 
-This document is a configuration brief only. Do not create the object, fields,
-views, workflows, or records until this proposal is approved.
+## Implementation status
+
+Implemented in the live CRM through the metadata API on 2026-08-11. The object,
+specified fields, reciprocal relations, and Twenty's default table and record
+page views are active. The Source Candidacy Key is active for API imports but
+hidden in both default views.
+
+No Job Candidacy records were created or migrated. The existing Candidates
+object was not renamed, modified, deleted, or migrated.
 
 ## Record grain
 
@@ -93,16 +100,15 @@ interview feedback, and other qualitative context.
 - No custom Next Step or Tasks field.
 - Do not automatically create Employment History from an accepted offer.
 - Do not rename, modify, delete, or migrate the existing Candidates object
-  until its purpose and fields have been compared with this proposal.
-- Do not create the object, fields, views, workflows, or records until this
-  configuration brief is approved.
+  until its purpose and fields have been compared with this configuration.
 
-## Decisions before implementation
+## Open follow-ups
 
-- Confirm that the Candidacy Stage options match Spectech's hiring vocabulary.
 - Decide when an accepted candidacy should produce an Employment History
   record: offer acceptance, confirmed start, or actual start.
-- Review the existing Candidates object and decide whether Job Candidacies
-  coexist with it, replace it, or receive migrated records.
+- Review the existing Candidates object before deciding whether to migrate any
+  records. Job Candidacies currently coexist with it.
 - Identify any source system before defining migration rules or the Source
   Candidacy Key format.
+- Create the suggested pipeline views when the team is ready to use the object
+  operationally; only Twenty's default views exist today.
