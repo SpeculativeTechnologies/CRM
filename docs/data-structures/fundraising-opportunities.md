@@ -113,3 +113,24 @@ supporting materials rather than creating long-form status fields.
 - Identify any source system and mapping rules before designing a migration.
 - Decide whether the either/or funder rule needs a workflow validation after
   the object is created.
+
+## Relationship to existing Opportunities
+
+Fundraising Opportunities intentionally reuse the compact pipeline shape of
+Twenty's existing Opportunities object, but they represent a different process
+and must remain a separate object.
+
+| Concept | Existing Opportunities | Fundraising Opportunities |
+| --- | --- | --- |
+| Purpose | Commercial or customer pipeline | Capital, grants, sponsorships, prizes, and other funding |
+| Record grain | One commercial deal | One funder, Funding Initiative, and application or deal cycle |
+| Pipeline | Generic stages ending in Customer | Fundraising stages distinguishing Committed, Funded, Passed, and Declined |
+| Money | One Amount | Amount Sought and Amount Committed |
+| Initiative grouping | None | Required canonical Funding Initiative select |
+
+Both objects need an owner, stage, amount, timing, organization or contact, and
+task-based follow-up because both are pipelines. The separate object prevents
+fundraising records from distorting the existing sales board, pipeline totals,
+and reporting. It also avoids forcing fundraising concepts into sales fields:
+`Customer` is not a fundraising outcome, committed funding may not yet be
+received, and the amount requested may differ from the amount committed.
