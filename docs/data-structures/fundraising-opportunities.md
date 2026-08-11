@@ -33,7 +33,7 @@ enforced through operating guidance or a future workflow.
 | Field | Type | Required | Notes |
 | --- | --- | --- | --- |
 | Fundraising Opportunity | Text, primary | Yes | Human-readable record label, populated during import or creation. |
-| Funding Initiative | Text | Yes | The round, campaign, grant program, or other fundraising effort this record belongs to. |
+| Funding Initiative | Select | Yes | The round, campaign, grant program, or other fundraising effort this record belongs to. Use the canonical options described below. |
 | Funder Organization | Relation to Company | No | Canonical organization supplying or administering the potential funding. |
 | Funder Contact | Relation to Person | No | Primary canonical contact, or the funder when the source is an individual. |
 | Funding Type | Select | Yes | `Equity Investment`, `Grant`, `Debt`, `Sponsorship`, `Prize`, or `Other`. |
@@ -58,6 +58,11 @@ Canonical Fundraising Stage options:
 - Funded
 - Passed
 - Declined
+
+Canonical Funding Initiative options must be agreed before implementation.
+Each option should identify one team-wide fundraising effort, such as a
+specific round or grant campaign. Add future initiatives to this select rather
+than creating initiative-specific fields or allowing free-text variations.
 
 Use `Committed` when funding has been promised but not received and `Funded`
 when the transaction or award is complete. Use `Passed` when the team chooses
@@ -104,8 +109,7 @@ supporting materials rather than creating long-form status fields.
 
 - Confirm that the Funding Type and Fundraising Stage option sets match the
   team's working vocabulary.
-- Confirm whether Funding Initiative should remain free text or become a
-  relation to a future Fundraising Initiative object.
+- Define the initial canonical Funding Initiative select options.
 - Identify any source system and mapping rules before designing a migration.
 - Decide whether the either/or funder rule needs a workflow validation after
   the object is created.
