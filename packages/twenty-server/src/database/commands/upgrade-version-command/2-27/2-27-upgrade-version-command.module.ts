@@ -11,10 +11,13 @@ import { BackfillConnectionReciprocalsCommand } from 'src/database/commands/upgr
 import { HidePersonConnectedFromViewFieldCommand } from 'src/database/commands/upgrade-version-command/2-27/2-27-workspace-command-1785840000000-hide-person-connected-from-view-field.command';
 import { HideReciprocalsFromConnectionsViewCommand } from 'src/database/commands/upgrade-version-command/2-27/2-27-workspace-command-1785850000000-hide-reciprocals-from-connections-view.command';
 import { BackfillMissingStandardSkillsCommand } from 'src/database/commands/upgrade-version-command/2-27/2-27-workspace-command-1785499350000-backfill-standard-skills.command';
+import { RepairCreateCompanyWorkflowCommand } from 'src/database/commands/upgrade-version-command/2-27/2-27-workspace-command-1785852000000-repair-create-company-workflow.command';
 import { ApplicationModule } from 'src/engine/core-modules/application/application.module';
+import { WorkflowVersionCoreModule } from 'src/engine/core-modules/workflow/workflow-version-core.module';
 import { ConnectionModule } from 'src/modules/connection/connection.module';
 import { FieldMetadataEntity } from 'src/engine/metadata-modules/field-metadata/field-metadata.entity';
 import { WorkspaceCacheModule } from 'src/engine/workspace-cache/workspace-cache.module';
+import { StandardObjectsPrefillModule } from 'src/engine/workspace-manager/standard-objects-prefill-data/standard-objects-prefill.module';
 import { WorkspaceMigrationRunnerModule } from 'src/engine/workspace-manager/workspace-migration/workspace-migration-runner/workspace-migration-runner.module';
 import { WorkspaceMigrationModule } from 'src/engine/workspace-manager/workspace-migration/workspace-migration.module';
 
@@ -22,6 +25,8 @@ import { WorkspaceMigrationModule } from 'src/engine/workspace-manager/workspace
   imports: [
     ApplicationModule,
     TypeOrmModule.forFeature([FieldMetadataEntity]),
+    StandardObjectsPrefillModule,
+    WorkflowVersionCoreModule,
     WorkspaceCacheModule,
     WorkspaceMigrationModule,
     WorkspaceMigrationRunnerModule,
@@ -38,6 +43,7 @@ import { WorkspaceMigrationModule } from 'src/engine/workspace-manager/workspace
     BackfillConnectionReciprocalsCommand,
     HidePersonConnectedFromViewFieldCommand,
     HideReciprocalsFromConnectionsViewCommand,
+    RepairCreateCompanyWorkflowCommand,
   ],
 })
 export class V2_27_UpgradeVersionCommandModule {}

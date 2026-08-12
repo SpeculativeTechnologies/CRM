@@ -15,6 +15,8 @@ const PERSON_SYNC_SOURCE_EMAIL_FILTER_ID =
 const PERSON_SYNC_SOURCE_CALENDAR_FILTER_ID =
   '4f9c3b5d-8d6a-4e0c-9b34-7c5d6e8f0a12';
 
+const PERSON_COMPANY_EMPTY_FILTER_ID = '5a0d4c6e-9e7b-4f1d-8c45-8d6e7f9a1b23';
+
 export const buildPersonSyncSourceFilter = ({
   createdByFieldMetadataId,
 }: {
@@ -48,6 +50,35 @@ export const buildPersonSyncSourceFilter = ({
         id: PERSON_SYNC_SOURCE_CALENDAR_FILTER_ID,
         value: JSON.stringify([FieldActorSource.CALENDAR]),
         positionInStepFilterGroup: 1,
+      },
+    ],
+  };
+};
+
+export const buildPersonCompanyInferenceFilter = ({
+  createdByFieldMetadataId,
+  companyFieldMetadataId,
+}: {
+  createdByFieldMetadataId: string;
+  companyFieldMetadataId: string;
+}): { stepFilterGroups: StepFilterGroup[]; stepFilters: StepFilter[] } => {
+  const sourceFilter = buildPersonSyncSourceFilter({
+    createdByFieldMetadataId,
+  });
+
+  return {
+    stepFilterGroups: sourceFilter.stepFilterGroups,
+    stepFilters: [
+      ...sourceFilter.stepFilters,
+      {
+        id: PERSON_COMPANY_EMPTY_FILTER_ID,
+        type: 'RELATION',
+        operand: ViewFilterOperand.IS_EMPTY,
+        value: '',
+        stepOutputKey: '{{trigger.properties.after.companyId}}',
+        stepFilterGroupId: PERSON_SYNC_SOURCE_FILTER_GROUP_ID,
+        fieldMetadataId: companyFieldMetadataId,
+        positionInStepFilterGroup: 2,
       },
     ],
   };

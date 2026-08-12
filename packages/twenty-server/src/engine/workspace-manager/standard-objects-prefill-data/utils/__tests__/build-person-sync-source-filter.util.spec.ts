@@ -1,4 +1,7 @@
-import { buildPersonSyncSourceFilter } from 'src/engine/workspace-manager/standard-objects-prefill-data/utils/build-person-sync-source-filter.util';
+import {
+  buildPersonCompanyInferenceFilter,
+  buildPersonSyncSourceFilter,
+} from 'src/engine/workspace-manager/standard-objects-prefill-data/utils/build-person-sync-source-filter.util';
 import { evaluateStepFilters } from 'src/modules/workflow/workflow-executor/workflow-actions/filter/utils/evaluate-step-filters.util';
 
 describe('buildPersonSyncSourceFilter', () => {
@@ -54,5 +57,67 @@ describe('buildPersonSyncSourceFilter', () => {
           stepFilter.stepFilterGroupId === filter.stepFilterGroups[0].id,
       ),
     ).toBe(true);
+  });
+});
+
+describe('buildPersonCompanyInferenceFilter', () => {
+  const filter = buildPersonCompanyInferenceFilter({
+    createdByFieldMetadataId: 'created-by-field-id',
+    companyFieldMetadataId: 'company-field-id',
+  });
+
+  const evaluateForPerson = ({
+    source = 'MANUAL',
+    companyId,
+  }: {
+    source?: string;
+    companyId?: string | null;
+  }) =>
+    evaluateStepFilters({
+      stepFilters: filter.stepFilters,
+      stepFilterGroups: filter.stepFilterGroups,
+      context: {
+        trigger: {
+          properties: {
+            after: {
+              createdBy: { source },
+              companyId,
+            },
+          },
+        },
+      },
+    });
+
+  it.each([undefined, null, ''])(
+    'runs when the person has no company (%s)',
+    (companyId) => {
+      expect(evaluateForPerson({ companyId })).toBe(true);
+    },
+  );
+
+  it('does not run when the person already has a company', () => {
+    expect(evaluateForPerson({ companyId: 'intentional-company-id' })).toBe(
+      false,
+    );
+  });
+
+  it.each(['EMAIL', 'CALENDAR'])(
+    'does not run for people created by %s sync',
+    (source) => {
+      expect(evaluateForPerson({ source })).toBe(false);
+    },
+  );
+
+  it('adds the company guard to the same AND group as the source guards', () => {
+    expect(filter.stepFilterGroups).toHaveLength(1);
+    expect(filter.stepFilters).toHaveLength(3);
+    expect(filter.stepFilters[2]).toMatchObject({
+      type: 'RELATION',
+      operand: 'IS_EMPTY',
+      value: '',
+      stepOutputKey: '{{trigger.properties.after.companyId}}',
+      fieldMetadataId: 'company-field-id',
+      stepFilterGroupId: filter.stepFilterGroups[0].id,
+    });
   });
 });
