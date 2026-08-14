@@ -57,7 +57,7 @@ import { EventLogLiveService } from 'src/engine/core-modules/event-logs/live/eve
 import { WorkspaceEntity } from 'src/engine/core-modules/workspace/workspace.entity';
 import { WorkspaceCacheService } from 'src/engine/workspace-cache/services/workspace-cache.service';
 import { WorkspaceEventEmitter } from 'src/engine/workspace-event-emitter/workspace-event-emitter';
-import { cleanServerUrl } from 'src/utils/clean-server-url';
+import { selectLogicFunctionApiBaseUrl } from 'src/engine/core-modules/logic-function/logic-function-executor/utils/select-logic-function-api-base-url.util';
 
 export class LogicFunctionExecutionException extends Error {
   constructor(
@@ -339,7 +339,12 @@ export class LogicFunctionExecutorService {
         userWorkspaceId,
       });
 
-    const baseUrl = cleanServerUrl(this.twentyConfigService.get('SERVER_URL'));
+    const baseUrl = selectLogicFunctionApiBaseUrl({
+      logicFunctionApiUrl: this.twentyConfigService.get(
+        'LOGIC_FUNCTION_API_URL',
+      ),
+      serverUrl: this.twentyConfigService.get('SERVER_URL'),
+    });
     const functionsBaseUrl = await this.buildFunctionsBaseUrl({
       workspaceId,
       flatApplication,
