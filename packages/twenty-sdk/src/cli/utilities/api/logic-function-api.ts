@@ -1,5 +1,6 @@
 import { type ApiClient } from '@/cli/utilities/api/api-client';
 import { type ApiResponse } from '@/cli/utilities/api/api-response-type';
+import { getExtraHeadersFromEnv } from '@/cli/utilities/api/get-extra-headers-from-env';
 import { createClient } from 'graphql-sse';
 
 export class LogicFunctionApi {
@@ -150,6 +151,7 @@ export class LogicFunctionApi {
         const authToken = await this.apiClient.resolveAuthToken();
 
         return {
+          ...getExtraHeadersFromEnv(),
           Authorization: authToken ? `Bearer ${authToken}` : '',
           'Content-Type': 'application/json',
           Accept: 'text/event-stream',
