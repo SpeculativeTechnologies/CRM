@@ -6,6 +6,7 @@ import { MemoryRouter } from 'react-router-dom';
 
 import { isLayoutCustomizationModeEnabledState } from '@/layout-customization/states/isLayoutCustomizationModeEnabledState';
 import { SidePanelToggleButton } from '@/side-panel/components/SidePanelToggleButton';
+import { DEFAULT_SIDE_PANEL_SEARCH_OBJECT_FILTER } from '@/side-panel/constants/DefaultSidePanelSearchObjectFilter';
 import { isSidePanelOpenedState } from '@/side-panel/states/isSidePanelOpenedState';
 import { sidePanelNavigationStackState } from '@/side-panel/states/sidePanelNavigationStackState';
 import { sidePanelPageState } from '@/side-panel/states/sidePanelPageState';
@@ -37,7 +38,7 @@ const renderSidePanelToggleButton = ({
   sidePanelPage = SidePanelPages.CommandMenuDisplay,
   sidePanelNavigationStack = [],
   sidePanelSearch = '',
-  sidePanelSearchObjectFilter = null,
+  sidePanelSearchObjectFilter = DEFAULT_SIDE_PANEL_SEARCH_OBJECT_FILTER,
   isLayoutCustomizationModeEnabled = false,
 }: {
   isSidePanelOpened?: boolean;
@@ -49,7 +50,7 @@ const renderSidePanelToggleButton = ({
     pageId: string;
   }>;
   sidePanelSearch?: string;
-  sidePanelSearchObjectFilter?: string | null;
+  sidePanelSearchObjectFilter?: string[];
   isLayoutCustomizationModeEnabled?: boolean;
 } = {}) => {
   const store = createStore();
@@ -253,7 +254,7 @@ describe('SidePanelToggleButton', () => {
       isSidePanelOpened: true,
       sidePanelPage: SidePanelPages.ViewRecord,
       sidePanelSearch: 'acme',
-      sidePanelSearchObjectFilter: 'company',
+      sidePanelSearchObjectFilter: ['company'],
       sidePanelNavigationStack: [
         {
           page: SidePanelPages.ViewRecord,
@@ -277,6 +278,8 @@ describe('SidePanelToggleButton', () => {
       },
     ]);
     expect(store.get(sidePanelSearchState.atom)).toBe('');
-    expect(store.get(sidePanelSearchObjectFilterState.atom)).toBeNull();
+    expect(store.get(sidePanelSearchObjectFilterState.atom)).toEqual(
+      DEFAULT_SIDE_PANEL_SEARCH_OBJECT_FILTER,
+    );
   });
 });

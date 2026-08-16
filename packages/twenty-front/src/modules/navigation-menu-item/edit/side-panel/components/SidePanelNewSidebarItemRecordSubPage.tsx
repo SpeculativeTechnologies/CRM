@@ -13,9 +13,8 @@ import { SidePanelNewSidebarItemRecordItem } from '@/navigation-menu-item/edit/s
 export const SidePanelNewSidebarItemRecordSubPage = () => {
   const { t } = useLingui();
   const [recordSearchInput, setRecordSearchInput] = useState('');
-  const [selectedObjectNameSingular, setSelectedObjectNameSingular] = useState<
-    string | null
-  >(null);
+  const [selectedObjectNameSingulars, setSelectedObjectNameSingulars] =
+    useState<string[]>([]);
   const {
     availableSearchRecords,
     isSearchDebouncing,
@@ -23,7 +22,7 @@ export const SidePanelNewSidebarItemRecordSubPage = () => {
     trimmedSearchInput,
   } = useAvailableNavigationMenuItemSearchRecords({
     searchInput: recordSearchInput,
-    selectedObjectNameSingular,
+    selectedObjectNameSingulars,
     skip: !isNonEmptyString(recordSearchInput.trim()),
   });
 
@@ -43,8 +42,8 @@ export const SidePanelNewSidebarItemRecordSubPage = () => {
       onSearchChange={setRecordSearchInput}
       rightElement={
         <SidePanelObjectFilterDropdown
-          selectedObjectNameSingular={selectedObjectNameSingular}
-          onSelectObject={setSelectedObjectNameSingular}
+          selectedObjectNameSingulars={selectedObjectNameSingulars}
+          onChangeSelectedObjects={setSelectedObjectNameSingulars}
         />
       }
     >

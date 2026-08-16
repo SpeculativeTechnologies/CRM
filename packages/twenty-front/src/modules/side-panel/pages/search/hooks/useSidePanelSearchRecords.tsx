@@ -5,15 +5,9 @@ import { sortSearchResultsByObjectPriority } from '@/side-panel/pages/search/uti
 import { sidePanelSearchObjectFilterState } from '@/side-panel/states/sidePanelSearchObjectFilterState';
 import { sidePanelSearchState } from '@/side-panel/states/sidePanelSearchState';
 import { CoreObjectNameSingular } from 'twenty-shared/types';
-import { isDefined } from 'twenty-shared/utils';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
 import { useMemo } from 'react';
 import { useDebounce } from 'use-debounce';
-
-const DEFAULT_SEARCH_EXCLUDED_OBJECT_NAME_SINGULARS: string[] = [
-  CoreObjectNameSingular.Note,
-  CoreObjectNameSingular.Task,
-];
 
 export type SearchResultItem = {
   id: string;
@@ -39,24 +33,13 @@ export const useSidePanelSearchRecords = () => {
 
   const [deferredSidePanelSearch] = useDebounce(trimmedSidePanelSearch, 300);
   const { readableObjectMetadataItems } = useReadableObjectMetadataItems();
-  const searchableObjectNameSingulars = useSearchableObjectNameSingulars({
-    selectedObjectNameSingular: sidePanelSearchObjectFilter,
-  });
+  const searchableObjectNameSingulars = useSearchableObjectNameSingulars();
 
-  // Notes and tasks clutter global search; they stay reachable through the
-  // explicit object filter.
-  const includedObjectNameSingulars = useMemo(
-    () =>
-      isDefined(sidePanelSearchObjectFilter)
-        ? searchableObjectNameSingulars
-        : searchableObjectNameSingulars.filter(
-            (objectNameSingular) =>
-              !DEFAULT_SEARCH_EXCLUDED_OBJECT_NAME_SINGULARS.includes(
-                objectNameSingular,
-              ),
-          ),
-    [searchableObjectNameSingulars, sidePanelSearchObjectFilter],
-  );
+  // An empty filter selection means searching across all objects.
+  const includedObjectNameSingulars =
+    sidePanelSearchObjectFilter.length > 0
+      ? sidePanelSearchObjectFilter
+      : searchableObjectNameSingulars;
 
   const { loading, searchRecords } = useObjectRecordSearchRecords({
     objectNameSingulars: includedObjectNameSingulars,

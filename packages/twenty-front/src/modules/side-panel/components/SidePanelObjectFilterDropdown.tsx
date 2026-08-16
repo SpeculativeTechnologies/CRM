@@ -1,5 +1,4 @@
 import { useLingui } from '@lingui/react/macro';
-import { isDefined } from 'twenty-shared/utils';
 import { IconFilter } from 'twenty-ui/icon';
 import { IconButton } from 'twenty-ui/input';
 
@@ -9,16 +8,16 @@ import { Dropdown } from '@/ui/layout/dropdown/components/Dropdown';
 export const OBJECT_FILTER_DROPDOWN_ID = 'side-panel-object-filter-dropdown';
 
 type SidePanelObjectFilterDropdownProps = {
-  selectedObjectNameSingular: string | null;
-  onSelectObject: (objectNameSingular: string | null) => void;
+  selectedObjectNameSingulars: string[];
+  onChangeSelectedObjects: (objectNameSingulars: string[]) => void;
 };
 
 export const SidePanelObjectFilterDropdown = ({
-  selectedObjectNameSingular,
-  onSelectObject,
+  selectedObjectNameSingulars,
+  onChangeSelectedObjects,
 }: SidePanelObjectFilterDropdownProps) => {
   const { t } = useLingui();
-  const isFilterActive = isDefined(selectedObjectNameSingular);
+  const isFilterActive = selectedObjectNameSingulars.length > 0;
 
   return (
     <Dropdown
@@ -35,8 +34,8 @@ export const SidePanelObjectFilterDropdown = ({
       }
       dropdownComponents={
         <SidePanelObjectFilterDropdownContent
-          selectedObjectNameSingular={selectedObjectNameSingular}
-          onSelectObject={onSelectObject}
+          selectedObjectNameSingulars={selectedObjectNameSingulars}
+          onChangeSelectedObjects={onChangeSelectedObjects}
         />
       }
     />
