@@ -16020,6 +16020,11 @@ msgstr "报告"
 msgid "Request"
 msgstr "请求"
 
+#. js-lingui-id: nTlQ1w
+#: src/modules/navigation/components/MainNavigationDrawerFeatureRequestItem.tsx
+msgid "Request a feature"
+msgstr ""
+
 #. js-lingui-id: /laZGZ
 #: src/modules/workflow/workflow-steps/workflow-actions/http-request-action/components/HttpRequestExecutionResult.tsx
 msgid "Request Failed"

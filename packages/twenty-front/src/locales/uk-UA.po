@@ -16043,6 +16043,11 @@ msgstr "Звіти"
 msgid "Request"
 msgstr "Запит"
 
+#. js-lingui-id: nTlQ1w
+#: src/modules/navigation/components/MainNavigationDrawerFeatureRequestItem.tsx
+msgid "Request a feature"
+msgstr ""
+
 #. js-lingui-id: /laZGZ
 #: src/modules/workflow/workflow-steps/workflow-actions/http-request-action/components/HttpRequestExecutionResult.tsx
 msgid "Request Failed"
