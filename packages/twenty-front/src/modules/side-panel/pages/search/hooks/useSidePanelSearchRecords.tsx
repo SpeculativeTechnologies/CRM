@@ -10,6 +10,11 @@ import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomState
 import { useMemo } from 'react';
 import { useDebounce } from 'use-debounce';
 
+const DEFAULT_SEARCH_EXCLUDED_OBJECT_NAME_SINGULARS: string[] = [
+  CoreObjectNameSingular.Note,
+  CoreObjectNameSingular.Task,
+];
+
 export type SearchResultItem = {
   id: string;
   label: string;
@@ -38,15 +43,17 @@ export const useSidePanelSearchRecords = () => {
     selectedObjectNameSingular: sidePanelSearchObjectFilter,
   });
 
-  // Notes clutter global search; they stay reachable through the explicit
-  // object filter.
+  // Notes and tasks clutter global search; they stay reachable through the
+  // explicit object filter.
   const includedObjectNameSingulars = useMemo(
     () =>
       isDefined(sidePanelSearchObjectFilter)
         ? searchableObjectNameSingulars
         : searchableObjectNameSingulars.filter(
             (objectNameSingular) =>
-              objectNameSingular !== CoreObjectNameSingular.Note,
+              !DEFAULT_SEARCH_EXCLUDED_OBJECT_NAME_SINGULARS.includes(
+                objectNameSingular,
+              ),
           ),
     [searchableObjectNameSingulars, sidePanelSearchObjectFilter],
   );
