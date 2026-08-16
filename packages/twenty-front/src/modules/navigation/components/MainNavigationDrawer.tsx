@@ -1,8 +1,10 @@
 import { currentWorkspaceState } from '@/auth/states/currentWorkspaceState';
+import { MainNavigationDrawerFeatureRequestItem } from '@/navigation/components/MainNavigationDrawerFeatureRequestItem';
 import { MainNavigationDrawerNavigationContent } from '@/navigation/components/MainNavigationDrawerNavigationContent';
 import { NavigationDrawerTabbedContent } from '@/navigation/components/NavigationDrawerTabbedContent';
 import { useHasPermissionFlag } from '@/settings/roles/hooks/useHasPermissionFlag';
 import { NavigationDrawer } from '@/ui/navigation/navigation-drawer/components/NavigationDrawer';
+import { NavigationDrawerFixedContent } from '@/ui/navigation/navigation-drawer/components/NavigationDrawerFixedContent';
 import { NavigationDrawerScrollableContent } from '@/ui/navigation/navigation-drawer/components/NavigationDrawerScrollableContent';
 import { navigationDrawerActiveTabState } from '@/ui/navigation/states/navigationDrawerActiveTabState';
 import { NAVIGATION_DRAWER_TABS } from '@/ui/navigation/states/navigationDrawerTabs';
@@ -32,6 +34,9 @@ export const MainNavigationDrawer = ({ className }: { className?: string }) => {
           navigationContent={<MainNavigationDrawerNavigationContent />}
         />
       </NavigationDrawerScrollableContent>
+      <NavigationDrawerFixedContent>
+        <MainNavigationDrawerFeatureRequestItem />
+      </NavigationDrawerFixedContent>
     </NavigationDrawer>
   );
 };

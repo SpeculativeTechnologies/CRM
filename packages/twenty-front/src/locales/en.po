@@ -16038,6 +16038,11 @@ msgstr "Reports"
 msgid "Request"
 msgstr "Request"
 
+#. js-lingui-id: nTlQ1w
+#: src/modules/navigation/components/MainNavigationDrawerFeatureRequestItem.tsx
+msgid "Request a feature"
+msgstr "Request a feature"
+
 #. js-lingui-id: /laZGZ
 #: src/modules/workflow/workflow-steps/workflow-actions/http-request-action/components/HttpRequestExecutionResult.tsx
 msgid "Request Failed"
