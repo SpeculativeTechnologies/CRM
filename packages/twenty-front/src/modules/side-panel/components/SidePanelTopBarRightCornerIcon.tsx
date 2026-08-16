@@ -28,8 +28,8 @@ export const SidePanelTopBarRightCornerIcon = () => {
   if (isOnSearchPage) {
     return (
       <SidePanelObjectFilterDropdown
-        selectedObjectNameSingular={sidePanelSearchObjectFilter}
-        onSelectObject={setSidePanelSearchObjectFilter}
+        selectedObjectNameSingulars={sidePanelSearchObjectFilter}
+        onChangeSelectedObjects={setSidePanelSearchObjectFilter}
       />
     );
   }

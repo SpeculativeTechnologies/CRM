@@ -16,13 +16,13 @@ export type NavigationMenuItemSearchRecord = {
 
 type UseAvailableNavigationMenuItemSearchRecordsParams = {
   searchInput: string;
-  selectedObjectNameSingular?: string | null;
+  selectedObjectNameSingulars?: string[];
   skip?: boolean;
 };
 
 export const useAvailableNavigationMenuItemSearchRecords = ({
   searchInput,
-  selectedObjectNameSingular = null,
+  selectedObjectNameSingulars = [],
   skip = false,
 }: UseAvailableNavigationMenuItemSearchRecordsParams) => {
   const { currentItems } = useNavigationMenuItemEditController();
@@ -30,9 +30,12 @@ export const useAvailableNavigationMenuItemSearchRecords = ({
 
   const [deferredSearchInput] = useDebounce(trimmedSearchInput, 300);
 
-  const includedObjectNameSingulars = useSearchableObjectNameSingulars({
-    selectedObjectNameSingular,
-  });
+  const searchableObjectNameSingulars = useSearchableObjectNameSingulars();
+
+  const includedObjectNameSingulars =
+    selectedObjectNameSingulars.length > 0
+      ? selectedObjectNameSingulars
+      : searchableObjectNameSingulars;
 
   const { loading: recordSearchLoading, searchRecords } =
     useObjectRecordSearchRecords({

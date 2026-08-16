@@ -17,6 +17,7 @@ import { hasUserSelectedSidePanelListItemState } from '@/side-panel/states/hasUs
 import { isSidePanelClosingState } from '@/side-panel/states/isSidePanelClosingState';
 import { isSidePanelOpenedState } from '@/side-panel/states/isSidePanelOpenedState';
 import { sidePanelNavigationMorphItemsByPageState } from '@/side-panel/states/sidePanelNavigationMorphItemsByPageState';
+import { DEFAULT_SIDE_PANEL_SEARCH_OBJECT_FILTER } from '@/side-panel/constants/DefaultSidePanelSearchObjectFilter';
 import { sidePanelNavigationStackState } from '@/side-panel/states/sidePanelNavigationStackState';
 import { sidePanelPageInfoState } from '@/side-panel/states/sidePanelPageInfoState';
 import { sidePanelPageState } from '@/side-panel/states/sidePanelPageState';
@@ -105,7 +106,10 @@ export const useSidePanelCloseAnimationCompleteCleanup = () => {
       });
       store.set(isSidePanelOpenedState.atom, false);
       store.set(sidePanelSearchState.atom, '');
-      store.set(sidePanelSearchObjectFilterState.atom, null);
+      store.set(
+        sidePanelSearchObjectFilterState.atom,
+        DEFAULT_SIDE_PANEL_SEARCH_OBJECT_FILTER,
+      );
       store.set(sidePanelShowHiddenObjectsState.atom, false);
       store.set(sidePanelNavigationMorphItemsByPageState.atom, new Map());
       store.set(sidePanelNavigationStackState.atom, []);

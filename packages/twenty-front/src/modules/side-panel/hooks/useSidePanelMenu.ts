@@ -2,6 +2,7 @@ import { MAIN_CONTEXT_STORE_INSTANCE_ID } from '@/context-store/constants/MainCo
 import { isLayoutCustomizationModeEnabledState } from '@/layout-customization/states/isLayoutCustomizationModeEnabledState';
 import { useResetRecordIndexSelection } from '@/object-record/record-index/hooks/useResetRecordIndexSelection';
 import { selectedNavigationMenuItemIdInEditModeState } from '@/navigation-menu-item/common/states/selectedNavigationMenuItemIdInEditModeState';
+import { DEFAULT_SIDE_PANEL_SEARCH_OBJECT_FILTER } from '@/side-panel/constants/DefaultSidePanelSearchObjectFilter';
 import { SIDE_PANEL_FOCUS_ID } from '@/side-panel/constants/SidePanelFocusId';
 import { useNavigateSidePanel } from '@/side-panel/hooks/useNavigateSidePanel';
 import { isSidePanelClosingState } from '@/side-panel/states/isSidePanelClosingState';
@@ -66,7 +67,10 @@ export const useSidePanelMenu = () => {
     emitSidePanelOpenEvent();
     closeAnyOpenDropdown();
     store.set(sidePanelSearchState.atom, '');
-    store.set(sidePanelSearchObjectFilterState.atom, null);
+    store.set(
+      sidePanelSearchObjectFilterState.atom,
+      DEFAULT_SIDE_PANEL_SEARCH_OBJECT_FILTER,
+    );
 
     const isLayoutCustomizationModeEnabled = store.get(
       isLayoutCustomizationModeEnabledState.atom,
@@ -108,7 +112,10 @@ export const useSidePanelMenu = () => {
     const isSidePanelOpened = store.get(isSidePanelOpenedState.atom);
 
     store.set(sidePanelSearchState.atom, '');
-    store.set(sidePanelSearchObjectFilterState.atom, null);
+    store.set(
+      sidePanelSearchObjectFilterState.atom,
+      DEFAULT_SIDE_PANEL_SEARCH_OBJECT_FILTER,
+    );
 
     if (isSidePanelOpened) {
       closeSidePanelMenu();

@@ -1,6 +1,7 @@
 import { useObjectRecordSearchRecords } from '@/object-record/hooks/useObjectRecordSearchRecords';
 import { useReadableObjectMetadataItems } from '@/object-metadata/hooks/useReadableObjectMetadataItems';
 import { useSearchableObjectNameSingulars } from '@/side-panel/hooks/useSearchableObjectNameSingulars';
+import { sortSearchResultsByObjectPriority } from '@/side-panel/pages/search/utils/sortSearchResultsByObjectPriority';
 import { sidePanelSearchObjectFilterState } from '@/side-panel/states/sidePanelSearchObjectFilterState';
 import { sidePanelSearchState } from '@/side-panel/states/sidePanelSearchState';
 import { CoreObjectNameSingular } from 'twenty-shared/types';
@@ -32,9 +33,13 @@ export const useSidePanelSearchRecords = () => {
 
   const [deferredSidePanelSearch] = useDebounce(trimmedSidePanelSearch, 300);
   const { readableObjectMetadataItems } = useReadableObjectMetadataItems();
-  const includedObjectNameSingulars = useSearchableObjectNameSingulars({
-    selectedObjectNameSingular: sidePanelSearchObjectFilter,
-  });
+  const searchableObjectNameSingulars = useSearchableObjectNameSingulars();
+
+  // An empty filter selection means searching across all objects.
+  const includedObjectNameSingulars =
+    sidePanelSearchObjectFilter.length > 0
+      ? sidePanelSearchObjectFilter
+      : searchableObjectNameSingulars;
 
   const { loading, searchRecords } = useObjectRecordSearchRecords({
     objectNameSingulars: includedObjectNameSingulars,
@@ -42,21 +47,23 @@ export const useSidePanelSearchRecords = () => {
   });
 
   const searchResultItems: SearchResultItem[] = useMemo(() => {
-    return searchRecords.map((searchRecord) => ({
-      id: searchRecord.recordId,
-      label: searchRecord.label,
-      objectNameSingular: searchRecord.objectNameSingular,
-      recordId: searchRecord.recordId,
-      imageUrl: searchRecord.imageUrl,
-      objectLabel:
-        readableObjectMetadataItems.find(
-          (item) => item.nameSingular === searchRecord.objectNameSingular,
-        )?.labelSingular ?? searchRecord.objectNameSingular,
-      avatarType:
-        searchRecord.objectNameSingular === CoreObjectNameSingular.Company
-          ? ('squared' as const)
-          : ('rounded' as const),
-    }));
+    return sortSearchResultsByObjectPriority(searchRecords).map(
+      (searchRecord) => ({
+        id: searchRecord.recordId,
+        label: searchRecord.label,
+        objectNameSingular: searchRecord.objectNameSingular,
+        recordId: searchRecord.recordId,
+        imageUrl: searchRecord.imageUrl,
+        objectLabel:
+          readableObjectMetadataItems.find(
+            (item) => item.nameSingular === searchRecord.objectNameSingular,
+          )?.labelSingular ?? searchRecord.objectNameSingular,
+        avatarType:
+          searchRecord.objectNameSingular === CoreObjectNameSingular.Company
+            ? ('squared' as const)
+            : ('rounded' as const),
+      }),
+    );
   }, [searchRecords, readableObjectMetadataItems]);
 
   return {

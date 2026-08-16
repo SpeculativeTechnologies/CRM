@@ -3,7 +3,11 @@ import { useState } from 'react';
 import { OBJECTS_WITH_CHANNEL_VISIBILITY_CONSTRAINTS } from 'twenty-shared/constants';
 import { TintedIconTile } from 'twenty-ui/data-display';
 import { IconCube } from 'twenty-ui/icon';
-import { MenuItemSelectAvatar, MenuItemToggle } from 'twenty-ui/navigation';
+import {
+  MenuItemMultiSelectAvatar,
+  MenuItemSelectAvatar,
+  MenuItemToggle,
+} from 'twenty-ui/navigation';
 
 import { ObjectMetadataIcon } from '@/object-metadata/components/ObjectMetadataIcon';
 import { useReadableObjectMetadataItems } from '@/object-metadata/hooks/useReadableObjectMetadataItems';
@@ -14,7 +18,6 @@ import { DropdownMenuHeader } from '@/ui/layout/dropdown/components/DropdownMenu
 import { DropdownMenuItemsContainer } from '@/ui/layout/dropdown/components/DropdownMenuItemsContainer';
 import { DropdownMenuSearchInput } from '@/ui/layout/dropdown/components/DropdownMenuSearchInput';
 import { DropdownMenuSeparator } from '@/ui/layout/dropdown/components/DropdownMenuSeparator';
-import { useCloseDropdown } from '@/ui/layout/dropdown/hooks/useCloseDropdown';
 import { SelectableList } from '@/ui/layout/selectable-list/components/SelectableList';
 import { SelectableListItem } from '@/ui/layout/selectable-list/components/SelectableListItem';
 import { selectedItemIdComponentState } from '@/ui/layout/selectable-list/states/selectedItemIdComponentState';
@@ -24,20 +27,19 @@ import { useAtomState } from '@/ui/utilities/state/jotai/hooks/useAtomState';
 const ALL_OBJECTS_ITEM_ID = 'all-objects';
 
 type SidePanelObjectFilterDropdownContentProps = {
-  selectedObjectNameSingular: string | null;
-  onSelectObject: (objectNameSingular: string | null) => void;
+  selectedObjectNameSingulars: string[];
+  onChangeSelectedObjects: (objectNameSingulars: string[]) => void;
 };
 
 export const SidePanelObjectFilterDropdownContent = ({
-  selectedObjectNameSingular,
-  onSelectObject,
+  selectedObjectNameSingulars,
+  onChangeSelectedObjects,
 }: SidePanelObjectFilterDropdownContentProps) => {
   const { t } = useLingui();
   const [filterSearch, setFilterSearch] = useState('');
   const [sidePanelShowHiddenObjects, setSidePanelShowHiddenObjects] =
     useAtomState(sidePanelShowHiddenObjectsState);
   const { readableObjectMetadataItems } = useReadableObjectMetadataItems();
-  const { closeDropdown } = useCloseDropdown();
 
   const searchFilter = filterSearch.toLowerCase();
 
@@ -57,9 +59,14 @@ export const SidePanelObjectFilterDropdownContent = ({
     return item.labelPlural.toLowerCase().includes(searchFilter);
   });
 
-  const handleSelect = (objectNameSingular: string | null) => {
-    onSelectObject(objectNameSingular);
-    closeDropdown(OBJECT_FILTER_DROPDOWN_ID);
+  const handleToggleObject = (objectNameSingular: string) => {
+    onChangeSelectedObjects(
+      selectedObjectNameSingulars.includes(objectNameSingular)
+        ? selectedObjectNameSingulars.filter(
+            (selected) => selected !== objectNameSingular,
+          )
+        : [...selectedObjectNameSingulars, objectNameSingular],
+    );
   };
 
   const selectableItemIdArray = [
@@ -89,13 +96,13 @@ export const SidePanelObjectFilterDropdownContent = ({
         <DropdownMenuItemsContainer hasMaxHeight>
           <SelectableListItem
             itemId={ALL_OBJECTS_ITEM_ID}
-            onEnter={() => handleSelect(null)}
+            onEnter={() => onChangeSelectedObjects([])}
           >
             <MenuItemSelectAvatar
               avatar={<TintedIconTile Icon={IconCube} />}
               text={t`All objects`}
-              selected={selectedObjectNameSingular === null}
-              onClick={() => handleSelect(null)}
+              selected={selectedObjectNameSingulars.length === 0}
+              onClick={() => onChangeSelectedObjects([])}
               focused={selectedItemId === ALL_OBJECTS_ITEM_ID}
             />
           </SelectableListItem>
@@ -104,21 +111,26 @@ export const SidePanelObjectFilterDropdownContent = ({
               <SelectableListItem
                 key={objectMetadataItem.id}
                 itemId={objectMetadataItem.nameSingular}
-                onEnter={() => handleSelect(objectMetadataItem.nameSingular)}
+                onEnter={() =>
+                  handleToggleObject(objectMetadataItem.nameSingular)
+                }
               >
-                <MenuItemSelectAvatar
+                <MenuItemMultiSelectAvatar
                   avatar={
                     <ObjectMetadataIcon
                       objectMetadataItem={objectMetadataItem}
                     />
                   }
                   text={objectMetadataItem.labelPlural}
-                  selected={
-                    selectedObjectNameSingular ===
-                    objectMetadataItem.nameSingular
+                  selected={selectedObjectNameSingulars.includes(
+                    objectMetadataItem.nameSingular,
+                  )}
+                  isKeySelected={
+                    selectedItemId === objectMetadataItem.nameSingular
                   }
-                  onClick={() => handleSelect(objectMetadataItem.nameSingular)}
-                  focused={selectedItemId === objectMetadataItem.nameSingular}
+                  onSelectChange={() =>
+                    handleToggleObject(objectMetadataItem.nameSingular)
+                  }
                 />
               </SelectableListItem>
             );
