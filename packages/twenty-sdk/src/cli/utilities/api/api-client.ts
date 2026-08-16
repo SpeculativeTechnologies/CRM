@@ -8,6 +8,7 @@ import chalk from 'chalk';
 import { isDefined } from 'twenty-shared/utils';
 
 import { promptForReauthentication } from '@/cli/utilities/auth/reauth-helper';
+import { getExtraHeadersFromEnv } from '@/cli/utilities/api/get-extra-headers-from-env';
 import { ConfigService } from '@/cli/utilities/config/config-service';
 
 export class ApiClient {
@@ -38,6 +39,12 @@ export class ApiClient {
       const twentyConfig = await this.configService.getConfig();
 
       config.baseURL = this.serverUrlOverride ?? twentyConfig.apiUrl;
+
+      for (const [headerName, headerValue] of Object.entries(
+        getExtraHeadersFromEnv(),
+      )) {
+        config.headers.set(headerName, headerValue);
+      }
 
       if (!config.headers.Authorization && !skipAuth) {
         const authToken = await this.resolveAuthToken();

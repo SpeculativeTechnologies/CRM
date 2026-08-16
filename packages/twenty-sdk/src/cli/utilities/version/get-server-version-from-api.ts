@@ -1,3 +1,4 @@
+import { getExtraHeadersFromEnv } from '@/cli/utilities/api/get-extra-headers-from-env';
 import { ConfigService } from '@/cli/utilities/config/config-service';
 import { parseSemver } from '@/cli/utilities/version/parse-semver';
 
@@ -19,7 +20,7 @@ export const getServerVersionFromApi = async (
   try {
     const response = await fetch(
       `${baseUrl.replace(/\/$/, '')}${SERVER_CARD_PATH}`,
-      { signal: controller.signal },
+      { signal: controller.signal, headers: getExtraHeadersFromEnv() },
     );
 
     if (!response.ok) {
