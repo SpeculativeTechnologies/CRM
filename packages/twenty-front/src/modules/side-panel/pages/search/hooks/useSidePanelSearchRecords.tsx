@@ -1,9 +1,11 @@
 import { useObjectRecordSearchRecords } from '@/object-record/hooks/useObjectRecordSearchRecords';
 import { useReadableObjectMetadataItems } from '@/object-metadata/hooks/useReadableObjectMetadataItems';
 import { useSearchableObjectNameSingulars } from '@/side-panel/hooks/useSearchableObjectNameSingulars';
+import { sortSearchResultsByObjectPriority } from '@/side-panel/pages/search/utils/sortSearchResultsByObjectPriority';
 import { sidePanelSearchObjectFilterState } from '@/side-panel/states/sidePanelSearchObjectFilterState';
 import { sidePanelSearchState } from '@/side-panel/states/sidePanelSearchState';
 import { CoreObjectNameSingular } from 'twenty-shared/types';
+import { isDefined } from 'twenty-shared/utils';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
 import { useMemo } from 'react';
 import { useDebounce } from 'use-debounce';
@@ -32,9 +34,22 @@ export const useSidePanelSearchRecords = () => {
 
   const [deferredSidePanelSearch] = useDebounce(trimmedSidePanelSearch, 300);
   const { readableObjectMetadataItems } = useReadableObjectMetadataItems();
-  const includedObjectNameSingulars = useSearchableObjectNameSingulars({
+  const searchableObjectNameSingulars = useSearchableObjectNameSingulars({
     selectedObjectNameSingular: sidePanelSearchObjectFilter,
   });
+
+  // Notes clutter global search; they stay reachable through the explicit
+  // object filter.
+  const includedObjectNameSingulars = useMemo(
+    () =>
+      isDefined(sidePanelSearchObjectFilter)
+        ? searchableObjectNameSingulars
+        : searchableObjectNameSingulars.filter(
+            (objectNameSingular) =>
+              objectNameSingular !== CoreObjectNameSingular.Note,
+          ),
+    [searchableObjectNameSingulars, sidePanelSearchObjectFilter],
+  );
 
   const { loading, searchRecords } = useObjectRecordSearchRecords({
     objectNameSingulars: includedObjectNameSingulars,
@@ -42,21 +57,23 @@ export const useSidePanelSearchRecords = () => {
   });
 
   const searchResultItems: SearchResultItem[] = useMemo(() => {
-    return searchRecords.map((searchRecord) => ({
-      id: searchRecord.recordId,
-      label: searchRecord.label,
-      objectNameSingular: searchRecord.objectNameSingular,
-      recordId: searchRecord.recordId,
-      imageUrl: searchRecord.imageUrl,
-      objectLabel:
-        readableObjectMetadataItems.find(
-          (item) => item.nameSingular === searchRecord.objectNameSingular,
-        )?.labelSingular ?? searchRecord.objectNameSingular,
-      avatarType:
-        searchRecord.objectNameSingular === CoreObjectNameSingular.Company
-          ? ('squared' as const)
-          : ('rounded' as const),
-    }));
+    return sortSearchResultsByObjectPriority(searchRecords).map(
+      (searchRecord) => ({
+        id: searchRecord.recordId,
+        label: searchRecord.label,
+        objectNameSingular: searchRecord.objectNameSingular,
+        recordId: searchRecord.recordId,
+        imageUrl: searchRecord.imageUrl,
+        objectLabel:
+          readableObjectMetadataItems.find(
+            (item) => item.nameSingular === searchRecord.objectNameSingular,
+          )?.labelSingular ?? searchRecord.objectNameSingular,
+        avatarType:
+          searchRecord.objectNameSingular === CoreObjectNameSingular.Company
+            ? ('squared' as const)
+            : ('rounded' as const),
+      }),
+    );
   }, [searchRecords, readableObjectMetadataItems]);
 
   return {
