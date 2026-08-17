@@ -363,6 +363,21 @@ msgstr ""
 msgid "A valid viewUniversalIdentifier is required for VIEW type"
 msgstr ""
 
+#. js-lingui-id: LQD1eK
+#: src/engine/metadata-modules/view/utils/validate-view-parent-or-throw.util.ts
+msgid "A view can only be added to a stack on the same object."
+msgstr ""
+
+#. js-lingui-id: V2Nu5k
+#: src/engine/metadata-modules/view/utils/validate-view-parent-or-throw.util.ts
+msgid "A view cannot be its own parent"
+msgstr ""
+
+#. js-lingui-id: TloFnU
+#: src/engine/metadata-modules/view/utils/validate-view-parent-or-throw.util.ts
+msgid "A view cannot be its own parent."
+msgstr ""
+
 #. js-lingui-id: qqnpQ9
 #: src/engine/metadata-modules/view/exceptions/view.exception.ts
 msgid "A view error occurred."
@@ -3867,6 +3882,11 @@ msgstr ""
 msgid "Invalid filter: \"isEmptyArray\" operator requires a boolean"
 msgstr ""
 
+#. js-lingui-id: kymlZR
+#: src/engine/api/common/common-args-processors/filter-arg-processor/filter-arg-processor.service.ts
+msgid "Invalid filter: choose a field on a related record for \"{key}\""
+msgstr ""
+
 #. js-lingui-id: Np9Fvw
 #: src/engine/api/common/common-args-processors/filter-arg-processor/utils/validate-and-transform-operator-and-value.util.ts
 msgid "Invalid filter: exactly one operator per field is required"
@@ -5518,6 +5538,11 @@ msgstr ""
 msgid "Number of spam complaints received"
 msgstr ""
 
+#. js-lingui-id: 5Lb4fW
+#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-person-standard-flat-field-metadata.util.ts
+msgid "Number of tasks tied to the contact that are not done"
+msgstr ""
+
 #. js-lingui-id: MKdH/S
 #: src/engine/workspace-manager/workspace-migration/workspace-migration-builder/validators/services/flat-connection-provider-validator.service.ts
 msgid "OAuth {label} is required"
@@ -5740,6 +5765,11 @@ msgstr ""
 #. js-lingui-id: 6mOUi9
 #: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-workspace-member-standard-flat-field-metadata.util.ts
 msgid "Open Records In"
+msgstr ""
+
+#. js-lingui-id: VVBlwg
+#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-person-standard-flat-field-metadata.util.ts
+msgid "Open tasks"
 msgstr ""
 
 #. js-lingui-id: e/+ykp
@@ -6047,12 +6077,27 @@ msgstr ""
 msgid "Parent row level permission predicate group not found"
 msgstr ""
 
+#. js-lingui-id: iOZ/kO
+#: src/engine/metadata-modules/view/utils/validate-view-parent-or-throw.util.ts
+msgid "Parent view belongs to a different object"
+msgstr ""
+
 #. js-lingui-id: 6OzP7Y
 #: src/engine/workspace-manager/workspace-migration/workspace-migration-builder/validators/services/flat-view-filter-group-validator.service.ts
 #: src/engine/workspace-manager/workspace-migration/workspace-migration-builder/validators/services/flat-view-filter-group-validator.service.ts
 #: src/engine/workspace-manager/workspace-migration/workspace-migration-builder/validators/services/flat-view-filter-group-validator.service.ts
 #: src/engine/workspace-manager/workspace-migration/workspace-migration-builder/validators/services/flat-view-filter-group-validator.service.ts
 msgid "Parent view filter group not found"
+msgstr ""
+
+#. js-lingui-id: b8/ezf
+#: src/engine/metadata-modules/view/utils/validate-view-parent-or-throw.util.ts
+msgid "Parent view is already inside a stack"
+msgstr ""
+
+#. js-lingui-id: qfJecq
+#: src/engine/metadata-modules/view/utils/validate-view-parent-or-throw.util.ts
+msgid "Parent view not found"
 msgstr ""
 
 #. js-lingui-id: /GJDxy
@@ -6606,10 +6651,14 @@ msgstr ""
 #. js-lingui-id: HmNKeM
 #: src/engine/api/graphql/graphql-query-runner/graphql-query-parsers/graphql-query-filter/graphql-query-filter-field.parser.ts
 #: src/engine/api/graphql/graphql-query-runner/graphql-query-parsers/graphql-query-filter/graphql-query-filter-field.parser.ts
+#: src/engine/api/graphql/graphql-query-runner/graphql-query-parsers/graphql-query-filter/graphql-query-filter-field.parser.ts
+#: src/engine/api/graphql/graphql-query-runner/graphql-query-parsers/graphql-query-filter/graphql-query-filter-field.parser.ts
+#: src/engine/api/graphql/graphql-query-runner/graphql-query-parsers/graphql-query-filter/graphql-query-filter-field.parser.ts
 msgid "Relation filter is misconfigured"
 msgstr ""
 
 #. js-lingui-id: 1RF4/e
+#: src/engine/api/graphql/graphql-query-runner/graphql-query-parsers/graphql-query-filter/graphql-query-filter-field.parser.ts
 #: src/engine/api/graphql/graphql-query-runner/graphql-query-parsers/graphql-query-filter/graphql-query-filter-field.parser.ts
 msgid "Relation filter is not supported here"
 msgstr ""
@@ -7286,6 +7335,11 @@ msgstr ""
 msgid "SSO is disabled."
 msgstr ""
 
+#. js-lingui-id: T30Bn9
+#: src/engine/metadata-modules/view/utils/validate-view-parent-or-throw.util.ts
+msgid "Stacks cannot be nested inside other stacks."
+msgstr ""
+
 #. js-lingui-id: 3PRxO3
 #: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-opportunity-standard-flat-field-metadata.util.ts
 msgid "Stage"
@@ -7934,6 +7988,11 @@ msgstr ""
 msgid "The provider is temporarily unavailable. Please try again later."
 msgstr ""
 
+#. js-lingui-id: wdaHel
+#: src/engine/metadata-modules/flat-field-metadata/validators/utils/validate-text-flat-field-metadata.util.ts
+msgid "The record label formula is invalid."
+msgstr ""
+
 #. js-lingui-id: pv+BoZ
 #: src/engine/core-modules/graphql/hooks/use-validate-graphql-query-complexity.hook.ts
 msgid "The request is too complex to process. Please try reducing the amount of requested fields."
@@ -7980,6 +8039,11 @@ msgstr ""
 #. js-lingui-id: FOEWHl
 #: src/engine/metadata-modules/flat-object-metadata/validators/utils/validate-flat-object-metadata-name.util.ts
 msgid "The singular and plural names cannot be the same for an object"
+msgstr ""
+
+#. js-lingui-id: kIEMl9
+#: src/engine/metadata-modules/view/utils/validate-view-parent-or-throw.util.ts
+msgid "The stack this view points to no longer exists."
 msgstr ""
 
 #. js-lingui-id: Dvwk3g
@@ -8499,6 +8563,11 @@ msgstr ""
 #. js-lingui-id: ZXnasf
 #: src/engine/core-modules/application/application.exception.ts
 msgid "This version of the application is already installed in this workspace."
+msgstr ""
+
+#. js-lingui-id: uJZkYy
+#: src/engine/metadata-modules/view/utils/validate-view-parent-or-throw.util.ts
+msgid "This view already holds a stack, so it cannot be moved into another one."
 msgstr ""
 
 #. js-lingui-id: o/Kt/Y
@@ -9031,6 +9100,11 @@ msgstr ""
 #. js-lingui-id: HhN1Bv
 #: src/engine/workspace-manager/workspace-migration/workspace-migration-builder/validators/utils/validate-flat-view-creation.util.ts
 msgid "View already exists"
+msgstr ""
+
+#. js-lingui-id: +GJhrv
+#: src/engine/metadata-modules/view/utils/validate-view-parent-or-throw.util.ts
+msgid "View already holds a stack"
 msgstr ""
 
 #. js-lingui-id: pTvQqf

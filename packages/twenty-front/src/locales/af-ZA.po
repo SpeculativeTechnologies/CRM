@@ -46,6 +46,11 @@ msgstr "—"
 msgid ": Empty"
 msgstr ": Leeg"
 
+#. js-lingui-id: jmJy4X
+#: src/modules/object-record/object-filter-dropdown/utils/getOperandLabel.ts
+msgid ": Exactly"
+msgstr ""
+
 #. js-lingui-id: CE75IR
 #: src/modules/object-record/object-filter-dropdown/utils/getOperandLabel.ts
 msgid ": Future"
@@ -65,6 +70,11 @@ msgstr ": Nie"
 #: src/modules/object-record/object-filter-dropdown/utils/getOperandLabel.ts
 msgid ": NotEmpty"
 msgstr ": NieLeeg"
+
+#. js-lingui-id: 0DaS2L
+#: src/modules/object-record/object-filter-dropdown/utils/getOperandLabel.ts
+msgid ": NotExactly"
+msgstr ""
 
 #. js-lingui-id: 11QpPG
 #: src/modules/object-record/object-filter-dropdown/utils/getOperandLabel.ts
@@ -95,6 +105,11 @@ msgstr "· {objectFilterDropdownSearchInput}"
 #: src/pages/onboarding/UpgradeFreeTrial.tsx
 msgid "· FREE"
 msgstr "· GRATIS"
+
+#. js-lingui-id: +ryuLa
+#: src/modules/object-record/record-field/ui/meta-types/utils/getNewSelectOptionErrorMessage.ts
+msgid "\"{optionName}\" cannot be used as an option name."
+msgstr ""
 
 #. js-lingui-id: TaLmrR
 #. placeholder {0}: formatNumber(currentCreditsByPeriod, { decimals: 2 })
@@ -219,6 +234,7 @@ msgstr "{0} dae"
 
 #. js-lingui-id: okrK9q
 #. placeholder {0}: preview.duplicateEmails
+#: src/modules/activities/emails/components/CampaignComposerFields.tsx
 #: src/modules/activities/emails/components/CampaignDetailsFields.tsx
 msgid "{0} duplicate"
 msgstr "{0} duplikaat"
@@ -239,6 +255,13 @@ msgstr "{0} het geen verband met {loadBalancePoolObjectLabel} nie. Kies 'n ander
 #. placeholder {0}: preview.totalMembers
 #: src/modules/activities/emails/components/CampaignDetailsFields.tsx
 msgid "{0} in this list"
+msgstr ""
+
+#. js-lingui-id: MY0lRK
+#. placeholder {0}: preview.totalMembers
+#. placeholder {1}: preview.sendable
+#: src/modules/activities/emails/components/CampaignComposerFields.tsx
+msgid "{0} in this list — {1} sendable"
 msgstr ""
 
 #. js-lingui-id: /PXxEG
@@ -275,6 +298,7 @@ msgstr "{0} van {1}"
 
 #. js-lingui-id: BzvoVr
 #. placeholder {0}: preview.topicUnsubscribed
+#: src/modules/activities/emails/components/CampaignComposerFields.tsx
 #: src/modules/activities/emails/components/CampaignDetailsFields.tsx
 msgid "{0} opted out of this topic"
 msgstr "{0} het van hierdie onderwerp afgeteken"
@@ -299,6 +323,7 @@ msgstr "{0} vertoon"
 
 #. js-lingui-id: nZUq+6
 #. placeholder {0}: preview.globallyUnsubscribed
+#: src/modules/activities/emails/components/CampaignComposerFields.tsx
 #: src/modules/activities/emails/components/CampaignDetailsFields.tsx
 msgid "{0} unsubscribed from everything"
 msgstr "{0} het van alles afgeteken"
@@ -323,6 +348,7 @@ msgstr "{0} widgets"
 
 #. js-lingui-id: Aixgij
 #. placeholder {0}: preview.withoutEmail
+#: src/modules/activities/emails/components/CampaignComposerFields.tsx
 #: src/modules/activities/emails/components/CampaignDetailsFields.tsx
 msgid "{0} without email"
 msgstr "{0} sonder e-pos"
@@ -558,6 +584,11 @@ msgstr ""
 msgid "{positionLabel} record holds priority"
 msgstr "{positionLabel}-rekord het voorrang"
 
+#. js-lingui-id: M71PWW
+#: src/modules/activities/emails/mass-email/components/MassEmailComposeCard.tsx
+msgid "{recipientCount} recipients"
+msgstr ""
+
 #. js-lingui-id: 5d0hY6
 #: src/modules/settings/admin-panel/health-status/hooks/useRetryJobs.ts
 #: src/modules/settings/admin-panel/health-status/hooks/useRetryJobs.ts
@@ -618,6 +649,11 @@ msgstr "{stepCount, plural, one {# stap} other {# stappe}}"
 #: src/pages/settings/accounts/SettingsAccountsConfigurationStepCalendar.tsx
 msgid "{stepNumber}. Calendar"
 msgstr "{stepNumber}. Kalender"
+
+#. js-lingui-id: NcsiO/
+#: src/modules/activities/emails/mass-email/hooks/useSendMassEmail.ts
+msgid "{successCount} emails sent"
+msgstr ""
 
 #. js-lingui-id: bI/mcH
 #: src/modules/settings/applications/hooks/useComputeApplicationContentForLayoutAndLogic.ts
@@ -1463,6 +1499,11 @@ msgstr "Voeg sortering by"
 msgid "Add SSO Identity Provider"
 msgstr "Voeg SSO-identiteitsverskaffer by"
 
+#. js-lingui-id: ZAh4zP
+#: src/modules/views/view-stack/components/ViewStackTabList.tsx
+msgid "Add stack"
+msgstr ""
+
 #. js-lingui-id: 6Tl23V
 #: src/pages/settings/ai/components/SettingsAgentEvalsTab.tsx
 msgid "Add test input for evaluation (e.g., \"Find all customers in NY\")"
@@ -1528,6 +1569,11 @@ msgstr "Voeg URI by"
 msgid "Add view"
 msgstr "Voeg aansig by"
 
+#. js-lingui-id: oU1lna
+#: src/modules/views/view-stack/components/ViewStackTabDropdownContent.tsx
+msgid "Add view to this stack"
+msgstr ""
+
 #. js-lingui-id: 8sZiWP
 #: src/modules/page-layout/widgets/components/DashboardWidgetPlaceholder.tsx
 #: src/modules/page-layout/widgets/components/RecordPageAddWidgetSection.tsx
@@ -1577,6 +1623,11 @@ msgstr "Bygevoeg {beautifiedCreatedAt}"
 #: src/modules/settings/accounts/components/SettingsAccountsBlocklistTable.tsx
 msgid "Added to blocklist"
 msgstr "By swartlys gevoeg"
+
+#. js-lingui-id: BrJ98E
+#: src/modules/settings/data-model/fields/forms/select/components/AddSelectOptionMenuItem.tsx
+msgid "Adding \"{trimmedName}\"..."
+msgstr ""
 
 #. js-lingui-id: hW/fMg
 #: src/modules/object-metadata/hooks/useSortSubFieldChoicesForField.ts
@@ -2249,6 +2300,11 @@ msgstr "‘n Interne fout het voorgekom tydens die validering van jou veranderin
 #: src/modules/settings/data-model/objects/forms/components/SettingsDataModelObjectAboutForm.tsx
 msgid "An object with this name already exists"
 msgstr "'n Objek met hierdie naam bestaan reeds"
+
+#. js-lingui-id: oMJTL2
+#: src/modules/object-record/record-field/ui/meta-types/utils/getNewSelectOptionErrorMessage.ts
+msgid "An option matching \"{optionName}\" already exists."
+msgstr ""
 
 #. js-lingui-id: HZFm5R
 #: src/modules/auth/sign-in-up/components/FooterNote.tsx
@@ -2960,6 +3016,11 @@ msgstr "Beskikbaarheid"
 msgid "Available"
 msgstr "Beskikbaar"
 
+#. js-lingui-id: HsAhgd
+#: src/modules/settings/data-model/objects/forms/components/SettingsDataModelObjectLabelFormulaForm.tsx
+msgid "Available fields:"
+msgstr ""
+
 #. js-lingui-id: STA+22
 #: src/pages/settings/ai/components/SettingsAiModelsTab.tsx
 msgid "Available models"
@@ -3526,6 +3587,7 @@ msgstr "Kan nie skandeer nie? Kopieer die"
 #: src/modules/spreadsheet-import/steps/components/ValidationStep/ValidationStep.tsx
 #: src/modules/ui/feedback/snack-bar-manager/components/SnackBar.tsx
 #: src/modules/ui/layout/modal/components/ConfirmationModal.tsx
+#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
 #: src/pages/settings/admin-panel/SettingsAdminApplicationRegistrationDangerZone.tsx
 #: src/pages/settings/applications/components/SettingsApplicationConnectScopePickerModal.tsx
 msgid "Cancel"
@@ -4315,6 +4377,11 @@ msgstr "Maatskappye"
 msgid "Compare plans"
 msgstr "Vergelyk planne"
 
+#. js-lingui-id: +vJdAa
+#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
+msgid "Compare the source records and decide. Twenty never merges or separates people without your choice."
+msgstr ""
+
 #. js-lingui-id: amPBVF
 #: src/modules/settings/admin-panel/constants/CreditGrantTypeLabels.ts
 msgid "Compensation"
@@ -4552,6 +4619,16 @@ msgstr "Bevestig verwydering van {roleName}-rol? Dit kan nie ongedaan gemaak wor
 msgid "Confirm downgrade"
 msgstr "Bevestig verlaagde gradering"
 
+#. js-lingui-id: EfxM6i
+#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
+msgid "Confirm merge"
+msgstr ""
+
+#. js-lingui-id: x/wPTT
+#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
+msgid "Confirm merge: the chosen survivor keeps its ID and the reviewed contact details. The other selected records move to Trash with their email fields cleared; restoring them later will not move relationships back."
+msgstr ""
+
 #. js-lingui-id: 28b8wO
 #: src/modules/settings/members/components/MemberPermissionsTab.tsx
 msgid "Confirm role update"
@@ -4587,6 +4664,11 @@ msgstr "Koppel {providerDisplayName}"
 msgid "Connect a new account to your workspace"
 msgstr "Verbind 'n nuwe rekening met jou werkruimte"
 
+#. js-lingui-id: 2OzvqP
+#: src/pages/mass-email/MassEmailPage.tsx
+msgid "Connect account"
+msgstr ""
+
 #. js-lingui-id: CMrq4R
 #: src/modules/settings/mcp-and-apis/utils/buildMcpSetupCategories.tsx
 msgid "Connect additional MCP clients using install links or client docs."
@@ -4596,6 +4678,11 @@ msgstr "Koppel ekstra MCP-kliënte met installasieskakels of kliëntdokumentasie
 #: src/pages/settings/ai/components/SettingsAiOverviewTab.tsx
 msgid "Connect AI assistants like Claude or Cursor to your workspace via the Model Context Protocol"
 msgstr "Koppel KI-assistente soos Claude of Cursor aan jou werkruimte via die Model Context-protokol"
+
+#. js-lingui-id: CcYWYM
+#: src/pages/mass-email/MassEmailPage.tsx
+msgid "Connect an email account to send emails."
+msgstr ""
 
 #. js-lingui-id: YLx3sC
 #: src/modules/settings/accounts/components/SettingsAccountsListEmptyStateCard.tsx
@@ -5264,6 +5351,7 @@ msgid "Create, edit, and delete workspace views"
 msgstr "Skep, wysig en verwyder werkruimte-uitsigte"
 
 #. js-lingui-id: d+F6q9
+#: src/modules/person-duplicate-review/components/PersonDuplicateCard.tsx
 #: src/modules/settings/admin-panel/chats/components/SettingsAdminChatsTable.tsx
 #: src/modules/settings/admin-panel/components/SettingsAdminWorkspaceContent.tsx
 #: src/modules/settings/components/SettingsDatabaseEventsForm.tsx
@@ -5708,6 +5796,11 @@ msgstr "Pas aan wat hierdie gebruiker kan sien en doen"
 #: src/modules/settings/security/components/SettingsSecuritySettings.tsx
 msgid "Customize your workspace security"
 msgstr "Pas jou werksruimte se sekuriteit aan"
+
+#. js-lingui-id: xMd3+1
+#: src/modules/activities/emails/mass-email/components/MassEmailComposeCard.tsx
+msgid "Customized for this recipient"
+msgstr ""
 
 #. js-lingui-id: fFwMZv
 #: src/modules/settings/data-model/fields/forms/select/components/SettingsDataModelFieldSelectFormOptionRow.tsx
@@ -6792,6 +6885,11 @@ msgstr "Laai voorbeeld af"
 msgid "Draft"
 msgstr "Konsep"
 
+#. js-lingui-id: 1dpSPf
+#: src/modules/activities/emails/hooks/useMessageCampaignDraft.ts
+msgid "Draft deleted"
+msgstr ""
+
 #. js-lingui-id: DbAw4C
 #: src/modules/workflow/workflow-steps/workflow-actions/components/WorkflowRunStepLogsEmailDetail.tsx
 msgid "Draft email"
@@ -6849,6 +6947,10 @@ msgstr ""
 
 #. js-lingui-id: cheWPw
 #: src/modules/object-record/record-field-list/record-detail-section/duplicate/components/RecordDetailDuplicatesSection.tsx
+#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
+#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
+#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
+#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
 msgid "Duplicates"
 msgstr "Duplicasies"
 
@@ -7016,6 +7118,11 @@ msgstr "Wysig gegevensstruktuur en velde"
 msgid "Edit each side"
 msgstr ""
 
+#. js-lingui-id: QjNcml
+#: src/modules/object-record/record-table/record-table-header/components/RecordTableColumnHeadDropdownMenu.tsx
+msgid "Edit field"
+msgstr ""
+
 #. js-lingui-id: 9QCQIc
 #: src/modules/object-record/object-options-dropdown/components/ObjectOptionsDropdownHiddenRecordGroupsContent.tsx
 msgid "Edit field values"
@@ -7083,6 +7190,12 @@ msgstr "Wysig Rekordtabel"
 #: src/modules/settings/roles/role-permissions/objects-permissions/components/SettingsRolePermissionsObjectsSection.tsx
 msgid "Edit Records on All Objects"
 msgstr "Wysig rekords op alle voorwerpe"
+
+#. js-lingui-id: CvRD+4
+#. placeholder {0}: composerState.includedRecipients.length
+#: src/modules/activities/emails/mass-email/components/MassEmailRecipientList.tsx
+msgid "Edit template · {0} recipients"
+msgstr ""
 
 #. js-lingui-id: eMFB6/
 #: src/modules/views/view-picker/components/ViewPickerContentEditMode.tsx
@@ -7250,6 +7363,8 @@ msgid "Email/Domain"
 msgstr "E-pos/Domein"
 
 #. js-lingui-id: BXEcos
+#: src/modules/person-duplicate-review/components/PersonDuplicateCard.tsx
+#: src/modules/person-duplicate-review/components/PersonDuplicateMergePreview.tsx
 #: src/modules/settings/accounts/components/SettingsAccountsSettingsSection.tsx
 #: src/modules/settings/hooks/useSettingsNavigationItems.tsx
 #: src/pages/settings/accounts/SettingsAccountsEmails.tsx
@@ -7738,6 +7853,11 @@ msgstr "Omgewingsveranderlike-opsies"
 msgid "Environment variable"
 msgstr "Omgewingsveranderlike"
 
+#. js-lingui-id: fa53BW
+#: src/modules/information-banner/components/environment/InformationBannerEnvironment.tsx
+msgid "Environment: {REACT_APP_ENVIRONMENT_LABEL}"
+msgstr ""
+
 #. js-lingui-id: 3dQ6zJ
 #: src/modules/settings/billing/constants/SettingsBillingPlanComparisonRows.ts
 msgid "Environments"
@@ -8030,6 +8150,10 @@ msgid "every minute"
 msgstr "elke minuut"
 
 #. js-lingui-id: PsQmAw
+#: src/modules/activities/emails/mass-email/components/MassEmailComposeCard.tsx
+#: src/modules/activities/emails/mass-email/components/MassEmailComposeCard.tsx
+#: src/modules/activities/emails/mass-email/components/MassEmailRecipientList.tsx
+#: src/modules/activities/emails/mass-email/components/MassEmailRecipientList.tsx
 #: src/modules/object-record/object-options-dropdown/components/ObjectOptionsDropdownVisibilityContent.tsx
 msgid "Everyone"
 msgstr "Almal"
@@ -8303,6 +8427,11 @@ msgstr ""
 msgid "Failed to create unsubscribe topic."
 msgstr "Kon nie uitskryf-onderwerp skep nie."
 
+#. js-lingui-id: dQhrqB
+#: src/modules/activities/emails/hooks/useMessageCampaignDraft.ts
+msgid "Failed to delete draft"
+msgstr ""
+
 #. js-lingui-id: AXveCw
 #: src/pages/settings/communications/SettingsWorkspaceCommunicationGroupChannelDetail.tsx
 msgid "Failed to delete email channel."
@@ -8452,6 +8581,12 @@ msgstr "Kon nie werke herprobeer nie. Probeer asseblief later weer."
 msgid "Failed to revoke signing key. Please try again later."
 msgstr "Kon nie ondertekeningsleutel herroep nie. Probeer asseblief weer later."
 
+#. js-lingui-id: TQfiMk
+#: src/modules/activities/emails/hooks/useMessageCampaignDraft.ts
+#: src/modules/activities/emails/mass-email/hooks/useMassEmailCampaignDraft.ts
+msgid "Failed to save draft"
+msgstr ""
+
 #. js-lingui-id: farFvy
 #: src/modules/layout-customization/hooks/useSaveLayoutCustomization.ts
 msgid "Failed to save layout customization"
@@ -8483,6 +8618,11 @@ msgstr "Kon nie veldtog stuur nie"
 #: src/modules/activities/emails/hooks/useSendEmail.ts
 msgid "Failed to send email"
 msgstr "Kon nie e-pos stuur nie"
+
+#. js-lingui-id: B6aF8Q
+#: src/modules/activities/emails/mass-email/hooks/useSendMassEmail.ts
+msgid "Failed to send emails"
+msgstr ""
 
 #. js-lingui-id: aH/q8K
 #: src/modules/activities/emails/hooks/useSendMessageCampaignTest.ts
@@ -9094,9 +9234,11 @@ msgid "French"
 msgstr "Frans"
 
 #. js-lingui-id: ejVYRQ
+#: src/modules/activities/emails/components/CampaignComposerFields.tsx
 #: src/modules/activities/emails/components/CampaignDetailsFields.tsx
 #: src/modules/activities/emails/components/CampaignSentEnvelope.tsx
 #: src/modules/activities/emails/components/EmailComposerFields.tsx
+#: src/modules/activities/emails/mass-email/components/MassEmailComposeCard.tsx
 msgid "From"
 msgstr "Van"
 
@@ -9318,6 +9460,11 @@ msgstr "Gaan na die faktureringsportaal"
 #: src/modules/command-menu-item/engine-command/record/single-record/workflow-versions/components/UseAsDraftWorkflowVersionSingleRecordCommand.tsx
 msgid "Go to Draft"
 msgstr "Gaan na Konsep"
+
+#. js-lingui-id: MrE/Qb
+#: src/pages/mass-email/MassEmailPage.tsx
+msgid "Go to People"
+msgstr ""
 
 #. js-lingui-id: mT57+Q
 #: src/modules/object-record/record-table/empty-state/components/RecordTableEmptyStateRemote.tsx
@@ -10135,6 +10282,11 @@ msgstr "Onaktiewe objekopsies"
 msgid "Inactive Skill Options"
 msgstr "Onaktiewe vaardigheidsopsies"
 
+#. js-lingui-id: KiXg6J
+#: src/modules/person-duplicate-review/components/PersonDuplicateCard.tsx
+msgid "Include {displayName} in merge"
+msgstr ""
+
 #. js-lingui-id: j8Bj7e
 #: src/modules/settings/security/components/SettingsSecuritySettings.tsx
 msgid "Include emails where all participants share the same domain."
@@ -10586,6 +10738,11 @@ msgstr "Is voor"
 msgid "Is empty"
 msgstr "Is leeg"
 
+#. js-lingui-id: tJ3FGI
+#: src/modules/object-record/object-filter-dropdown/utils/getOperandLabel.ts
+msgid "Is exactly"
+msgstr ""
+
 #. js-lingui-id: glSyvW
 #: src/modules/object-record/object-filter-dropdown/utils/getOperandLabel.ts
 msgid "Is in future"
@@ -10655,6 +10812,11 @@ msgstr "is nie 'n geldige UUID nie"
 #: src/modules/object-record/object-filter-dropdown/utils/getOperandLabel.ts
 msgid "Is not empty"
 msgstr "Is nie leeg nie"
+
+#. js-lingui-id: UmjIni
+#: src/modules/object-record/object-filter-dropdown/utils/getOperandLabel.ts
+msgid "Is not exactly"
+msgstr ""
 
 #. js-lingui-id: HQFVAU
 #: src/modules/object-record/object-filter-dropdown/utils/getOperandLabel.ts
@@ -10800,6 +10962,32 @@ msgstr "Kanban"
 #. js-lingui-id: lsRWTc
 #: src/modules/views/types/ViewType.ts
 msgid "Kanban widget"
+msgstr ""
+
+#. js-lingui-id: ok27CW
+#. placeholder {0}: link.url
+#: src/modules/person-duplicate-review/components/PersonDuplicateMergePreview.tsx
+msgid "Keep {0}"
+msgstr ""
+
+#. js-lingui-id: tXq9mG
+#: src/modules/person-duplicate-review/components/PersonDuplicateMergePreview.tsx
+msgid "Keep {displayValue}"
+msgstr ""
+
+#. js-lingui-id: w7Wygd
+#: src/modules/person-duplicate-review/components/PersonDuplicateMergePreview.tsx
+msgid "Keep {email}"
+msgstr ""
+
+#. js-lingui-id: IwceEs
+#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
+msgid "Keep everyone separate"
+msgstr ""
+
+#. js-lingui-id: 4Hatax
+#: src/modules/person-duplicate-review/components/PersonDuplicateCard.tsx
+msgid "Keep this record"
 msgstr ""
 
 #. js-lingui-id: 7sMeHQ
@@ -11051,6 +11239,7 @@ msgid "Last signed in"
 msgstr "Laas aangemeld"
 
 #. js-lingui-id: C3yOz3
+#: src/modules/person-duplicate-review/components/PersonDuplicateCard.tsx
 #: src/modules/settings/admin-panel/components/SettingsAdminWorkspaceContent.tsx
 #: src/pages/settings/admin-panel/SettingsAdminInstanceStatus.tsx
 msgid "Last updated"
@@ -11354,6 +11543,12 @@ msgstr "het 'n kalendergeleentheid met {labelIdentifierValue} gekoppel"
 msgid "linked an email with"
 msgstr "het 'n e-pos gekoppel met"
 
+#. js-lingui-id: gggTBm
+#: src/modules/person-duplicate-review/components/PersonDuplicateCard.tsx
+#: src/modules/person-duplicate-review/components/PersonDuplicateMergePreview.tsx
+msgid "LinkedIn"
+msgstr ""
+
 #. js-lingui-id: 82kQhK
 #: src/modules/advanced-text-editor/extensions/slash-command/DefaultSlashCommands.ts
 #: src/modules/advanced-text-editor/extensions/slash-command/DefaultSlashCommands.ts
@@ -11610,6 +11805,11 @@ msgstr "Lengtegraad"
 msgid "Look up"
 msgstr ""
 
+#. js-lingui-id: 9NNx2W
+#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
+msgid "Looking for exact duplicate signals…"
+msgstr ""
+
 #. js-lingui-id: tL2lBI
 #: src/modules/workflow/workflow-diagram/utils/generateNodesAndEdgesForIteratorNode.ts
 msgid "loop"
@@ -11629,6 +11829,22 @@ msgstr "Onderhoud"
 #: src/modules/settings/admin-panel/health-status/maintenance-mode/components/SettingsAdminMaintenanceMode.tsx
 msgid "Maintenance mode"
 msgstr "Onderhoudsmodus"
+
+#. js-lingui-id: 6nweKM
+#. placeholder {0}: link.url
+#: src/modules/person-duplicate-review/components/PersonDuplicateMergePreview.tsx
+msgid "Make {0} primary"
+msgstr ""
+
+#. js-lingui-id: HpCWO5
+#: src/modules/person-duplicate-review/components/PersonDuplicateMergePreview.tsx
+msgid "Make {displayValue} primary"
+msgstr ""
+
+#. js-lingui-id: VSfvRD
+#: src/modules/person-duplicate-review/components/PersonDuplicateMergePreview.tsx
+msgid "Make {email} primary"
+msgstr ""
 
 #. js-lingui-id: MOLprz
 #: src/modules/settings/roles/role-permissions/permission-flags/hooks/useActionRolePermissionFlagConfig.ts
@@ -11781,6 +11997,11 @@ msgstr "Markplek"
 #: src/modules/settings/admin-panel/apps/components/SettingsAdminApps.tsx
 msgid "Marketplace catalog synchronization started."
 msgstr "Markplek-katalogus-sinchronisering begin."
+
+#. js-lingui-id: EvNy5N
+#: src/pages/mass-email/MassEmailPage.tsx
+msgid "Mass email"
+msgstr ""
 
 #. js-lingui-id: 8r6vNs
 #. placeholder {0}: fieldLabel ?? ''
@@ -11958,10 +12179,20 @@ msgstr "Voorskou saamvoeg"
 msgid "Merge records"
 msgstr "Voeg rekords saam"
 
+#. js-lingui-id: nLKgG0
+#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
+msgid "Merge selected"
+msgstr ""
+
 #. js-lingui-id: LuriZ0
 #: src/modules/object-record/record-merge/components/MergeRecordsFooter.tsx
 msgid "Merging..."
 msgstr "Saamvoeg..."
+
+#. js-lingui-id: MJKChL
+#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
+msgid "Merging…"
+msgstr ""
 
 #. js-lingui-id: xDAtGP
 #: src/modules/settings/event-logs/utils/getColumnsForEventLogTable.tsx
@@ -12054,6 +12285,11 @@ msgstr "Minute tussen snellers"
 #: src/modules/workflow/workflow-steps/workflow-actions/components/WorkflowEditActionCreateCalendarEvent.tsx
 msgid "Missing calendar permission."
 msgstr "Kalendertoestemming ontbreek."
+
+#. js-lingui-id: kVXdHR
+#: src/modules/activities/emails/mass-email/components/MassEmailComposeCard.tsx
+msgid "Missing data for:"
+msgstr ""
 
 #. js-lingui-id: URVUmK
 #: src/modules/workflow/workflow-steps/workflow-actions/components/WorkflowEditActionEmailBase.tsx
@@ -12331,6 +12567,7 @@ msgstr "n.v.t."
 
 #. js-lingui-id: 6YtxFj
 #: src/modules/auth/sign-in-up/components/internal/SignInUpWorkspaceCreationForm.tsx
+#: src/modules/person-duplicate-review/components/PersonDuplicateMergePreview.tsx
 #: src/modules/settings/accounts/components/SettingsAccountsConnectionForm.tsx
 #: src/modules/settings/admin-panel/apps/components/SettingsAdminApps.tsx
 #: src/modules/settings/admin-panel/components/SettingsAdminGeneral.tsx
@@ -12554,6 +12791,11 @@ msgstr "Nuwe e-pos"
 msgid "New Email Channel"
 msgstr "Nuwe E-poskanaal"
 
+#. js-lingui-id: 8ETZA5
+#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
+msgid "New exact matches on full name, email, phone, or LinkedIn will appear here. No records are merged automatically."
+msgstr ""
+
 #. js-lingui-id: k6B3QD
 #: src/modules/navigation-menu-item/display/sections/favorites/components/FavoritesSection.tsx
 msgid "New favorite"
@@ -12709,6 +12951,7 @@ msgstr "Nuusbriewe"
 #: src/modules/settings/admin-panel/health-status/components/SettingsAdminQueueJobsTable.tsx
 #: src/modules/settings/billing/components/internal/SubscriptionInfoRowContainer.tsx
 #: src/modules/settings/components/SettingsPaginationControls.tsx
+#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
 #: src/pages/settings/accounts/SettingsAccountsConfigurationStepEmail.tsx
 msgid "Next"
 msgstr "Volgende"
@@ -13031,6 +13274,12 @@ msgstr "Geen gedeleteerde rekords wat aan die filterkriteria voldoen nie, is gev
 msgid "No description available for this application"
 msgstr "Geen beskrywing beskikbaar vir hierdie toepassing nie"
 
+#. js-lingui-id: E0HtSP
+#. placeholder {0}: formatSkippedLabels( composerState.skippedWithoutEmail.map( (skipped) => skipped.displayName, ), )
+#: src/modules/activities/emails/mass-email/components/MassEmailRecipientList.tsx
+msgid "No email address, skipped: {0}"
+msgstr ""
+
 #. js-lingui-id: mINrlz
 #: src/modules/activities/emails/components/EmptyInboxPlaceholder.tsx
 msgid "No email exchange has occurred with this record yet."
@@ -13144,6 +13393,13 @@ msgstr "Geen jongste weergawe gevind nie"
 msgid "No limit"
 msgstr "Geen limiet"
 
+#. js-lingui-id: ANScpa
+#. placeholder {0}: massEmailRelatedSource.relationFieldLabel
+#. placeholder {1}: formatSkippedLabels( massEmailRelatedSource.sourceRecordLabelsWithoutRelatedPerson, )
+#: src/modules/activities/emails/mass-email/components/MassEmailRecipientList.tsx
+msgid "No linked {0}, skipped: {1}"
+msgstr ""
+
 #. js-lingui-id: nivaRq
 #: src/modules/activities/emails/components/CampaignSentEnvelope.tsx
 msgid "No list"
@@ -13256,6 +13512,16 @@ msgstr "Geen toestemmings is ingestel vir individuele voorwerpe nie."
 #. js-lingui-id: pRxlf6
 #: src/pages/settings/applications/utils/getClaimErrorContent.ts
 msgid "No provenance attestation was found for this package. Publish it from GitHub Actions with npm trusted publishing, then try claiming again."
+msgstr ""
+
+#. js-lingui-id: O9dD65
+#: src/modules/activities/emails/mass-email/components/MassEmailRecipientList.tsx
+msgid "No recipients match your search."
+msgstr ""
+
+#. js-lingui-id: JPmCmL
+#: src/pages/mass-email/MassEmailPage.tsx
+msgid "No recipients selected."
 msgstr ""
 
 #. js-lingui-id: 5sv+ia
@@ -13373,6 +13639,11 @@ msgstr ""
 msgid "No server administrators found."
 msgstr "Geen bedieneradministrateurs gevind nie."
 
+#. js-lingui-id: RWRH60
+#: src/modules/views/view-picker/components/ViewPickerStackSelect.tsx
+msgid "No stack"
+msgstr ""
+
 #. js-lingui-id: eeoVfm
 #: src/modules/activities/emails/components/CampaignSentEnvelope.tsx
 msgid "No subject"
@@ -13403,12 +13674,18 @@ msgstr "Geen stelselobjekte met aansigte gevind nie"
 msgid "No targets available"
 msgstr "Geen teikens beskikbaar nie"
 
+#. js-lingui-id: LPYdVr
+#: src/modules/person-duplicate-review/components/PersonDuplicateCard.tsx
+msgid "No title or company"
+msgstr ""
+
 #. js-lingui-id: t0t36i
 #: src/modules/workflow/workflow-steps/workflow-actions/ai-agent-action/components/WorkflowRunStepLogsAiAgentDetail.tsx
 msgid "No tools were called"
 msgstr "Geen gereedskap is opgeroep nie"
 
 #. js-lingui-id: vK0RL8
+#: src/modules/activities/emails/components/CampaignComposerFields.tsx
 #: src/modules/activities/emails/components/CampaignDetailsFields.tsx
 msgid "No topic"
 msgstr "Geen onderwerp"
@@ -13432,6 +13709,11 @@ msgstr "Geen sneller is vir hierdie funksie gekonfigureer nie."
 #: src/modules/settings/logic-functions/components/tabs/SettingsLogicFunctionTriggersTab.tsx
 msgid "No trigger is enabled. Toggle one of the options above to choose how this function gets invoked."
 msgstr "Geen sneller is geaktiveer nie. Skakel een van die bogenoemde opsies oor om te kies hoe hierdie funksie aangeroep word."
+
+#. js-lingui-id: Bvyu3u
+#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
+msgid "No unresolved duplicate groups"
+msgstr ""
 
 #. js-lingui-id: OLsGjz
 #: src/modules/settings/unsubscribers/components/SettingsUnsubscribersList.tsx
@@ -13554,6 +13836,7 @@ msgstr "Node"
 #: src/modules/settings/accounts/components/SettingsAccountsMessageAutoCreationCard.tsx
 #: src/modules/settings/admin-panel/components/SettingsAdminWorkspaceContent.tsx
 #: src/modules/settings/data-model/objects/forms/components/SettingsDataModelObjectIdentifiersForm.tsx
+#: src/modules/settings/data-model/objects/forms/components/SettingsDataModelObjectLabelFormulaForm.tsx
 #: src/modules/side-panel/pages/page-layout/components/dashboard/SidePanelDashboardRecordTableSettings.tsx
 #: src/modules/side-panel/pages/page-layout/components/dashboard/SidePanelDashboardRecordTableSettings.tsx
 #: src/modules/side-panel/pages/page-layout/components/dashboard/SidePanelDashboardRecordTableSettings.tsx
@@ -13572,6 +13855,13 @@ msgstr "Node"
 #: src/pages/settings/admin-panel/SettingsAdminNewAiProvider.tsx
 msgid "None"
 msgstr "Geen"
+
+#. js-lingui-id: cMbQFQ
+#. placeholder {0}: objectMetadataItem.labelPlural
+#. placeholder {1}: relatedPersonFieldMetadataItem.label
+#: src/modules/activities/emails/related-people/hooks/useComposeEmailToRelatedPeople.ts
+msgid "None of the selected {0} have a linked {1}."
+msgstr ""
 
 #. js-lingui-id: 1IipHp
 #: src/pages/settings/profile/appearance/components/LocalePicker.tsx
@@ -14034,6 +14324,12 @@ msgstr "slegs op {firstDay} en {secondDay}"
 msgid "only on {remainingDays} and {0}"
 msgstr "slegs op {remainingDays} en {0}"
 
+#. js-lingui-id: asP63i
+#. placeholder {0}: massEmailRelatedSource.sourceObjectLabelPlural
+#: src/modules/activities/emails/mass-email/components/MassEmailRecipientList.tsx
+msgid "Only the first {MAX_EMAIL_RECIPIENTS} selected {0} were read."
+msgstr ""
+
 #. js-lingui-id: saaSLd
 #: src/modules/activities/emails/components/EmailThreadNotShared.tsx
 msgid "Only the subject is shared"
@@ -14147,6 +14443,16 @@ msgstr "Operasioneel"
 #: src/modules/settings/data-model/fields/forms/select/hooks/useSelectSettingsFormInitialValues.ts
 msgid "Option 1"
 msgstr "Opsie 1"
+
+#. js-lingui-id: WYGNk6
+#: src/modules/object-record/record-field/ui/meta-types/utils/getNewSelectOptionErrorMessage.ts
+msgid "Option names are limited to {OPTION_VALUE_MAXIMUM_LENGTH} characters."
+msgstr ""
+
+#. js-lingui-id: TUkT4u
+#: src/modules/object-record/record-field/ui/meta-types/utils/getNewSelectOptionErrorMessage.ts
+msgid "Option names cannot contain a comma."
+msgstr ""
 
 #. js-lingui-id: gUeG+X
 #: src/pages/settings/admin-panel/SettingsAdminNewAiProvider.tsx
@@ -14336,6 +14642,11 @@ msgstr "Oorsig"
 #: src/pages/settings/applications/SettingsApplicationRegistrationDetails.tsx
 msgid "Owner"
 msgstr "Eienaar"
+
+#. js-lingui-id: aiXStf
+#: src/modules/person-duplicate-review/components/PersonDuplicateCard.tsx
+msgid "Owner / creator"
+msgstr ""
 
 #. js-lingui-id: oDAEQq
 #: src/pages/settings/admin-panel/SettingsAdminApplicationRegistrationClaims.tsx
@@ -14556,6 +14867,11 @@ msgstr "Mense aan wie ek e-posse gestuur en van ontvang het."
 msgid "People I’ve sent emails to."
 msgstr "Mense aan wie ek e-posse gestuur het."
 
+#. js-lingui-id: ly1vF8
+#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
+msgid "People merged. Absorbed records are available in Trash."
+msgstr ""
+
 #. js-lingui-id: qMTN0w
 #: src/pages/settings/ai/SettingsAiUsageUserDetail.tsx
 msgid "Per-day AI consumption."
@@ -14645,6 +14961,11 @@ msgstr "Persoon geskep"
 msgid "Person ID"
 msgstr ""
 
+#. js-lingui-id: FaMom6
+#: src/modules/activities/emails/mass-email/components/MassEmailComposeCard.tsx
+msgid "Personalize for each recipient with placeholders:"
+msgstr ""
+
 #. js-lingui-id: zmwvG2
 #: src/modules/object-record/record-field/ui/meta-types/input/components/PhonesFieldInput.tsx
 msgid "Phone"
@@ -14660,6 +14981,12 @@ msgstr "Telefoonnommer"
 #: src/modules/object-record/record-table/record-table-cell/hooks/useGetSecondaryRecordTableCellButton.ts
 msgid "Phone number copied to clipboard"
 msgstr "Selfoonnommer na knipbord gekopieer"
+
+#. js-lingui-id: m2ivgq
+#: src/modules/person-duplicate-review/components/PersonDuplicateCard.tsx
+#: src/modules/person-duplicate-review/components/PersonDuplicateMergePreview.tsx
+msgid "Phones"
+msgstr ""
 
 #. js-lingui-id: vqKcU0
 #: src/modules/workflow/workflow-steps/components/WorkflowDropdownStepOutputItems.tsx
@@ -14939,6 +15266,7 @@ msgstr ""
 #. js-lingui-id: DHhJ7s
 #: src/modules/settings/admin-panel/health-status/components/SettingsAdminQueueJobsTable.tsx
 #: src/modules/settings/components/SettingsPaginationControls.tsx
+#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
 msgid "Previous"
 msgstr "Vorige"
 
@@ -15090,6 +15418,11 @@ msgstr "Eienskapnaam"
 #: src/modules/workflow/workflow-steps/workflow-actions/http-request-action/components/BodyInput.tsx
 msgid "Property value"
 msgstr "Eienskapwaarde"
+
+#. js-lingui-id: k5ePVH
+#: src/modules/person-duplicate-review/components/PersonDuplicateMergePreview.tsx
+msgid "Proposed merged person"
+msgstr ""
 
 #. js-lingui-id: GVxbU6
 #: src/modules/settings/security/components/SSO/SettingsSSOOIDCForm.tsx
@@ -15430,6 +15763,11 @@ msgstr "Rekord beeld"
 #: src/modules/settings/data-model/objects/forms/components/SettingsDataModelObjectIdentifiersForm.tsx
 msgid "Record label"
 msgstr "Rekord etiket"
+
+#. js-lingui-id: Pp7MBT
+#: src/modules/settings/data-model/objects/forms/components/SettingsDataModelObjectLabelFormulaForm.tsx
+msgid "Record label formula"
+msgstr ""
 
 #. js-lingui-id: XueM/X
 #: src/modules/settings/data-model/object-details/components/tabs/ObjectLayout.tsx
@@ -15843,6 +16181,11 @@ msgstr "Verslae"
 msgid "Request"
 msgstr "Versoek"
 
+#. js-lingui-id: nTlQ1w
+#: src/modules/navigation/components/MainNavigationDrawerFeatureRequestItem.tsx
+msgid "Request a feature"
+msgstr ""
+
 #. js-lingui-id: /laZGZ
 #: src/modules/workflow/workflow-steps/workflow-actions/http-request-action/components/HttpRequestExecutionResult.tsx
 msgid "Request Failed"
@@ -16023,6 +16366,11 @@ msgstr "Terugvoerwaarde"
 #: src/modules/side-panel/pages/page-layout/utils/getSortLabelSuffixForFieldType.ts
 msgid "reverse alphabetical"
 msgstr "omgekeerd alfabeties"
+
+#. js-lingui-id: wvtGe+
+#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
+msgid "Review possible duplicate people"
+msgstr ""
 
 #. js-lingui-id: GXsAby
 #: src/modules/settings/admin-panel/components/SettingsAdminWorkspaceCreditGrantRowDropdownMenu.tsx
@@ -16258,6 +16606,26 @@ msgstr "Russies"
 msgid "Sales"
 msgstr ""
 
+#. js-lingui-id: Ift2Jz
+#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
+msgid "Same email"
+msgstr ""
+
+#. js-lingui-id: asi7+Q
+#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
+msgid "Same full name"
+msgstr ""
+
+#. js-lingui-id: aWrH6A
+#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
+msgid "Same LinkedIn"
+msgstr ""
+
+#. js-lingui-id: Brfp+M
+#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
+msgid "Same phone"
+msgstr ""
+
 #. js-lingui-id: QeF0zb
 #: src/modules/side-panel/pages/email-block-settings/components/EmailBoxSidesInput.tsx
 msgid "Same value on every side"
@@ -16293,6 +16661,11 @@ msgstr "Stoor as nuwe aansig"
 #. js-lingui-id: 7byqGp
 #: src/modules/layout-customization/hooks/useEnterLayoutCustomizationMode.ts
 msgid "Save or cancel dashboard changes before editing the layout."
+msgstr ""
+
+#. js-lingui-id: K/F6pa
+#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
+msgid "Saving…"
 msgstr ""
 
 #. js-lingui-id: bifv6N
@@ -16364,6 +16737,7 @@ msgid "SDK"
 msgstr "SDK"
 
 #. js-lingui-id: A1taO8
+#: src/modules/activities/emails/mass-email/components/MassEmailRecipientList.tsx
 #: src/modules/command-menu-item/engine-command/constants/EngineComponentKeyHeadlessComponentMap.tsx
 #: src/modules/command-menu-item/engine-command/constants/EngineComponentKeyHeadlessComponentMap.tsx
 #: src/modules/navigation/hooks/useMobileNavigationBarItems.ts
@@ -16891,6 +17265,7 @@ msgid "Select a section, columns, button or divider in the email body to edit it
 msgstr ""
 
 #. js-lingui-id: YkYui1
+#: src/modules/activities/emails/components/CampaignComposerFields.tsx
 #: src/modules/activities/emails/components/CampaignDetailsFields.tsx
 msgid "Select a sender"
 msgstr "Kies 'n afsender"
@@ -16929,6 +17304,11 @@ msgstr ""
 #: src/modules/workflow/workflow-trigger/components/WorkflowEditTriggerDatabaseEventForm.tsx
 msgid "Select an option"
 msgstr "Kies 'n opsie"
+
+#. js-lingui-id: lqGidJ
+#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
+msgid "Select at least two people to merge."
+msgstr ""
 
 #. js-lingui-id: 21YIUv
 #: src/modules/spreadsheet-import/steps/components/MatchColumnsStep/components/TemplateColumn.tsx
@@ -17063,6 +17443,11 @@ msgstr ""
 msgid "Send"
 msgstr "Stuur"
 
+#. js-lingui-id: zKE0So
+#: src/modules/activities/emails/mass-email/components/MassEmailComposeCard.tsx
+msgid "Send {recipientCount} emails"
+msgstr ""
+
 #. js-lingui-id: mjK8F3
 #: src/pages/settings/members/tabs/SettingsWorkspaceMembersInviteTab.tsx
 msgid "Send an invite email to your team"
@@ -17075,7 +17460,9 @@ msgstr "Stuur e-pos"
 
 #. js-lingui-id: i/TzEU
 #: src/modules/activities/emails/components/EmptyInboxPlaceholder.tsx
+#: src/modules/command-menu-item/components/RecordIndexCommandMenuDropdown.tsx
 #: src/modules/settings/roles/role-permissions/permission-flags/hooks/useActionRolePermissionFlagConfig.ts
+#: src/modules/side-panel/hooks/useOpenComposeEmailToRelatedPeoplePickerInSidePanel.ts
 msgid "Send Email"
 msgstr "Stuur e-pos"
 
@@ -17105,6 +17492,12 @@ msgstr ""
 msgid "Sender name"
 msgstr ""
 
+#. js-lingui-id: 34Qpoa
+#. placeholder {0}: composerState.sentCount
+#: src/modules/activities/emails/mass-email/components/MassEmailComposeCard.tsx
+msgid "Sending {0}/{recipientCount}…"
+msgstr ""
+
 #. js-lingui-id: ULtHaJ
 #: src/pages/settings/communications/SettingsWorkspaceCommunicationGroupChannelDetail.tsx
 msgid "Sending domain"
@@ -17131,6 +17524,13 @@ msgstr "Besig om te stuur..."
 #: src/modules/workflow/workflow-steps/workflow-actions/components/WorkflowRunStepLogsEmailDetail.tsx
 msgid "Sent"
 msgstr "Gestuur"
+
+#. js-lingui-id: 7/XV81
+#. placeholder {0}: emails.length
+#. placeholder {1}: failedRecipients.join(', ')
+#: src/modules/activities/emails/mass-email/hooks/useSendMassEmail.ts
+msgid "Sent {successCount} of {0} emails. Failed: {1}"
+msgstr ""
 
 #. js-lingui-id: hdVMzO
 #: src/modules/settings/accounts/components/SettingsAccountsMessageAutoCreationCard.tsx
@@ -17266,7 +17666,6 @@ msgstr "Besig om jou <0>databasis</0> op te stel..."
 
 #. js-lingui-id: Tz0i8g
 #: src/modules/navigation/components/NavigationDrawerOtherSection.tsx
-#: src/modules/navigation/components/SettingsNavigationDrawer.tsx
 #: src/modules/navigation/components/SettingsNavigationDrawer.tsx
 #: src/modules/object-record/record-merge/hooks/useMergeRecordsContainerTabs.ts
 #: src/modules/settings/accounts/components/SettingsAccountsSettingsSection.tsx
@@ -17596,6 +17995,13 @@ msgstr "Slaan die skep van 'n Naam-veld oor "
 msgid "Skip the junction object (similar to many-to-many relations)"
 msgstr "Slaan die koppelingsobjek oor (soortgelyk aan baie-tot-baie-verhoudings)"
 
+#. js-lingui-id: L253KY
+#. placeholder {0}: relatedPersonFieldMetadataItem.label
+#. placeholder {1}: sourceRecordLabelsWithoutRelatedPerson.join(', ')
+#: src/modules/activities/emails/related-people/hooks/useComposeEmailToRelatedPeople.ts
+msgid "Skipped without a linked {0}: {1}"
+msgstr ""
+
 #. js-lingui-id: BIZl8w
 #: src/modules/settings/data-model/fields/forms/select/components/SettingsDataModelFieldSelectFormOptionRow.tsx
 msgid "Sky"
@@ -17809,6 +18215,11 @@ msgstr "SSO (SAML / OIDC)"
 #: src/modules/settings/security/components/SettingsSecuritySettings.tsx
 msgid "SSO Bypass"
 msgstr "SSO Omseil"
+
+#. js-lingui-id: P9fBwv
+#: src/modules/views/view-picker/components/ViewPickerStackSelect.tsx
+msgid "Stack"
+msgstr ""
 
 #. js-lingui-id: uavm+q
 #: src/modules/settings/admin-panel/health-status/components/SettingsAdminJobDetailsExpandable.tsx
@@ -18028,11 +18439,14 @@ msgid "subheading"
 msgstr ""
 
 #. js-lingui-id: UJmAAK
+#: src/modules/activities/emails/components/CampaignComposerFields.tsx
+#: src/modules/activities/emails/components/CampaignComposerFields.tsx
 #: src/modules/activities/emails/components/CampaignDetailsFields.tsx
 #: src/modules/activities/emails/components/CampaignDetailsFields.tsx
 #: src/modules/activities/emails/components/CampaignSentEnvelope.tsx
 #: src/modules/activities/emails/components/EmailComposerFields.tsx
 #: src/modules/activities/emails/components/EmailComposerFields.tsx
+#: src/modules/activities/emails/mass-email/components/MassEmailComposeCard.tsx
 #: src/modules/workflow/workflow-steps/workflow-actions/components/WorkflowEditActionEmailBase.tsx
 msgid "Subject"
 msgstr "Onderwerp"
@@ -18189,6 +18603,11 @@ msgstr "Ondersteunde invoertipes"
 #: src/pages/settings/admin-panel/SettingsAdminNewAiModel.tsx
 msgid "Supports reasoning"
 msgstr "Ondersteun redenasie"
+
+#. js-lingui-id: 1T4saU
+#: src/modules/person-duplicate-review/components/PersonDuplicateCard.tsx
+msgid "Survivor"
+msgstr ""
 
 #. js-lingui-id: UaISq3
 #: src/pages/settings/profile/appearance/components/LocalePicker.tsx
@@ -18597,6 +19016,11 @@ msgstr "Die verstek land vir nuwe adresse"
 msgid "The description of this field"
 msgstr "Die beskrywing van hierdie veld"
 
+#. js-lingui-id: JeOanZ
+#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
+msgid "The duplicate queue could not be loaded."
+msgstr ""
+
 #. js-lingui-id: xJSPh6
 #: src/modules/settings/members/components/MemberInfosTab.tsx
 msgid "The email associated to this account"
@@ -18616,6 +19040,17 @@ msgstr "Die volledige ooreenkoms met velde wat vir jou ontplooiing opgelos is."
 #: src/modules/workflow/workflow-trigger/components/WorkflowEditTriggerManual.tsx
 msgid "The icon your workflow trigger will display in the command menu"
 msgstr "Die ikoon wat jou werkvloeiproses in die opdragmenu sal vertoon"
+
+#. js-lingui-id: u7SthV
+#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
+msgid "The keep-separate decision could not be saved."
+msgstr ""
+
+#. js-lingui-id: 4YoVrr
+#. placeholder {0}: relatedPersonFieldMetadataItem.label
+#: src/modules/activities/emails/related-people/hooks/useComposeEmailToRelatedPeople.ts
+msgid "The linked {0} has no email address."
+msgstr ""
 
 #. js-lingui-id: HiI1Lo
 #: src/pages/settings/admin-panel/SettingsAdminNewAiModel.tsx
@@ -18664,6 +19099,11 @@ msgstr "Die bladsy waarna jy soek is of weg of het nooit bestaan nie. Kom ons kr
 msgid "The PDF is pre-signed by Twenty and executed with your legal entity and authorized signatory."
 msgstr "Die PDF is vooraf deur Twenty onderteken en uitgevoer met jou regs-entiteit en gemagtigde ondertekenaar."
 
+#. js-lingui-id: JD8guD
+#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
+msgid "The people could not be merged."
+msgstr ""
+
 #. js-lingui-id: wxyrqd
 #: src/modules/workflow/workflow-steps/workflow-actions/pick-record-action/components/WorkflowEditActionPickRecord.tsx
 msgid "the selected object"
@@ -18684,12 +19124,18 @@ msgstr ""
 msgid "The shared email you want to use."
 msgstr "Die gedeelde e-posadres wat jy wil gebruik."
 
+#. js-lingui-id: 8XEPsC
+#: src/modules/person-duplicate-review/components/PersonDuplicateMergePreview.tsx
+msgid "The survivor keeps its ID. Checked contact details are preserved; the star marks the primary value."
+msgstr ""
+
 #. js-lingui-id: 9q0gnf
 #: src/modules/page-layout/widgets/call-recording-transcript/components/CallRecordingTranscriptBody.tsx
 msgid "The transcript could not be generated."
 msgstr ""
 
 #. js-lingui-id: qrhV2s
+#: src/modules/activities/emails/components/CampaignComposerFields.tsx
 #: src/modules/activities/emails/components/CampaignDetailsFields.tsx
 msgid "The unsubscribe topic this email belongs to. Recipients who opted out of it are skipped, and the unsubscribe link is scoped to it."
 msgstr "Die afteken-onderwerp waaraan hierdie e-pos behoort. Ontvangers wat daarvan afgesien het, word oorgeslaan, en die afteken-skakel is daartoe beperk."
@@ -18763,6 +19209,11 @@ msgstr "Daar is geen gekoppelde aktiwiteit by hierdie rekord nie."
 #: src/pages/auth/PasswordReset.tsx
 msgid "There was an error while updating password."
 msgstr "Daar was 'n fout terwyl die wagwoord opgedateer is."
+
+#. js-lingui-id: RuO91P
+#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
+msgid "These people will remain separate unless their identity details change."
+msgstr ""
 
 #. js-lingui-id: 5Ml5Nr
 #: src/modules/advanced-text-editor/constants/AdvancedTextEditorBlockCatalog.ts
@@ -19204,11 +19655,18 @@ msgstr "titel"
 msgid "Title"
 msgstr "Titel"
 
+#. js-lingui-id: 6OdanD
+#: src/modules/person-duplicate-review/components/PersonDuplicateMergePreview.tsx
+msgid "Title and current company"
+msgstr ""
+
 #. js-lingui-id: /jQctM
+#: src/modules/activities/emails/components/CampaignComposerFields.tsx
 #: src/modules/activities/emails/components/CampaignDetailsFields.tsx
 #: src/modules/activities/emails/components/CampaignSentEnvelope.tsx
 #: src/modules/activities/emails/components/EmailComposerFields.tsx
 #: src/modules/activities/emails/components/EmailComposerFields.tsx
+#: src/modules/activities/emails/mass-email/components/MassEmailComposeCard.tsx
 #: src/modules/workflow/workflow-steps/workflow-actions/components/WorkflowEditActionEmailBase.tsx
 #: src/modules/workflow/workflow-steps/workflow-actions/components/WorkflowRunStepLogsEmailDetail.tsx
 msgid "To"
@@ -19581,6 +20039,11 @@ msgstr "Turkoois"
 msgid "Twenty fields"
 msgstr "Twenty-velde"
 
+#. js-lingui-id: 7uWmv3
+#: src/modules/person-duplicate-review/components/PersonDuplicateMergePreview.tsx
+msgid "Twenty supports one current company per person, so this comes from the chosen survivor."
+msgstr ""
+
 #. js-lingui-id: YIjS4q
 #: src/modules/ai/components/SettingsAgentModelCapabilities.tsx
 msgid "Twitter/X Search"
@@ -19658,6 +20121,7 @@ msgstr "Tik enigiets..."
 
 #. js-lingui-id: LaEX5I
 #: src/modules/activities/emails/components/CampaignBodyField.tsx
+#: src/modules/activities/emails/components/CampaignComposerFields.tsx
 #: src/modules/activities/emails/components/EmailComposerFields.tsx
 msgid "Type something or press \"/\" to see commands"
 msgstr "Tik iets of druk \"/\" om opdragte te sien"
@@ -19946,6 +20410,7 @@ msgid "Unsubscribe page"
 msgstr ""
 
 #. js-lingui-id: BEZcuL
+#: src/modules/activities/emails/components/CampaignComposerFields.tsx
 #: src/modules/activities/emails/components/CampaignDetailsFields.tsx
 #: src/modules/activities/emails/components/CampaignSentEnvelope.tsx
 msgid "Unsubscribe topic"
@@ -20017,6 +20482,7 @@ msgid "Untitled iFrame"
 msgstr "Naamlose iFrame"
 
 #. js-lingui-id: PMPun8
+#: src/modules/activities/emails/components/CampaignComposerFields.tsx
 #: src/modules/activities/emails/components/CampaignDetailsFields.tsx
 msgid "Untitled list"
 msgstr "Ongenoemde lys"
@@ -20027,6 +20493,7 @@ msgid "Untitled role"
 msgstr "Ongenoemde rol"
 
 #. js-lingui-id: jxRjAG
+#: src/modules/activities/emails/components/CampaignComposerFields.tsx
 #: src/modules/activities/emails/components/CampaignDetailsFields.tsx
 #: src/modules/activities/emails/components/CampaignSentEnvelope.tsx
 #: src/modules/settings/unsubscribe-topics/components/SettingsWorkspaceUnsubscribeTopicSection.tsx
@@ -20413,6 +20880,11 @@ msgstr "Gebruik magtiging apps en blaaieruitbreidings soos 1Password, Authy, Mic
 msgid "Use best models only"
 msgstr "Gebruik slegs die beste modelle"
 
+#. js-lingui-id: kp9jLK
+#: src/modules/settings/data-model/objects/forms/components/SettingsDataModelObjectLabelFormulaForm.tsx
+msgid "Use field API names in braces. Use ?? for a fallback. Clear the formula to enter labels manually."
+msgstr ""
+
 #. js-lingui-id: 5ZehS/
 #: src/pages/settings/ai/components/SettingsAgentSkillsTab.tsx
 msgid "Use filter to see existing skills or create your own"
@@ -20780,6 +21252,11 @@ msgstr "bekyk Filter"
 #: src/modules/metadata-error-handler/hooks/useMetadataErrorHandler.ts
 msgid "view filter group"
 msgstr "bekyk Filtergroep"
+
+#. js-lingui-id: cKqT2J
+#: src/modules/person-duplicate-review/components/PersonDuplicateCard.tsx
+msgid "View full record"
+msgstr ""
 
 #. js-lingui-id: n7a9IR
 #: src/modules/metadata-error-handler/hooks/useMetadataErrorHandler.ts
@@ -21236,6 +21713,11 @@ msgstr "Of hierdie model 'chain-of-thought'-redenasie ondersteun"
 msgid "Whole list"
 msgstr "Hele lys"
 
+#. js-lingui-id: 6rbnkB
+#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
+msgid "Why this was surfaced:"
+msgstr ""
+
 #. js-lingui-id: dmoPOu
 #: src/pages/settings/applications/SettingsAvailableApplicationDetails.tsx
 msgid "widget"
@@ -21509,6 +21991,11 @@ msgstr "Skryf 'n beskrywing"
 msgid "Write a description for this agent"
 msgstr "Skryf 'n beskrywing vir hierdie agent"
 
+#. js-lingui-id: gnkeuQ
+#: src/modules/activities/emails/mass-email/components/MassEmailComposeCard.tsx
+msgid "Write your email…"
+msgstr ""
+
 #. js-lingui-id: zeCIJi
 #: src/modules/settings/logic-functions/components/tabs/SettingsLogicFunctionCodeEditorTab.tsx
 msgid "Write your function (in typescript) below"
@@ -21620,6 +22107,11 @@ msgstr "Jy mag nie rekords vir hierdie voorwerp skep nie"
 #: src/pages/settings/applications/tabs/SettingsApplicationsDeveloperTab.tsx
 msgid "You can either create a private app or share it to others"
 msgstr "Jy kan of 'n privaat toepassing skep of dit met ander deel"
+
+#. js-lingui-id: lcoYde
+#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
+msgid "You can review this queue, but People edit and delete permissions are required to merge or keep records separate."
+msgstr ""
 
 #. js-lingui-id: CNAoaw
 #: src/modules/workflow/workflow-steps/workflow-actions/logic-function-action/components/WorkflowEditActionLogicFunction.tsx

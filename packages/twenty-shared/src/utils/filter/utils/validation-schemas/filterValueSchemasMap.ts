@@ -89,7 +89,11 @@ const numericOperandsSchemas = {
 };
 
 export const FILTER_VALUE_SCHEMAS_MAP = {
-  TEXT: containsOperandsSchemas,
+  TEXT: {
+    ...containsOperandsSchemas,
+    [ViewFilterOperand.IS_EXACTLY]: nonEmptyStringFilterValueSchema,
+    [ViewFilterOperand.IS_NOT_EXACTLY]: nonEmptyStringFilterValueSchema,
+  },
   EMAILS: containsOperandsSchemas,
   FULL_NAME: containsOperandsSchemas,
   ADDRESS: containsOperandsSchemas,
@@ -102,6 +106,8 @@ export const FILTER_VALUE_SCHEMAS_MAP = {
   MULTI_SELECT: {
     [ViewFilterOperand.CONTAINS]: selectFilterValueSchema,
     [ViewFilterOperand.DOES_NOT_CONTAIN]: selectFilterValueSchema,
+    [ViewFilterOperand.IS_EXACTLY]: selectFilterValueSchema,
+    [ViewFilterOperand.IS_NOT_EXACTLY]: selectFilterValueSchema,
   },
   SELECT: {
     [ViewFilterOperand.IS]: selectFilterValueSchema,
