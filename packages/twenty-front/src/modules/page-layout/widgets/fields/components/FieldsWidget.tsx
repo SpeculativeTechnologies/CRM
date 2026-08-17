@@ -167,13 +167,11 @@ export const FieldsWidget = ({ widget }: FieldsWidgetProps) => {
             </FieldsWidgetGroupContainer>
           )}
 
-          {!isInSidePanel && (
-            <FieldsWidgetCellHoveredPortal
-              objectMetadataItem={objectMetadataItem}
-              recordId={targetRecord.id}
-              flattenedFieldMetadataItems={flattenedFieldMetadataItems}
-            />
-          )}
+          <FieldsWidgetCellHoveredPortal
+            objectMetadataItem={objectMetadataItem}
+            recordId={targetRecord.id}
+            flattenedFieldMetadataItems={flattenedFieldMetadataItems}
+          />
           <FieldsWidgetCellEditModePortal
             objectMetadataItem={objectMetadataItem}
             recordId={targetRecord.id}

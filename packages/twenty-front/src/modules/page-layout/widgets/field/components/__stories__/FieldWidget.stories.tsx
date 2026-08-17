@@ -743,8 +743,15 @@ export const EmailsFieldWidgetInSidePanel: Story = {
     await userEvent.hover(primaryEmail);
 
     await waitFor(() => {
-      expect(canvas.getAllByText('jane.smith@acme.com')).toHaveLength(1);
-      expect(canvas.getAllByText('jane@personal.com')).toHaveLength(1);
+      const visibleLists = canvas
+        .getAllByRole('list')
+        .filter((list) => list.getAttribute('aria-hidden') !== 'true');
+
+      expect(visibleLists.length).toBeGreaterThan(0);
+
+      for (const list of visibleLists) {
+        expect(within(list).getAllByRole('listitem')).toHaveLength(2);
+      }
     });
   },
 };
