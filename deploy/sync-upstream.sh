@@ -58,7 +58,7 @@ gh_count() {
 report_conflict() {
   local behind="$1" conflicts="$2" body
 
-  body="$(printf 'Weekly upstream sync could not merge twentyhq/twenty main (%s commits behind) — manual merge needed:\n\n```\ngit fetch upstream && git switch -c sync/upstream-manual main && git merge upstream/main\n```\n\nConflicting files:\n```\n%s\n```\n' \
+  body="$(printf 'Weekly upstream sync could not merge twentyhq/twenty main (%s commits behind) — manual merge needed:\n\n```\ngit fetch upstream && git switch -c sync/upstream-manual main && git merge upstream/main\n```\n\nReal code conflicts (locale catalogs and generated GraphQL types are excluded — resolve those by taking upstream and regenerating afterwards):\n```\n%s\n```\n\nSee the "weekly upstream sync playbook" (PR #93 and #135 bodies) for how past conflicts in these files were resolved.\n' \
     "$behind" "$conflicts")"
 
   # Only suppress a duplicate when we can CONFIRM one is already open. If the
@@ -148,8 +148,68 @@ if git merge --no-edit upstream/main >/dev/null 2>&1; then
   fi
   log "OK: PR opened for $BRANCH ($BEHIND commits)"
 else
-  CONFLICTS=$(git diff --name-only --diff-filter=U)
-  git merge --abort 2>/dev/null
-  report_conflict "$BEHIND" "$CONFLICTS"
-  exit 1
+  # Locale catalogs and the generated metadata GraphQL types conflict on
+  # nearly every sync and are always resolved the same way: take upstream,
+  # regenerate after the merge. Resolve those mechanically so a human only
+  # sees real code conflicts.
+  MECHANICAL_PATHS=(
+    'packages/twenty-front/src/locales'
+    'packages/twenty-server/src/engine/core-modules/i18n/locales'
+    'packages/twenty-front/src/generated-metadata/graphql.ts'
+  )
+
+  # Hundreds of back-to-back index writes can trip over a not-yet-released
+  # index.lock on macOS; retry instead of misclassifying the failure. A file
+  # that still fails stays conflicted and flows into REMAINING below.
+  run_with_retry() {
+    local attempt
+    for attempt in 1 2 3; do
+      "$@" 2>/dev/null && return 0
+      sleep 1
+    done
+    return 1
+  }
+
+  while IFS= read -r conflicted_file; do
+    if [ -n "$(git ls-files -u -- "$conflicted_file" | awk '$3 == 3')" ]; then
+      run_with_retry git checkout --theirs -- "$conflicted_file" &&
+        run_with_retry git add -- "$conflicted_file"
+    else
+      # No stage 3: upstream deleted the file; taking upstream means git rm.
+      run_with_retry git rm -q -- "$conflicted_file"
+    fi
+  done < <(git diff --name-only --diff-filter=U -- "${MECHANICAL_PATHS[@]}")
+
+  REMAINING=$(git diff --name-only --diff-filter=U)
+
+  if [ -n "$REMAINING" ]; then
+    git merge --abort 2>/dev/null
+    report_conflict "$BEHIND" "$REMAINING"
+    exit 1
+  fi
+
+  # Only generated files conflicted — commit the merge and open the PR with a
+  # loud regeneration checklist. CI fails on the stale catalogs until the
+  # regeneration commit lands, which is intended: it blocks merging the PR
+  # with the fork's strings and types missing.
+  if ! git -c user.name="sync-upstream" -c user.email="sync-upstream@localhost" \
+       commit --no-edit >/dev/null 2>&1; then
+    log "FAIL: could not commit the mechanically resolved merge"
+    notify "Upstream sync auto-resolution failed to commit"
+    exit 1
+  fi
+  if ! push_branch "$BRANCH"; then
+    log "FAIL: resolved mechanically but could not push $BRANCH"
+    notify "Upstream sync merged but the push failed"
+    exit 1
+  fi
+  if ! gh pr create -R "$REPO" --base main --head "$BRANCH" \
+    --title "Sync upstream twentyhq/twenty ($BEHIND commits, regeneration needed)" \
+    --body "$(printf 'Automated weekly upstream sync (%s upstream commits). Only locale catalogs and generated GraphQL types conflicted; they were resolved by taking upstream, so the fork'"'"'s strings and types are MISSING until regenerated.\n\n**Do not merge yet — check out this branch and push a regeneration commit first:**\n\n```\nnpx nx run twenty-front:lingui:extract && npx nx run twenty-front:lingui:compile\nnpx nx run twenty-server:lingui:extract && npx nx run twenty-server:lingui:compile\n# with a dev server running against the merged code:\nnpx nx run twenty-front:graphql:generate --configuration=metadata\n```\n\nCI is expected to fail until that commit lands. Then verify per deploy/TEAM-WORKFLOW.md as usual.' \
+      "$BEHIND")"; then
+    log "FAIL: pushed $BRANCH but could not open the PR — open it by hand"
+    notify "Upstream sync branch pushed but the PR was not created"
+    exit 1
+  fi
+  log "OK: PR opened for $BRANCH ($BEHIND commits, generated files need regeneration)"
 fi
