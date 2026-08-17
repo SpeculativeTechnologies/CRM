@@ -1,10 +1,10 @@
 import { downloadFile } from '@/activities/files/utils/downloadFile';
 import { isAttachmentPreviewEnabledState } from '@/client-config/states/isAttachmentPreviewEnabledState';
 import { type FieldFilesValue } from '@/object-record/record-field/ui/types/FieldMetadata';
+import { FieldDisplayList } from '@/object-record/record-field/ui/components/FieldDisplayList';
 import { FileChip } from '@/ui/field/display/components/FileChip';
 import { UploadFileChip } from '@/ui/field/display/components/UploadFileChip';
 import { filePreviewState } from '@/ui/field/display/states/filePreviewState';
-import { ExpandableList } from '@/ui/layout/expandable-list/components/ExpandableList';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
 import { useSetAtomState } from '@/ui/utilities/state/jotai/hooks/useSetAtomState';
 import { isDefined } from 'twenty-shared/utils';
@@ -48,7 +48,7 @@ export const FilesDisplay = ({
   }
 
   return (
-    <ExpandableList>
+    <FieldDisplayList>
       {value.map((file) => (
         <FileChip
           key={file.fileId}
@@ -57,6 +57,6 @@ export const FilesDisplay = ({
           forceDisableClick={forceDisableClick}
         />
       ))}
-    </ExpandableList>
+    </FieldDisplayList>
   );
 };

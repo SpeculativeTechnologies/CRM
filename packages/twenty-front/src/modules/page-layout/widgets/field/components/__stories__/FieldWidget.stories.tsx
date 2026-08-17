@@ -717,6 +717,29 @@ export const EmailsFieldWidget: Story = {
   },
 };
 
+export const EmailsFieldWidgetInSidePanel: Story = {
+  render: () =>
+    renderFieldWidgetStory({
+      widget: buildFieldWidget({
+        id: 'widget-emails-field-side-panel',
+        title: 'Emails',
+        objectMetadataId: personObjectMetadataItem.id,
+        fieldMetadataId: personEmailsField.id,
+        fieldDisplayMode: FieldDisplayMode.FIELD,
+      }),
+      objectMetadataId: personObjectMetadataItem.id,
+      targetRecord: personTargetRecord,
+      records: personRecords,
+      isInSidePanel: true,
+    }),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    expect(await canvas.findByRole('list')).toBeVisible();
+    expect(await canvas.findAllByRole('listitem')).toHaveLength(2);
+  },
+};
+
 export const PhonesFieldWidget: Story = {
   render: () =>
     renderFieldWidgetStory({
