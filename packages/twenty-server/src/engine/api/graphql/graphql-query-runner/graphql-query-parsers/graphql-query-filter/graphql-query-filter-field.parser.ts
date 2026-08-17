@@ -1,9 +1,5 @@
 import { msg } from '@lingui/core/macro';
-import {
-  Brackets,
-  type ObjectLiteral,
-  type WhereExpressionBuilder,
-} from 'typeorm';
+import { Brackets, type WhereExpressionBuilder } from 'typeorm';
 import {
   compositeTypeDefinitions,
   FieldMetadataType,
@@ -36,11 +32,12 @@ import {
   PermissionsExceptionCode,
   PermissionsExceptionMessage,
 } from 'src/engine/metadata-modules/permissions/permissions.exception';
-import { type WorkspaceSelectQueryBuilder } from 'src/engine/twenty-orm/repository/workspace-select-query-builder';
+import { WorkspaceSelectQueryBuilder } from 'src/engine/twenty-orm/repository/workspace-select-query-builder';
 import { renderRowLevelPermissionFilterToSql } from 'src/engine/twenty-orm/utils/render-row-level-permission-filter-to-sql.util';
 import { resolveRowLevelPermissionRecordFilter } from 'src/engine/twenty-orm/utils/resolve-row-level-permission-record-filter.util';
 
 import { GraphqlQueryFilterConditionParser } from './graphql-query-filter-condition.parser';
+import { type RecordQueryBuilder } from 'src/engine/api/graphql/graphql-query-runner/types/record-query-builder.type';
 
 export class GraphqlQueryFilterFieldParser {
   private flatObjectMetadata: FlatObjectMetadata;
@@ -72,7 +69,7 @@ export class GraphqlQueryFilterFieldParser {
 
   public parse(
     queryBuilder: WhereExpressionBuilder,
-    outerQueryBuilder: WorkspaceSelectQueryBuilder<ObjectLiteral>,
+    outerQueryBuilder: RecordQueryBuilder,
     objectNameSingular: string,
     key: string,
     // oxlint-disable-next-line typescript/no-explicit-any
@@ -154,7 +151,7 @@ export class GraphqlQueryFilterFieldParser {
 
   private parseRelationSubFilter(
     queryBuilder: WhereExpressionBuilder,
-    outerQueryBuilder: WorkspaceSelectQueryBuilder<ObjectLiteral>,
+    outerQueryBuilder: RecordQueryBuilder,
     parentAlias: string,
     fieldMetadata: FlatFieldMetadata,
     filterValue: Partial<ObjectRecordFilter>,
@@ -248,13 +245,25 @@ export class GraphqlQueryFilterFieldParser {
 
   private parseOneToManyRelationSubFilter(
     queryBuilder: WhereExpressionBuilder,
-    outerQueryBuilder: WorkspaceSelectQueryBuilder<ObjectLiteral>,
+    outerQueryBuilder: RecordQueryBuilder,
     parentAlias: string,
     fieldMetadata: FlatFieldMetadata<FieldMetadataType.RELATION>,
     targetObjectMetadata: FlatObjectMetadata,
     filterValue: Partial<ObjectRecordFilter>,
     isFirst: boolean,
   ): void {
+    // The EXISTS subquery needs the full TypeORM builder (subQuery, alias
+    // metadata, permission context); the ORM v2 read builder only implements
+    // the structural RecordQueryBuilder slice, so fail loudly instead of
+    // emitting a wrong query if it ever reaches this filter.
+    if (!(outerQueryBuilder instanceof WorkspaceSelectQueryBuilder)) {
+      throw new GraphqlQueryRunnerException(
+        `One-to-many relation filter on "${fieldMetadata.name}" is not supported on this query path`,
+        GraphqlQueryRunnerExceptionCode.INVALID_QUERY_INPUT,
+        { userFriendlyMessage: msg`Relation filter is not supported here` },
+      );
+    }
+
     if (!isDefined(fieldMetadata.relationTargetFieldMetadataId)) {
       throw new GraphqlQueryRunnerException(
         `Relation filter on "${fieldMetadata.name}" is missing a target field`,
