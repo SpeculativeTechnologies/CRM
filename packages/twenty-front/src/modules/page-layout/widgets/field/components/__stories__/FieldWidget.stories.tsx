@@ -737,6 +737,15 @@ export const EmailsFieldWidgetInSidePanel: Story = {
 
     expect(await canvas.findByRole('list')).toBeVisible();
     expect(await canvas.findAllByRole('listitem')).toHaveLength(2);
+
+    const primaryEmail = await canvas.findByText('jane.smith@acme.com');
+
+    await userEvent.hover(primaryEmail);
+
+    await waitFor(() => {
+      expect(canvas.getAllByText('jane.smith@acme.com')).toHaveLength(1);
+      expect(canvas.getAllByText('jane@personal.com')).toHaveLength(1);
+    });
   },
 };
 

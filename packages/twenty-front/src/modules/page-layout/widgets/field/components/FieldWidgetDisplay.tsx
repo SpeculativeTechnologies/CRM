@@ -120,14 +120,16 @@ export const FieldWidgetDisplay = ({
             </FieldContext.Provider>
           </StyledContainer>
 
-          <FieldWidgetCellHoveredPortal
-            objectMetadataItem={objectMetadataItem}
-            fieldMetadataItem={fieldMetadataItem}
-            recordId={recordId}
-            instanceId={instanceId}
-            isHovered={fieldWidgetHover}
-            onMouseLeave={handleMouseLeave}
-          />
+          {!isInSidePanel && (
+            <FieldWidgetCellHoveredPortal
+              objectMetadataItem={objectMetadataItem}
+              fieldMetadataItem={fieldMetadataItem}
+              recordId={recordId}
+              instanceId={instanceId}
+              isHovered={fieldWidgetHover}
+              onMouseLeave={handleMouseLeave}
+            />
+          )}
           <FieldWidgetCellEditModePortal
             objectMetadataItem={objectMetadataItem}
             fieldMetadataItem={fieldMetadataItem}
