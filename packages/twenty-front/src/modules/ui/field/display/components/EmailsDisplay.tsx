@@ -1,8 +1,7 @@
 import React, { useMemo } from 'react';
 
+import { FieldDisplayList } from '@/object-record/record-field/ui/components/FieldDisplayList';
 import { type FieldEmailsValue } from '@/object-record/record-field/ui/types/FieldMetadata';
-import { ExpandableList } from '@/ui/layout/expandable-list/components/ExpandableList';
-import { styled } from '@linaria/react';
 import { isDefined } from 'twenty-shared/utils';
 import { RoundedLink } from 'twenty-ui/navigation';
 
@@ -11,19 +10,6 @@ type EmailsDisplayProps = {
   isFocused?: boolean;
   onEmailClick?: (email: string, event: React.MouseEvent<HTMLElement>) => void;
 };
-
-const StyledContainer = styled.div`
-  align-items: center;
-  display: flex;
-  gap: 4px;
-  justify-content: flex-start;
-
-  max-width: 100%;
-
-  overflow: hidden;
-
-  width: 100%;
-`;
 
 export const EmailsDisplay = ({
   value,
@@ -39,27 +25,16 @@ export const EmailsDisplay = ({
     [value?.primaryEmail, value?.additionalEmails],
   );
 
-  return isFocused ? (
-    <ExpandableList isChipCountDisplayed>
-      {emails.map((email, index) => (
+  return (
+    <FieldDisplayList isChipCountDisplayed={isFocused}>
+      {emails.map((email) => (
         <RoundedLink
-          key={index}
+          key={email}
           label={email}
           href={`mailto:${email}`}
           onClick={(event) => onEmailClick?.(email, event)}
         />
       ))}
-    </ExpandableList>
-  ) : (
-    <StyledContainer>
-      {emails.map((email, index) => (
-        <RoundedLink
-          key={index}
-          label={email}
-          href={`mailto:${email}`}
-          onClick={(event) => onEmailClick?.(email, event)}
-        />
-      ))}
-    </StyledContainer>
+    </FieldDisplayList>
   );
 };

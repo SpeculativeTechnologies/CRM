@@ -16,6 +16,7 @@ import { isJunctionRelationForbidden } from '@/object-record/record-field/ui/uti
 import { RecordInlineCellAnchoredPortalContext } from '@/object-record/record-inline-cell/components/RecordInlineCellAnchoredPortalContext';
 import { RecordInlineCellCloseOnSidePanelOpeningEffect } from '@/object-record/record-inline-cell/components/RecordInlineCellCloseOnSidePanelOpeningEffect';
 import { getRecordFieldInputInstanceId } from '@/object-record/utils/getRecordFieldInputId';
+import { useLayoutRenderingContext } from '@/ui/layout/contexts/LayoutRenderingContext';
 import { createPortal } from 'react-dom';
 import { isDefined } from 'twenty-shared/utils';
 
@@ -47,6 +48,8 @@ export const RecordInlineCellAnchoredPortal = ({
   children,
   onCloseEditMode,
 }: RecordInlineCellAnchoredPortalProps) => {
+  const { isInSidePanel } = useLayoutRenderingContext();
+
   const fieldInstanceId = getRecordFieldInputInstanceId({
     recordId,
     fieldName: fieldMetadataItem.name,
@@ -106,6 +109,7 @@ export const RecordInlineCellAnchoredPortal = ({
           }),
           useUpdateRecord: useUpdateOneObjectRecordMutation,
           isDisplayModeFixHeight: true,
+          isInSidePanel,
           isRecordFieldReadOnly,
           isForbidden,
           onCloseEditMode,

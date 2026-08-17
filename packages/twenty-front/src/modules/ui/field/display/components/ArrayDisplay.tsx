@@ -1,5 +1,5 @@
 import { type FieldArrayValue } from '@/object-record/record-field/ui/types/FieldMetadata';
-import { ExpandableList } from '@/ui/layout/expandable-list/components/ExpandableList';
+import { FieldDisplayList } from '@/object-record/record-field/ui/components/FieldDisplayList';
 import { t } from '@lingui/core/macro';
 import { Chip, ChipVariant } from 'twenty-ui/data-display';
 
@@ -9,7 +9,7 @@ type ArrayDisplayProps = {
 
 export const ArrayDisplay = ({ value }: ArrayDisplayProps) => {
   return (
-    <ExpandableList>
+    <FieldDisplayList>
       {value?.map((item, index) => (
         <Chip
           key={`${item}-${index}`}
@@ -18,6 +18,6 @@ export const ArrayDisplay = ({ value }: ArrayDisplayProps) => {
           emptyLabel={t`Untitled`}
         />
       ))}
-    </ExpandableList>
+    </FieldDisplayList>
   );
 };

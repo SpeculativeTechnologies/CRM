@@ -14,6 +14,7 @@ import { isJunctionRelationForbidden } from '@/object-record/record-field/ui/uti
 import { RecordInlineCell } from '@/object-record/record-inline-cell/components/RecordInlineCell';
 import { getRecordFieldInputInstanceId } from '@/object-record/utils/getRecordFieldInputId';
 import { getObjectPermissionsFromMapByObjectMetadataId } from '@/settings/roles/role-permissions/objects-permissions/utils/getObjectPermissionsFromMapByObjectMetadataId';
+import { useLayoutRenderingContext } from '@/ui/layout/contexts/LayoutRenderingContext';
 import {
   type CoreObjectNameSingular,
   type ObjectPermissions,
@@ -51,6 +52,8 @@ export const FieldsWidgetFieldItem = ({
   instanceId,
   onMouseEnter,
 }: FieldsWidgetFieldItemProps) => {
+  const { isInSidePanel } = useLayoutRenderingContext();
+
   const getIsMetadataItemFromStandardApplication =
     useGetIsMetadataItemFromStandardApplication();
 
@@ -77,6 +80,7 @@ export const FieldsWidgetFieldItem = ({
         fieldDefinition,
         useUpdateRecord,
         isDisplayModeFixHeight: true,
+        isInSidePanel,
         isRecordFieldReadOnly: isRecordFieldReadOnly({
           isRecordReadOnly,
           isSystemObject: objectMetadataItem.isSystem,

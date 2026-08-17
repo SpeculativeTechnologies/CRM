@@ -90,6 +90,7 @@ export const FieldWidgetDisplay = ({
                 fieldDefinition,
                 useUpdateRecord: useUpdateOneObjectRecordMutation,
                 isDisplayModeFixHeight: false,
+                isInSidePanel,
                 isRecordFieldReadOnly: isRecordFieldReadOnly({
                   isRecordReadOnly,
                   isSystemObject: objectMetadataItem.isSystem,

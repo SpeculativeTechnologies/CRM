@@ -6,6 +6,7 @@ import { type TaskTarget } from '@/activities/types/TaskTarget';
 import { useObjectMetadataItems } from '@/object-metadata/hooks/useObjectMetadataItems';
 import { CoreObjectNameSingular } from 'twenty-shared/types';
 import { RecordChip } from '@/object-record/components/RecordChip';
+import { FieldDisplayList } from '@/object-record/record-field/ui/components/FieldDisplayList';
 import { isActivityTargetField } from '@/object-record/record-field-list/utils/categorizeRelationFields';
 import { FieldContext } from '@/object-record/record-field/ui/contexts/FieldContext';
 import { useFieldFocus } from '@/object-record/record-field/ui/hooks/useFieldFocus';
@@ -15,21 +16,8 @@ import { extractTargetRecordsFromJunction } from '@/object-record/record-field/u
 import { getJunctionConfig } from '@/object-record/record-field/ui/utils/junction/getJunctionConfig';
 import { hasJunctionConfig } from '@/object-record/record-field/ui/utils/junction/hasJunctionConfig';
 
-import { ExpandableList } from '@/ui/layout/expandable-list/components/ExpandableList';
-import { styled } from '@linaria/react';
 import { isArray } from '@sniptt/guards';
 import { isDefined } from 'twenty-shared/utils';
-import { themeCssVariables } from 'twenty-ui/theme-constants';
-
-const StyledContainer = styled.div`
-  align-items: center;
-  display: flex;
-  gap: ${themeCssVariables.spacing[1]};
-  justify-content: flex-start;
-  max-width: 100%;
-  overflow: hidden;
-  width: 100%;
-`;
 
 export const RelationFromManyFieldDisplay = () => {
   const { fieldValue, fieldDefinition, generateRecordChipData } =
@@ -109,21 +97,13 @@ export const RelationFromManyFieldDisplay = () => {
       })
       .filter(isDefined);
 
-    if (isFocused) {
-      return (
-        <ExpandableList
-          isChipCountDisplayed={isFocused}
-          maxInlineCount={MAX_RELATION_CHIPS_DISPLAYED_INLINE}
-        >
-          {chips}
-        </ExpandableList>
-      );
-    }
-
     return (
-      <StyledContainer>
-        {chips.slice(0, MAX_RELATION_CHIPS_DISPLAYED_INLINE)}
-      </StyledContainer>
+      <FieldDisplayList
+        isChipCountDisplayed={isFocused}
+        maxInlineCount={MAX_RELATION_CHIPS_DISPLAYED_INLINE}
+      >
+        {chips}
+      </FieldDisplayList>
     );
   }
 
@@ -158,7 +138,7 @@ export const RelationFromManyFieldDisplay = () => {
     }
 
     return (
-      <ExpandableList
+      <FieldDisplayList
         isChipCountDisplayed={isFocused}
         maxInlineCount={MAX_RELATION_CHIPS_DISPLAYED_INLINE}
       >
@@ -171,13 +151,13 @@ export const RelationFromManyFieldDisplay = () => {
             triggerEvent={triggerEvent}
           />
         ))}
-      </ExpandableList>
+      </FieldDisplayList>
     );
   }
 
   if (isRelationFromActivityTargets) {
     return (
-      <ExpandableList
+      <FieldDisplayList
         isChipCountDisplayed={isFocused}
         maxInlineCount={MAX_RELATION_CHIPS_DISPLAYED_INLINE}
       >
@@ -189,12 +169,12 @@ export const RelationFromManyFieldDisplay = () => {
             forceDisableClick={disableChipClick}
           />
         ))}
-      </ExpandableList>
+      </FieldDisplayList>
     );
   }
 
   return (
-    <ExpandableList
+    <FieldDisplayList
       isChipCountDisplayed={isFocused}
       maxInlineCount={MAX_RELATION_CHIPS_DISPLAYED_INLINE}
     >
@@ -210,6 +190,6 @@ export const RelationFromManyFieldDisplay = () => {
           />
         );
       })}
-    </ExpandableList>
+    </FieldDisplayList>
   );
 };

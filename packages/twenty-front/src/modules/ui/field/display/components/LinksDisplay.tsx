@@ -1,8 +1,8 @@
 import React, { useMemo } from 'react';
 
+import { FieldDisplayList } from '@/object-record/record-field/ui/components/FieldDisplayList';
 import { getFieldLinkDefinedLinks } from '@/object-record/record-field/ui/meta-types/input/utils/getFieldLinkDefinedLinks';
 import { type FieldLinksValue } from '@/object-record/record-field/ui/types/FieldMetadata';
-import { ExpandableList } from '@/ui/layout/expandable-list/components/ExpandableList';
 import {
   getAbsoluteUrlOrThrow,
   getUrlHostnameOrThrow,
@@ -43,7 +43,7 @@ export const LinksDisplay = ({ value, onLinkClick }: LinksDisplayProps) => {
   }, [value]);
 
   return (
-    <ExpandableList>
+    <FieldDisplayList>
       {links.map(({ url, label, displayLabel, type }, index) =>
         isSocialLinkType(type) ? (
           <SocialLink
@@ -62,6 +62,6 @@ export const LinksDisplay = ({ value, onLinkClick }: LinksDisplayProps) => {
           />
         ),
       )}
-    </ExpandableList>
+    </FieldDisplayList>
   );
 };

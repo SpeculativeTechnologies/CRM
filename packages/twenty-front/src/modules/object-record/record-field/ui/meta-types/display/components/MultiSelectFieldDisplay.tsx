@@ -1,6 +1,6 @@
+import { FieldDisplayList } from '@/object-record/record-field/ui/components/FieldDisplayList';
 import { useFieldFocus } from '@/object-record/record-field/ui/hooks/useFieldFocus';
 import { useMultiSelectFieldDisplay } from '@/object-record/record-field/ui/meta-types/hooks/useMultiSelectFieldDisplay';
-import { ExpandableList } from '@/ui/layout/expandable-list/components/ExpandableList';
 import { Tag } from 'twenty-ui/data-display';
 import { isDefined } from 'twenty-shared/utils';
 
@@ -17,15 +17,15 @@ export const MultiSelectFieldDisplay = () => {
 
   if (!isDefined(selectedOptions)) return null;
 
+  const tags = selectedOptions.map((selectedOption) => (
+    <Tag
+      key={selectedOption.value}
+      color={selectedOption.color}
+      text={selectedOption.label}
+    />
+  ));
+
   return (
-    <ExpandableList isChipCountDisplayed={isFocused}>
-      {selectedOptions.map((selectedOption, index) => (
-        <Tag
-          key={index}
-          color={selectedOption.color}
-          text={selectedOption.label}
-        />
-      ))}
-    </ExpandableList>
+    <FieldDisplayList isChipCountDisplayed={isFocused}>{tags}</FieldDisplayList>
   );
 };
