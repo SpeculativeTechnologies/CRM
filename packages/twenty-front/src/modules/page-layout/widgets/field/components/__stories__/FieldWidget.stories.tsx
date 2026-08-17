@@ -354,6 +354,7 @@ type FieldWidgetStorySetup = {
   objectMetadataId: string;
   targetRecord: { id: string; nameSingular: string };
   records: Array<{ id: string; record: ObjectRecord }>;
+  isInSidePanel?: boolean;
 };
 
 const renderFieldWidgetStory = ({
@@ -361,6 +362,7 @@ const renderFieldWidgetStory = ({
   objectMetadataId,
   targetRecord,
   records,
+  isInSidePanel = false,
 }: FieldWidgetStorySetup) => {
   setTestObjectMetadataItemsInMetadataStore(
     jotaiStore,
@@ -389,7 +391,7 @@ const renderFieldWidgetStory = ({
           <PageLayoutTestWrapper store={jotaiStore}>
             <LayoutRenderingProvider
               value={{
-                isInSidePanel: false,
+                isInSidePanel,
                 layoutType: PageLayoutType.RECORD_PAGE,
                 targetRecordIdentifier: {
                   id: targetRecord.id,
@@ -781,6 +783,29 @@ export const MultiSelectFieldWidget: Story = {
 
     const hybridChip = await canvas.findByText(/Hybrid/);
     expect(hybridChip).toBeVisible();
+  },
+};
+
+export const MultiSelectFieldWidgetInSidePanel: Story = {
+  render: () =>
+    renderFieldWidgetStory({
+      widget: buildFieldWidget({
+        id: 'widget-multi-select-field-side-panel',
+        title: 'Work Policy',
+        objectMetadataId: companyObjectMetadataItem.id,
+        fieldMetadataId: companyWorkPolicyField.id,
+        fieldDisplayMode: FieldDisplayMode.FIELD,
+      }),
+      objectMetadataId: companyObjectMetadataItem.id,
+      targetRecord: companyTargetRecord,
+      records: companyRecords,
+      isInSidePanel: true,
+    }),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    expect(await canvas.findByRole('list')).toBeVisible();
+    expect(await canvas.findAllByRole('listitem')).toHaveLength(2);
   },
 };
 
