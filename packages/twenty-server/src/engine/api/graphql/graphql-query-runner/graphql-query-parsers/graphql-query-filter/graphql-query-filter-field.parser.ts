@@ -1,5 +1,9 @@
 import { msg } from '@lingui/core/macro';
-import { Brackets, type WhereExpressionBuilder } from 'typeorm';
+import {
+  Brackets,
+  type ObjectLiteral,
+  type WhereExpressionBuilder,
+} from 'typeorm';
 import {
   compositeTypeDefinitions,
   FieldMetadataType,
@@ -32,12 +36,29 @@ import {
   PermissionsExceptionCode,
   PermissionsExceptionMessage,
 } from 'src/engine/metadata-modules/permissions/permissions.exception';
-import { WorkspaceSelectQueryBuilder } from 'src/engine/twenty-orm/repository/workspace-select-query-builder';
+import { type WorkspaceSelectQueryBuilder } from 'src/engine/twenty-orm/repository/workspace-select-query-builder';
 import { renderRowLevelPermissionFilterToSql } from 'src/engine/twenty-orm/utils/render-row-level-permission-filter-to-sql.util';
 import { resolveRowLevelPermissionRecordFilter } from 'src/engine/twenty-orm/utils/resolve-row-level-permission-record-filter.util';
 
 import { GraphqlQueryFilterConditionParser } from './graphql-query-filter-condition.parser';
 import { type RecordQueryBuilder } from 'src/engine/api/graphql/graphql-query-runner/types/record-query-builder.type';
+
+// Checked structurally rather than with instanceof so tests can drive the
+// parser with a stub builder; what matters is the capabilities the EXISTS
+// subquery uses, not the concrete class.
+const isExistsCapableQueryBuilder = (
+  queryBuilder: RecordQueryBuilder,
+): queryBuilder is RecordQueryBuilder &
+  WorkspaceSelectQueryBuilder<ObjectLiteral> => {
+  const candidate = queryBuilder as Partial<
+    WorkspaceSelectQueryBuilder<ObjectLiteral>
+  >;
+
+  return (
+    typeof candidate.subQuery === 'function' &&
+    typeof candidate.expressionMap?.findAliasByName === 'function'
+  );
+};
 
 export class GraphqlQueryFilterFieldParser {
   private flatObjectMetadata: FlatObjectMetadata;
@@ -256,7 +277,7 @@ export class GraphqlQueryFilterFieldParser {
     // metadata, permission context); the ORM v2 read builder only implements
     // the structural RecordQueryBuilder slice, so fail loudly instead of
     // emitting a wrong query if it ever reaches this filter.
-    if (!(outerQueryBuilder instanceof WorkspaceSelectQueryBuilder)) {
+    if (!isExistsCapableQueryBuilder(outerQueryBuilder)) {
       throw new GraphqlQueryRunnerException(
         `One-to-many relation filter on "${fieldMetadata.name}" is not supported on this query path`,
         GraphqlQueryRunnerExceptionCode.INVALID_QUERY_INPUT,
