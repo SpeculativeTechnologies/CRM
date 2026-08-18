@@ -144,7 +144,7 @@ export const SidePanelRecordInfo = ({
             avatarUrl={getAbsoluteImageUrl(recordIdentifier.avatarUrl)}
             placeholder={recordIdentifier.name}
             placeholderColorSeed={objectRecordId}
-            size="lg"
+            size="xl"
             type={recordIdentifier.avatarType}
           />
         ) : undefined
