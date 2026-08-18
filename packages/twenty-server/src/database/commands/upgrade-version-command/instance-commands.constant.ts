@@ -1,4 +1,6 @@
 // Auto-edited by generate:instance-command — do not edit manually
+// Fork commands register through FORK_INSTANCE_COMMANDS at the bottom; keep
+// upstream's entries above untouched so weekly syncs merge cleanly.
 
 import { AddViewFieldGroupIdIndexOnViewFieldFastInstanceCommand } from 'src/database/commands/upgrade-version-command/1-21/1-21-instance-command-fast-1775129420309-add-view-field-group-id-index-on-view-field';
 import { MigrateMessagingCalendarToCoreFastInstanceCommand } from 'src/database/commands/upgrade-version-command/1-21/1-21-instance-command-fast-1775165049548-migrate-messaging-calendar-to-core';
@@ -140,15 +142,13 @@ import { AddMessageChannelDisplayNameFastInstanceCommand } from './2-25/2-25-ins
 import { AddAppTokenSsoExchangeIndexFastInstanceCommand } from './2-25/2-25-instance-command-fast-1785143586000-add-app-token-sso-exchange-index';
 import { AddMessageCampaignWidgetTypeFastInstanceCommand } from './2-25/2-25-instance-command-fast-1785229950000-add-message-campaign-widget-type';
 import { AddIsHiddenToAgentMessageFastInstanceCommand } from './2-25/2-25-instance-command-fast-1785230296000-add-is-hidden-to-agent-message';
-import { CreatePersonDuplicateReviewTablesFastInstanceCommand } from 'src/database/commands/upgrade-version-command/2-25/2-25-instance-command-fast-1785466013136-create-person-duplicate-review-tables';
-import { AddIsExactlyViewFilterOperandsFastInstanceCommand } from 'src/database/commands/upgrade-version-command/2-27/2-27-instance-command-fast-1785774996477-add-is-exactly-view-filter-operands';
-import { AddViewParentViewIdFastInstanceCommand } from 'src/database/commands/upgrade-version-command/2-31/2-31-instance-command-fast-1786400000000-add-view-parent-view-id';
 import { CreateBillingCreditGrantTableFastInstanceCommand } from 'src/database/commands/upgrade-version-command/2-31/2-31-instance-command-fast-1786532184000-create-billing-credit-grant-table';
 import { BackfillCreditBalanceIntoGrantsSlowInstanceCommand } from 'src/database/commands/upgrade-version-command/2-31/2-31-instance-command-slow-1786532184001-backfill-credit-balance-into-grants';
 import { AddPreviousPeriodStartToBillingSubscriptionFastInstanceCommand } from 'src/database/commands/upgrade-version-command/2-31/2-31-instance-command-fast-1786532184002-add-previous-period-start-to-billing-subscription';
 import { AddIsDeprecatedToApplicationVariablesFastInstanceCommand } from 'src/database/commands/upgrade-version-command/2-31/2-31-instance-command-fast-1786533439000-add-is-deprecated-to-application-variables';
 import { EncryptEmptyApplicationVariablesSlowInstanceCommand } from 'src/database/commands/upgrade-version-command/2-31/2-31-instance-command-slow-1786533438000-encrypt-empty-application-variables';
 import { AddWritabilityToMetadataFastInstanceCommand } from 'src/database/commands/upgrade-version-command/2-32/2-32-instance-command-fast-1786713600000-add-writability-to-metadata';
+import { FORK_INSTANCE_COMMANDS } from 'src/database/commands/upgrade-version-command/fork-instance-commands.constant';
 
 export const INSTANCE_COMMANDS = [
   AddViewFieldGroupIdIndexOnViewFieldFastInstanceCommand,
@@ -281,17 +281,14 @@ export const INSTANCE_COMMANDS = [
   AddPageLayoutCascadeDeleteIndexesFastInstanceCommand,
   AddChannelWebhookSubscriptionExternalIdIndexesFastInstanceCommand,
   AddIsHiddenToAgentMessageFastInstanceCommand,
-  CreatePersonDuplicateReviewTablesFastInstanceCommand,
   AddOnDisconnectLogicFunctionToConnectionProviderFastInstanceCommand,
   AddConnectedAccountHandleProviderIndexFastInstanceCommand,
   AddOpenRecordInToObjectMetadataFastInstanceCommand,
   CreateUserSessionCoreTableFastInstanceCommand,
   CreateApplicationAuthorizationCoreTableFastInstanceCommand,
-  AddIsExactlyViewFilterOperandsFastInstanceCommand,
   AddListViewTypeFastInstanceCommand,
   AddCallRecordingWidgetTypesFastInstanceCommand,
   AddListWidgetViewTypeFastInstanceCommand,
-  AddViewParentViewIdFastInstanceCommand,
   AddIsSystemSideEffectToViewFieldGroupFastInstanceCommand,
   AddFrontComponentSharedDependenciesToApplicationFastInstanceCommand,
   CreateBillingCreditGrantTableFastInstanceCommand,
@@ -300,4 +297,5 @@ export const INSTANCE_COMMANDS = [
   AddIsDeprecatedToApplicationVariablesFastInstanceCommand,
   EncryptEmptyApplicationVariablesSlowInstanceCommand,
   AddWritabilityToMetadataFastInstanceCommand,
+  ...FORK_INSTANCE_COMMANDS,
 ];

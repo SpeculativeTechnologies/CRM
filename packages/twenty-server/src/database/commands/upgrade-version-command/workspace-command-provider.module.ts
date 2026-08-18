@@ -30,6 +30,7 @@ import { V2_5_UpgradeVersionCommandModule } from 'src/database/commands/upgrade-
 import { V2_7_UpgradeVersionCommandModule } from 'src/database/commands/upgrade-version-command/2-7/2-7-upgrade-version-command.module';
 import { V2_8_UpgradeVersionCommandModule } from 'src/database/commands/upgrade-version-command/2-8/2-8-upgrade-version-command.module';
 import { V2_9_UpgradeVersionCommandModule } from 'src/database/commands/upgrade-version-command/2-9/2-9-upgrade-version-command.module';
+import { ForkWorkspaceCommandsModule } from 'src/database/commands/upgrade-version-command/fork-workspace-commands.module';
 
 @Module({
   imports: [
@@ -63,6 +64,9 @@ import { V2_9_UpgradeVersionCommandModule } from 'src/database/commands/upgrade-
     V2_28_UpgradeVersionCommandModule,
     V2_31_UpgradeVersionCommandModule,
     V2_32_UpgradeVersionCommandModule,
+    // Fork commands stay in their own module so upstream's per-version module
+    // edits merge cleanly; keep this entry last.
+    ForkWorkspaceCommandsModule,
   ],
 })
 export class WorkspaceCommandProviderModule {}
