@@ -1,11 +1,35 @@
 import { compositeTypeDefinitions } from 'twenty-shared/types';
-import { capitalize } from 'twenty-shared/utils';
+import { capitalize, isDefined } from 'twenty-shared/utils';
 
 import { type WorkspaceInternalContext } from 'src/engine/twenty-orm/interfaces/workspace-internal-context.interface';
 
 import { getFlatFieldsFromFlatObjectMetadata } from 'src/engine/api/graphql/workspace-schema-builder/utils/get-flat-fields-for-flat-object-metadata.util';
+import { type FlatEntityMaps } from 'src/engine/metadata-modules/flat-entity/types/flat-entity-maps.type';
+import { type FlatIndexMetadata } from 'src/engine/metadata-modules/flat-index-metadata/types/flat-index-metadata.type';
 import { type FlatObjectMetadata } from 'src/engine/metadata-modules/flat-object-metadata/types/flat-object-metadata.type';
 import { type WorkspaceEntityManager } from 'src/engine/twenty-orm/entity-manager/workspace-entity-manager';
+
+const getFieldMetadataIdsBackedByUniqueIndex = (
+  objectMetadataId: string,
+  flatIndexMaps: FlatEntityMaps<FlatIndexMetadata>,
+): Set<string> => {
+  const fieldMetadataIds = new Set<string>();
+
+  for (const flatIndex of Object.values(flatIndexMaps.byUniversalIdentifier)) {
+    if (
+      !isDefined(flatIndex) ||
+      !flatIndex.isUnique ||
+      flatIndex.objectMetadataId !== objectMetadataId ||
+      flatIndex.flatIndexFieldMetadatas.length !== 1
+    ) {
+      continue;
+    }
+
+    fieldMetadataIds.add(flatIndex.flatIndexFieldMetadatas[0].fieldMetadataId);
+  }
+
+  return fieldMetadataIds;
+};
 
 export const findConflictingRecord = async (
   columnName: string,
@@ -19,7 +43,21 @@ export const findConflictingRecord = async (
     internalContext.flatFieldMetadataMaps,
   );
 
-  const uniqueFields = flatFields.filter((field) => field.isUnique);
+  // field.isUnique only tracks unique indexes the engine owns as a field's
+  // backing constraint, so a workspace whose index predates that flag reports
+  // false while Postgres still rejects the write. Trust the index metadata too,
+  // otherwise the user gets an unattributed "record already exists" with no way
+  // to reach the record they collided with.
+  const fieldMetadataIdsBackedByUniqueIndex =
+    getFieldMetadataIdsBackedByUniqueIndex(
+      objectMetadata.id,
+      internalContext.flatIndexMaps,
+    );
+
+  const uniqueFields = flatFields.filter(
+    (field) =>
+      field.isUnique || fieldMetadataIdsBackedByUniqueIndex.has(field.id),
+  );
 
   const matchingField = uniqueFields.find((field) => {
     const compositeType = compositeTypeDefinitions.get(field.type);
