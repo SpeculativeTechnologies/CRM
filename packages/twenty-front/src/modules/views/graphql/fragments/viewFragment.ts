@@ -24,7 +24,6 @@ export const VIEW_FRAGMENT = gql`
     position
     parentViewId
     isCompact
-    openRecordIn
     kanbanAggregateOperation
     kanbanAggregateOperationFieldMetadataId
     mainGroupByFieldMetadataId

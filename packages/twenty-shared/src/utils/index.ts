@@ -125,6 +125,7 @@ export { turnRecordFilterGroupsIntoGqlOperationFilter } from './filter/turnRecor
 export type { FieldShared } from './filter/turnRecordFilterIntoGqlOperationFilter';
 export { turnRecordFilterIntoRecordGqlOperationFilter } from './filter/turnRecordFilterIntoGqlOperationFilter';
 export { combineFilters } from './filter/utils/combineFilters';
+export { compareSelectOptionValues } from './filter/utils/compareSelectOptionValues';
 export { COMPOSITE_FIELD_FILTER_OPERANDS_MAP } from './filter/utils/compositeFieldFilterOperandsMap';
 export { convertViewFilterOperandToCoreOperand } from './filter/utils/convert-view-filter-operand-to-core-operand.util';
 export { convertViewFilterValueToString } from './filter/utils/convertViewFilterValueToString';
@@ -156,7 +157,27 @@ export { isMatchingStringFilter } from './filter/utils/isMatchingStringFilter';
 export { isMatchingTSVectorFilter } from './filter/utils/isMatchingTSVectorFilter';
 export { isMatchingUUIDFilter } from './filter/utils/isMatchingUUIDFilter';
 export { arrayOfStringsOrVariablesSchema } from './filter/utils/validation-schemas/arrayOfStringsOrVariablesSchema';
-export { arrayOfUuidOrVariableSchema } from './filter/utils/validation-schemas/arrayOfUuidsOrVariablesSchema';
+export {
+  strictArrayOfUuidOrVariableSchema,
+  arrayOfUuidOrVariableSchema,
+} from './filter/utils/validation-schemas/arrayOfUuidsOrVariablesSchema';
+export {
+  nonEmptyStringFilterValueSchema,
+  numericFilterValueSchema,
+  plainDateFilterValueSchema,
+  instantFilterValueSchema,
+  plainDateOrInstantFilterValueSchema,
+  booleanFilterValueSchema,
+  actorSourceFilterValueSchema,
+} from './filter/utils/validation-schemas/filterValueScalarSchemas';
+export {
+  FILTER_VALUE_SCHEMAS_MAP,
+  COMPOSITE_SUB_FIELD_VALUE_SCHEMAS,
+  FILTER_VALUE_FORMAT_HINTS,
+} from './filter/utils/validation-schemas/filterValueSchemasMap';
+export { getFilterValueSchema } from './filter/utils/validation-schemas/getFilterValueSchema';
+export type { FilterValueValidationIssue } from './filter/utils/validation-schemas/getFilterValueValidationIssue';
+export { getFilterValueValidationIssue } from './filter/utils/validation-schemas/getFilterValueValidationIssue';
 export {
   relationFilterValueSchemaObject,
   jsonRelationFilterValueSchema,

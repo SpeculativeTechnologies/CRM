@@ -41,6 +41,24 @@ import { renderRowLevelPermissionFilterToSql } from 'src/engine/twenty-orm/utils
 import { resolveRowLevelPermissionRecordFilter } from 'src/engine/twenty-orm/utils/resolve-row-level-permission-record-filter.util';
 
 import { GraphqlQueryFilterConditionParser } from './graphql-query-filter-condition.parser';
+import { type RecordQueryBuilder } from 'src/engine/api/graphql/graphql-query-runner/types/record-query-builder.type';
+
+// Checked structurally rather than with instanceof so tests can drive the
+// parser with a stub builder; what matters is the capabilities the EXISTS
+// subquery uses, not the concrete class.
+const isExistsCapableQueryBuilder = (
+  queryBuilder: RecordQueryBuilder,
+): queryBuilder is RecordQueryBuilder &
+  WorkspaceSelectQueryBuilder<ObjectLiteral> => {
+  const candidate = queryBuilder as Partial<
+    WorkspaceSelectQueryBuilder<ObjectLiteral>
+  >;
+
+  return (
+    typeof candidate.subQuery === 'function' &&
+    typeof candidate.expressionMap?.findAliasByName === 'function'
+  );
+};
 
 export class GraphqlQueryFilterFieldParser {
   private flatObjectMetadata: FlatObjectMetadata;
@@ -72,7 +90,7 @@ export class GraphqlQueryFilterFieldParser {
 
   public parse(
     queryBuilder: WhereExpressionBuilder,
-    outerQueryBuilder: WorkspaceSelectQueryBuilder<ObjectLiteral>,
+    outerQueryBuilder: RecordQueryBuilder,
     objectNameSingular: string,
     key: string,
     // oxlint-disable-next-line typescript/no-explicit-any
@@ -154,7 +172,7 @@ export class GraphqlQueryFilterFieldParser {
 
   private parseRelationSubFilter(
     queryBuilder: WhereExpressionBuilder,
-    outerQueryBuilder: WorkspaceSelectQueryBuilder<ObjectLiteral>,
+    outerQueryBuilder: RecordQueryBuilder,
     parentAlias: string,
     fieldMetadata: FlatFieldMetadata,
     filterValue: Partial<ObjectRecordFilter>,
@@ -248,13 +266,25 @@ export class GraphqlQueryFilterFieldParser {
 
   private parseOneToManyRelationSubFilter(
     queryBuilder: WhereExpressionBuilder,
-    outerQueryBuilder: WorkspaceSelectQueryBuilder<ObjectLiteral>,
+    outerQueryBuilder: RecordQueryBuilder,
     parentAlias: string,
     fieldMetadata: FlatFieldMetadata<FieldMetadataType.RELATION>,
     targetObjectMetadata: FlatObjectMetadata,
     filterValue: Partial<ObjectRecordFilter>,
     isFirst: boolean,
   ): void {
+    // The EXISTS subquery needs the full TypeORM builder (subQuery, alias
+    // metadata, permission context); the ORM v2 read builder only implements
+    // the structural RecordQueryBuilder slice, so fail loudly instead of
+    // emitting a wrong query if it ever reaches this filter.
+    if (!isExistsCapableQueryBuilder(outerQueryBuilder)) {
+      throw new GraphqlQueryRunnerException(
+        `One-to-many relation filter on "${fieldMetadata.name}" is not supported on this query path`,
+        GraphqlQueryRunnerExceptionCode.INVALID_QUERY_INPUT,
+        { userFriendlyMessage: msg`Relation filter is not supported here` },
+      );
+    }
+
     if (!isDefined(fieldMetadata.relationTargetFieldMetadataId)) {
       throw new GraphqlQueryRunnerException(
         `Relation filter on "${fieldMetadata.name}" is missing a target field`,
