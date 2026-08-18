@@ -26,6 +26,7 @@ import {
   formatCampaignRate,
   isDraftCampaign,
 } from '@/activities/emails/utils/campaignDisplay';
+import { useTextInputFocusStack } from '@/ui/input/hooks/useTextInputFocusStack';
 import { PageContainer } from '@/ui/layout/page/components/PageContainer';
 import { PageHeader } from '@/ui/layout/page/components/PageHeader';
 
@@ -81,6 +82,38 @@ const StyledControl = styled.input`
   min-width: 160px;
   padding: 0 ${themeCssVariables.spacing[2]};
 `;
+
+type CampaignControlProps = {
+  focusId: string;
+  ariaLabel: string;
+  value: string;
+  onChange: (value: string) => void;
+  placeholder?: string;
+  type?: 'text' | 'date';
+};
+
+const CampaignControl = ({
+  focusId,
+  ariaLabel,
+  value,
+  onChange,
+  placeholder,
+  type = 'text',
+}: CampaignControlProps) => {
+  const { handleFocus, handleBlur } = useTextInputFocusStack({ focusId });
+
+  return (
+    <StyledControl
+      aria-label={ariaLabel}
+      type={type}
+      value={value}
+      placeholder={placeholder}
+      onChange={(event) => onChange(event.target.value)}
+      onFocus={handleFocus}
+      onBlur={handleBlur}
+    />
+  );
+};
 
 const StyledDateFilter = styled.label`
   align-items: flex-start;
@@ -331,11 +364,12 @@ const CampaignList = () => {
           </StyledTab>
         </StyledTabs>
         <StyledFilters>
-          <StyledControl
-            aria-label="Search campaigns"
+          <CampaignControl
+            focusId="campaign-list-search"
+            ariaLabel="Search campaigns"
             placeholder="Search by subject"
             value={search}
-            onChange={(event) => setSearch(event.target.value)}
+            onChange={setSearch}
           />
           <StyledSelect
             value={status}
@@ -374,25 +408,27 @@ const CampaignList = () => {
             {tab === 'drafts'
               ? 'Draft created on or after'
               : 'Campaign created on or after'}
-            <StyledControl
-              aria-label={
+            <CampaignControl
+              focusId="campaign-list-created-after"
+              ariaLabel={
                 tab === 'drafts'
                   ? 'Draft created on or after'
                   : 'Campaign created on or after'
               }
               type="date"
               value={createdAfter}
-              onChange={(event) => setCreatedAfter(event.target.value)}
+              onChange={setCreatedAfter}
             />
           </StyledDateFilter>
           {tab === 'messages' && (
             <StyledDateFilter>
               Campaign sent on or after
-              <StyledControl
-                aria-label="Campaign sent on or after"
+              <CampaignControl
+                focusId="campaign-list-sent-after"
+                ariaLabel="Campaign sent on or after"
                 type="date"
                 value={sentAfter}
-                onChange={(event) => setSentAfter(event.target.value)}
+                onChange={setSentAfter}
               />
             </StyledDateFilter>
           )}
@@ -625,11 +661,12 @@ const CampaignDetail = ({ campaign }: { campaign: MessageCampaignDetails }) => {
             })}
           </StyledRecipientTabs>
           <StyledFilters>
-            <StyledControl
-              aria-label="Search recipients"
+            <CampaignControl
+              focusId="campaign-detail-recipient-search"
+              ariaLabel="Search recipients"
               placeholder="Search recipients"
               value={search}
-              onChange={(event) => setSearch(event.target.value)}
+              onChange={setSearch}
             />
           </StyledFilters>
           <StyledRecipientList>

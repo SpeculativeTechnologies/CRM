@@ -23,6 +23,7 @@ import { type EmailComposerState } from '@/activities/emails/types/EmailComposer
 import { FormAdvancedTextFieldInput } from '@/advanced-text-editor/components/FormAdvancedTextFieldInput';
 import { FORM_FIELD_PLACEHOLDER_STYLES } from '@/ui/input/constants/FormFieldPlaceholderStyles';
 import { Select } from '@/ui/input/components/Select';
+import { useTextInputFocusStack } from '@/ui/input/hooks/useTextInputFocusStack';
 import { DND_KIT_PROVIDER_PLUGINS_WITHOUT_DROP_ANIMATION } from '@/ui/utilities/drag-and-drop/constants/DndKitProviderPluginsWithoutDropAnimation';
 import { DND_KIT_SENSORS } from '@/ui/utilities/drag-and-drop/constants/DndKitSensors';
 import { DragDropItemDndContext } from '@/ui/utilities/drag-and-drop/context/DragDropItemDndContext';
@@ -134,6 +135,8 @@ export const EmailComposerFields = ({
 }: EmailComposerFieldsProps) => {
   const { theme } = useContext(ThemeContext);
   const { uploadEmailImage } = useUploadEmailImage();
+  const { handleFocus: handleSubjectFocus, handleBlur: handleSubjectBlur } =
+    useTextInputFocusStack({ focusId: 'email-composer-subject' });
   const { data: accountsData } = useQuery<{
     myConnectedAccounts: { id: string; handle: string }[];
   }>(GET_MY_CONNECTED_ACCOUNTS);
@@ -269,6 +272,8 @@ export const EmailComposerFields = ({
                 onChange={(event) =>
                   composerState.setSubject(event.target.value)
                 }
+                onFocus={handleSubjectFocus}
+                onBlur={handleSubjectBlur}
               />
             </EmailComposerFieldRow>
           </StyledHeaderRows>

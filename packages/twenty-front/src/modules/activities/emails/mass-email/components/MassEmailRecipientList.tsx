@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { type MassEmailComposerState } from '@/activities/emails/mass-email/hooks/useMassEmailComposerState';
 import { massEmailRelatedSourceState } from '@/activities/emails/mass-email/states/massEmailRelatedSourceState';
 import { formatSkippedLabels } from '@/activities/emails/mass-email/utils/formatSkippedLabels';
+import { useTextInputFocusStack } from '@/ui/input/hooks/useTextInputFocusStack';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
 import { t } from '@lingui/core/macro';
 import { MAX_EMAIL_RECIPIENTS } from 'twenty-shared/constants';
@@ -128,6 +129,9 @@ export const MassEmailRecipientList = ({
   const [searchQuery, setSearchQuery] = useState('');
   const massEmailRelatedSource = useAtomStateValue(massEmailRelatedSourceState);
 
+  const { handleFocus: handleSearchFocus, handleBlur: handleSearchBlur } =
+    useTextInputFocusStack({ focusId: 'mass-email-recipient-search' });
+
   const normalizedQuery = searchQuery.trim().toLowerCase();
 
   const visibleRecipients = composerState.includedRecipients.filter(
@@ -152,6 +156,8 @@ export const MassEmailRecipientList = ({
         <StyledSearchInput
           value={searchQuery}
           onChange={(event) => setSearchQuery(event.target.value)}
+          onFocus={handleSearchFocus}
+          onBlur={handleSearchBlur}
           placeholder={t`Search`}
         />
       </StyledSearchRow>
