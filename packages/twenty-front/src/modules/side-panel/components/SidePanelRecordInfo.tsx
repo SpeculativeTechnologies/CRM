@@ -37,12 +37,12 @@ const StyledClickableTitle = styled.div`
   }
 `;
 
-// The xl Avatar (40px) is 1px taller than what the fixed-height, overflow-hidden
-// side panel top bar can fit once the icon wrapper's own padding is subtracted,
-// so it gets clipped. Scale it down in place rather than cropping it.
+// lg (24px) is the largest named size confirmed to fit the side panel top bar
+// without clipping. Nudge it up slightly rather than jumping to the next
+// named size (xl, 40px), which clips against the bar's fixed height.
 const StyledAvatarSizeAdjustment = styled.div`
   display: flex;
-  transform: scale(0.85);
+  transform: scale(1.15);
 `;
 
 export const SidePanelRecordInfo = ({
@@ -153,7 +153,7 @@ export const SidePanelRecordInfo = ({
               avatarUrl={getAbsoluteImageUrl(recordIdentifier.avatarUrl)}
               placeholder={recordIdentifier.name}
               placeholderColorSeed={objectRecordId}
-              size="xl"
+              size="lg"
               type={recordIdentifier.avatarType}
             />
           </StyledAvatarSizeAdjustment>
