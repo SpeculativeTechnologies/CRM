@@ -6,8 +6,12 @@ import { RecordTableColumnAggregateFooterDropdownContext } from '@/object-record
 import { RecordTableColumnAggregateFooterValueCell } from '@/object-record/record-table/record-table-footer/components/RecordTableColumnAggregateFooterValueCell';
 import { type RecordTableFooterAggregateContentId } from '@/object-record/record-table/record-table-footer/types/RecordTableFooterAggregateContentId';
 import { Dropdown } from '@/ui/layout/dropdown/components/Dropdown';
+import { useCloseAnyOpenDropdown } from '@/ui/layout/dropdown/hooks/useCloseAnyOpenDropdown';
+import { useOpenDropdown } from '@/ui/layout/dropdown/hooks/useOpenDropdown';
+import { isDropdownOpenComponentState } from '@/ui/layout/dropdown/states/isDropdownOpenComponentState';
 import { useToggleScrollWrapper } from '@/ui/utilities/scroll/hooks/useToggleScrollWrapper';
-import { useCallback, useContext } from 'react';
+import { useAtomComponentStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomComponentStateValue';
+import { type MouseEvent, useCallback, useContext } from 'react';
 
 type RecordTableColumnFooterWithDropdownProps = {
   isFirstCell: boolean;
@@ -34,6 +38,18 @@ export const RecordTableColumnFooterWithDropdown = ({
   const { toggleScrollXWrapper, toggleScrollYWrapper } =
     useToggleScrollWrapper();
 
+  const dropdownId = currentRecordGroupId
+    ? `${fieldMetadataId}-footer-${currentRecordGroupId}`
+    : `${fieldMetadataId}-footer`;
+
+  const isDropdownOpen = useAtomComponentStateValue(
+    isDropdownOpenComponentState,
+    dropdownId,
+  );
+
+  const { openDropdown } = useOpenDropdown();
+  const { closeAnyOpenDropdown } = useCloseAnyOpenDropdown();
+
   const handleDropdownOpen = useCallback(() => {
     toggleScrollXWrapper(false);
     toggleScrollYWrapper(false);
@@ -45,9 +61,23 @@ export const RecordTableColumnFooterWithDropdown = ({
     toggleScrollYWrapper(true);
   }, [handleResetContent, toggleScrollXWrapper, toggleScrollYWrapper]);
 
-  const dropdownId = currentRecordGroupId
-    ? `${fieldMetadataId}-footer-${currentRecordGroupId}`
-    : `${fieldMetadataId}-footer`;
+  // Right click does not emit a click event, so the click outside listener
+  // cannot close the dropdowns that are already open
+  const handleContextMenu = useCallback(
+    (event: MouseEvent) => {
+      event.preventDefault();
+      event.stopPropagation();
+
+      const wasDropdownOpen = isDropdownOpen;
+
+      closeAnyOpenDropdown();
+
+      if (!wasDropdownOpen) {
+        openDropdown({ dropdownComponentInstanceIdFromProps: dropdownId });
+      }
+    },
+    [closeAnyOpenDropdown, dropdownId, isDropdownOpen, openDropdown],
+  );
 
   return (
     <Dropdown
@@ -58,6 +88,7 @@ export const RecordTableColumnFooterWithDropdown = ({
         <RecordTableColumnAggregateFooterValueCell
           dropdownId={dropdownId}
           isFirstCell={isFirstCell}
+          onContextMenu={handleContextMenu}
         />
       }
       dropdownComponents={
