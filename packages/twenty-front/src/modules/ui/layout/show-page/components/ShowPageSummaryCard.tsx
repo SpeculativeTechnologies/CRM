@@ -10,7 +10,11 @@ import {
 } from 'react';
 import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
 import { isDefined } from 'twenty-shared/utils';
-import { Avatar, type AvatarType } from 'twenty-ui/data-display';
+import {
+  AVATAR_PROPERTIES_BY_SIZE,
+  Avatar,
+  type AvatarType,
+} from 'twenty-ui/data-display';
 import { type IconComponent } from 'twenty-ui/icon';
 import { AppTooltip } from 'twenty-ui/surfaces';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
@@ -21,6 +25,17 @@ import {
   beautifyPastDateRelativeToNow,
 } from '~/utils/date-utils';
 import { getAbsoluteImageUrl } from '~/utils/image/getAbsoluteImageUrl';
+
+const SUMMARY_CARD_AVATAR_SIZE = 'xxl';
+const SUMMARY_CARD_AVATAR_SIZE_IN_PX =
+  AVATAR_PROPERTIES_BY_SIZE[SUMMARY_CARD_AVATAR_SIZE].width;
+
+// The card keeps a fixed height so the record page does not shift while the
+// record loads. Both variants therefore have to absorb the avatar size by hand:
+// the column variant stacks the avatar above the title and date, the row variant
+// only has to be tall enough for the avatar plus its vertical padding.
+const SUMMARY_CARD_HEIGHT_IN_COLUMN_LAYOUT = '151px';
+const SUMMARY_CARD_HEIGHT_IN_ROW_LAYOUT = '101px';
 
 type ShowPageSummaryCardProps = {
   avatarPlaceholder: string;
@@ -46,7 +61,10 @@ export const StyledShowPageSummaryCard = styled.div<{
   flex-direction: ${({ isMobile }) => (isMobile ? 'row' : 'column')};
   gap: ${({ isMobile }) =>
     isMobile ? themeCssVariables.spacing[2] : themeCssVariables.spacing[3]};
-  height: ${({ isMobile }) => (isMobile ? '77px' : '127px')};
+  height: ${({ isMobile }) =>
+    isMobile
+      ? SUMMARY_CARD_HEIGHT_IN_ROW_LAYOUT
+      : SUMMARY_CARD_HEIGHT_IN_COLUMN_LAYOUT};
   justify-content: ${({ isMobile }) => (isMobile ? 'flex-start' : 'center')};
   padding: ${themeCssVariables.spacing[4]};
 `;
@@ -105,7 +123,10 @@ const StyledShowPageSummaryCardSkeletonLoader = () => {
       highlightColor={theme.background.transparent.lighter}
       borderRadius={4}
     >
-      <Skeleton width={40} height={SKELETON_LOADER_HEIGHT_SIZES.standard.xl} />
+      <Skeleton
+        width={SUMMARY_CARD_AVATAR_SIZE_IN_PX}
+        height={SUMMARY_CARD_AVATAR_SIZE_IN_PX}
+      />
       <StyledSubSkeleton>
         <Skeleton width={96} height={SKELETON_LOADER_HEIGHT_SIZES.standard.s} />
       </StyledSubSkeleton>
@@ -157,7 +178,7 @@ export const ShowPageSummaryCard = ({
         <Avatar
           avatarUrl={getAbsoluteImageUrl(logoOrAvatar)}
           onClick={onUploadPicture ? handleAvatarClick : undefined}
-          size="xl"
+          size={SUMMARY_CARD_AVATAR_SIZE}
           placeholderColorSeed={id}
           placeholder={avatarPlaceholder}
           type={icon ? 'icon' : avatarType}

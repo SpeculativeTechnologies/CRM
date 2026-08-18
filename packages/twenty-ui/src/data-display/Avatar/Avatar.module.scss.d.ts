@@ -1,5 +1,6 @@
 declare const classNames: {
   readonly root: 'root';
+  readonly xxl: 'xxl';
   readonly xl: 'xl';
   readonly lg: 'lg';
   readonly md: 'md';

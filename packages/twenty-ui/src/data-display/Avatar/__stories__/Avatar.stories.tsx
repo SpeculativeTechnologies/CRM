@@ -37,6 +37,17 @@ export const NoAvatarPictureSquared: Story = {
   },
 };
 
+export const ExtraExtraLarge: Story = {
+  args: { size: 'xxl' },
+};
+
+export const ExtraExtraLargeNoAvatarPicture: Story = {
+  args: {
+    ...NoAvatarPictureRounded.args,
+    ...ExtraExtraLarge.args,
+  },
+};
+
 export const App: Story = {
   args: {
     type: 'app',

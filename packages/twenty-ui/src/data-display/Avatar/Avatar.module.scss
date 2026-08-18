@@ -32,6 +32,15 @@
   }
 }
 
+// A 2px corner reads as fully square at this diameter, so the largest size steps
+// the squared corner up one token to stay proportional to the smaller sizes.
+.xxl {
+  border-radius: var(--t-border-radius-sm);
+  font-size: 24px;
+  height: 64px;
+  width: 64px;
+}
+
 .xl {
   font-size: 16px;
   height: 40px;
