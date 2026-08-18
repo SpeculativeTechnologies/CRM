@@ -6,11 +6,14 @@ import { getSafeUrl } from '@ui/utilities/utils/getSafeUrl';
 
 import styles from './RoundedLink.module.scss';
 
+type RoundedLinkAccent = 'gold';
+
 type RoundedLinkProps = {
   href: string;
   label?: string;
   onClick?: (event: React.MouseEvent<HTMLElement>) => void;
   className?: string;
+  accent?: RoundedLinkAccent;
 };
 
 export const RoundedLink = ({
@@ -18,6 +21,7 @@ export const RoundedLink = ({
   href,
   onClick,
   className,
+  accent,
 }: RoundedLinkProps) => {
   if (!isNonEmptyString(label)) {
     return <></>;
@@ -34,7 +38,11 @@ export const RoundedLink = ({
       target="_blank"
       rel="noreferrer"
       onClick={handleClick}
-      className={clsx(styles.root, className)}
+      className={clsx(
+        styles.root,
+        accent === 'gold' && styles.accentGold,
+        className,
+      )}
     >
       {label}
     </a>

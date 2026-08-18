@@ -32,3 +32,10 @@ export const Default: Story = {
     await expect(clickJestFn).toHaveBeenCalledTimes(1);
   },
 };
+
+export const AccentGold: Story = {
+  args: {
+    accent: 'gold',
+    label: 'primary@example.com',
+  },
+};

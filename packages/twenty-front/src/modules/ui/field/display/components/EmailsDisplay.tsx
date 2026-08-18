@@ -16,22 +16,25 @@ export const EmailsDisplay = ({
   isFocused,
   onEmailClick,
 }: EmailsDisplayProps) => {
-  const emails = useMemo(
-    () =>
-      [
-        value?.primaryEmail ? value.primaryEmail : null,
-        ...(value?.additionalEmails ?? []),
-      ].filter(isDefined),
-    [value?.primaryEmail, value?.additionalEmails],
-  );
+  const emails = useMemo(() => {
+    const primaryEmail = value?.primaryEmail;
+
+    return [
+      ...(primaryEmail ? [{ email: primaryEmail, isPrimary: true }] : []),
+      ...(value?.additionalEmails ?? [])
+        .filter(isDefined)
+        .map((email) => ({ email, isPrimary: false })),
+    ];
+  }, [value?.primaryEmail, value?.additionalEmails]);
 
   return (
     <FieldDisplayList isChipCountDisplayed={isFocused}>
-      {emails.map((email) => (
+      {emails.map(({ email, isPrimary }) => (
         <RoundedLink
           key={email}
           label={email}
           href={`mailto:${email}`}
+          accent={isPrimary ? 'gold' : undefined}
           onClick={(event) => onEmailClick?.(email, event)}
         />
       ))}

@@ -30,3 +30,20 @@
     background-color: var(--t-background-transparent-medium);
   }
 }
+
+// Opt-in variant to single out one pill among sibling pills, e.g. the primary
+// email. The amber scale carries the gold hue in both color schemes, whereas
+// the Radix gold scale reads as a near-neutral beige at tint level 3.
+.accentGold {
+  background-color: var(--t-color-amber3);
+  border-color: var(--t-color-amber6);
+  color: var(--t-color-amber11);
+
+  &:hover {
+    background-color: var(--t-color-amber4);
+  }
+
+  &:active {
+    background-color: var(--t-color-amber5);
+  }
+}
