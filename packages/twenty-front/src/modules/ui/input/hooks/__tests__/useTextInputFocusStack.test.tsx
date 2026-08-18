@@ -49,6 +49,7 @@ const renderWithGlobalHotkey = (input: React.ReactNode) => {
 describe('useTextInputFocusStack', () => {
   it('should let global single key hotkeys fire while typing in an unregistered input', async () => {
     const { callback } = renderWithGlobalHotkey(
+      // oxlint-disable-next-line twenty/require-text-input-focus-handlers -- reproduces the bug this hook fixes
       <input aria-label="unprotected" type="text" />,
     );
 

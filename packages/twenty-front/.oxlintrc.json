@@ -126,6 +126,7 @@
     "twenty/no-navigate-prefer-link": "error",
     "twenty/no-jotai-store-in-selector": "error",
     "twenty/no-direct-atom-family-in-selector": "error",
+    "twenty/require-text-input-focus-handlers": "warn",
     "twenty/folder-structure": "error",
     "twenty/enforce-module-boundaries": [
       "error",
@@ -144,6 +145,16 @@
       "files": ["**/constants/*.ts", "**/*.constants.ts"],
       "rules": {
         "twenty/max-consts-per-file": ["error", { "max": 1 }]
+      }
+    },
+    {
+      "files": [
+        "src/modules/activities/emails/**",
+        "src/pages/emails/**",
+        "src/pages/mass-email/**"
+      ],
+      "rules": {
+        "twenty/require-text-input-focus-handlers": "error"
       }
     }
   ]
