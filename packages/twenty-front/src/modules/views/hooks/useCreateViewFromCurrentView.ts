@@ -14,6 +14,7 @@ import { usePerformViewSortAPIPersist } from '@/views/hooks/internal/usePerformV
 import { viewFromViewIdFamilySelector } from '@/views/states/selectors/viewFromViewIdFamilySelector';
 import { type GraphQLView } from '@/views/types/GraphQLView';
 import { ViewType } from '@/views/types/ViewType';
+import { computeViewFieldInputsForNewView } from '@/views/utils/computeViewFieldInputsForNewView';
 import { duplicateViewFiltersAndViewFilterGroups } from '@/views/utils/duplicateViewFiltersAndViewFilterGroups';
 import { mapRecordFilterGroupToViewFilterGroup } from '@/views/utils/mapRecordFilterGroupToViewFilterGroup';
 import { mapRecordFilterToViewFilter } from '@/views/utils/mapRecordFilterToViewFilter';
@@ -164,17 +165,26 @@ export const useCreateViewFromCurrentView = (viewBarComponentId?: string) => {
         throw new Error('Failed to create view');
       }
 
+      const copiedViewFieldInputs = sourceView.viewFields.map((viewField) => ({
+        id: v4(),
+        fieldMetadataId: viewField.fieldMetadataId,
+        position: viewField.position,
+        isVisible: viewField.isVisible,
+        size: viewField.size,
+        aggregateOperation: viewField.aggregateOperation,
+        viewFieldGroupId: viewField.viewFieldGroupId,
+        viewId: newViewId,
+      }));
+
       const fieldResult = await performViewFieldAPICreate({
-        inputs: sourceView.viewFields.map((viewField) => ({
-          id: v4(),
-          fieldMetadataId: viewField.fieldMetadataId,
-          position: viewField.position,
-          isVisible: viewField.isVisible,
-          size: viewField.size,
-          aggregateOperation: viewField.aggregateOperation,
-          viewFieldGroupId: viewField.viewFieldGroupId,
+        inputs: computeViewFieldInputsForNewView({
+          copiedViewFieldInputs,
+          labelIdentifierFieldMetadataId:
+            objectMetadataItem.labelIdentifierFieldMetadataId,
+          viewType,
           viewId: newViewId,
-        })),
+          generateId: v4,
+        }),
       });
 
       if (fieldResult.status === 'failed') {

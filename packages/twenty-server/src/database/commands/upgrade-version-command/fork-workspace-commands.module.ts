@@ -11,6 +11,7 @@ import { BackfillConnectionReciprocalsCommand } from 'src/database/commands/upgr
 import { HidePersonConnectedFromViewFieldCommand } from 'src/database/commands/upgrade-version-command/2-27/2-27-workspace-command-1785840000000-hide-person-connected-from-view-field.command';
 import { HideReciprocalsFromConnectionsViewCommand } from 'src/database/commands/upgrade-version-command/2-27/2-27-workspace-command-1785850000000-hide-reciprocals-from-connections-view.command';
 import { AddComposeEmailToRelatedPeopleCommandMenuItemCommand } from 'src/database/commands/upgrade-version-command/2-32/2-32-workspace-command-1786400000000-add-compose-email-to-related-people-command-menu-item.command';
+import { BackfillMissingLabelIdentifierViewFieldsCommand } from 'src/database/commands/upgrade-version-command/2-32/2-32-workspace-command-1786838400000-backfill-missing-label-identifier-view-fields.command';
 import { MakeRequiredFieldsWithoutDefaultsOptionalCommand } from 'src/database/commands/upgrade-version-command/2-32/2-32-workspace-command-1786900000000-make-required-fields-without-defaults-optional.command';
 import { ApplicationModule } from 'src/engine/core-modules/application/application.module';
 import { FieldMetadataEntity } from 'src/engine/metadata-modules/field-metadata/field-metadata.entity';
@@ -45,6 +46,7 @@ import { ConnectionModule } from 'src/modules/connection/connection.module';
     HideReciprocalsFromConnectionsViewCommand,
     AddComposeEmailToRelatedPeopleCommandMenuItemCommand,
     MakeRequiredFieldsWithoutDefaultsOptionalCommand,
+    BackfillMissingLabelIdentifierViewFieldsCommand,
   ],
 })
 export class ForkWorkspaceCommandsModule {}
