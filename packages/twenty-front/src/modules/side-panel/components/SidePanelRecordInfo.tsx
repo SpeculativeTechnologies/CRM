@@ -37,6 +37,14 @@ const StyledClickableTitle = styled.div`
   }
 `;
 
+// lg (24px) is the largest named size confirmed to fit the side panel top bar
+// without clipping. Nudge it up slightly rather than jumping to the next
+// named size (xl, 40px), which clips against the bar's fixed height.
+const StyledAvatarSizeAdjustment = styled.div`
+  display: flex;
+  transform: scale(1.265);
+`;
+
 export const SidePanelRecordInfo = ({
   sidePanelPageInstanceId,
 }: {
@@ -140,13 +148,15 @@ export const SidePanelRecordInfo = ({
     <SidePanelPageInfoLayout
       icon={
         recordIdentifier ? (
-          <Avatar
-            avatarUrl={getAbsoluteImageUrl(recordIdentifier.avatarUrl)}
-            placeholder={recordIdentifier.name}
-            placeholderColorSeed={objectRecordId}
-            size="md"
-            type={recordIdentifier.avatarType}
-          />
+          <StyledAvatarSizeAdjustment>
+            <Avatar
+              avatarUrl={getAbsoluteImageUrl(recordIdentifier.avatarUrl)}
+              placeholder={recordIdentifier.name}
+              placeholderColorSeed={objectRecordId}
+              size="lg"
+              type={recordIdentifier.avatarType}
+            />
+          </StyledAvatarSizeAdjustment>
         ) : undefined
       }
       title={
