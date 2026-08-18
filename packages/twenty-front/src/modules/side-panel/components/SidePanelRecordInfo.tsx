@@ -42,7 +42,7 @@ const StyledClickableTitle = styled.div`
 // named size (xl, 40px), which clips against the bar's fixed height.
 const StyledAvatarSizeAdjustment = styled.div`
   display: flex;
-  transform: scale(1.15);
+  transform: scale(1.265);
 `;
 
 export const SidePanelRecordInfo = ({
