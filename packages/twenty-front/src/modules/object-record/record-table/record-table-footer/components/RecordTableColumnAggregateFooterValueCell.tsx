@@ -9,7 +9,7 @@ import { useAtomFamilySelectorValue } from '@/ui/utilities/state/jotai/hooks/use
 import { useAtomComponentSelectorValue } from '@/ui/utilities/state/jotai/hooks/useAtomComponentSelectorValue';
 import { useAtomComponentStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomComponentStateValue';
 import { styled } from '@linaria/react';
-import { useContext, useState } from 'react';
+import { type MouseEvent, useContext, useState } from 'react';
 import { IconChevronDown } from 'twenty-ui/icon';
 import { ThemeContext, themeCssVariables } from 'twenty-ui/theme-constants';
 
@@ -48,13 +48,17 @@ const StyledIconContainer = styled.div`
   padding-right: ${themeCssVariables.spacing[2]};
 `;
 
+type RecordTableColumnAggregateFooterValueCellProps = {
+  dropdownId: string;
+  isFirstCell: boolean;
+  onContextMenu?: (event: MouseEvent<HTMLDivElement>) => void;
+};
+
 export const RecordTableColumnAggregateFooterValueCell = ({
   dropdownId,
   isFirstCell,
-}: {
-  dropdownId: string;
-  isFirstCell: boolean;
-}) => {
+  onContextMenu,
+}: RecordTableColumnAggregateFooterValueCellProps) => {
   const [isHovered, setIsHovered] = useState(false);
 
   const isDropdownOpen = useAtomComponentStateValue(
@@ -82,6 +86,7 @@ export const RecordTableColumnAggregateFooterValueCell = ({
         setIsHovered(true);
       }}
       onMouseLeave={() => setIsHovered(false)}
+      onContextMenu={onContextMenu}
     >
       <StyledCell isUnfolded={isDropdownOpen} isFirstCell={isFirstCell}>
         {isHovered ||
