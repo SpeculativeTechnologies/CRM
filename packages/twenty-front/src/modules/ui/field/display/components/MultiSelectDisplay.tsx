@@ -1,21 +1,8 @@
+import { FieldDisplayList } from '@/object-record/record-field/ui/components/FieldDisplayList';
 import { type FieldMultiSelectValue } from '@/object-record/record-field/ui/types/FieldMetadata';
 import { isDefined } from 'twenty-shared/utils';
-import { styled } from '@linaria/react';
 import { Tag } from 'twenty-ui/data-display';
 import { type SelectOption } from 'twenty-ui/input';
-
-const StyledContainer = styled.div`
-  align-items: center;
-  display: flex;
-  gap: 4px;
-  justify-content: flex-start;
-
-  max-width: 100%;
-
-  overflow: hidden;
-
-  width: 100%;
-`;
 
 export const MultiSelectDisplay = ({
   values,
@@ -31,16 +18,16 @@ export const MultiSelectDisplay = ({
   if (!isDefined(selectedOptions)) return null;
 
   return (
-    <StyledContainer>
-      {selectedOptions.map((selectedOption, index) => (
+    <FieldDisplayList>
+      {selectedOptions.map((selectedOption) => (
         <Tag
           preventShrink
-          key={index}
+          key={selectedOption.value}
           color={selectedOption.color ?? 'transparent'}
           text={selectedOption.label}
           Icon={selectedOption.Icon ?? undefined}
         />
       ))}
-    </StyledContainer>
+    </FieldDisplayList>
   );
 };

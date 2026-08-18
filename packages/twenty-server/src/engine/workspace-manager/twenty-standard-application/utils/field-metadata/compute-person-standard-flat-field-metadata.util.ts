@@ -28,7 +28,6 @@ export const buildPersonStandardFlatFieldMetadatas = ({
   CreateStandardFieldArgs<'person', FieldMetadataType>,
   'context'
 >): Record<AllStandardObjectFieldName<'person'>, FlatFieldMetadata> => ({
-  // Base fields from BaseWorkspaceEntity
   id: createStandardFieldFlatMetadata({
     objectName,
     workspaceId,
@@ -114,7 +113,6 @@ export const buildPersonStandardFlatFieldMetadatas = ({
     now,
   }),
 
-  // Person-specific fields
   name: createStandardFieldFlatMetadata({
     objectName,
     workspaceId,
@@ -327,7 +325,6 @@ export const buildPersonStandardFlatFieldMetadatas = ({
     now,
   }),
 
-  // Relation fields
   company: createStandardRelationFieldFlatMetadata({
     objectName,
     workspaceId,

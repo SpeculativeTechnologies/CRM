@@ -127,7 +127,7 @@ describe('ProvisionMessageCampaignStandardMetadataCommand', () => {
     expect(payload.viewField.flatEntityToCreate).toHaveLength(16);
     expect(payload.pageLayout.flatEntityToCreate).toHaveLength(2);
     expect(payload.pageLayoutTab.flatEntityToCreate).toHaveLength(2);
-    expect(payload.pageLayoutWidget.flatEntityToCreate).toHaveLength(6);
+    expect(payload.pageLayoutWidget.flatEntityToCreate).toHaveLength(4);
 
     for (const operations of Object.values(payload) as Array<{
       flatEntityToDelete: unknown[];

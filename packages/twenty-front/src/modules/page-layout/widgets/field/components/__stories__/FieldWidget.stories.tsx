@@ -283,13 +283,17 @@ const createPageLayoutWithWidget = (
   widget: PageLayoutWidget,
   objectMetadataId: string,
 ): PageLayout => ({
+  applicationId: 'application-id-mock',
   id: PAGE_LAYOUT_TEST_INSTANCE_ID,
   name: 'Mock Page Layout',
   type: PageLayoutType.RECORD_PAGE,
+  isSystemSideEffect: true,
   objectMetadataId,
   universalIdentifier: '20202020-0000-0000-0000-000000000001',
   tabs: [
     {
+      isSystemSideEffect: false,
+      universalIdentifier: 'universal-identifier-mock',
       __typename: 'PageLayoutTab' as const,
       isActive: true,
       applicationId: '',
@@ -323,6 +327,8 @@ const buildFieldWidget = ({
   fieldMetadataId,
   fieldDisplayMode,
 }: BuildFieldWidgetArgs): PageLayoutWidget => ({
+  isSystemSideEffect: false,
+  universalIdentifier: 'universal-identifier-mock',
   __typename: 'PageLayoutWidget',
   applicationId: '',
   isActive: true,
@@ -354,6 +360,7 @@ type FieldWidgetStorySetup = {
   objectMetadataId: string;
   targetRecord: { id: string; nameSingular: string };
   records: Array<{ id: string; record: ObjectRecord }>;
+  isInSidePanel?: boolean;
 };
 
 const renderFieldWidgetStory = ({
@@ -361,6 +368,7 @@ const renderFieldWidgetStory = ({
   objectMetadataId,
   targetRecord,
   records,
+  isInSidePanel = false,
 }: FieldWidgetStorySetup) => {
   setTestObjectMetadataItemsInMetadataStore(
     jotaiStore,
@@ -389,7 +397,7 @@ const renderFieldWidgetStory = ({
           <PageLayoutTestWrapper store={jotaiStore}>
             <LayoutRenderingProvider
               value={{
-                isInSidePanel: false,
+                isInSidePanel,
                 layoutType: PageLayoutType.RECORD_PAGE,
                 targetRecordIdentifier: {
                   id: targetRecord.id,
@@ -715,6 +723,45 @@ export const EmailsFieldWidget: Story = {
   },
 };
 
+export const EmailsFieldWidgetInSidePanel: Story = {
+  render: () =>
+    renderFieldWidgetStory({
+      widget: buildFieldWidget({
+        id: 'widget-emails-field-side-panel',
+        title: 'Emails',
+        objectMetadataId: personObjectMetadataItem.id,
+        fieldMetadataId: personEmailsField.id,
+        fieldDisplayMode: FieldDisplayMode.FIELD,
+      }),
+      objectMetadataId: personObjectMetadataItem.id,
+      targetRecord: personTargetRecord,
+      records: personRecords,
+      isInSidePanel: true,
+    }),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    expect(await canvas.findByRole('list')).toBeVisible();
+    expect(await canvas.findAllByRole('listitem')).toHaveLength(2);
+
+    const primaryEmail = await canvas.findByText('jane.smith@acme.com');
+
+    await userEvent.hover(primaryEmail);
+
+    await waitFor(() => {
+      const visibleLists = canvas
+        .getAllByRole('list')
+        .filter((list) => list.getAttribute('aria-hidden') !== 'true');
+
+      expect(visibleLists.length).toBeGreaterThan(0);
+
+      for (const list of visibleLists) {
+        expect(within(list).getAllByRole('listitem')).toHaveLength(2);
+      }
+    });
+  },
+};
+
 export const PhonesFieldWidget: Story = {
   render: () =>
     renderFieldWidgetStory({
@@ -781,6 +828,29 @@ export const MultiSelectFieldWidget: Story = {
 
     const hybridChip = await canvas.findByText(/Hybrid/);
     expect(hybridChip).toBeVisible();
+  },
+};
+
+export const MultiSelectFieldWidgetInSidePanel: Story = {
+  render: () =>
+    renderFieldWidgetStory({
+      widget: buildFieldWidget({
+        id: 'widget-multi-select-field-side-panel',
+        title: 'Work Policy',
+        objectMetadataId: companyObjectMetadataItem.id,
+        fieldMetadataId: companyWorkPolicyField.id,
+        fieldDisplayMode: FieldDisplayMode.FIELD,
+      }),
+      objectMetadataId: companyObjectMetadataItem.id,
+      targetRecord: companyTargetRecord,
+      records: companyRecords,
+      isInSidePanel: true,
+    }),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    expect(await canvas.findByRole('list')).toBeVisible();
+    expect(await canvas.findAllByRole('listitem')).toHaveLength(2);
   },
 };
 

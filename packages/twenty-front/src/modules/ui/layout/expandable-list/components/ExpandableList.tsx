@@ -51,8 +51,24 @@ const StyledUnShrinkableContainer = styled.div`
   width: 24px;
 `;
 
+const StyledVerticalList = styled.ul`
+  align-items: flex-start;
+  display: flex;
+  flex-direction: column;
+  gap: ${themeCssVariables.spacing[1]};
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+`;
+
+const StyledVerticalListItem = styled.li`
+  display: flex;
+`;
+
 export type ExpandableListProps = {
   isChipCountDisplayed?: boolean;
+  isVertical?: boolean;
   // Caps children mounted inline; the dropdown still renders all.
   maxInlineCount?: number;
 };
@@ -65,6 +81,7 @@ export type ChildrenProperty = {
 export const ExpandableList = ({
   children,
   isChipCountDisplayed: isChipCountDisplayedFromProps,
+  isVertical = false,
   maxInlineCount,
 }: {
   children: ReactElement[];
@@ -130,6 +147,18 @@ export const ExpandableList = ({
       );
     }
   };
+
+  if (isVertical) {
+    return (
+      <StyledVerticalList>
+        {children.map((child, index) => (
+          <StyledVerticalListItem key={child.key ?? index}>
+            {child}
+          </StyledVerticalListItem>
+        ))}
+      </StyledVerticalList>
+    );
+  }
 
   return (
     <StyledContainer

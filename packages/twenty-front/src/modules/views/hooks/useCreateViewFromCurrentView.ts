@@ -135,7 +135,6 @@ export const useCreateViewFromCurrentView = (viewBarComponentId?: string) => {
               : mainGroupByFieldMetadataId,
             type: viewType,
             objectMetadataId: sourceView.objectMetadataId,
-            openRecordIn: sourceView.openRecordIn,
             anyFieldFilterValue: anyFieldFilterValue,
             calendarLayout:
               viewType === ViewType.CALENDAR

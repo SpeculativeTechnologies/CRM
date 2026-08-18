@@ -21,4 +21,16 @@ describe('ExpandableList', () => {
 
     expect(screen.getAllByTestId('chip')).toHaveLength(2);
   });
+
+  it('stacks every child in a semantic list when vertical', () => {
+    render(
+      <ExpandableList isVertical maxInlineCount={2}>
+        {buildChips(5)}
+      </ExpandableList>,
+    );
+
+    expect(screen.getByRole('list')).toBeVisible();
+    expect(screen.getAllByRole('listitem')).toHaveLength(5);
+    expect(screen.getAllByTestId('chip')).toHaveLength(5);
+  });
 });
