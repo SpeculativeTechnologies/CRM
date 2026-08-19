@@ -8,6 +8,7 @@ import { EMAIL_PLACEHOLDER_KEYS } from '@/activities/emails/mass-email/utils/ema
 import { FormAdvancedTextFieldInput } from '@/advanced-text-editor/components/FormAdvancedTextFieldInput';
 import { GET_MY_CONNECTED_ACCOUNTS } from '@/settings/accounts/graphql/queries/getMyConnectedAccounts';
 import { Select } from '@/ui/input/components/Select';
+import { useTextInputFocusStack } from '@/ui/input/hooks/useTextInputFocusStack';
 import { t } from '@lingui/core/macro';
 import { isDefined } from 'twenty-shared/utils';
 import { Avatar } from 'twenty-ui/data-display';
@@ -132,6 +133,9 @@ export const MassEmailComposeCard = ({
 }: MassEmailComposeCardProps) => {
   const [resetNonce, setResetNonce] = useState(0);
 
+  const { handleFocus: handleSubjectFocus, handleBlur: handleSubjectBlur } =
+    useTextInputFocusStack({ focusId: 'mass-email-subject' });
+
   const { data: accountsData } = useQuery<{
     myConnectedAccounts: { id: string; handle: string }[];
   }>(GET_MY_CONNECTED_ACCOUNTS);
@@ -239,6 +243,8 @@ export const MassEmailComposeCard = ({
               composerState.setSubjectTemplate(event.target.value);
             }
           }}
+          onFocus={handleSubjectFocus}
+          onBlur={handleSubjectBlur}
           placeholder={t`Subject`}
         />
         <StyledBodyContainer>

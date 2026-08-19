@@ -65,6 +65,10 @@ import {
   RULE_NAME as preferWorkspaceScopedRepositoryName,
 } from './rules/prefer-workspace-scoped-repository';
 import {
+  rule as requireTextInputFocusHandlers,
+  RULE_NAME as requireTextInputFocusHandlersName,
+} from './rules/require-text-input-focus-handlers';
+import {
   rule as restApiMethodsShouldBeGuarded,
   RULE_NAME as restApiMethodsShouldBeGuardedName,
 } from './rules/rest-api-methods-should-be-guarded';
@@ -101,6 +105,7 @@ export default definePlugin({
     [noStateUserefName]: noStateUseref,
     [noStorybookA11yDisableName]: noStorybookA11yDisable,
     [preferWorkspaceScopedRepositoryName]: preferWorkspaceScopedRepository,
+    [requireTextInputFocusHandlersName]: requireTextInputFocusHandlers,
     [restApiMethodsShouldBeGuardedName]: restApiMethodsShouldBeGuarded,
     [sortCssPropertiesAlphabeticallyName]: sortCssPropertiesAlphabetically,
     [styledComponentsPrefixedWithStyledName]:

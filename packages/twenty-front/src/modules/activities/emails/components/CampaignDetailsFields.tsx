@@ -21,6 +21,7 @@ import { useCreateOneRecord } from '@/object-record/hooks/useCreateOneRecord';
 import { FormSingleRecordPicker } from '@/object-record/record-field/ui/form-types/components/FormSingleRecordPicker';
 import { useMyMessageChannels } from '@/settings/accounts/hooks/useMyMessageChannels';
 import { Select } from '@/ui/input/components/Select';
+import { useTextInputFocusStack } from '@/ui/input/hooks/useTextInputFocusStack';
 
 const StyledSubjectInput = styled.input`
   background: transparent;
@@ -87,6 +88,9 @@ export const CampaignDetailsFields = ({
   width,
 }: CampaignDetailsFieldsProps) => {
   const detailsState = useCampaignDetailsState({ campaign });
+
+  const { handleFocus: handleSubjectFocus, handleBlur: handleSubjectBlur } =
+    useTextInputFocusStack({ focusId: 'campaign-composer-subject' });
 
   const { channels } = useMyMessageChannels();
   const { unsubscribeTopics } = useUnsubscribeTopics();
@@ -196,6 +200,8 @@ export const CampaignDetailsFields = ({
           aria-label={t`Subject`}
           defaultValue={detailsState.subject}
           onChange={(event) => detailsState.setSubject(event.target.value)}
+          onFocus={handleSubjectFocus}
+          onBlur={handleSubjectBlur}
         />
       </EmailComposerFieldRow>
     </CampaignEnvelopeBox>
