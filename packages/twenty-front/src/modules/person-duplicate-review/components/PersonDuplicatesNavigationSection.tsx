@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { AppPath } from 'twenty-shared/types';
 import { Pill } from 'twenty-ui/data-display';
 
-import { usePersonDuplicateGroups } from '@/person-duplicate-review/hooks/usePersonDuplicateGroups';
+import { usePersonDuplicateGroupsCount } from '@/person-duplicate-review/hooks/usePersonDuplicateGroupsCount';
 import { NavigationDrawerAnimatedCollapseWrapper } from '@/ui/navigation/navigation-drawer/components/NavigationDrawerAnimatedCollapseWrapper';
 import { NavigationDrawerSection } from '@/ui/navigation/navigation-drawer/components/NavigationDrawerSection';
 import { NavigationDrawerSectionTitle } from '@/ui/navigation/navigation-drawer/components/NavigationDrawerSectionTitle';
@@ -16,7 +16,7 @@ const StyledLink = styled(Link)`
 `;
 
 export const PersonDuplicatesNavigationSection = () => {
-  const { totalCount } = usePersonDuplicateGroups();
+  const { totalCount } = usePersonDuplicateGroupsCount();
 
   return (
     <NavigationDrawerSection>

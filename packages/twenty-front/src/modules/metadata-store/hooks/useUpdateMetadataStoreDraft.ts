@@ -56,6 +56,32 @@ const changeMetadataEntityAsUpToDate = (
   });
 };
 
+// A loaded collection whose refetch short-circuited on identical data still
+// carries the newer server hash in draftCollectionHash; promote it so the
+// next boot's hash comparison succeeds.
+const promotePendingCollectionHash = (
+  store: JotaiStore,
+  metadataEntityKey: MetadataEntityKey,
+): boolean => {
+  const entry = store.get(metadataStoreState.atomFamily(metadataEntityKey));
+
+  if (
+    entry.status !== 'up-to-date' ||
+    !isDefined(entry.draftCollectionHash) ||
+    entry.draftCollectionHash === entry.currentCollectionHash
+  ) {
+    return false;
+  }
+
+  store.set(metadataStoreState.atomFamily(metadataEntityKey), (prev) => ({
+    ...prev,
+    currentCollectionHash: prev.draftCollectionHash,
+    draftCollectionHash: undefined,
+  }));
+
+  return true;
+};
+
 export const useUpdateMetadataStoreDraft = () => {
   const store = useStore();
 
@@ -71,6 +97,23 @@ export const useUpdateMetadataStoreDraft = () => {
         currentEntry.status === 'up-to-date' &&
         isDeeplyEqual(currentEntry.current, data)
       ) {
+        // The data is unchanged but the server hash may be new (or was never
+        // adopted). Without adopting it here, the collection compares stale
+        // on every subsequent boot and refetches forever.
+        const adoptedCollectionHash =
+          collectionHash ?? currentEntry.draftCollectionHash;
+
+        if (
+          isDefined(adoptedCollectionHash) &&
+          currentEntry.currentCollectionHash !== adoptedCollectionHash
+        ) {
+          store.set(metadataStoreState.atomFamily(key), (prev) => ({
+            ...prev,
+            currentCollectionHash: adoptedCollectionHash,
+            draftCollectionHash: undefined,
+          }));
+        }
+
         return;
       }
 
@@ -103,6 +146,8 @@ export const useUpdateMetadataStoreDraft = () => {
       if (metadataStoreEntityEntry.status === 'draft-pending') {
         changeMetadataEntityAsUpToDate(store, metadataEntityKey);
         hasPersistedAnyMetadataEntity = true;
+      } else if (promotePendingCollectionHash(store, metadataEntityKey)) {
+        hasPersistedAnyMetadataEntity = true;
       }
     }
 
@@ -119,6 +164,8 @@ export const useUpdateMetadataStoreDraft = () => {
         changeMetadataEntityAsUpToDate(store, 'views');
         hasPersistedAnyMetadataEntity = true;
       }
+    } else if (promotePendingCollectionHash(store, 'views')) {
+      hasPersistedAnyMetadataEntity = true;
     }
 
     return { hasPersistedAnyMetadataEntity };

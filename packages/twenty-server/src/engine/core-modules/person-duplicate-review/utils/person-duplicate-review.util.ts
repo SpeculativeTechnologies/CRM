@@ -332,18 +332,29 @@ export const buildPersonDuplicateGroups = ({
   );
   const parentByPersonId = new Map<string, string>();
 
+  // Iterative find with path compression: no stack depth limit on long
+  // parent chains, and registers first-seen ids as their own root.
   const find = (personId: string): string => {
-    const parentId = parentByPersonId.get(personId) ?? personId;
-
-    if (parentId === personId) {
+    if (!parentByPersonId.has(personId)) {
       parentByPersonId.set(personId, personId);
 
       return personId;
     }
 
-    const rootId = find(parentId);
+    let rootId = personId;
 
-    parentByPersonId.set(personId, rootId);
+    while (parentByPersonId.get(rootId) !== rootId) {
+      rootId = parentByPersonId.get(rootId) as string;
+    }
+
+    let currentId = personId;
+
+    while (currentId !== rootId) {
+      const nextId = parentByPersonId.get(currentId) as string;
+
+      parentByPersonId.set(currentId, rootId);
+      currentId = nextId;
+    }
 
     return rootId;
   };
@@ -372,9 +383,23 @@ export const buildPersonDuplicateGroups = ({
     personIdsByRootId.set(rootId, personIds);
   }
 
-  return [...personIdsByRootId.values()]
-    .map((personIds) => {
-      const personIdSet = new Set(personIds);
+  // One pass over the pairs instead of re-filtering every pair per group,
+  // which was O(groups x pairs) and dominated the request time.
+  const reasonsByRootId = new Map<string, Set<PersonDuplicateReason>>();
+
+  for (const pair of activePairs) {
+    const rootId = find(pair.leftPersonId);
+    const rootReasons =
+      reasonsByRootId.get(rootId) ?? new Set<PersonDuplicateReason>();
+
+    for (const reason of pair.reasons) {
+      rootReasons.add(reason);
+    }
+    reasonsByRootId.set(rootId, rootReasons);
+  }
+
+  return [...personIdsByRootId.entries()]
+    .map(([rootId, personIds]) => {
       const groupPeople = personIds
         .map((personId) => peopleById.get(personId))
         .filter((person): person is PersonWorkspaceEntity => Boolean(person))
@@ -383,14 +408,9 @@ export const buildPersonDuplicateGroups = ({
             new Date(firstPerson.createdAt).getTime() -
             new Date(secondPerson.createdAt).getTime(),
         );
-      const reasons = uniqueSorted(
-        activePairs
-          .filter(
-            ({ leftPersonId, rightPersonId }) =>
-              personIdSet.has(leftPersonId) && personIdSet.has(rightPersonId),
-          )
-          .flatMap(({ reasons: pairReasons }) => pairReasons),
-      ) as PersonDuplicateReason[];
+      const reasons = uniqueSorted([
+        ...(reasonsByRootId.get(rootId) ?? []),
+      ]) as PersonDuplicateReason[];
       const detectedAt = new Date(
         Math.max(
           ...groupPeople.map(({ createdAt }) => new Date(createdAt).getTime()),

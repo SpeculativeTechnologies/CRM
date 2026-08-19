@@ -1,5 +1,5 @@
 import { UseGuards } from '@nestjs/common';
-import { Args, Mutation, Query } from '@nestjs/graphql';
+import { Args, Int, Mutation, Query } from '@nestjs/graphql';
 
 import { CoreResolver } from 'src/engine/api/graphql/graphql-config/decorators/core-resolver.decorator';
 import {
@@ -27,6 +27,16 @@ export class PersonDuplicateReviewResolver {
     @AuthWorkspace() _workspace: WorkspaceEntity,
   ): Promise<PersonDuplicateGroupsDTO> {
     return this.personDuplicateReviewService.getDuplicateGroups({
+      authContext: getWorkspaceAuthContext(),
+    });
+  }
+
+  // The nav badge only needs the number, not the full group tree.
+  @Query(() => Int)
+  async personDuplicateGroupsTotalCount(
+    @AuthWorkspace() _workspace: WorkspaceEntity,
+  ): Promise<number> {
+    return this.personDuplicateReviewService.getDuplicateGroupsTotalCount({
       authContext: getWorkspaceAuthContext(),
     });
   }

@@ -184,4 +184,50 @@ describe('person duplicate review utilities', () => {
     );
     expect(groups[1].reasons).toEqual(['NAME']);
   });
+
+  it('merges reasons across a transitive chain into one group', () => {
+    const chainStartPerson = makePerson({
+      id: '55555555-5555-5555-5555-555555555555',
+      firstName: 'Jordan',
+      lastName: 'Reed',
+      emails: ['jordan@example.com'],
+    });
+    const chainMiddlePerson = makePerson({
+      id: '66666666-6666-6666-6666-666666666666',
+      firstName: 'Jordy',
+      lastName: 'Reed',
+      emails: ['jordan@example.com'],
+      phone: '5551112222',
+    });
+    const chainEndPerson = makePerson({
+      id: '77777777-7777-7777-7777-777777777777',
+      firstName: 'J',
+      lastName: 'Reed',
+      phone: '5551112222',
+      linkedinUrl: 'https://linkedin.com/in/jordan-reed',
+    });
+    const unrelatedPerson = makePerson({
+      id: '88888888-8888-8888-8888-888888888888',
+      firstName: 'Casey',
+      lastName: 'Woods',
+    });
+
+    const groups = buildPersonDuplicateGroups({
+      people: [
+        chainEndPerson,
+        unrelatedPerson,
+        chainStartPerson,
+        chainMiddlePerson,
+      ],
+      decisions: [],
+    });
+
+    expect(groups).toHaveLength(1);
+    expect(groups[0].people.map(({ id }) => id).sort()).toEqual([
+      '55555555-5555-5555-5555-555555555555',
+      '66666666-6666-6666-6666-666666666666',
+      '77777777-7777-7777-7777-777777777777',
+    ]);
+    expect(groups[0].reasons).toEqual(['EMAIL', 'PHONE']);
+  });
 });

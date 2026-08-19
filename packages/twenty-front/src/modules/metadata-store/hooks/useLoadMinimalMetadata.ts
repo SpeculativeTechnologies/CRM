@@ -57,11 +57,20 @@ export const useLoadMinimalMetadata = () => {
       }
     }
 
+    // A key without a server hash is only stale when it has never been
+    // loaded. Treating loaded hash-less keys as stale made every boot
+    // refetch whole collection groups forever.
     for (const entityKey of ALL_METADATA_ENTITY_KEYS) {
       if (
-        !entityKeysWithServerHash.has(entityKey) &&
-        !staleEntityKeys.includes(entityKey)
+        entityKeysWithServerHash.has(entityKey) ||
+        staleEntityKeys.includes(entityKey)
       ) {
+        continue;
+      }
+
+      const entry = store.get(metadataStoreState.atomFamily(entityKey));
+
+      if (entry.status === 'empty') {
         staleEntityKeys.push(entityKey);
       }
     }
