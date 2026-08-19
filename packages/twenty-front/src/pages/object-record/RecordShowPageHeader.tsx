@@ -1,6 +1,6 @@
+import { useObjectMetadataItem } from '@/object-metadata/hooks/useObjectMetadataItem';
 import { getObjectMetadataIdentifierFields } from '@/object-metadata/utils/getObjectMetadataIdentifierFields';
 import { ObjectRecordShowPageBreadcrumb } from '@/object-record/record-show/components/ObjectRecordShowPageBreadcrumb';
-import { useRecordShowPagePagination } from '@/object-record/record-show/hooks/useRecordShowPagePagination';
 import { PageCardHeader } from '@/ui/layout/page/components/PageCardHeader';
 
 export const RecordShowPageHeader = ({
@@ -12,10 +12,9 @@ export const RecordShowPageHeader = ({
   objectRecordId: string;
   children?: React.ReactNode;
 }) => {
-  const { objectMetadataItem } = useRecordShowPagePagination(
+  const { objectMetadataItem } = useObjectMetadataItem({
     objectNameSingular,
-    objectRecordId,
-  );
+  });
 
   const { labelIdentifierFieldMetadataItem } =
     getObjectMetadataIdentifierFields({ objectMetadataItem });

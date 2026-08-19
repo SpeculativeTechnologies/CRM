@@ -3,21 +3,21 @@ import { useNumberFormat } from '@/localization/hooks/useNumberFormat';
 import { ObjectMetadataIcon } from '@/object-metadata/components/ObjectMetadataIcon';
 import { useObjectMetadataItem } from '@/object-metadata/hooks/useObjectMetadataItem';
 import { type FieldMetadataItem } from '@/object-metadata/types/FieldMetadataItem';
-import { useFindOneRecord } from '@/object-record/hooks/useFindOneRecord';
 import { useIsRecordFieldReadOnly } from '@/object-record/read-only/hooks/useIsRecordFieldReadOnly';
 import { FieldContext } from '@/object-record/record-field/ui/contexts/FieldContext';
 import { useRecordShowContainerActions } from '@/object-record/record-show/hooks/useRecordShowContainerActions';
 import { useRecordShowPageGroupByBreadcrumbInfo } from '@/object-record/record-show/hooks/useRecordShowPageGroupByBreadcrumbInfo';
 import { useRecordShowPagePagination } from '@/object-record/record-show/hooks/useRecordShowPagePagination';
 import { getRecordShowPageBreadcrumbPaginationLabel } from '@/object-record/record-show/utils/getRecordShowPageBreadcrumbPaginationLabel';
+import { recordStoreFamilyState } from '@/object-record/record-store/states/recordStoreFamilyState';
 import { recordStoreIdentifierFamilySelector } from '@/object-record/record-store/states/selectors/recordStoreIdentifierFamilySelector';
 import { RecordTitleCell } from '@/object-record/record-title-cell/components/RecordTitleCell';
 import { RecordTitleCellContainerType } from '@/object-record/record-title-cell/types/RecordTitleCellContainerType';
 import { useIsMobile } from '@/ui/utilities/responsive/hooks/useIsMobile';
 import { useAtomFamilySelectorValue } from '@/ui/utilities/state/jotai/hooks/useAtomFamilySelectorValue';
+import { useAtomFamilyStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomFamilyStateValue';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
 import { styled } from '@linaria/react';
-import { useState } from 'react';
 import { FieldMetadataType } from 'twenty-shared/types';
 import { isDefined } from 'twenty-shared/utils';
 import { Avatar } from 'twenty-ui/data-display';
@@ -83,17 +83,16 @@ export const ObjectRecordShowPageBreadcrumb = ({
   objectLabel: string;
   labelIdentifierFieldMetadataItem?: FieldMetadataItem;
 }) => {
-  const [isInitialLoad, setIsInitialLoad] = useState(true);
-
   const isMobile = useIsMobile();
 
-  const { loading } = useFindOneRecord({
-    objectNameSingular,
+  // The show page findOne (RecordShowEffect) writes the record into the
+  // record store; rendering waits on that instead of issuing a second query
+  // for the label identifier. Coming from a table the store is already
+  // primed, so the breadcrumb paints immediately.
+  const recordStore = useAtomFamilyStateValue(
+    recordStoreFamilyState,
     objectRecordId,
-    recordGqlFields: {
-      [labelIdentifierFieldMetadataItem?.name ?? 'name']: true,
-    },
-  });
+  );
 
   const { objectMetadataItem } = useObjectMetadataItem({
     objectNameSingular,
@@ -141,11 +140,7 @@ export const ObjectRecordShowPageBreadcrumb = ({
     groupValueLabel,
   });
 
-  if (!loading && isInitialLoad) {
-    setIsInitialLoad(false);
-  }
-
-  if (isInitialLoad && loading) {
+  if (!isDefined(recordStore)) {
     return null;
   }
 

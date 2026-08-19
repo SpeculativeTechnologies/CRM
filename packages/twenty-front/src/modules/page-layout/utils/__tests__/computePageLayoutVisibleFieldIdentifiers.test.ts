@@ -29,9 +29,8 @@ const buildPageLayout = (widgets: PageLayoutWidget[]): PageLayout =>
     ],
   }) as unknown as PageLayout;
 
-const buildView = (
-  view: Partial<ViewWithRelations>,
-): ViewWithRelations => view as ViewWithRelations;
+const buildView = (view: Partial<ViewWithRelations>): ViewWithRelations =>
+  view as ViewWithRelations;
 
 describe('computePageLayoutVisibleFieldIdentifiers', () => {
   it('should not restrict when the page layout is undefined', () => {
@@ -174,9 +173,7 @@ describe('computePageLayoutVisibleFieldIdentifiers', () => {
   });
 
   it('should not restrict when a fields widget has no view id', () => {
-    const pageLayout = buildPageLayout([
-      buildWidget(WidgetType.FIELDS, {}),
-    ]);
+    const pageLayout = buildPageLayout([buildWidget(WidgetType.FIELDS, {})]);
 
     const result = computePageLayoutVisibleFieldIdentifiers({
       pageLayout,

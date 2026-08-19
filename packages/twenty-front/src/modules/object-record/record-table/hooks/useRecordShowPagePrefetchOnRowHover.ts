@@ -1,7 +1,8 @@
 import { usePrefetchRecordShowPageRecord } from '@/object-record/record-show/hooks/usePrefetchRecordShowPageRecord';
 import { useRecordTableContextOrThrow } from '@/object-record/record-table/contexts/RecordTableContext';
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback } from 'react';
 import { isDefined } from 'twenty-shared/utils';
+import { useDebouncedCallback } from 'use-debounce';
 
 // Long enough to skip rows crossed while scanning the table, short enough to
 // hide most of the findOne round trip before the user clicks through.
@@ -14,19 +15,16 @@ export const useRecordShowPagePrefetchOnRowHover = () => {
     objectNameSingular: objectMetadataItem.nameSingular,
   });
 
-  const hoverIntentTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
-    null,
+  const prefetchHoveredRecordDebounced = useDebouncedCallback(
+    (hoveredRecordId: string) => {
+      prefetchRecordShowPageRecord(hoveredRecordId);
+    },
+    ROW_HOVER_PREFETCH_DELAY_MS,
   );
-  const lastHoveredRecordIdRef = useRef<string | null>(null);
 
   const cancelPendingRowHoverPrefetch = useCallback(() => {
-    lastHoveredRecordIdRef.current = null;
-
-    if (isDefined(hoverIntentTimeoutRef.current)) {
-      clearTimeout(hoverIntentTimeoutRef.current);
-      hoverIntentTimeoutRef.current = null;
-    }
-  }, []);
+    prefetchHoveredRecordDebounced.cancel();
+  }, [prefetchHoveredRecordDebounced]);
 
   const handleRowHoverPrefetch = useCallback(
     (event: React.MouseEvent) => {
@@ -34,38 +32,16 @@ export const useRecordShowPagePrefetchOnRowHover = () => {
         '[data-selectable-id]',
       );
 
-      const hoveredRecordId = rowElement?.dataset.selectableId ?? null;
-
-      if (hoveredRecordId === lastHoveredRecordIdRef.current) {
-        return;
-      }
-
-      lastHoveredRecordIdRef.current = hoveredRecordId;
-
-      if (isDefined(hoverIntentTimeoutRef.current)) {
-        clearTimeout(hoverIntentTimeoutRef.current);
-        hoverIntentTimeoutRef.current = null;
-      }
+      const hoveredRecordId = rowElement?.dataset.selectableId;
 
       if (!isDefined(hoveredRecordId)) {
+        prefetchHoveredRecordDebounced.cancel();
         return;
       }
 
-      hoverIntentTimeoutRef.current = setTimeout(() => {
-        hoverIntentTimeoutRef.current = null;
-        prefetchRecordShowPageRecord(hoveredRecordId);
-      }, ROW_HOVER_PREFETCH_DELAY_MS);
+      prefetchHoveredRecordDebounced(hoveredRecordId);
     },
-    [prefetchRecordShowPageRecord],
-  );
-
-  useEffect(
-    () => () => {
-      if (isDefined(hoverIntentTimeoutRef.current)) {
-        clearTimeout(hoverIntentTimeoutRef.current);
-      }
-    },
-    [],
+    [prefetchHoveredRecordDebounced],
   );
 
   return { handleRowHoverPrefetch, cancelPendingRowHoverPrefetch };

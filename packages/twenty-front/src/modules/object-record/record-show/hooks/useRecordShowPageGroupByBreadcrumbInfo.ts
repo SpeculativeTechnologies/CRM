@@ -1,7 +1,9 @@
 import { PreComputedChipGeneratorsContext } from '@/object-metadata/contexts/PreComputedChipGeneratorsContext';
 import { useFieldMetadataItemById } from '@/object-metadata/hooks/useFieldMetadataItemById';
+import { useObjectMetadataItem } from '@/object-metadata/hooks/useObjectMetadataItem';
 import { getFieldMetadataItemGqlFieldName } from '@/object-metadata/utils/getFieldMetadataItemGqlFieldName';
 import { isManyToOneRelationField } from '@/object-metadata/utils/isManyToOneRelationField';
+import { buildIdentifierGqlFields } from '@/object-record/graphql/record-gql-fields/utils/buildIdentifierGqlFields';
 import { useFindOneRecord } from '@/object-record/hooks/useFindOneRecord';
 import { getRecordGroupByValueLabel } from '@/object-record/record-show/utils/getRecordGroupByValueLabel';
 import { useGetCurrentViewOnly } from '@/views/hooks/useGetCurrentViewOnly';
@@ -55,10 +57,18 @@ export const useRecordShowPageGroupByBreadcrumbInfo = ({
   const shouldFetchRelationRecord =
     isDefined(relationObjectNameSingular) && isDefined(relationRecordId);
 
+  const { objectMetadataItem: relationObjectMetadataItem } =
+    useObjectMetadataItem({
+      objectNameSingular: relationObjectNameSingular ?? objectNameSingular,
+    });
+
+  // The chip only renders the related record's identifier, so the full
+  // depth-1 default field set is not needed.
   const { record: relationRecord, loading: isLoadingRelationRecord } =
     useFindOneRecord({
       objectNameSingular: relationObjectNameSingular ?? objectNameSingular,
       objectRecordId: relationRecordId ?? '',
+      recordGqlFields: buildIdentifierGqlFields(relationObjectMetadataItem),
       skip: !shouldFetchRelationRecord,
       withSoftDeleted: true,
     });

@@ -25,7 +25,7 @@ export const useRecordShowPageRecordGqlFields = ({
     { objectMetadataId: objectMetadataItem.id },
   );
 
-  const viewsById = useAtomStateValue(viewsByIdMapSelector);
+  const viewsByIdMap = useAtomStateValue(viewsByIdMapSelector);
 
   // In layout customization mode any field can become visible, so the full
   // field set must be available.
@@ -37,7 +37,7 @@ export const useRecordShowPageRecordGqlFields = ({
     const visibleFieldIdentifiersResult =
       computePageLayoutVisibleFieldIdentifiers({
         pageLayout,
-        viewsById,
+        viewsById: viewsByIdMap,
       });
 
     const visibleFieldIdentifiers =
@@ -53,7 +53,7 @@ export const useRecordShowPageRecordGqlFields = ({
     }).fields;
   }, [
     pageLayout,
-    viewsById,
+    viewsByIdMap,
     isLayoutCustomizationModeEnabled,
     objectMetadataItem,
     objectMetadataItems,

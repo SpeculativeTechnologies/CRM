@@ -50,7 +50,8 @@ export const buildFindOneRecordForShowPageOperationSignature: RecordGqlOperation
       | CoreObjectNamePlural.TaskTarget,
   ) =>
     fieldsToFetch.some(
-      (fieldMetadataItem) => fieldMetadataItem.name === activityTargetsFieldName,
+      (fieldMetadataItem) =>
+        fieldMetadataItem.name === activityTargetsFieldName,
     );
 
   return {

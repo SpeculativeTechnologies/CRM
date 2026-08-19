@@ -3,7 +3,7 @@ import { useObjectMetadataItem } from '@/object-metadata/hooks/useObjectMetadata
 import { useFindOneRecordQuery } from '@/object-record/hooks/useFindOneRecordQuery';
 import { useObjectPermissionsForObject } from '@/object-record/hooks/useObjectPermissionsForObject';
 import { useRecordShowPageRecordGqlFields } from '@/object-record/record-show/hooks/useRecordShowPageRecordGqlFields';
-import { useCallback, useRef } from 'react';
+import { useCallback } from 'react';
 
 // Warms the Apollo cache with the exact findOne query the record show page
 // runs, so navigating to the record paints instantly from cache while
@@ -33,29 +33,22 @@ export const usePrefetchRecordShowPageRecord = ({
 
   const hasReadPermission = objectPermissions.canReadObjectRecords;
 
-  const prefetchedRecordIdsRef = useRef(new Set<string>());
-
   const prefetchRecordShowPageRecord = useCallback(
     (objectRecordId: string) => {
-      if (
-        !hasReadPermission ||
-        prefetchedRecordIdsRef.current.has(objectRecordId)
-      ) {
+      if (!hasReadPermission) {
         return;
       }
 
-      prefetchedRecordIdsRef.current.add(objectRecordId);
-
+      // cache-first skips the network once the record is already complete in
+      // the cache, and Apollo deduplicates concurrent identical operations,
+      // so repeated hovers cost at most a cache read.
       apolloCoreClient
         .query({
           query: findOneRecordQuery,
           variables: { objectRecordId },
           fetchPolicy: 'cache-first',
         })
-        .catch(() => {
-          // Allow a later hover to retry after a transient failure.
-          prefetchedRecordIdsRef.current.delete(objectRecordId);
-        });
+        .catch(() => {});
     },
     [hasReadPermission, apolloCoreClient, findOneRecordQuery],
   );
