@@ -69,6 +69,11 @@ const serve = sirv(BUILD_DIR, {
   // 404'd every new asset -> blank page on fresh loads. Per-request stat is
   // negligible on this single-user stack and makes rebuilds self-healing.
   dev: true,
+  // Serve the .br/.gz siblings that precompress-frontend-build.mjs emits for
+  // /assets/*; ~7MB of JS ships as ~2MB. Falls back to the original file when
+  // no sibling exists (e.g. a build made before this change).
+  brotli: true,
+  gzip: true,
   etag: true,
   single: true, // SPA fallback: serve index.html for unknown routes (/invite/...)
   setHeaders(res, pathname) {
