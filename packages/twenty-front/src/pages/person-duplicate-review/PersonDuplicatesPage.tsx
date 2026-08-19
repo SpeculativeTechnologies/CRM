@@ -19,7 +19,10 @@ import { useMergeManyRecords } from '@/object-record/hooks/useMergeManyRecords';
 import { type ObjectRecord } from '@/object-record/types/ObjectRecord';
 import { PersonDuplicateCard } from '@/person-duplicate-review/components/PersonDuplicateCard';
 import { PersonDuplicateMergePreview } from '@/person-duplicate-review/components/PersonDuplicateMergePreview';
-import { KEEP_PERSON_DUPLICATE_RECORDS_SEPARATE } from '@/person-duplicate-review/graphql/personDuplicateReview';
+import {
+  GET_PERSON_DUPLICATE_GROUPS_COUNT,
+  KEEP_PERSON_DUPLICATE_RECORDS_SEPARATE,
+} from '@/person-duplicate-review/graphql/personDuplicateReview';
 import { usePersonDuplicateGroups } from '@/person-duplicate-review/hooks/usePersonDuplicateGroups';
 import {
   type PersonDuplicateGroup,
@@ -365,6 +368,9 @@ export const PersonDuplicatesPage = () => {
         },
       });
       await refetch();
+      await apolloCoreClient.refetchQueries({
+        include: [GET_PERSON_DUPLICATE_GROUPS_COUNT],
+      });
       enqueueSuccessSnackBar({
         message: t`These people will remain separate unless their identity details change.`,
       });
@@ -448,6 +454,9 @@ export const PersonDuplicatesPage = () => {
       }
 
       await refetch();
+      await apolloCoreClient.refetchQueries({
+        include: [GET_PERSON_DUPLICATE_GROUPS_COUNT],
+      });
       enqueueSuccessSnackBar({
         message: t`People merged. Absorbed records are available in Trash.`,
       });

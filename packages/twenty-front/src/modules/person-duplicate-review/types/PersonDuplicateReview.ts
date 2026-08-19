@@ -48,3 +48,7 @@ export type PersonDuplicatePairInput = {
   leftPersonId: string;
   rightPersonId: string;
 };
+
+export type PersonDuplicateGroupsCountData = {
+  personDuplicateGroupsTotalCount: number;
+};

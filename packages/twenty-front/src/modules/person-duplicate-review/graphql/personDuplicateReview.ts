@@ -45,3 +45,9 @@ export const KEEP_PERSON_DUPLICATE_RECORDS_SEPARATE = gql`
     keepPersonDuplicateRecordsSeparate(pairs: $pairs)
   }
 `;
+
+export const GET_PERSON_DUPLICATE_GROUPS_COUNT = gql`
+  query GetPersonDuplicateGroupsCount {
+    personDuplicateGroupsTotalCount
+  }
+`;
