@@ -10,7 +10,7 @@
 // config to clients that accept brotli. Hashed assets never change in place,
 // so their siblings cannot go stale.
 //
-// Usage: node packages/twenty-utils/precompress-frontend-build.mjs [buildDir]
+// Usage: node packages/twenty-front/scripts/precompress-build.mjs [buildDir]
 // =============================================================================
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
@@ -38,10 +38,7 @@ const MIN_SIZE_BYTES = 1024;
 
 const buildDir = path.resolve(
   process.argv[2] ??
-    path.join(
-      path.dirname(fileURLToPath(import.meta.url)),
-      '../twenty-front/build',
-    ),
+    path.join(path.dirname(fileURLToPath(import.meta.url)), '../build'),
 );
 const assetsDir = path.join(buildDir, 'assets');
 
