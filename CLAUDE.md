@@ -38,6 +38,22 @@ npx nx storybook:test twenty-front
 # When testing the UI end to end, click on "Continue with Email" and use the prefilled credentials.
 ```
 
+### Browser Automation
+
+Two browser paths are available. Default to Playwright.
+
+- **Playwright MCP** (configured in `.mcp.json`, headless chromium) for all local
+  development UI work: verifying a change in the running app, screenshots for a
+  pull request, reproducing a frontend bug, reading console and network activity.
+  It runs in an isolated browser, so it cannot disturb a developer's own tabs or
+  sessions. This also matches `twenty-e2e-testing`, which is Playwright based.
+- **Claude in Chrome** only when an already-authenticated session is genuinely
+  required, such as the deployed CRM behind Cloudflare Access. It drives the
+  developer's real browser, so say so before using it and never use it to reach
+  production data for routine verification.
+
+Screenshots must come from fixture or seed data, never mirrored records.
+
 ### Code Quality
 ```bash
 # Linting (diff with main - fastest, always prefer this)
