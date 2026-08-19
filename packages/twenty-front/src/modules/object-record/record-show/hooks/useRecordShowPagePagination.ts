@@ -116,7 +116,6 @@ export const useRecordShowPagePagination = (
     totalCount: totalCountBefore,
   } = useFindManyRecords({
     ...baseNeighborOptions,
-    fetchPolicy: 'network-only',
     filter: combineFilters([mergedFilter, beforeFilter].filter(isDefined)),
     orderBy: reversedOrderBy,
   });
@@ -127,7 +126,6 @@ export const useRecordShowPagePagination = (
     totalCount: totalCountAfter,
   } = useFindManyRecords({
     ...baseNeighborOptions,
-    fetchPolicy: 'network-only',
     filter: combineFilters([mergedFilter, afterFilter].filter(isDefined)),
     orderBy,
   });

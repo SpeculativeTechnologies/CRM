@@ -96,15 +96,25 @@ export const useRelevantRecordsGqlFields = ({
     createdAt: true,
     updatedAt: true,
     deletedAt: true,
-    noteTargets: generateActivityTargetGqlFields({
-      activityObjectNameSingular: CoreObjectNameSingular.Note,
-      objectMetadataItems,
-      loadRelations: isObjectAnActivity ? 'relations' : 'activity',
-    }),
-    taskTargets: generateActivityTargetGqlFields({
-      activityObjectNameSingular: CoreObjectNameSingular.Task,
-      objectMetadataItems,
-      loadRelations: isObjectAnActivity ? 'relations' : 'activity',
-    }),
+    // Notes and tasks need their targets on every row: the Relations chips on
+    // their list views read them with the target records loaded. For every
+    // other object, fetching the activity targets unconditionally pulled up
+    // to 60 noteTargets plus 60 taskTargets per row for columns nothing
+    // displays; when a targets column is visible or filtered on, it is
+    // already covered by allDepthOneGqlFields above.
+    ...(isObjectAnActivity
+      ? {
+          noteTargets: generateActivityTargetGqlFields({
+            activityObjectNameSingular: CoreObjectNameSingular.Note,
+            objectMetadataItems,
+            loadRelations: 'relations',
+          }),
+          taskTargets: generateActivityTargetGqlFields({
+            activityObjectNameSingular: CoreObjectNameSingular.Task,
+            objectMetadataItems,
+            loadRelations: 'relations',
+          }),
+        }
+      : {}),
   };
 };

@@ -9,6 +9,7 @@ import { isRecordTableDragColumnHiddenComponentState } from '@/object-record/rec
 import { RecordTableWidthEffect } from '@/object-record/record-table/components/RecordTableWidthEffect';
 import { getRecordTableHtmlId } from '@/object-record/record-table/utils/getRecordTableHtmlId';
 import { useRecordTableContextOrThrow } from '@/object-record/record-table/contexts/RecordTableContext';
+import { useRecordShowPagePrefetchOnRowHover } from '@/object-record/record-table/hooks/useRecordShowPagePrefetchOnRowHover';
 import { RecordTableNoRecordGroupBody } from '@/object-record/record-table/record-table-body/components/RecordTableNoRecordGroupBody';
 import { RecordTableRecordGroupsBody } from '@/object-record/record-table/record-table-body/components/RecordTableRecordGroupsBody';
 import { RecordTableHeader } from '@/object-record/record-table/record-table-header/components/RecordTableHeader';
@@ -92,18 +93,30 @@ export const RecordTableContent = ({
     recordTableId,
   );
 
+  const { handleRowHoverPrefetch, cancelPendingRowHoverPrefetch } =
+    useRecordShowPagePrefetchOnRowHover();
+
   const handleMouseLeave = useCallback(() => {
+    cancelPendingRowHoverPrefetch();
+
     const cellInEditMode = store.get(isSomeCellInEditMode);
 
     if (!cellInEditMode) {
       store.set(recordTableHoverPositionCallbackState, null);
     }
-  }, [store, isSomeCellInEditMode, recordTableHoverPositionCallbackState]);
+  }, [
+    cancelPendingRowHoverPrefetch,
+    store,
+    isSomeCellInEditMode,
+    recordTableHoverPositionCallbackState,
+  ]);
 
   const { moveHoverToCurrentCell } = useMoveHoverToCurrentCell(recordTableId);
 
   const handleDelegatedMouseMove = useCallback(
     (event: React.MouseEvent) => {
+      handleRowHoverPrefetch(event);
+
       const target = event.target as HTMLElement;
       const cellElement = target.closest<HTMLElement>(
         '[data-record-table-col]',
@@ -122,7 +135,7 @@ export const RecordTableContent = ({
 
       moveHoverToCurrentCell({ column, row });
     },
-    [moveHoverToCurrentCell],
+    [handleRowHoverPrefetch, moveHoverToCurrentCell],
   );
 
   const isRecordTableDragColumnHidden = useAtomComponentStateValue(

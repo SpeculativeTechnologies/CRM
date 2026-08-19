@@ -6,6 +6,7 @@ import { inspect } from 'util';
 
 import bytes from 'bytes';
 import { useContainer } from 'class-validator';
+import compression from 'compression';
 import session from 'express-session';
 import graphqlUploadExpress from 'graphql-upload/graphqlUploadExpress.mjs';
 import { ApiPath } from 'twenty-shared/types';
@@ -66,6 +67,27 @@ const bootstrap = async () => {
     : (configTransformers.boolean(trustProxyRaw) ?? trustProxyRaw);
 
   app.set('trust proxy', trustProxy);
+
+  // SSE responses (GraphQL subscriptions over /graphql, MCP streams) are
+  // long-lived and flushed per event; zlib buffering would hold events back,
+  // so they bypass compression.
+  app.use(
+    compression({
+      filter: (req, res) => {
+        if (req.headers.accept === 'text/event-stream') {
+          return false;
+        }
+
+        const contentType = String(res.getHeader('content-type') ?? '');
+
+        if (contentType.includes('text/event-stream')) {
+          return false;
+        }
+
+        return compression.filter(req, res);
+      },
+    }),
+  );
 
   applyCredentialedCors(app, twentyConfigService);
 
