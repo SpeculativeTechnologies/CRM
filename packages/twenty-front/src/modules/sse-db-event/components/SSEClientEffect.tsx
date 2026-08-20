@@ -1,4 +1,5 @@
 import { useIsLogged } from '@/auth/hooks/useIsLogged';
+import { isCookieAuthActiveState } from '@/auth/states/isCookieAuthActiveState';
 import { tokenPairState } from '@/auth/states/tokenPairState';
 import { useListenToBrowserEvent } from '@/browser-event/hooks/useListenToBrowserEvent';
 import { dispatchBrowserEvent } from '@/browser-event/utils/dispatchBrowserEvent';
@@ -8,6 +9,7 @@ import { SSE_RESYNC_DEBOUNCE_TIME_IN_MS } from '@/sse-db-event/constants/SseResy
 import { useHandleSseClientConnectionRetry } from '@/sse-db-event/hooks/useHandleSseClientConnectionRetry';
 import { activeQueryListenersState } from '@/sse-db-event/states/activeQueryListenersState';
 import { sseClientState } from '@/sse-db-event/states/sseClientState';
+import { getSseClientAuthHeaders } from '@/sse-db-event/utils/getSseClientAuthHeaders';
 import { useAtomState } from '@/ui/utilities/state/jotai/hooks/useAtomState';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
 import { isNonEmptyArray } from '@sniptt/guards';
@@ -61,14 +63,11 @@ export const SSEClientEffect = () => {
       const newSseClient = createClient({
         url: `${REACT_APP_SERVER_BASE_URL}/metadata`,
         credentials: 'include',
-        headers: () => {
-          const currentTokenPair = store.get(tokenPairState.atom);
-          const token = currentTokenPair?.accessOrWorkspaceAgnosticToken?.token;
-
-          return {
-            Authorization: token ? `Bearer ${token}` : '',
-          };
-        },
+        headers: () =>
+          getSseClientAuthHeaders({
+            isCookieAuthActive: store.get(isCookieAuthActiveState.atom),
+            tokenPair: store.get(tokenPairState.atom),
+          }),
         on: {
           connected: handleSSEClientConnected,
         },
