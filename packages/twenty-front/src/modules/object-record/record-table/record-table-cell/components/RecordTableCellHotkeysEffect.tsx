@@ -3,6 +3,7 @@ import { Key } from 'ts-key-enum';
 
 import { FieldContext } from '@/object-record/record-field/ui/contexts/FieldContext';
 import { useClearField } from '@/object-record/record-field/ui/hooks/useClearField';
+import { useCopyFieldDisplayLabel } from '@/object-record/record-field/ui/hooks/useCopyFieldDisplayLabel';
 import { useIsFieldClearable } from '@/object-record/record-field/ui/hooks/useIsFieldClearable';
 import { useIsFieldInputOnly } from '@/object-record/record-field/ui/hooks/useIsFieldInputOnly';
 import { useToggleEditOnlyInput } from '@/object-record/record-field/ui/hooks/useToggleEditOnlyInput';
@@ -27,6 +28,7 @@ export const RecordTableCellHotkeysEffect = ({
   const isFieldClearable = useIsFieldClearable();
   const toggleEditOnlyInput = useToggleEditOnlyInput();
   const clearField = useClearField();
+  const { copyFieldDisplayLabel } = useCopyFieldDisplayLabel();
 
   const handleBackspaceOrDelete = () => {
     if (!isFieldInputOnly && isFieldClearable) {
@@ -106,6 +108,20 @@ export const RecordTableCellHotkeysEffect = ({
     dependencies: [handleAnyKey],
     options: {
       preventDefault: false,
+    },
+  });
+
+  const handleCopy = () => {
+    copyFieldDisplayLabel();
+  };
+
+  useHotkeysOnFocusedElement({
+    keys: ['ctrl+c,meta+c'],
+    callback: handleCopy,
+    focusId: cellFocusId,
+    dependencies: [handleCopy],
+    options: {
+      enableOnFormTags: false,
     },
   });
 
