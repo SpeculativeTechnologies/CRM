@@ -22,9 +22,13 @@ import {
   type MessageCampaignSummary,
 } from '@/activities/emails/types/MessageCampaign';
 import {
+  CAMPAIGN_RECIPIENT_STATUS_FILTERS,
+  type CampaignRecipientStatusFilter,
   formatCampaignDate,
   formatCampaignRate,
+  getCampaignRecipientTrackingMessage,
   isDraftCampaign,
+  matchesCampaignRecipientStatus,
 } from '@/activities/emails/utils/campaignDisplay';
 import { useTextInputFocusStack } from '@/ui/input/hooks/useTextInputFocusStack';
 import { PageContainer } from '@/ui/layout/page/components/PageContainer';
@@ -593,22 +597,15 @@ const CampaignEditor = ({
   );
 };
 
-type RecipientStatusFilter =
-  | 'ALL'
-  | 'SENT'
-  | 'FAILED'
-  | 'BOUNCED'
-  | 'COMPLAINED';
-
 const CampaignDetail = ({ campaign }: { campaign: MessageCampaignDetails }) => {
   const navigate = useNavigate();
-  const [status, setStatus] = useState<RecipientStatusFilter>('ALL');
+  const [status, setStatus] = useState<CampaignRecipientStatusFilter>('ALL');
   const [search, setSearch] = useState('');
   const filteredRecipients = useMemo(
     () =>
       campaign.recipients.filter(
         (recipient) =>
-          (status === 'ALL' || recipient.deliveryStatus === status) &&
+          matchesCampaignRecipientStatus(recipient.deliveryStatus, status) &&
           `${recipient.displayName} ${recipient.email}`
             .toLowerCase()
             .includes(search.toLowerCase()),
@@ -622,13 +619,7 @@ const CampaignDetail = ({ campaign }: { campaign: MessageCampaignDetails }) => {
     filteredRecipients.find(
       ({ messageId }) => messageId === selectedMessageId,
     ) ?? filteredRecipients[0];
-  const filters: RecipientStatusFilter[] = [
-    'ALL',
-    'SENT',
-    'FAILED',
-    'BOUNCED',
-    'COMPLAINED',
-  ];
+  const hasNoRecipientTracking = campaign.recipients.length === 0;
 
   return (
     <PageContainer>
@@ -641,13 +632,10 @@ const CampaignDetail = ({ campaign }: { campaign: MessageCampaignDetails }) => {
       <StyledDetailGrid>
         <StyledRecipientPanel>
           <StyledRecipientTabs>
-            {filters.map((filter) => {
-              const count =
-                filter === 'ALL'
-                  ? campaign.recipients.length
-                  : campaign.recipients.filter(
-                      ({ deliveryStatus }) => deliveryStatus === filter,
-                    ).length;
+            {CAMPAIGN_RECIPIENT_STATUS_FILTERS.map((filter) => {
+              const count = campaign.recipients.filter(({ deliveryStatus }) =>
+                matchesCampaignRecipientStatus(deliveryStatus, filter),
+              ).length;
 
               return (
                 <StyledRecipientTab
@@ -678,6 +666,13 @@ const CampaignDetail = ({ campaign }: { campaign: MessageCampaignDetails }) => {
                 onClick={() => setSelectedMessageId(recipient.messageId)}
               />
             ))}
+            {filteredRecipients.length === 0 && (
+              <StyledEmpty>
+                {hasNoRecipientTracking
+                  ? getCampaignRecipientTrackingMessage(campaign)
+                  : 'No recipients match this filter.'}
+              </StyledEmpty>
+            )}
           </StyledRecipientList>
         </StyledRecipientPanel>
         <StyledPreview>
@@ -707,6 +702,20 @@ const CampaignDetail = ({ campaign }: { campaign: MessageCampaignDetails }) => {
               </StyledPreviewHeader>
               <StyledFrame
                 title="Campaign draft preview"
+                sandbox=""
+                srcDoc={campaign.body ?? ''}
+              />
+            </>
+          ) : hasNoRecipientTracking ? (
+            <>
+              <StyledName>{campaign.subject || 'Untitled campaign'}</StyledName>
+              <StyledPreviewHeader>
+                {getCampaignRecipientTrackingMessage(campaign)}
+                <br />
+                From: {campaign.fromAddress ?? 'Unknown sender'}
+              </StyledPreviewHeader>
+              <StyledFrame
+                title="Campaign preview"
                 sandbox=""
                 srcDoc={campaign.body ?? ''}
               />
