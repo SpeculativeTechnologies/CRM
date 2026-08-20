@@ -1,30 +1,14 @@
-import { useRecordTableContextOrThrow } from '@/object-record/record-table/contexts/RecordTableContext';
 import { useCopyRecordTableCellRange } from '@/object-record/record-table/record-table-cell-range/hooks/useCopyRecordTableCellRange';
-import { recordTableCellRangeComponentState } from '@/object-record/record-table/record-table-cell-range/states/recordTableCellRangeComponentState';
 import { PageFocusId } from '@/types/PageFocusId';
 import { useHotkeysOnFocusedElement } from '@/ui/utilities/hotkey/hooks/useHotkeysOnFocusedElement';
-import { useAtomComponentState } from '@/ui/utilities/state/jotai/hooks/useAtomComponentState';
-import { Key } from 'ts-key-enum';
-import { isDefined } from 'twenty-shared/utils';
 
+// Clearing the range lives in RecordTableBodyEscapeHotkeyEffect: a second
+// handler on the same key and focus id never fires.
 export const RecordTableCellRangeHotkeysEffect = () => {
-  const { recordTableId } = useRecordTableContextOrThrow();
-
-  const [recordTableCellRange, setRecordTableCellRange] = useAtomComponentState(
-    recordTableCellRangeComponentState,
-    recordTableId,
-  );
-
   const { copyRecordTableCellRange } = useCopyRecordTableCellRange();
 
   const handleCopy = () => {
     copyRecordTableCellRange();
-  };
-
-  const handleEscape = () => {
-    if (isDefined(recordTableCellRange)) {
-      setRecordTableCellRange(null);
-    }
   };
 
   useHotkeysOnFocusedElement({
@@ -35,13 +19,6 @@ export const RecordTableCellRangeHotkeysEffect = () => {
     options: {
       enableOnFormTags: false,
     },
-  });
-
-  useHotkeysOnFocusedElement({
-    keys: [Key.Escape],
-    callback: handleEscape,
-    focusId: PageFocusId.RecordIndex,
-    dependencies: [handleEscape],
   });
 
   return null;
