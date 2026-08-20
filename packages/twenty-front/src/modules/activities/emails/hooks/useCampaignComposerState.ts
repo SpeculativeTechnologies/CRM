@@ -8,6 +8,7 @@ type UseCampaignComposerStateArgs = {
   initialValues?: {
     unsubscribeTopicId?: string | null;
     listId?: string | null;
+    personIds?: string[];
     fromAddress?: string | null;
     subject?: string | null;
     body?: string | null;
@@ -27,6 +28,9 @@ export const useCampaignComposerState = ({
   );
   const [listId, setListId] = useState<string | null>(
     initialValues?.listId ?? null,
+  );
+  const [personIds, setPersonIds] = useState<string[]>(
+    initialValues?.personIds ?? [],
   );
   const [fromAddress, setFromAddress] = useState(
     initialValues?.fromAddress ?? '',
@@ -48,6 +52,7 @@ export const useCampaignComposerState = ({
     const savedDraft = await saveDraft({
       campaignId: draftCampaignId,
       listId,
+      personIds,
       unsubscribeTopicId,
       subject,
       body,
@@ -66,6 +71,7 @@ export const useCampaignComposerState = ({
     draftCampaignId,
     fromAddress,
     listId,
+    personIds,
     saveDraft,
     subject,
     unsubscribeTopicId,
@@ -97,13 +103,13 @@ export const useCampaignComposerState = ({
   }, [autoSaveDraft, draftCampaignId, saveCurrentDraft]);
 
   const canSend =
-    listId !== null &&
+    (listId !== null || personIds.length > 0) &&
     fromAddress.trim().length > 0 &&
     subject.trim().length > 0 &&
     !isSending;
 
   const handleSend = async () => {
-    if (listId === null || !canSend) {
+    if ((listId === null && personIds.length === 0) || !canSend) {
       return;
     }
 
@@ -129,6 +135,8 @@ export const useCampaignComposerState = ({
     setUnsubscribeTopicId,
     listId,
     setListId,
+    personIds,
+    setPersonIds,
     fromAddress,
     setFromAddress,
     subject,

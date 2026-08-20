@@ -170,6 +170,7 @@ export class EmailingSendResolver {
       workspaceId: currentWorkspace.id,
       userWorkspaceId,
       listId: input.listId,
+      personIds: input.personIds,
       unsubscribeTopicId: input.unsubscribeTopicId,
     });
   }

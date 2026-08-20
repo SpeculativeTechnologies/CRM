@@ -12,6 +12,7 @@ import { t } from '@lingui/core/macro';
 export type SaveMessageCampaignDraftInput = {
   campaignId?: string;
   listId?: string | null;
+  personIds?: string[];
   unsubscribeTopicId?: string | null;
   subject?: string | null;
   body?: string | null;

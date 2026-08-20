@@ -524,12 +524,17 @@ const CampaignEditor = ({
 }) => {
   const navigate = useNavigate();
   const { deleteDraft, isDeleting } = useMessageCampaignDraft();
+  const isManagedAudience =
+    campaign?.listName?.startsWith('Campaign audience (') === true;
   const campaignState = useCampaignComposerState({
     campaignId: campaign?.id,
     initialValues: campaign
       ? {
           unsubscribeTopicId: campaign.unsubscribeTopicId,
-          listId: campaign.listId,
+          // A managed list is an implementation detail. On reload its union is
+          // intentionally flattened into individually editable People.
+          listId: isManagedAudience ? null : campaign.listId,
+          personIds: campaign.draftPersonIds,
           fromAddress: campaign.fromAddress,
           subject: campaign.subject,
           body: campaign.body,

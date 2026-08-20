@@ -10,21 +10,24 @@ import {
 
 type UseCampaignAudiencePreviewArgs = {
   listId: string | null;
+  personIds: string[];
   unsubscribeTopicId: string | null;
 };
 
 export const useCampaignAudiencePreview = ({
   listId,
+  personIds,
   unsubscribeTopicId,
 }: UseCampaignAudiencePreviewArgs) => {
   const { data } = useQuery<
     PreviewMessageCampaignAudienceQuery,
     PreviewMessageCampaignAudienceQueryVariables
   >(PREVIEW_MESSAGE_CAMPAIGN_AUDIENCE, {
-    skip: !isNonEmptyString(listId),
+    skip: !isNonEmptyString(listId) && personIds.length === 0,
     variables: {
       input: {
-        listId: listId ?? '',
+        listId: listId ?? undefined,
+        personIds,
         unsubscribeTopicId: unsubscribeTopicId ?? undefined,
       },
     },

@@ -16,6 +16,11 @@ import { MessageParticipantWorkspaceEntity } from 'src/modules/messaging/common/
 import { MessageWorkspaceEntity } from 'src/modules/messaging/common/standard-objects/message.workspace-entity';
 import { PersonWorkspaceEntity } from 'src/modules/person/standard-objects/person.workspace-entity';
 
+const MANAGED_DRAFT_AUDIENCE_LIST_PREFIXES = [
+  'Selected people (',
+  'Campaign audience (',
+];
+
 @Injectable()
 export class MessageCampaignQueryService {
   constructor(
@@ -210,7 +215,11 @@ export class MessageCampaignQueryService {
             campaign.status === MessageCampaignStatus.DRAFT &&
             campaign.createdBy.workspaceMemberId === workspaceMemberId,
           recipients,
-          draftPersonIds: draftAudience.map(({ personId }) => personId),
+          draftPersonIds: MANAGED_DRAFT_AUDIENCE_LIST_PREFIXES.some(
+            (prefix) => campaign.list?.name?.startsWith(prefix) === true,
+          )
+            ? draftAudience.map(({ personId }) => personId)
+            : [],
         };
       },
     );

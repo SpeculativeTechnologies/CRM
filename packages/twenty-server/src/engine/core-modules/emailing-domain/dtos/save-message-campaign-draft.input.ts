@@ -1,6 +1,14 @@
 import { Field, InputType } from '@nestjs/graphql';
 
-import { IsEmail, IsOptional, IsString, IsUUID, Length } from 'class-validator';
+import {
+  ArrayUnique,
+  IsArray,
+  IsEmail,
+  IsOptional,
+  IsString,
+  IsUUID,
+  Length,
+} from 'class-validator';
 
 @InputType()
 export class SaveMessageCampaignDraftInput {
@@ -13,6 +21,13 @@ export class SaveMessageCampaignDraftInput {
   @IsOptional()
   @IsUUID('4')
   listId?: string;
+
+  @Field(() => [String], { nullable: true })
+  @IsOptional()
+  @IsArray()
+  @ArrayUnique()
+  @IsUUID('4', { each: true })
+  personIds?: string[];
 
   @Field(() => String, { nullable: true })
   @IsOptional()

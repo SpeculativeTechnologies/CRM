@@ -4569,7 +4569,8 @@ export type PlaceDetailsResult = {
 };
 
 export type PreviewMessageCampaignAudienceInput = {
-  listId: Scalars['String']['input'];
+  listId?: InputMaybe<Scalars['String']['input']>;
+  personIds?: InputMaybe<Array<Scalars['String']['input']>>;
   unsubscribeTopicId?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -5411,6 +5412,7 @@ export type SaveMessageCampaignDraftInput = {
   campaignId?: InputMaybe<Scalars['String']['input']>;
   fromAddress?: InputMaybe<Scalars['String']['input']>;
   listId?: InputMaybe<Scalars['String']['input']>;
+  personIds?: InputMaybe<Array<Scalars['String']['input']>>;
   subject?: InputMaybe<Scalars['String']['input']>;
   unsubscribeTopicId?: InputMaybe<Scalars['String']['input']>;
 };
