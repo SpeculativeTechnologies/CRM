@@ -40,4 +40,22 @@ describe('findDuplicateRecordFilterInNonAdvancedRecordFilters', () => {
       }),
     ).toBe(statusFilter);
   });
+
+  it.each(['NUMBER', 'CURRENCY'] as const)(
+    'allows multiple simple %s filters on the same field',
+    (type) => {
+      const numericFilter: RecordFilter = {
+        ...createFilter('numeric-filter'),
+        type,
+        operand: ViewFilterOperand.GREATER_THAN_OR_EQUAL,
+      };
+
+      expect(
+        findDuplicateRecordFilterInNonAdvancedRecordFilters({
+          recordFilters: [numericFilter],
+          fieldMetadataItemId: numericFilter.fieldMetadataId,
+        }),
+      ).toBeUndefined();
+    },
+  );
 });

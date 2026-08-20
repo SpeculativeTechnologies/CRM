@@ -51,6 +51,48 @@ describe('mapViewFiltersToFilters', () => {
       mapViewFiltersToFilters(viewFilters, [baseFieldMetadataItem]),
     ).toEqual(expectedFilters);
   });
+
+  it('should restore both persisted numeric filters on the same field', () => {
+    const numericFieldMetadataItem = {
+      ...baseFieldMetadataItem,
+      name: 'lifetimeDonations',
+      label: 'Lifetime Donations',
+      type: FieldMetadataType.NUMBER,
+    };
+    const viewFilters: ViewFilter[] = [
+      {
+        id: 'lower-bound-filter',
+        fieldMetadataId: numericFieldMetadataItem.id,
+        value: '100',
+        operand: ViewFilterOperand.GREATER_THAN_OR_EQUAL,
+      },
+      {
+        id: 'upper-bound-filter',
+        fieldMetadataId: numericFieldMetadataItem.id,
+        value: '500',
+        operand: ViewFilterOperand.LESS_THAN_OR_EQUAL,
+      },
+    ];
+
+    expect(
+      mapViewFiltersToFilters(viewFilters, [numericFieldMetadataItem]),
+    ).toMatchObject([
+      {
+        id: 'lower-bound-filter',
+        fieldMetadataId: numericFieldMetadataItem.id,
+        operand: ViewFilterOperand.GREATER_THAN_OR_EQUAL,
+        type: 'NUMBER',
+        value: '100',
+      },
+      {
+        id: 'upper-bound-filter',
+        fieldMetadataId: numericFieldMetadataItem.id,
+        operand: ViewFilterOperand.LESS_THAN_OR_EQUAL,
+        type: 'NUMBER',
+        value: '500',
+      },
+    ]);
+  });
 });
 
 describe('mapViewFieldsToColumnDefinitions', () => {
