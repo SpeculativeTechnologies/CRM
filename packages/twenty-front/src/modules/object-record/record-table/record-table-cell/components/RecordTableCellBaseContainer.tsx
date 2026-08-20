@@ -7,7 +7,11 @@ import { RECORD_CHIP_CLICK_OUTSIDE_ID } from '@/object-record/record-table/const
 import { RecordTableCellContext } from '@/object-record/record-table/contexts/RecordTableCellContext';
 import { useRecordTableContextOrThrow } from '@/object-record/record-table/contexts/RecordTableContext';
 import { useOpenRecordTableCellFromCell } from '@/object-record/record-table/record-table-cell/hooks/useOpenRecordTableCellFromCell';
+import { recordTableCellRangeEdgesComponentFamilySelector } from '@/object-record/record-table/record-table-cell-range/states/selectors/recordTableCellRangeEdgesComponentFamilySelector';
+import { getRecordTableCellRangeBoxShadow } from '@/object-record/record-table/record-table-cell-range/utils/getRecordTableCellRangeBoxShadow';
+import { RECORD_TABLE_CELL_RANGE_INSIDE } from '@/object-record/record-table/record-table-cell-range/utils/getRecordTableCellRangeEdges';
 import { getRecordTableCellId } from '@/object-record/record-table/utils/getRecordTableCellId';
+import { useAtomComponentFamilySelectorValue } from '@/ui/utilities/state/jotai/hooks/useAtomComponentFamilySelectorValue';
 import { ThemeContext } from 'twenty-ui/theme-constants';
 
 const StyledBaseContainer = styled.div<{
@@ -15,9 +19,16 @@ const StyledBaseContainer = styled.div<{
   backgroundColorSecondary: string;
   fontColorSecondary: string;
   isReadOnly: boolean;
+  selectedRangeBackgroundColor: string | undefined;
+  selectedRangeBoxShadow: string | undefined;
 }>`
   align-items: center;
+  background-color: ${({ selectedRangeBackgroundColor }) =>
+    selectedRangeBackgroundColor ?? 'unset'};
   box-sizing: border-box;
+  // inset shadows draw the range outline without changing the cell box
+  box-shadow: ${({ selectedRangeBoxShadow }) =>
+    selectedRangeBoxShadow ?? 'unset'};
   cursor: ${({ isReadOnly }) => (isReadOnly ? 'default' : 'pointer')};
   display: flex;
   height: 32px;
@@ -63,6 +74,16 @@ export const RecordTableCellBaseContainer = ({
   const { cellPosition } = useContext(RecordTableCellContext);
   const { recordTableId } = useRecordTableContextOrThrow();
 
+  const selectedRangeEdges = useAtomComponentFamilySelectorValue(
+    recordTableCellRangeEdgesComponentFamilySelector,
+    cellPosition,
+    recordTableId,
+  );
+
+  const isInSelectedRange = selectedRangeEdges.includes(
+    RECORD_TABLE_CELL_RANGE_INSIDE,
+  );
+
   const isChipDisplay = isFieldIdentifierDisplay(
     fieldDefinition,
     isLabelIdentifier,
@@ -79,6 +100,13 @@ export const RecordTableCellBaseContainer = ({
       fontColorSecondary={theme.font.color.secondary}
       fontColorMedium={theme.border.color.medium}
       isReadOnly={isReadOnly ?? false}
+      selectedRangeBackgroundColor={
+        isInSelectedRange ? theme.accent.tertiary : undefined
+      }
+      selectedRangeBoxShadow={getRecordTableCellRangeBoxShadow({
+        selectedRangeEdges,
+        color: theme.color.blue,
+      })}
       id={getRecordTableCellId(
         recordTableId,
         cellPosition.column,

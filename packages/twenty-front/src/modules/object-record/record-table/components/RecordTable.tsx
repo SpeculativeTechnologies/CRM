@@ -11,7 +11,6 @@ import { RecordTableScrollToFocusedCellEffect } from '@/object-record/record-tab
 import { RecordTableScrollToFocusedRowEffect } from '@/object-record/record-table/components/RecordTableScrollToFocusedRowEffect';
 import { RECORD_TABLE_CLICK_OUTSIDE_LISTENER_ID } from '@/object-record/record-table/constants/RecordTableClickOutsideListenerId';
 import { useRecordTableContextOrThrow } from '@/object-record/record-table/contexts/RecordTableContext';
-import { useResetTableRowSelection } from '@/object-record/record-table/hooks/internal/useResetTableRowSelection';
 import { isRecordTableEmptyStateHiddenComponentState } from '@/object-record/record-table/states/isRecordTableEmptyStateHiddenComponentState';
 import { isRecordTableInitialLoadingComponentState } from '@/object-record/record-table/states/isRecordTableInitialLoadingComponentState';
 import { useClickOutsideListener } from '@/ui/utilities/pointer-event/hooks/useClickOutsideListener';
@@ -57,8 +56,6 @@ export const RecordTable = () => {
     recordTableId,
   );
 
-  const { resetTableRowSelection } = useResetTableRowSelection(recordTableId);
-
   const recordTableIsEmpty =
     !isRecordTableInitialLoading && !recordTableHasRecords;
 
@@ -67,7 +64,6 @@ export const RecordTable = () => {
   }
 
   const handleDragSelectionStart = () => {
-    resetTableRowSelection();
     toggleClickOutside(false);
   };
 

@@ -11,7 +11,8 @@ import { isValidSelectionStart } from '@/ui/utilities/drag-select/utils/selectio
 
 type DragSelectProps = {
   selectableItemsContainerRef: RefObject<HTMLElement | null>;
-  onDragSelectionChange: (id: string, selected: boolean) => void;
+  onDragSelectionChange?: (id: string, selected: boolean) => void;
+  onDragSelectionBoxChange?: (selectionBox: SelectionBox | null) => void;
   onDragSelectionStart?: (event: MouseEvent | TouchEvent) => void;
   onDragSelectionEnd?: (event: MouseEvent | TouchEvent) => void;
   scrollWrapperComponentInstanceId?: string;
@@ -40,6 +41,7 @@ const StyledDragSelection = styled.div<SelectionBox>`
 export const DragSelect = ({
   selectableItemsContainerRef,
   onDragSelectionChange,
+  onDragSelectionBoxChange,
   onDragSelectionStart,
   onDragSelectionEnd,
   scrollWrapperComponentInstanceId,
@@ -148,6 +150,16 @@ export const DragSelect = ({
         }
 
         if (isSelecting && isDefined(selectionBox)) {
+          onDragSelectionBoxChange?.(selectionBox);
+
+          // A consumer that only wants the box (the record table paints a cell
+          // range from it) skips the per-item intersection pass entirely.
+          if (!isDefined(onDragSelectionChange)) {
+            handleAutoScroll(x, y);
+
+            return;
+          }
+
           const scrollAwareBox = {
             ...selectionBox,
             top: selectionBox.top + window.scrollY,
