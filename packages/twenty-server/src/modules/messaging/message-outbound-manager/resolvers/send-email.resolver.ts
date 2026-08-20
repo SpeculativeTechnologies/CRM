@@ -108,6 +108,18 @@ export class SendEmailResolver {
     });
 
     const outcomes: MassEmailCampaignSendOutcome[] = [];
+    // Each outcome is recorded as soon as its email leaves, so an interrupted
+    // batch still shows per-recipient tracking on the campaign.
+    const recordOutcome = async (outcome: MassEmailCampaignSendOutcome) => {
+      outcomes.push(outcome);
+
+      await this.messageCampaignService.recordMassEmailCampaignSendOutcome({
+        workspaceId: workspace.id,
+        campaignId: input.campaignId,
+        fromAddress: connectedAccount.handle,
+        outcome,
+      });
+    };
 
     for (const email of input.emails) {
       try {
@@ -123,7 +135,7 @@ export class SendEmailResolver {
         );
 
         if (!composed.success) {
-          outcomes.push({ ...email, email: email.to, success: false });
+          await recordOutcome({ ...email, email: email.to, success: false });
           continue;
         }
 
@@ -138,7 +150,7 @@ export class SendEmailResolver {
             )
           : undefined;
 
-        outcomes.push({
+        await recordOutcome({
           ...email,
           email: email.to,
           success: true,
@@ -148,7 +160,7 @@ export class SendEmailResolver {
         this.logger.error(
           `Failed to send campaign email to ${email.to}: ${error}`,
         );
-        outcomes.push({ ...email, email: email.to, success: false });
+        await recordOutcome({ ...email, email: email.to, success: false });
       }
     }
 
@@ -156,7 +168,6 @@ export class SendEmailResolver {
       workspaceId: workspace.id,
       campaignId: input.campaignId,
       workspaceMemberId,
-      fromAddress: connectedAccount.handle,
       outcomes,
     });
 
