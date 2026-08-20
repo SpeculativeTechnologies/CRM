@@ -33,7 +33,9 @@ describe('getRenderedRecordTableRowIndices', () => {
   it('should ignore cells whose row index is not a number', () => {
     const container = buildContainer([0, 'not-a-number', 1]);
 
-    expect(getRenderedRecordTableRowIndices(container)).toEqual(new Set([0, 1]));
+    expect(getRenderedRecordTableRowIndices(container)).toEqual(
+      new Set([0, 1]),
+    );
   });
 
   it('should return an empty set for a container with no rows', () => {
