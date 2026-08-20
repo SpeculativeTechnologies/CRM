@@ -44,7 +44,7 @@ export const ViewPickerStackSelect = ({
   }
 
   const options = [
-    { value: '', label: t`No stack` },
+    { value: '', label: t`New stack` },
     ...viewStacks
       .filter(
         (viewStack) =>

@@ -12900,6 +12900,11 @@ msgstr "Нова конфігурація SSO"
 msgid "New SSO provider"
 msgstr "Новий провайдер єдиної системи входу"
 
+#. js-lingui-id: l3pyXo
+#: src/modules/views/view-picker/components/ViewPickerStackSelect.tsx
+msgid "New stack"
+msgstr ""
+
 #. js-lingui-id: 3YvS+c
 #: src/modules/page-layout/components/PageLayoutTabListNewTabDropdownContent.tsx
 msgid "New tab"
@@ -13638,11 +13643,6 @@ msgstr ""
 #: src/modules/settings/admin-panel/components/SettingsAdminServerAdmins.tsx
 msgid "No server administrators found."
 msgstr "Адміністраторів сервера не знайдено."
-
-#. js-lingui-id: RWRH60
-#: src/modules/views/view-picker/components/ViewPickerStackSelect.tsx
-msgid "No stack"
-msgstr ""
 
 #. js-lingui-id: eeoVfm
 #: src/modules/activities/emails/components/CampaignSentEnvelope.tsx
