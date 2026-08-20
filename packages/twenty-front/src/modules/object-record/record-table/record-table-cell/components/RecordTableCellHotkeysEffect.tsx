@@ -1,9 +1,11 @@
 import { useContext } from 'react';
 import { Key } from 'ts-key-enum';
+import { isDefined } from 'twenty-shared/utils';
 
 import { FieldContext } from '@/object-record/record-field/ui/contexts/FieldContext';
 import { useClearField } from '@/object-record/record-field/ui/hooks/useClearField';
 import { useCopyFieldDisplayLabel } from '@/object-record/record-field/ui/hooks/useCopyFieldDisplayLabel';
+import { recordTableCellRangeComponentState } from '@/object-record/record-table/record-table-cell-range/states/recordTableCellRangeComponentState';
 import { useIsFieldClearable } from '@/object-record/record-field/ui/hooks/useIsFieldClearable';
 import { useIsFieldInputOnly } from '@/object-record/record-field/ui/hooks/useIsFieldInputOnly';
 import { useToggleEditOnlyInput } from '@/object-record/record-field/ui/hooks/useToggleEditOnlyInput';
@@ -14,6 +16,7 @@ import { useOpenRecordTableCellFromCell } from '@/object-record/record-table/rec
 import { useListenToSidePanelOpening } from '@/ui/layout/side-panel/hooks/useListenToSidePanelOpening';
 import { useHotkeysOnFocusedElement } from '@/ui/utilities/hotkey/hooks/useHotkeysOnFocusedElement';
 import { isNonTextWritingKey } from '@/ui/utilities/hotkey/utils/isNonTextWritingKey';
+import { useAtomComponentStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomComponentStateValue';
 
 export const RecordTableCellHotkeysEffect = ({
   cellFocusId,
@@ -29,6 +32,10 @@ export const RecordTableCellHotkeysEffect = ({
   const toggleEditOnlyInput = useToggleEditOnlyInput();
   const clearField = useClearField();
   const { copyFieldDisplayLabel } = useCopyFieldDisplayLabel();
+
+  const recordTableCellRange = useAtomComponentStateValue(
+    recordTableCellRangeComponentState,
+  );
 
   const handleBackspaceOrDelete = () => {
     if (!isFieldInputOnly && isFieldClearable) {
@@ -111,7 +118,12 @@ export const RecordTableCellHotkeysEffect = ({
     },
   });
 
+  // A painted range wins: the table-level handler copies the whole range.
   const handleCopy = () => {
+    if (isDefined(recordTableCellRange)) {
+      return;
+    }
+
     copyFieldDisplayLabel();
   };
 

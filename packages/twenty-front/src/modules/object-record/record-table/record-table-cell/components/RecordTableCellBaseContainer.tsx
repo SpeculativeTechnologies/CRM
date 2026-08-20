@@ -7,7 +7,11 @@ import { RECORD_CHIP_CLICK_OUTSIDE_ID } from '@/object-record/record-table/const
 import { RecordTableCellContext } from '@/object-record/record-table/contexts/RecordTableCellContext';
 import { useRecordTableContextOrThrow } from '@/object-record/record-table/contexts/RecordTableContext';
 import { useOpenRecordTableCellFromCell } from '@/object-record/record-table/record-table-cell/hooks/useOpenRecordTableCellFromCell';
+import { recordTableCellRangeComponentState } from '@/object-record/record-table/record-table-cell-range/states/recordTableCellRangeComponentState';
+import { isCellInRecordTableCellRangeComponentFamilySelector } from '@/object-record/record-table/record-table-cell-range/states/selectors/isCellInRecordTableCellRangeComponentFamilySelector';
 import { getRecordTableCellId } from '@/object-record/record-table/utils/getRecordTableCellId';
+import { useAtomComponentFamilySelectorValue } from '@/ui/utilities/state/jotai/hooks/useAtomComponentFamilySelectorValue';
+import { useSetAtomComponentState } from '@/ui/utilities/state/jotai/hooks/useSetAtomComponentState';
 import { ThemeContext } from 'twenty-ui/theme-constants';
 
 const StyledBaseContainer = styled.div<{
@@ -15,8 +19,11 @@ const StyledBaseContainer = styled.div<{
   backgroundColorSecondary: string;
   fontColorSecondary: string;
   isReadOnly: boolean;
+  selectedRangeBackgroundColor: string | undefined;
 }>`
   align-items: center;
+  background-color: ${({ selectedRangeBackgroundColor }) =>
+    selectedRangeBackgroundColor ?? 'unset'};
   box-sizing: border-box;
   cursor: ${({ isReadOnly }) => (isReadOnly ? 'default' : 'pointer')};
   display: flex;
@@ -63,12 +70,24 @@ export const RecordTableCellBaseContainer = ({
   const { cellPosition } = useContext(RecordTableCellContext);
   const { recordTableId } = useRecordTableContextOrThrow();
 
+  const setRecordTableCellRange = useSetAtomComponentState(
+    recordTableCellRangeComponentState,
+    recordTableId,
+  );
+
+  const isInSelectedRange = useAtomComponentFamilySelectorValue(
+    isCellInRecordTableCellRangeComponentFamilySelector,
+    cellPosition,
+    recordTableId,
+  );
+
   const isChipDisplay = isFieldIdentifierDisplay(
     fieldDefinition,
     isLabelIdentifier,
   );
 
   const handleContainerClick = () => {
+    setRecordTableCellRange(null);
     openTableCell();
   };
 
@@ -79,6 +98,9 @@ export const RecordTableCellBaseContainer = ({
       fontColorSecondary={theme.font.color.secondary}
       fontColorMedium={theme.border.color.medium}
       isReadOnly={isReadOnly ?? false}
+      selectedRangeBackgroundColor={
+        isInSelectedRange ? theme.accent.quaternary : undefined
+      }
       id={getRecordTableCellId(
         recordTableId,
         cellPosition.column,
