@@ -12896,6 +12896,11 @@ msgstr "New SSO Configuration"
 msgid "New SSO provider"
 msgstr "New SSO provider"
 
+#. js-lingui-id: l3pyXo
+#: src/modules/views/view-picker/components/ViewPickerStackSelect.tsx
+msgid "New stack"
+msgstr "New stack"
+
 #. js-lingui-id: 3YvS+c
 #: src/modules/page-layout/components/PageLayoutTabListNewTabDropdownContent.tsx
 msgid "New tab"
@@ -13634,11 +13639,6 @@ msgstr "No sender"
 #: src/modules/settings/admin-panel/components/SettingsAdminServerAdmins.tsx
 msgid "No server administrators found."
 msgstr "No server administrators found."
-
-#. js-lingui-id: RWRH60
-#: src/modules/views/view-picker/components/ViewPickerStackSelect.tsx
-msgid "No stack"
-msgstr "No stack"
 
 #. js-lingui-id: eeoVfm
 #: src/modules/activities/emails/components/CampaignSentEnvelope.tsx
