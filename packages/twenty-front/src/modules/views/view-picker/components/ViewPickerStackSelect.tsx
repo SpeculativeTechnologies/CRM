@@ -7,7 +7,6 @@ import { VIEW_PICKER_STACK_DROPDOWN_ID } from '@/views/view-picker/constants/Vie
 import { viewPickerIsDirtyComponentState } from '@/views/view-picker/states/viewPickerIsDirtyComponentState';
 import { viewPickerParentViewIdComponentState } from '@/views/view-picker/states/viewPickerParentViewIdComponentState';
 import { viewPickerReferenceViewIdComponentState } from '@/views/view-picker/states/viewPickerReferenceViewIdComponentState';
-import { useAreViewStacksEnabled } from '@/views/view-stack/hooks/useAreViewStacksEnabled';
 import { useViewStacks } from '@/views/view-stack/hooks/useViewStacks';
 import { useLingui } from '@lingui/react/macro';
 
@@ -20,7 +19,6 @@ export const ViewPickerStackSelect = ({
 }: ViewPickerStackSelectProps) => {
   const { t } = useLingui();
 
-  const { areViewStacksEnabled } = useAreViewStacksEnabled();
   const { viewStacks } = useViewStacks();
 
   const [viewPickerParentViewId, setViewPickerParentViewId] =
@@ -33,10 +31,6 @@ export const ViewPickerStackSelect = ({
   const viewPickerReferenceViewId = useAtomComponentStateValue(
     viewPickerReferenceViewIdComponentState,
   );
-
-  if (!areViewStacksEnabled) {
-    return null;
-  }
 
   const editedViewStack = isEditingExistingView
     ? viewStacks.find(
