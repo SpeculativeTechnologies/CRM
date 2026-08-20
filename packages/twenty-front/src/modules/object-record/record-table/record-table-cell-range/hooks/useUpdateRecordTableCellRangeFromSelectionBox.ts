@@ -1,10 +1,11 @@
 import { recordTableCellRangeComponentState } from '@/object-record/record-table/record-table-cell-range/states/recordTableCellRangeComponentState';
+import { type RecordTableAxisBounds } from '@/object-record/record-table/record-table-cell-range/types/RecordTableAxisBound';
 import { computeRecordTableCellRangeFromSelectionBox } from '@/object-record/record-table/record-table-cell-range/utils/computeRecordTableCellRangeFromSelectionBox';
 import { getRecordTableAxisBounds } from '@/object-record/record-table/record-table-cell-range/utils/getRecordTableAxisBounds';
 import { type SelectionBox } from '@/ui/utilities/drag-select/types/SelectionBox';
 import { useAtomComponentStateCallbackState } from '@/ui/utilities/state/jotai/hooks/useAtomComponentStateCallbackState';
 import { useStore } from 'jotai';
-import { useCallback, type RefObject } from 'react';
+import { useCallback, useRef, type RefObject } from 'react';
 import { isDefined } from 'twenty-shared/utils';
 import { isDeeplyEqual } from '~/utils/isDeeplyEqual';
 
@@ -20,7 +21,18 @@ export const useUpdateRecordTableCellRangeFromSelectionBox = ({
     recordTableId,
   );
 
+  // Cell geometry is measured against the container, so it does not move while
+  // the table scrolls under the drag. Measuring once per drag keeps the move
+  // handler off the layout path instead of reading every row and column rect on
+  // each mouse move.
+  // oxlint-disable-next-line twenty/no-state-useref -- A measurement cache, not state: nothing renders from it and it is dropped at the end of each drag.
+  const axisBoundsRef = useRef<RecordTableAxisBounds | null>(null);
+
   const store = useStore();
+
+  const resetRecordTableAxisBounds = useCallback(() => {
+    axisBoundsRef.current = null;
+  }, []);
 
   const updateRecordTableCellRangeFromSelectionBox = useCallback(
     (selectionBox: SelectionBox | null) => {
@@ -30,12 +42,15 @@ export const useUpdateRecordTableCellRangeFromSelectionBox = ({
         return;
       }
 
-      const { rowBounds, columnBounds } = getRecordTableAxisBounds(container);
+      const axisBounds =
+        axisBoundsRef.current ?? getRecordTableAxisBounds(container);
+
+      axisBoundsRef.current = axisBounds;
 
       const newCellRange = computeRecordTableCellRangeFromSelectionBox({
         selectionBox,
-        rowBounds,
-        columnBounds,
+        rowBounds: axisBounds.rowBounds,
+        columnBounds: axisBounds.columnBounds,
       });
 
       // Dragging inside one cell fires many moves that all resolve to the same
@@ -49,5 +64,8 @@ export const useUpdateRecordTableCellRangeFromSelectionBox = ({
     [containerRef, recordTableCellRange, store],
   );
 
-  return { updateRecordTableCellRangeFromSelectionBox };
+  return {
+    updateRecordTableCellRangeFromSelectionBox,
+    resetRecordTableAxisBounds,
+  };
 };

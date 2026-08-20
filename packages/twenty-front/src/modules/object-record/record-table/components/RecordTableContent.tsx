@@ -54,27 +54,28 @@ export const RecordTableContent = ({
   const [isDragging, setIsDragging] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const { updateRecordTableCellRangeFromSelectionBox } =
-    useUpdateRecordTableCellRangeFromSelectionBox({
-      containerRef,
-      recordTableId,
-    });
+  const {
+    updateRecordTableCellRangeFromSelectionBox,
+    resetRecordTableAxisBounds,
+  } = useUpdateRecordTableCellRangeFromSelectionBox({
+    containerRef,
+    recordTableId,
+  });
 
   const handleDragStart = () => {
     setIsDragging(true);
+    resetRecordTableAxisBounds();
     handleDragSelectionStart();
   };
 
   const handleDragEnd = () => {
     setIsDragging(false);
+    resetRecordTableAxisBounds();
 
     handleDragSelectionEnd();
   };
 
   const store = useStore();
-
-  // Dragging paints a cell range now, so rows are left to the checkbox column.
-  const handleDragSelectionChange = useCallback(() => {}, []);
 
   const recordTableScrollWrapperId = `record-table-scroll-${recordTableId}`;
 
@@ -177,12 +178,11 @@ export const RecordTableContent = ({
         <RecordTableColumnWidthEffect />
         <RecordTableWidthEffect />
       </RecordTableStyleWrapper>
-      <RecordTableCellRangeHotkeysEffect />
+      <RecordTableCellRangeHotkeysEffect containerRef={containerRef} />
       <RecordTableCellRangeResetOnClickEffect />
       <DragSelect
         selectableItemsContainerRef={containerRef}
         onDragSelectionStart={handleDragStart}
-        onDragSelectionChange={handleDragSelectionChange}
         onDragSelectionBoxChange={updateRecordTableCellRangeFromSelectionBox}
         onDragSelectionEnd={handleDragEnd}
         scrollWrapperComponentInstanceId={recordTableScrollWrapperId}

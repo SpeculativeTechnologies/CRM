@@ -23,4 +23,25 @@ describe('formatRecordTableCellRangeAsText', () => {
   it('should return an empty string for no rows', () => {
     expect(formatRecordTableCellRangeAsText([])).toBe('');
   });
+
+  it('should quote a cell holding a tab or a newline so columns stay aligned', () => {
+    expect(
+      formatRecordTableCellRangeAsText([
+        ['first\tsecond', 'Jane Doe'],
+        ['line one\nline two', 'John Doe'],
+      ]),
+    ).toBe('"first\tsecond"\tJane Doe\n"line one\nline two"\tJohn Doe');
+  });
+
+  it('should double the quotes inside a quoted cell', () => {
+    expect(
+      formatRecordTableCellRangeAsText([['say "hi"\tnow', 'Jane Doe']]),
+    ).toBe('"say ""hi""\tnow"\tJane Doe');
+  });
+
+  it('should leave a lone cell verbatim even when it holds a newline', () => {
+    expect(formatRecordTableCellRangeAsText([['line one\nline two']])).toBe(
+      'line one\nline two',
+    );
+  });
 });

@@ -5,15 +5,20 @@ import { useRecordIndexContextOrThrow } from '@/object-record/record-index/conte
 import { useRecordTableContextOrThrow } from '@/object-record/record-table/contexts/RecordTableContext';
 import { recordTableCellRangeComponentState } from '@/object-record/record-table/record-table-cell-range/states/recordTableCellRangeComponentState';
 import { formatRecordTableCellRangeAsText } from '@/object-record/record-table/record-table-cell-range/utils/formatRecordTableCellRangeAsText';
+import { getRenderedRecordTableRowIndices } from '@/object-record/record-table/record-table-cell-range/utils/getRenderedRecordTableRowIndices';
 import { useAtomComponentStateCallbackState } from '@/ui/utilities/state/jotai/hooks/useAtomComponentStateCallbackState';
 import { useAtomComponentSelectorCallbackState } from '@/ui/utilities/state/jotai/hooks/useAtomComponentSelectorCallbackState';
 import { isNonEmptyString } from '@sniptt/guards';
 import { useStore } from 'jotai';
-import { useCallback } from 'react';
+import { useCallback, type RefObject } from 'react';
 import { isDefined } from 'twenty-shared/utils';
 import { useCopyToClipboard } from '~/hooks/useCopyToClipboard';
 
-export const useCopyRecordTableCellRange = () => {
+export const useCopyRecordTableCellRange = ({
+  containerRef,
+}: {
+  containerRef: RefObject<HTMLElement | null>;
+}) => {
   const { recordTableId, visibleRecordFields } = useRecordTableContextOrThrow();
   const { fieldDefinitionByFieldMetadataItemId } =
     useRecordIndexContextOrThrow();
@@ -41,9 +46,19 @@ export const useCopyRecordTableCellRange = () => {
 
     const allRecordIds = store.get(recordIndexAllRecordIds);
 
+    const container = containerRef.current;
+
+    const renderedRowIndices = isDefined(container)
+      ? getRenderedRecordTableRowIndices(container)
+      : undefined;
+
     const rows: string[][] = [];
 
     for (let row = cellRange.fromRow; row <= cellRange.toRow; row++) {
+      if (isDefined(renderedRowIndices) && !renderedRowIndices.has(row)) {
+        continue;
+      }
+
       const recordId = allRecordIds[row];
 
       if (!isNonEmptyString(recordId)) {
@@ -93,6 +108,7 @@ export const useCopyRecordTableCellRange = () => {
 
     return true;
   }, [
+    containerRef,
     copyToClipboard,
     fieldDefinitionByFieldMetadataItemId,
     getFieldDisplayLabelText,

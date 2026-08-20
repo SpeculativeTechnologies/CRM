@@ -5,3 +5,8 @@ export type RecordTableAxisBound = {
   start: number;
   end: number;
 };
+
+export type RecordTableAxisBounds = {
+  rowBounds: RecordTableAxisBound[];
+  columnBounds: RecordTableAxisBound[];
+};

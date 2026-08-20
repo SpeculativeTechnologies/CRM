@@ -1,8 +1,13 @@
-import { type RecordTableAxisBound } from '@/object-record/record-table/record-table-cell-range/types/RecordTableAxisBound';
+import {
+  type RecordTableAxisBound,
+  type RecordTableAxisBounds,
+} from '@/object-record/record-table/record-table-cell-range/types/RecordTableAxisBound';
 
-// Measuring one cell per row and one per column keeps the drag loop at
-// rows + columns rect reads instead of one per cell.
-export const getRecordTableAxisBounds = (container: HTMLElement) => {
+// Measuring one cell per row and one per column keeps this at rows + columns
+// rect reads instead of one per cell. Called once per drag, not once per move.
+export const getRecordTableAxisBounds = (
+  container: HTMLElement,
+): RecordTableAxisBounds => {
   const cells = container.querySelectorAll<HTMLElement>(
     '[data-record-table-row][data-record-table-col]',
   );
