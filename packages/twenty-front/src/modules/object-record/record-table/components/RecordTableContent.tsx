@@ -14,6 +14,7 @@ import { RecordTableNoRecordGroupBody } from '@/object-record/record-table/recor
 import { RecordTableRecordGroupsBody } from '@/object-record/record-table/record-table-body/components/RecordTableRecordGroupsBody';
 import { RecordTableHeader } from '@/object-record/record-table/record-table-header/components/RecordTableHeader';
 import { RecordTableCellRangeHotkeysEffect } from '@/object-record/record-table/record-table-cell-range/components/RecordTableCellRangeHotkeysEffect';
+import { RecordTableCellRangeResetOnClickEffect } from '@/object-record/record-table/record-table-cell-range/components/RecordTableCellRangeResetOnClickEffect';
 import { useUpdateRecordTableCellRangeFromSelectionBox } from '@/object-record/record-table/record-table-cell-range/hooks/useUpdateRecordTableCellRangeFromSelectionBox';
 import { useMoveHoverToCurrentCell } from '@/object-record/record-table/record-table-cell/hooks/useMoveHoverToCurrentCell';
 import { recordTableHoverPositionComponentState } from '@/object-record/record-table/states/recordTableHoverPositionComponentState';
@@ -53,17 +54,14 @@ export const RecordTableContent = ({
   const [isDragging, setIsDragging] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const {
-    updateRecordTableCellRangeFromSelectionBox,
-    resetRecordTableCellRange,
-  } = useUpdateRecordTableCellRangeFromSelectionBox({
-    containerRef,
-    recordTableId,
-  });
+  const { updateRecordTableCellRangeFromSelectionBox } =
+    useUpdateRecordTableCellRangeFromSelectionBox({
+      containerRef,
+      recordTableId,
+    });
 
   const handleDragStart = () => {
     setIsDragging(true);
-    resetRecordTableCellRange();
     handleDragSelectionStart();
   };
 
@@ -180,6 +178,7 @@ export const RecordTableContent = ({
         <RecordTableWidthEffect />
       </RecordTableStyleWrapper>
       <RecordTableCellRangeHotkeysEffect />
+      <RecordTableCellRangeResetOnClickEffect />
       <DragSelect
         selectableItemsContainerRef={containerRef}
         onDragSelectionStart={handleDragStart}

@@ -49,16 +49,5 @@ export const useUpdateRecordTableCellRangeFromSelectionBox = ({
     [containerRef, recordTableCellRange, store],
   );
 
-  const resetRecordTableCellRange = useCallback(() => {
-    if (!isDefined(store.get(recordTableCellRange))) {
-      return;
-    }
-
-    store.set(recordTableCellRange, null);
-  }, [recordTableCellRange, store]);
-
-  return {
-    updateRecordTableCellRangeFromSelectionBox,
-    resetRecordTableCellRange,
-  };
+  return { updateRecordTableCellRangeFromSelectionBox };
 };
