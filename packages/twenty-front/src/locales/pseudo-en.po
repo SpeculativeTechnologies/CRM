@@ -1445,6 +1445,11 @@ msgstr ""
 msgid "Add Output Field"
 msgstr ""
 
+#. js-lingui-id: +1O5zr
+#: src/modules/activities/emails/mass-email/components/MassEmailAddPeopleButton.tsx
+msgid "Add people"
+msgstr ""
+
 #. js-lingui-id: aYtHO6
 #: src/modules/workflow/workflow-steps/workflow-actions/ai-agent-action/components/WorkflowAiAgentPermissionsTab.tsx
 #: src/modules/workflow/workflow-steps/workflow-actions/ai-agent-action/components/WorkflowEditActionAiAgent.tsx
@@ -22060,6 +22065,11 @@ msgstr ""
 #. js-lingui-id: CNAoaw
 #: src/modules/workflow/workflow-steps/workflow-actions/logic-function-action/components/WorkflowEditActionLogicFunction.tsx
 msgid "You can see the function logic in your application settings."
+msgstr ""
+
+#. js-lingui-id: jedKjC
+#: src/modules/activities/emails/mass-email/components/MassEmailAddPeopleButton.tsx
+msgid "You can select at most {MAX_EMAIL_RECIPIENTS} people."
 msgstr ""
 
 #. js-lingui-id: VlX5Sq
