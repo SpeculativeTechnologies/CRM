@@ -111,7 +111,6 @@ export const CampaignDetailsFields = ({
 
   const audiencePreview = useCampaignAudiencePreview({
     listId: detailsState.listId,
-    personIds: [],
     unsubscribeTopicId: detailsState.unsubscribeTopicId,
   });
 

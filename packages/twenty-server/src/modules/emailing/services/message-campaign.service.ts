@@ -68,7 +68,6 @@ import {
   resolveCompletedCampaignStatus,
 } from 'src/modules/emailing/utils/compute-campaign-terminal-status.util';
 import { renderCampaignTemplate } from 'src/modules/emailing/utils/render-campaign-template.util';
-import { mergeCampaignAudiencePersonIds } from 'src/modules/emailing/utils/merge-campaign-audience-person-ids.util';
 import { sendableDraftCampaignSchema } from 'src/modules/emailing/zod-schemas/sendable-draft-campaign.zod-schema';
 import { MessageDirection } from 'src/modules/messaging/common/enums/message-direction.enum';
 import { MessageChannelMessageAssociationWorkspaceEntity } from 'src/modules/messaging/common/standard-objects/message-channel-message-association.workspace-entity';
@@ -106,7 +105,6 @@ type SaveCampaignDraftArgs = {
   workspaceMemberId: string;
   campaignId?: string;
   listId?: string | null;
-  personIds?: string[];
   unsubscribeTopicId?: string | null;
   subject?: string | null;
   body?: string | null;
@@ -140,7 +138,6 @@ export type MassEmailCampaignSendOutcome = {
 };
 
 const MASS_EMAIL_RECIPIENT_LIST_PREFIX = 'Selected people (';
-const CAMPAIGN_AUDIENCE_LIST_PREFIX = 'Campaign audience (';
 
 type SendableDraftCampaign = z.infer<typeof sendableDraftCampaignSchema>;
 
@@ -297,7 +294,6 @@ export class MessageCampaignService {
     workspaceMemberId,
     campaignId,
     listId,
-    personIds = [],
     unsubscribeTopicId,
     subject,
     body,
@@ -315,24 +311,6 @@ export class MessageCampaignService {
           MessageCampaignWorkspaceEntity,
           roleId,
         );
-        const existingCampaign = isDefined(campaignId)
-          ? await campaignRepository.findOne({
-              where: { id: campaignId },
-              relations: { list: true },
-            })
-          : null;
-
-        if (isDefined(campaignId)) {
-          this.assertCanModifyDraft(existingCampaign, workspaceMemberId);
-        }
-
-        const recipientListId = await this.persistDraftAudience({
-          workspaceId,
-          roleId,
-          inputListId: listId ?? null,
-          selectedPersonIds: personIds,
-          existingCampaign,
-        });
         const now = new Date();
         const campaignValues = {
           subject: subject?.trim().length ? subject : null,
@@ -343,7 +321,7 @@ export class MessageCampaignService {
                 additionalEmails: null,
               }
             : null,
-          listId: recipientListId,
+          listId: listId ?? null,
           unsubscribeTopicId: unsubscribeTopicId ?? null,
         };
 
@@ -372,102 +350,17 @@ export class MessageCampaignService {
           return { campaignId: identifiers[0].id, updatedAt: now };
         }
 
+        const campaign = await campaignRepository.findOne({
+          where: { id: campaignId },
+        });
+
+        this.assertCanModifyDraft(campaign, workspaceMemberId);
+
         await campaignRepository.update({ id: campaignId }, campaignValues);
 
         return { campaignId, updatedAt: now };
       },
     );
-  }
-
-  private async persistDraftAudience({
-    workspaceId,
-    roleId,
-    inputListId,
-    selectedPersonIds,
-    existingCampaign,
-  }: {
-    workspaceId: string;
-    roleId: string;
-    inputListId: string | null;
-    selectedPersonIds: string[];
-    existingCampaign: MessageCampaignWorkspaceEntity | null;
-  }): Promise<string | null> {
-    const uniqueSelectedPersonIds = [...new Set(selectedPersonIds)];
-
-    if (uniqueSelectedPersonIds.length === 0) {
-      return inputListId;
-    }
-
-    const accessibleSelectedRecipients = await this.loadRecipientsByPersonIds(
-      workspaceId,
-      uniqueSelectedPersonIds,
-      roleId,
-    );
-
-    if (
-      accessibleSelectedRecipients.length !== uniqueSelectedPersonIds.length
-    ) {
-      throw new ForbiddenException(
-        'One or more campaign recipients are not accessible',
-      );
-    }
-
-    const listRepository = await this.getRoleScopedRepository(
-      workspaceId,
-      MessageListWorkspaceEntity,
-      roleId,
-    );
-    const listMemberRepository = await this.getRoleScopedRepository(
-      workspaceId,
-      MessageListMemberWorkspaceEntity,
-      roleId,
-    );
-    const inputList = isDefined(inputListId)
-      ? await listRepository.findOne({ where: { id: inputListId } })
-      : null;
-
-    if (isDefined(inputListId) && inputList === null) {
-      throw new ForbiddenException('Campaign list is not accessible');
-    }
-
-    // A managed audience already contains the full union. After a reload the
-    // people picker is canonical, so do not merge its stale members back in.
-    const inputIsManagedAudience =
-      inputList?.name?.startsWith(CAMPAIGN_AUDIENCE_LIST_PREFIX) === true;
-    const listMembers =
-      inputListId === null || inputIsManagedAudience
-        ? []
-        : await listMemberRepository.find({ where: { listId: inputListId } });
-    const audiencePersonIds = mergeCampaignAudiencePersonIds(
-      listMembers.map(({ personId }) => personId),
-      uniqueSelectedPersonIds,
-    );
-    const existingManagedListId =
-      existingCampaign?.list?.name?.startsWith(
-        CAMPAIGN_AUDIENCE_LIST_PREFIX,
-      ) === true
-        ? existingCampaign.listId
-        : null;
-    const listName = `${CAMPAIGN_AUDIENCE_LIST_PREFIX}${audiencePersonIds.length})`;
-    let audienceListId = existingManagedListId;
-
-    if (audienceListId === null) {
-      const { identifiers } = await listRepository.insert({ name: listName });
-
-      audienceListId = identifiers[0].id;
-    } else {
-      await listRepository.update({ id: audienceListId }, { name: listName });
-      await listMemberRepository.delete({ listId: audienceListId });
-    }
-
-    await listMemberRepository.insert(
-      audiencePersonIds.map((personId) => ({
-        listId: audienceListId as string,
-        personId,
-      })),
-    );
-
-    return audienceListId;
   }
 
   async sendTest({
@@ -1517,13 +1410,11 @@ export class MessageCampaignService {
     workspaceId,
     userWorkspaceId,
     listId,
-    personIds = [],
     unsubscribeTopicId,
   }: {
     workspaceId: string;
     userWorkspaceId: string;
-    listId?: string;
-    personIds?: string[];
+    listId: string;
     unsubscribeTopicId?: string;
   }): Promise<CampaignAudiencePreview> {
     const roleId = await this.userRoleService.getRoleIdForUserWorkspace({
@@ -1533,10 +1424,9 @@ export class MessageCampaignService {
 
     return this.globalWorkspaceOrmManager.executeInWorkspaceContext(
       async () => {
-        const rawRecipients = await this.resolveRecipientsFromAudience(
+        const rawRecipients = await this.resolveRecipientsFromList(
           workspaceId,
           listId,
-          personIds,
           roleId,
         );
         const totalMembers = rawRecipients.length;
@@ -1586,32 +1476,6 @@ export class MessageCampaignService {
           sendable,
         };
       },
-    );
-  }
-
-  private async resolveRecipientsFromAudience(
-    workspaceId: string,
-    listId: string | undefined,
-    selectedPersonIds: string[],
-    roleId: string,
-  ): Promise<RawCampaignRecipient[]> {
-    const listMemberRepository = await this.getRoleScopedRepository(
-      workspaceId,
-      MessageListMemberWorkspaceEntity,
-      roleId,
-    );
-    const listMembers = isDefined(listId)
-      ? await listMemberRepository.find({ where: { listId } })
-      : [];
-    const audiencePersonIds = mergeCampaignAudiencePersonIds(
-      listMembers.map(({ personId }) => personId),
-      selectedPersonIds,
-    );
-
-    return this.loadRecipientsByPersonIds(
-      workspaceId,
-      audiencePersonIds,
-      roleId,
     );
   }
 

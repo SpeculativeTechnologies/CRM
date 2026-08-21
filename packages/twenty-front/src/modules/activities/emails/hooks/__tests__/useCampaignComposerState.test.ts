@@ -62,38 +62,6 @@ describe('useCampaignComposerState', () => {
     expect(result.current.canSend).toBe(true);
   });
 
-  it('should become sendable with selected people and no list', () => {
-    const { result } = renderHook(() =>
-      useCampaignComposerState({ autoSaveDraft: false }),
-    );
-
-    act(() => {
-      result.current.setPersonIds(['person-1']);
-      result.current.setFromAddress('sender@example.com');
-      result.current.setSubject('Hello');
-    });
-
-    expect(result.current.canSend).toBe(true);
-  });
-
-  it('should restore selected people without requiring a list', () => {
-    const { result } = renderHook(() =>
-      useCampaignComposerState({
-        autoSaveDraft: false,
-        initialValues: {
-          listId: null,
-          personIds: ['person-1', 'person-2'],
-          fromAddress: 'sender@example.com',
-          subject: 'Hello',
-        },
-      }),
-    );
-
-    expect(result.current.listId).toBeNull();
-    expect(result.current.personIds).toEqual(['person-1', 'person-2']);
-    expect(result.current.canSend).toBe(true);
-  });
-
   it('should not be sendable while a send is in flight', () => {
     mockedUseSendMessageCampaign.mockReturnValue({
       sendMessageCampaign: sendMessageCampaignMock,
@@ -155,7 +123,6 @@ describe('useCampaignComposerState', () => {
     expect(saveDraftMock).toHaveBeenLastCalledWith({
       campaignId: 'campaign-1',
       listId: 'list-1',
-      personIds: [],
       unsubscribeTopicId: 'topic-1',
       subject: 'Hello',
       body: 'Body',
@@ -227,7 +194,6 @@ describe('useCampaignComposerState', () => {
     expect(saveDraftMock).toHaveBeenCalledWith({
       campaignId: undefined,
       listId: null,
-      personIds: [],
       unsubscribeTopicId: null,
       subject: '',
       body: '',

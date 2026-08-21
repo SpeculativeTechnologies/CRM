@@ -6,7 +6,6 @@ import { type useCampaignComposerState } from '@/activities/emails/hooks/useCamp
 import { useUnsubscribeTopics } from '@/activities/emails/hooks/useUnsubscribeTopics';
 import { useCreateOneRecord } from '@/object-record/hooks/useCreateOneRecord';
 import { FormAdvancedTextFieldInput } from '@/advanced-text-editor/components/FormAdvancedTextFieldInput';
-import { FormMultiRecordPicker } from '@/object-record/record-field/ui/form-types/components/FormMultiRecordPicker';
 import { FormSingleRecordPicker } from '@/object-record/record-field/ui/form-types/components/FormSingleRecordPicker';
 import { FormTextFieldInput } from '@/object-record/record-field/ui/form-types/components/FormTextFieldInput';
 import { useMyMessageChannels } from '@/settings/accounts/hooks/useMyMessageChannels';
@@ -53,7 +52,7 @@ const buildAudienceHint = (preview: CampaignAudiencePreview): string => {
   const breakdown = parts.length > 0 ? ` (${parts.join(', ')})` : '';
 
   return (
-    t`${preview.totalMembers} in this audience — ${preview.sendable} sendable` +
+    t`${preview.totalMembers} in this list — ${preview.sendable} sendable` +
     breakdown
   );
 };
@@ -84,7 +83,6 @@ export const CampaignComposerFields = ({
 
   const audiencePreview = useCampaignAudiencePreview({
     listId: campaignState.listId,
-    personIds: campaignState.personIds,
     unsubscribeTopicId: campaignState.unsubscribeTopicId,
   });
 
@@ -113,19 +111,11 @@ export const CampaignComposerFields = ({
         onChange={campaignState.setFromAddress}
       />
       <FormSingleRecordPicker
-        label={t`To list (optional)`}
+        label={t`To`}
         objectNameSingulars={['messageList']}
         defaultValue={campaignState.listId}
         onChange={campaignState.setListId}
         onCreate={handleCreateList}
-      />
-      <FormMultiRecordPicker
-        label={t`People (optional)`}
-        objectNameSingular="person"
-        defaultValue={campaignState.personIds}
-        onChange={(value) =>
-          campaignState.setPersonIds(Array.isArray(value) ? value : [])
-        }
       />
       {isDefined(audiencePreview) && (
         <StyledHint>{buildAudienceHint(audiencePreview)}</StyledHint>
