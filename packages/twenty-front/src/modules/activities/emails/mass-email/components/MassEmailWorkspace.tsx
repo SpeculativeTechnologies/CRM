@@ -19,6 +19,7 @@ type MassEmailWorkspaceProps = {
     subject: string;
     body: string;
   };
+  onDraftCreated?: (campaignId: string) => void;
   onSent: () => void;
 };
 
@@ -26,6 +27,7 @@ export const MassEmailWorkspace = ({
   connectedAccountId,
   personIds,
   initialDraft,
+  onDraftCreated,
   onSent,
 }: MassEmailWorkspaceProps) => {
   const [selectedPersonId, setSelectedPersonId] = useState<string | null>(null);
@@ -34,6 +36,7 @@ export const MassEmailWorkspace = ({
     connectedAccountId,
     personIds,
     initialDraft,
+    onDraftCreated,
     onSent,
   });
 
