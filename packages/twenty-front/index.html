@@ -37,6 +37,26 @@
     </script>
     <!-- END: Twenty Config -->
 
+    <!-- Preflight the client-config request so it resolves while the JS
+         bundle is still downloading. The app consumes the in-flight promise
+         instead of issuing its own fetch, cutting one serial round trip from
+         every cold load (the router cannot mount until client-config lands).
+         Must stay below the twenty-env-config script that sets window._env_. -->
+    <script>
+      window.__clientConfigPreflight = (function () {
+        try {
+          var baseUrl =
+            (window._env_ && window._env_.REACT_APP_SERVER_BASE_URL) ||
+            window.location.origin;
+          return fetch(baseUrl + '/client-config').catch(function () {
+            return null;
+          });
+        } catch (e) {
+          return null;
+        }
+      })();
+    </script>
+
     <!-- Resilient chunk loading: when served behind a relay tunnel (e.g.
          Tailscale Funnel) the cold-load burst of JS chunks can have a few
          requests dropped, which silently fails a dynamic import() and leaves a

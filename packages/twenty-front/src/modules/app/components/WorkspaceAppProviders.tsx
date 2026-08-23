@@ -20,6 +20,7 @@ import { IsMinimalMetadataReadyEffect } from '@/metadata-store/effect-components
 import { MinimalMetadataLoadEffect } from '@/metadata-store/effect-components/MinimalMetadataLoadEffect';
 import { UserMetadataProviderInitialEffect } from '@/metadata-store/effect-components/UserMetadataProviderInitialEffect';
 import { ApolloCoreProvider } from '@/object-metadata/components/ApolloCoreProvider';
+import { EarlyRecordShowPrefetch } from '@/object-record/record-show/components/EarlyRecordShowPrefetch';
 import { WelcomeOverlay } from '@/onboarding/components/WelcomeOverlay/WelcomeOverlay';
 import { CompanyEnrichmentOnboardingEffect } from '@/onboarding/effect-components/CompanyEnrichmentOnboardingEffect';
 import { ApolloAdminProvider } from '@/settings/admin-panel/apollo/components/ApolloAdminProvider';
@@ -79,6 +80,7 @@ export const WorkspaceAppProviders = () => {
                     </AgentChatProvider>
                   </SnackBarProvider>
                   <MainContextStoreProvider />
+                  <EarlyRecordShowPrefetch />
                   <SupportChatEffect />
                   <InitializeQueryParamStateEffect />
                   <TrackPageViewEffect />
