@@ -5,6 +5,7 @@ import {
   type MetadataEntityKey,
 } from '@/metadata-store/states/metadataStoreState';
 import { clearMetadataStoreStorage } from '@/metadata-store/storage/metadataStoreStorage';
+import { clearRecordShowSnapshots } from '@/object-record/record-show/utils/recordShowSnapshotStorage';
 import { clearSessionLocalStorageKeys } from './clearSessionLocalStorageKeys';
 
 const getMetadataStoreKeys = (): string[] =>
@@ -15,5 +16,6 @@ const getMetadataStoreKeys = (): string[] =>
 export const clearAllSessionLocalStorageKeys = () => {
   clearSessionLocalStorageKeys();
   void clearMetadataStoreStorage();
+  clearRecordShowSnapshots();
   safeRemoveLocalStorageItems(getMetadataStoreKeys());
 };

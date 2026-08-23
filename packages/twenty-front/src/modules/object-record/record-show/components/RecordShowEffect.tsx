@@ -1,9 +1,14 @@
 import { useFindOneRecord } from '@/object-record/hooks/useFindOneRecord';
 import { useRecordShowPageRecordGqlFields } from '@/object-record/record-show/hooks/useRecordShowPageRecordGqlFields';
+import {
+  readRecordShowSnapshot,
+  removeRecordShowSnapshot,
+  saveRecordShowSnapshot,
+} from '@/object-record/record-show/utils/recordShowSnapshotStorage';
 import { recordStoreFamilyState } from '@/object-record/record-store/states/recordStoreFamilyState';
 import { type ObjectRecord } from '@/object-record/types/ObjectRecord';
 import { useStore } from 'jotai';
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { isDefined } from 'twenty-shared/utils';
 
 type RecordShowEffectProps = {
@@ -41,11 +46,47 @@ export const RecordShowEffect = ({
     [recordId, store],
   );
 
+  // Paint immediately from the locally persisted snapshot of a previously
+  // visited record; the findOne result overwrites it as soon as it lands.
+  const [hasSeededFromSnapshot, setHasSeededFromSnapshot] = useState(false);
+
   useEffect(() => {
-    if (!loading && isDefined(record)) {
-      setRecordStore(record);
+    if (hasSeededFromSnapshot) {
+      return;
     }
-  }, [record, setRecordStore, loading]);
+    setHasSeededFromSnapshot(true);
+
+    const existingRecord = store.get(
+      recordStoreFamilyState.atomFamily(recordId),
+    );
+    if (isDefined(existingRecord)) {
+      return;
+    }
+
+    const snapshot = readRecordShowSnapshot(recordId);
+    if (isDefined(snapshot)) {
+      store.set(recordStoreFamilyState.atomFamily(recordId), snapshot);
+    }
+  }, [hasSeededFromSnapshot, recordId, store]);
+
+  useEffect(() => {
+    if (loading) {
+      return;
+    }
+
+    if (isDefined(record)) {
+      setRecordStore(record);
+      saveRecordShowSnapshot(record);
+      return;
+    }
+
+    // The record no longer exists (or is not readable): a stale snapshot
+    // must not keep painting it, and its cache entry has to go.
+    if (hasSeededFromSnapshot) {
+      removeRecordShowSnapshot(recordId);
+      setRecordStore(undefined);
+    }
+  }, [record, setRecordStore, loading, hasSeededFromSnapshot, recordId]);
 
   return <></>;
 };
