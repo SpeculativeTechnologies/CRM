@@ -3,6 +3,7 @@ import { type ComponentInstanceStateContext } from '@/ui/utilities/state/compone
 declare global {
   interface Window {
     _env_?: Record<string, string>;
+    __clientConfigPreflight?: Promise<Response | null> | null;
     __APOLLO_CLIENT__?: any;
     grecaptcha?: any;
     turnstile?: any;

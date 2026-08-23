@@ -2,6 +2,7 @@ import { lazy, useMemo } from 'react';
 import {
   createBrowserRouter,
   createRoutesFromElements,
+  matchPath,
   Navigate,
   Route,
 } from 'react-router-dom';
@@ -27,17 +28,32 @@ import { MainAppLayoutWithSidePanel } from '@/ui/layout/page/components/MainAppL
 import { Verify } from '~/pages/onboarding/Verify';
 import { lazyWithPreload } from '~/utils/lazyWithPreload';
 
-const RecordIndexPage = lazy(() =>
+const RecordIndexPage = lazyWithPreload(() =>
   import('~/pages/object-record/RecordIndexPage').then((module) => ({
     default: module.RecordIndexPage,
   })),
 );
 
-const RecordShowPage = lazy(() =>
+const RecordShowPage = lazyWithPreload(() =>
   import('~/pages/object-record/RecordShowPage').then((module) => ({
     default: module.RecordShowPage,
   })),
 );
+
+// On a direct URL load the matched page's lazy chunk is only requested once
+// auth and metadata gates have opened. Warming it at boot lets the chunk
+// download in parallel with those round trips instead of after them.
+export const preloadWorkspacePageChunkForPath = (pathname: string) => {
+  if (matchPath(AppPath.RecordShowPage, pathname) !== null) {
+    RecordShowPage.preload();
+
+    return;
+  }
+
+  if (matchPath(AppPath.RecordIndexPage, pathname) !== null) {
+    RecordIndexPage.preload();
+  }
+};
 
 const SignInUp = lazy(() =>
   import('~/pages/auth/SignInUp').then((module) => ({
