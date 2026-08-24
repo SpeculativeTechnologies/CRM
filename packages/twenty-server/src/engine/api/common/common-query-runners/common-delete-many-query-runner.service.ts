@@ -48,6 +48,7 @@ export class CommonDeleteManyQueryRunnerService extends CommonBaseQueryRunnerSer
     const {
       authContext,
       rolePermissionConfig,
+      workspaceDataSource,
       flatObjectMetadataMaps,
       flatFieldMetadataMaps,
       flatObjectMetadata,

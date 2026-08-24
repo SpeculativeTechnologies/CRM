@@ -81,6 +81,7 @@ export class CommonCreateManyQueryRunnerService extends CommonBaseQueryRunnerSer
     const {
       repository,
       authContext,
+      workspaceDataSource,
       rolePermissionConfig,
       flatObjectMetadata,
       flatObjectMetadataMaps,

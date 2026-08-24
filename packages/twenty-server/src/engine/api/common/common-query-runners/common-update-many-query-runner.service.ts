@@ -49,6 +49,7 @@ export class CommonUpdateManyQueryRunnerService extends CommonBaseQueryRunnerSer
     const {
       authContext,
       rolePermissionConfig,
+      workspaceDataSource,
       flatObjectMetadataMaps,
       flatFieldMetadataMaps,
       flatObjectMetadata,

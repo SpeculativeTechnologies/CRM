@@ -359,9 +359,14 @@ export abstract class CommonBaseQueryRunnerService<
         rolePermissionConfig,
       ) as unknown as WorkspaceRepository<ObjectLiteral>;
 
+    const workspaceDataSource = this.isReadOnly
+      ? await this.globalWorkspaceOrmManager.getGlobalWorkspaceDataSourceReplica()
+      : await this.globalWorkspaceOrmManager.getGlobalWorkspaceDataSource();
+
     return {
       ...queryRunnerContext,
       authContext: context.authContext,
+      workspaceDataSource,
       rolePermissionConfig,
       repository,
       featureFlagsMap: context.featureFlagsMap,

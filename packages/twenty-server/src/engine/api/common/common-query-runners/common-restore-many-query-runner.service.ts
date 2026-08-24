@@ -48,6 +48,7 @@ export class CommonRestoreManyQueryRunnerService extends CommonBaseQueryRunnerSe
     const {
       authContext,
       rolePermissionConfig,
+      workspaceDataSource,
       flatObjectMetadataMaps,
       flatFieldMetadataMaps,
       flatObjectMetadata,
