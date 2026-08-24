@@ -58,6 +58,7 @@ import { isMorphOrRelationFlatFieldMetadata } from 'src/engine/metadata-modules/
 import { FlatObjectMetadata } from 'src/engine/metadata-modules/flat-object-metadata/types/flat-object-metadata.type';
 import { assertMutationNotOnRemoteObject } from 'src/engine/metadata-modules/object-metadata/utils/assert-mutation-not-on-remote-object.util';
 import { type WorkspaceTransactionScopeV2 } from 'src/engine/twenty-orm-v2/datasource/workspace-data-source-v2';
+import { getWorkspaceSchemaName } from 'src/engine/workspace-datasource/utils/get-workspace-schema-name.util';
 
 @Injectable()
 export class CommonMergeManyQueryRunnerService extends CommonBaseQueryRunnerService<
@@ -608,6 +609,9 @@ export class CommonMergeManyQueryRunnerService extends CommonBaseQueryRunnerServ
     } = queryRunnerContext;
     const alias = flatObjectMetadata.nameSingular;
     const isPerson = this.isPersonObject(flatObjectMetadata);
+    const workspaceSchemaName = getWorkspaceSchemaName(
+      queryRunnerContext.authContext.workspace.id,
+    );
 
     const columnsToReturn = buildColumnsToReturn({
       select: args.selectedFieldsResult.select,
@@ -664,20 +668,15 @@ export class CommonMergeManyQueryRunnerService extends CommonBaseQueryRunnerServ
           ) {
             // A null value makes the FILES sync skip the field entirely, so the
             // absorbed record lets go of the avatar without the file being soft
-            // deleted along with it. Clearing it with an empty array instead
-            // would read as a removal and take the file the survivor is about
-            // to claim.
-            await objectRepository.runMutation({
-              selectQueryBuilder: objectRepository
-                .createQueryBuilder(alias)
-                .where({
-                  id: In(personAvatarFileHandover.previousOwnerPersonIds),
-                }),
-              rowLevelPermissionsApplied: false,
-              kind: 'update',
-              columnsToReturn: ['id'],
-              data: { avatarFile: null },
-            });
+            // deleted along with it. Raw SQL keeps this internal step out of
+            // the event stream, as the v1 path did: subscribers should see one
+            // merge, not the housekeeping writes inside it.
+            await transactionScope.executeRawQuery(
+              `UPDATE "${workspaceSchemaName}"."person"
+               SET "avatarFile" = NULL
+               WHERE "id" = ANY($1)`,
+              [personAvatarFileHandover.previousOwnerPersonIds],
+            );
           }
 
           await this.migrateRelatedRecords(
@@ -692,34 +691,37 @@ export class CommonMergeManyQueryRunnerService extends CommonBaseQueryRunnerServ
             // soft delete. Release them inside the merge transaction so a
             // reviewed email can be assigned to the survivor. Use null because
             // PostgreSQL unique indexes allow multiple nulls; the API still
-            // exposes this as an empty primary email in Trash. Other record
-            // details remain in Trash.
+            // exposes this as an empty primary email in Trash. Raw SQL keeps
+            // this internal step, and the soft delete below, out of the event
+            // stream, matching the v1 path: an "updated" or "deleted" event on
+            // the absorbed person would spawn timeline activities and webhook
+            // calls for what is one merge operation.
+            await transactionScope.executeRawQuery(
+              `UPDATE "${workspaceSchemaName}"."person"
+               SET "emailsPrimaryEmail" = NULL,
+                   "emailsAdditionalEmails" = '[]'::jsonb
+               WHERE "id" = ANY($1)`,
+              [idsToDelete],
+            );
+
+            // Absorbed people go to Trash so a bad merge can be undone from
+            // there.
+            await transactionScope.executeRawQuery(
+              `UPDATE "${workspaceSchemaName}"."person"
+               SET "deletedAt" = now()
+               WHERE "id" = ANY($1) AND "deletedAt" IS NULL`,
+              [idsToDelete],
+            );
+          } else {
             await objectRepository.runMutation({
               selectQueryBuilder: objectRepository
                 .createQueryBuilder(alias)
                 .where({ id: In(idsToDelete) }),
               rowLevelPermissionsApplied: false,
-              kind: 'update',
-              columnsToReturn: ['id'],
-              data: {
-                emails: {
-                  primaryEmail: null,
-                  additionalEmails: [],
-                },
-              },
+              kind: 'delete',
+              columnsToReturn,
             });
           }
-
-          // Absorbed people go to Trash so a bad merge can be undone from
-          // there; other objects keep upstream's hard delete.
-          await objectRepository.runMutation({
-            selectQueryBuilder: objectRepository
-              .createQueryBuilder(alias)
-              .where({ id: In(idsToDelete) }),
-            rowLevelPermissionsApplied: false,
-            kind: isPerson ? 'soft-delete' : 'delete',
-            columnsToReturn,
-          });
 
           const [resolvedMergedData] =
             await this.resolveNestedRelationsForOrmV2({
