@@ -30,3 +30,17 @@ README.md merge=ours
 *.ttf binary
 *.eot binary
 
+
+# --- fork merge policy (weekly upstream sync) ---------------------------------
+# Append-only registries where the fork and upstream add entries independently
+# every week; keeping both sides is always the right resolution. Duplicate or
+# misplaced entries are caught by typecheck/lint.
+packages/twenty-shared/src/types/AppPath.ts merge=union
+packages/twenty-shared/src/types/SidePanelPages.ts merge=union
+packages/twenty-front/src/modules/side-panel/constants/SidePanelPagesConfig.tsx merge=union
+packages/twenty-server/src/database/commands/upgrade-version-command/instance-commands.constant.ts merge=union
+packages/twenty-server/src/database/commands/upgrade-version-command/workspace-command-provider.module.ts merge=union
+# The fork's CLAUDE.md replaces upstream's; their rewrites never apply here.
+# The "ours" driver only exists where configured (sync-upstream.sh passes
+# -c merge.ours.driver=true); elsewhere this still conflicts, which is fine.
+CLAUDE.md merge=ours
