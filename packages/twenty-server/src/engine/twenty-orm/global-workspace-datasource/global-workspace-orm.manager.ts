@@ -11,6 +11,7 @@ import { ExecuteInWorkspaceContextOptions } from 'src/engine/twenty-orm/global-w
 import { type WorkspaceTransactionScope } from 'src/engine/twenty-orm/global-workspace-datasource/types/workspace-transaction-scope.type';
 import type { WorkspaceRepository } from 'src/engine/twenty-orm/repository/workspace.repository';
 import {
+  getWorkspaceContext,
   type ORMWorkspaceContext,
   withWorkspaceContext,
 } from 'src/engine/twenty-orm/storage/orm-workspace-context.storage';
@@ -57,11 +58,36 @@ export class GlobalWorkspaceOrmManager {
   }
 
   async getGlobalWorkspaceDataSource(): Promise<GlobalWorkspaceDataSource> {
+    await this.ensureEntityMetadatasLoaded();
+
     return this.globalWorkspaceDataSourceService.getGlobalWorkspaceDataSource();
   }
 
   async getGlobalWorkspaceDataSourceReplica(): Promise<GlobalWorkspaceDataSource> {
+    await this.ensureEntityMetadatasLoaded();
+
     return this.globalWorkspaceDataSourceService.getGlobalWorkspaceDataSourceReplica();
+  }
+
+  // Fork: upstream stopped loading TypeORM entity metadata when it collapsed
+  // reads and writes onto ORM v2, but fork machinery that still consumes the
+  // v1 data source (record label formula recomputes) needs the metadata in
+  // the workspace context or getRepository throws "No metadata ... found".
+  // Delete this once those consumers run on ORM v2.
+  async ensureEntityMetadatasLoaded(): Promise<void> {
+    const context = getWorkspaceContext();
+
+    if (context.entityMetadatas.length > 0) {
+      return;
+    }
+
+    const { ORMEntityMetadatas } =
+      await this.workspaceCacheService.getOrRecompute(
+        context.authContext.workspace.id,
+        ['ORMEntityMetadatas'],
+      );
+
+    context.entityMetadatas.push(...ORMEntityMetadatas);
   }
 
   private resolveObjectMetadataName<T extends ObjectLiteral>(

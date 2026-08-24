@@ -13,7 +13,7 @@ import {
   RelationType,
 } from 'twenty-shared/types';
 import { isDefined } from 'twenty-shared/utils';
-import { FindOptionsRelations, In, ObjectLiteral } from 'typeorm';
+import { FindOptionsRelations, In, ObjectLiteral, QueryRunner } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 
 import { CommonBaseQueryRunnerService } from 'src/engine/api/common/common-query-runners/common-base-query-runner.service';
@@ -59,6 +59,7 @@ import { FlatObjectMetadata } from 'src/engine/metadata-modules/flat-object-meta
 import { assertMutationNotOnRemoteObject } from 'src/engine/metadata-modules/object-metadata/utils/assert-mutation-not-on-remote-object.util';
 import { WorkspaceEntityManager } from 'src/engine/twenty-orm/entity-manager/workspace-entity-manager';
 import { WorkspaceRepository } from 'src/engine/twenty-orm/repository/workspace.repository';
+import { getWorkspaceSchemaName } from 'src/engine/workspace-datasource/utils/get-workspace-schema-name.util';
 
 @Injectable()
 export class CommonMergeManyQueryRunnerService extends CommonBaseQueryRunnerService<
@@ -217,6 +218,9 @@ export class CommonMergeManyQueryRunnerService extends CommonBaseQueryRunnerServ
       queryRunnerContext.rolePermissionConfig,
       queryRunnerContext.authContext,
     );
+    const workspaceSchemaName = getWorkspaceSchemaName(
+      queryRunnerContext.authContext.workspace.id,
+    );
 
     if (this.isPersonObject(flatObjectMetadata)) {
       // Keep ambiguous source-to-source collisions; only remove a source row
@@ -231,7 +235,8 @@ export class CommonMergeManyQueryRunnerService extends CommonBaseQueryRunnerServ
 
     if (isDefined(personAvatarFileHandover)) {
       await this.releasePersonAvatarFileOwnership(
-        transactionRepository,
+        transactionManager,
+        workspaceSchemaName,
         personAvatarFileHandover.previousOwnerPersonIds,
       );
     }
@@ -245,23 +250,26 @@ export class CommonMergeManyQueryRunnerService extends CommonBaseQueryRunnerServ
 
     if (this.isPersonObject(flatObjectMetadata)) {
       await this.releaseAbsorbedPersonUniqueValues(
-        transactionRepository,
+        transactionManager,
+        workspaceSchemaName,
         idsToDelete,
       );
     }
 
-    const deleteQueryBuilder = transactionRepository.createQueryBuilder(
-      flatObjectMetadata.nameSingular,
-    );
-
     if (this.isPersonObject(flatObjectMetadata)) {
-      await deleteQueryBuilder
-        .softDelete()
-        .whereInIds(idsToDelete)
-        .returning(columnsToReturn)
-        .execute();
+      // Absorbed people go to Trash so a bad merge can be undone from there.
+      // Raw SQL keeps the housekeeping soft delete out of the event stream:
+      // a "deleted" event here would spawn a timeline activity and webhook
+      // calls for what is one merge operation.
+      await this.getTransactionQueryRunner(transactionManager).query(
+        `UPDATE "${workspaceSchemaName}"."person"
+         SET "deletedAt" = now()
+         WHERE "id" = ANY($1) AND "deletedAt" IS NULL`,
+        [idsToDelete],
+      );
     } else {
-      await deleteQueryBuilder
+      await transactionRepository
+        .createQueryBuilder(flatObjectMetadata.nameSingular)
         .delete()
         .whereInIds(idsToDelete)
         .returning(columnsToReturn)
@@ -312,20 +320,24 @@ export class CommonMergeManyQueryRunnerService extends CommonBaseQueryRunnerServ
   // of the avatar without the file being soft deleted along with it. Clearing it with an empty
   // array instead would read as a removal and take the file the survivor is about to claim.
   private async releasePersonAvatarFileOwnership(
-    repository: WorkspaceRepository<ObjectLiteral>,
+    transactionManager: WorkspaceEntityManager,
+    workspaceSchemaName: string,
     previousOwnerPersonIds: string[],
   ): Promise<void> {
     if (previousOwnerPersonIds.length === 0) {
       return;
     }
 
-    await repository
-      .createQueryBuilder('person')
-      .update()
-      .set({ avatarFile: null })
-      .where({ id: In(previousOwnerPersonIds) })
-      .returning(['id'])
-      .execute();
+    // Raw SQL keeps this internal step out of the event stream: an "updated"
+    // event on the absorbed person would spawn timeline activities and
+    // webhook calls for what is one merge operation. The entity manager
+    // blocks raw SQL, so go through the transaction's own query runner.
+    await this.getTransactionQueryRunner(transactionManager).query(
+      `UPDATE "${workspaceSchemaName}"."person"
+       SET "avatarFile" = NULL
+       WHERE "id" = ANY($1)`,
+      [previousOwnerPersonIds],
+    );
   }
 
   private async setPersonAvatarFilesTemporary(
@@ -346,7 +358,8 @@ export class CommonMergeManyQueryRunnerService extends CommonBaseQueryRunnerServ
   }
 
   private async releaseAbsorbedPersonUniqueValues(
-    repository: WorkspaceRepository<ObjectLiteral>,
+    transactionManager: WorkspaceEntityManager,
+    workspaceSchemaName: string,
     personIds: string[],
   ): Promise<void> {
     // Person emails remain subject to a workspace unique index after a soft
@@ -354,18 +367,31 @@ export class CommonMergeManyQueryRunnerService extends CommonBaseQueryRunnerServ
     // can be assigned to the survivor. Use null because PostgreSQL unique
     // indexes allow multiple nulls; the API still exposes this as an empty
     // primary email in Trash. Other record details remain in Trash.
-    await repository
-      .createQueryBuilder('person')
-      .update()
-      .set({
-        emails: {
-          primaryEmail: null,
-          additionalEmails: [],
-        },
-      })
-      .where({ id: In(personIds) })
-      .returning(['id'])
-      .execute();
+    // Raw SQL for the same reason as the avatar release above: no events for
+    // internal housekeeping on the absorbed person.
+    await this.getTransactionQueryRunner(transactionManager).query(
+      `UPDATE "${workspaceSchemaName}"."person"
+       SET "emailsPrimaryEmail" = NULL,
+           "emailsAdditionalEmails" = '[]'::jsonb
+       WHERE "id" = ANY($1)`,
+      [personIds],
+    );
+  }
+
+  private getTransactionQueryRunner(
+    transactionManager: WorkspaceEntityManager,
+  ): QueryRunner {
+    const queryRunner = transactionManager.queryRunner;
+
+    if (!isDefined(queryRunner)) {
+      throw new CommonQueryRunnerException(
+        'Merge housekeeping must run inside a transaction',
+        CommonQueryRunnerExceptionCode.INTERNAL_SERVER_ERROR,
+        { userFriendlyMessage: STANDARD_ERROR_MESSAGE },
+      );
+    }
+
+    return queryRunner;
   }
 
   private async fetchRecordsToMerge(
