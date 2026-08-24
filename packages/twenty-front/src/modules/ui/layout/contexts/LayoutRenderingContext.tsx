@@ -13,5 +13,8 @@ export type LayoutRenderingContextType = {
   isInSidePanel: boolean;
 };
 
-export const [LayoutRenderingProvider, useLayoutRenderingContext] =
-  createRequiredContext<LayoutRenderingContextType>('LayoutRenderingContext');
+export const [
+  LayoutRenderingProvider,
+  useLayoutRenderingContext,
+  useLayoutRenderingContextOrUndefined,
+] = createRequiredContext<LayoutRenderingContextType>('LayoutRenderingContext');
