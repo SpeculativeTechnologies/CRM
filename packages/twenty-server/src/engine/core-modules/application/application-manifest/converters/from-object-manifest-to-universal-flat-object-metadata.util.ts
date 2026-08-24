@@ -30,7 +30,7 @@ export const fromObjectManifestToUniversalFlatObjectMetadata = ({
     isSystem: false,
     isUIEditable: objectManifest.isUIEditable ?? true,
     isUICreatable: objectManifest.isUICreatable ?? true,
-    writability: MetadataWritability.OPEN,
+    writability: objectManifest.writability ?? MetadataWritability.OPEN,
     isAuditLogged: true,
     isSearchable: objectManifest.isSearchable ?? true,
     duplicateCriteria: null,
@@ -42,6 +42,7 @@ export const fromObjectManifestToUniversalFlatObjectMetadata = ({
     objectPermissionUniversalIdentifiers: [],
     fieldPermissionUniversalIdentifiers: [],
     viewUniversalIdentifiers: [],
+    pageLayoutUniversalIdentifiers: [],
     labelIdentifierFieldMetadataUniversalIdentifier:
       objectManifest.labelIdentifierFieldMetadataUniversalIdentifier,
     imageIdentifierFieldMetadataUniversalIdentifier: null,

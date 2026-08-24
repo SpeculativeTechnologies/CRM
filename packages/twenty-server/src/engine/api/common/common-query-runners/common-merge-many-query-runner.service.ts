@@ -7,7 +7,6 @@ import {
   QUERY_MAX_RECORDS_FROM_RELATION,
 } from 'twenty-shared/constants';
 import {
-  FeatureFlagKey,
   FieldMetadataSettingsMapping,
   FieldMetadataType,
   ObjectRecord,
@@ -58,8 +57,6 @@ import { buildFieldMapsFromFlatObjectMetadata } from 'src/engine/metadata-module
 import { isMorphOrRelationFlatFieldMetadata } from 'src/engine/metadata-modules/flat-field-metadata/utils/is-morph-or-relation-flat-field-metadata.util';
 import { FlatObjectMetadata } from 'src/engine/metadata-modules/flat-object-metadata/types/flat-object-metadata.type';
 import { assertMutationNotOnRemoteObject } from 'src/engine/metadata-modules/object-metadata/utils/assert-mutation-not-on-remote-object.util';
-import { WorkspaceEntityManager } from 'src/engine/twenty-orm/entity-manager/workspace-entity-manager';
-import { WorkspaceRepository } from 'src/engine/twenty-orm/repository/workspace.repository';
 
 @Injectable()
 export class CommonMergeManyQueryRunnerService extends CommonBaseQueryRunnerService<
@@ -121,11 +118,8 @@ export class CommonMergeManyQueryRunnerService extends CommonBaseQueryRunnerServ
 
     // Person merges rely on transactional steps (relation dedup, avatar file
     // handover, unique-value release, soft delete) that only the v1 path
-    // implements, so they never take the ORM v2 path even when the flag is on.
-    const updatedRecord =
-      queryRunnerContext.featureFlagsMap[
-        FeatureFlagKey.IS_ORM_V2_READ_PATH_ENABLED
-      ] && !this.isPersonObject(flatObjectMetadata)
+    // implements, so they never take the ORM v2 path.
+    const updatedRecord = !this.isPersonObject(flatObjectMetadata)
         ? await this.executeMergeWithinTransactionV2({
             args,
             queryRunnerContext,
@@ -427,10 +421,9 @@ export class CommonMergeManyQueryRunnerService extends CommonBaseQueryRunnerServ
         >,
         limit: QUERY_MAX_RECORDS_FROM_RELATION,
         authContext: context.authContext,
-        workspaceDataSource: context.workspaceDataSource,
         rolePermissionConfig: context.rolePermissionConfig,
         selectedFields: args.selectedFieldsResult.select,
-        ...this.getNestedRelationsReadPathOptions(context),
+        ...this.getNestedRelationsReadPathOptions(),
       });
     }
 
@@ -571,51 +564,6 @@ export class CommonMergeManyQueryRunnerService extends CommonBaseQueryRunnerServ
     };
 
     return dryRunRecord;
-  }
-
-  private async updatePriorityRecord(
-    args: CommonExtendedInput<MergeManyQueryArgs>,
-    queryRunnerContext: CommonExtendedQueryRunnerContext,
-    repository: WorkspaceRepository<ObjectLiteral>,
-    priorityRecordId: string,
-    mergedData: Partial<ObjectRecord>,
-  ): Promise<ObjectRecord> {
-    const {
-      flatObjectMetadata,
-      flatObjectMetadataMaps,
-      flatFieldMetadataMaps,
-    } = queryRunnerContext;
-
-    const queryBuilder = repository.createQueryBuilder(
-      flatObjectMetadata.nameSingular,
-    );
-
-    const columnsToReturn = buildColumnsToReturn({
-      select: args.selectedFieldsResult.select,
-      relations: args.selectedFieldsResult.relations,
-      flatObjectMetadata,
-      flatObjectMetadataMaps,
-      flatFieldMetadataMaps,
-    });
-
-    const updatedObjectRecords = await queryBuilder
-      .update()
-      .set(mergedData)
-      .where({ id: priorityRecordId })
-      .returning(columnsToReturn)
-      .execute();
-
-    if (!updatedObjectRecords.generatedMaps.length) {
-      throw new CommonQueryRunnerException(
-        'Failed to update record',
-        CommonQueryRunnerExceptionCode.RECORD_NOT_FOUND,
-        { userFriendlyMessage: STANDARD_ERROR_MESSAGE },
-      );
-    }
-
-    const updatedRecord = updatedObjectRecords.generatedMaps[0] as ObjectRecord;
-
-    return updatedRecord;
   }
 
   private getRelationFieldsPointingToCurrentObject(
@@ -930,7 +878,6 @@ export class CommonMergeManyQueryRunnerService extends CommonBaseQueryRunnerServ
       flatFieldMetadataMaps,
       flatObjectMetadata,
       authContext,
-      workspaceDataSource,
       rolePermissionConfig,
     } = queryRunnerContext;
 
@@ -946,10 +893,9 @@ export class CommonMergeManyQueryRunnerService extends CommonBaseQueryRunnerServ
         >,
         limit: QUERY_MAX_RECORDS_FROM_RELATION,
         authContext,
-        workspaceDataSource,
         rolePermissionConfig,
         selectedFields: args.selectedFieldsResult.select,
-        ...this.getNestedRelationsReadPathOptions(queryRunnerContext),
+        ...this.getNestedRelationsReadPathOptions(),
       });
     }
   }
