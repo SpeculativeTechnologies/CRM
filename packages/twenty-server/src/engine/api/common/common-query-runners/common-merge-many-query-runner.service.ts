@@ -122,24 +122,24 @@ export class CommonMergeManyQueryRunnerService extends CommonBaseQueryRunnerServ
     // handover, unique-value release, soft delete) that only the v1 path
     // implements, so they never take the ORM v2 path.
     const updatedRecord = !this.isPersonObject(flatObjectMetadata)
-        ? await this.executeMergeWithinTransactionV2({
-            args,
-            queryRunnerContext,
-            idsToDelete,
-            priorityRecordId: priorityRecord.id,
-            mergedData,
-          })
-        : await queryRunnerContext.workspaceDataSource.transaction(
-            (transactionManager: WorkspaceEntityManager) =>
-              this.executeMergeWithinTransaction(transactionManager, {
-                args,
-                queryRunnerContext,
-                idsToDelete,
-                priorityRecordId: priorityRecord.id,
-                mergedData,
-                personAvatarFileHandover,
-              }),
-          );
+      ? await this.executeMergeWithinTransactionV2({
+          args,
+          queryRunnerContext,
+          idsToDelete,
+          priorityRecordId: priorityRecord.id,
+          mergedData,
+        })
+      : await queryRunnerContext.workspaceDataSource.transaction(
+          (transactionManager: WorkspaceEntityManager) =>
+            this.executeMergeWithinTransaction(transactionManager, {
+              args,
+              queryRunnerContext,
+              idsToDelete,
+              priorityRecordId: priorityRecord.id,
+              mergedData,
+              personAvatarFileHandover,
+            }),
+        );
 
     if (this.isPersonObject(flatObjectMetadata)) {
       await this.recordPersonMergeProvenance({
@@ -925,7 +925,6 @@ export class CommonMergeManyQueryRunnerService extends CommonBaseQueryRunnerServ
       flatFieldMetadataMaps,
       flatObjectMetadata,
       authContext,
-      workspaceDataSource,
       rolePermissionConfig,
     } = queryRunnerContext;
 
