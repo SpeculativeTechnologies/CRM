@@ -1,6 +1,8 @@
 import { useIsLogged } from '@/auth/hooks/useIsLogged';
+import { metadataStoreState } from '@/metadata-store/states/metadataStoreState';
 import { useObjectMetadataItems } from '@/object-metadata/hooks/useObjectMetadataItems';
 import { usePrefetchRecordShowPageRecord } from '@/object-record/record-show/hooks/usePrefetchRecordShowPageRecord';
+import { useAtomFamilyStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomFamilyStateValue';
 import { useEffect, useState } from 'react';
 import { matchPath, useLocation } from 'react-router-dom';
 import { AppPath } from 'twenty-shared/types';
@@ -57,11 +59,27 @@ export const EarlyRecordShowPrefetch = () => {
       objectMetadataItem.nameSingular === objectNameSingular,
   );
 
+  // Without page layouts the field set cannot be restricted and the prefetch
+  // would issue the expensive full-depth query, which the show page then
+  // repeats with the restricted set once layouts land. On a cold boot the
+  // layouts arrive with the core metadata wave moments later; waiting for
+  // them keeps the prefetch byte-identical to the page query. An up-to-date
+  // but empty collection means the workspace genuinely has no layouts, and
+  // the unrestricted query is what the page will run anyway.
+  const metadataStorePageLayouts = useAtomFamilyStateValue(
+    metadataStoreState,
+    'pageLayouts',
+  );
+  const pageLayoutsAreUsable =
+    metadataStorePageLayouts.current.length > 0 ||
+    metadataStorePageLayouts.status === 'up-to-date';
+
   if (
     !isLogged ||
     !isDefined(objectNameSingular) ||
     !isDefined(objectRecordId) ||
-    !objectMetadataIsAvailable
+    !objectMetadataIsAvailable ||
+    !pageLayoutsAreUsable
   ) {
     return null;
   }

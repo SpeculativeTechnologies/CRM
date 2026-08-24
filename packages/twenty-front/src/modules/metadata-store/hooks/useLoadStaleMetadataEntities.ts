@@ -72,7 +72,14 @@ export const useLoadStaleMetadataEntities = () => {
         return;
       }
 
+      // Two waves: the collections the minimal-metadata gate and the record
+      // pages depend on (objects, views, page layouts) fetch first with the
+      // server's full capacity and apply as soon as they all land, opening
+      // the gate. The nav/command/front-component collections fetch and
+      // apply in a second wave so they neither delay the gate nor compete
+      // with the core queries for server capacity.
       const fetchPromises: Promise<void>[] = [];
+      const deferredFetchThunks: Array<() => Promise<void>> = [];
 
       if (hasOverlap(staleEntityKeys, OBJECTS_GROUP_KEYS)) {
         fetchPromises.push(
@@ -173,7 +180,7 @@ export const useLoadStaleMetadataEntities = () => {
       }
 
       if (staleEntityKeys.includes('logicFunctions')) {
-        fetchPromises.push(
+        deferredFetchThunks.push(() =>
           client
             .query({
               query: FindManyLogicFunctionsDocument,
@@ -193,7 +200,7 @@ export const useLoadStaleMetadataEntities = () => {
       }
 
       if (staleEntityKeys.includes('navigationMenuItems')) {
-        fetchPromises.push(
+        deferredFetchThunks.push(() =>
           client
             .query({
               query: FindManyNavigationMenuItemsDocument,
@@ -213,7 +220,7 @@ export const useLoadStaleMetadataEntities = () => {
       }
 
       if (staleEntityKeys.includes('commandMenuItems')) {
-        fetchPromises.push(
+        deferredFetchThunks.push(() =>
           client
             .query({
               query: FindManyCommandMenuItemsDocument,
@@ -230,7 +237,7 @@ export const useLoadStaleMetadataEntities = () => {
       }
 
       if (staleEntityKeys.includes('frontComponents')) {
-        fetchPromises.push(
+        deferredFetchThunks.push(() =>
           client
             .query({
               query: FindManyFrontComponentsDocument,
@@ -248,6 +255,13 @@ export const useLoadStaleMetadataEntities = () => {
 
       await Promise.all(fetchPromises);
       applyChanges();
+
+      if (deferredFetchThunks.length > 0) {
+        await Promise.all(
+          deferredFetchThunks.map((fetchThunk) => fetchThunk()),
+        );
+        applyChanges();
+      }
     },
     [client, replaceDraft, applyChanges],
   );
