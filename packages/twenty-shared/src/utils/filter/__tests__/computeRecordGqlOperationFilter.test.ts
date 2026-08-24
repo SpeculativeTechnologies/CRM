@@ -41,4 +41,53 @@ describe('computeRecordGqlOperationFilter', () => {
       },
     });
   });
+
+  it('should combine two numeric filters on the same field into an AND range', () => {
+    const lifetimeDonationsField: PartialFieldMetadataItem = {
+      id: 'lifetime-donations-field',
+      name: 'lifetimeDonations',
+      label: 'Lifetime Donations',
+      type: FieldMetadataType.NUMBER,
+    };
+    const recordFilters: RecordFilter[] = [
+      {
+        id: 'lower-bound-filter',
+        fieldMetadataId: lifetimeDonationsField.id,
+        value: '100',
+        type: 'NUMBER',
+        operand: ViewFilterOperand.GREATER_THAN_OR_EQUAL,
+      },
+      {
+        id: 'upper-bound-filter',
+        fieldMetadataId: lifetimeDonationsField.id,
+        value: '500',
+        type: 'NUMBER',
+        operand: ViewFilterOperand.LESS_THAN_OR_EQUAL,
+      },
+    ];
+
+    const filter = computeRecordGqlOperationFilter({
+      fieldMetadataItems: [lifetimeDonationsField],
+      recordFilters,
+      recordFilterGroups: [],
+      filterValueDependencies: {
+        timeZone: 'UTC',
+      },
+    });
+
+    expect(filter).toEqual({
+      and: [
+        {
+          lifetimeDonations: {
+            gte: 100,
+          },
+        },
+        {
+          lifetimeDonations: {
+            lte: 500,
+          },
+        },
+      ],
+    });
+  });
 });

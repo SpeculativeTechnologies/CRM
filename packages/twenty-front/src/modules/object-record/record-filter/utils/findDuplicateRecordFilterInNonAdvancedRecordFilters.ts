@@ -13,8 +13,14 @@ export const findDuplicateRecordFilterInNonAdvancedRecordFilters = ({
   subFieldName?: string | null | undefined;
   relationTargetFieldMetadataId?: string | null | undefined;
 }): RecordFilter | undefined => {
+  // Numeric conditions can intentionally repeat to express an AND range.
   const duplicateFilterInCurrentRecordFilters = recordFilters
-    .filter((recordFilter) => !isDefined(recordFilter.recordFilterGroupId))
+    .filter(
+      (recordFilter) =>
+        !isDefined(recordFilter.recordFilterGroupId) &&
+        recordFilter.type !== 'NUMBER' &&
+        recordFilter.type !== 'CURRENCY',
+    )
     .find(
       (recordFilter) =>
         compareStrictlyExceptForNullAndUndefined(
