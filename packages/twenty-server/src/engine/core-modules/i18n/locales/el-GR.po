@@ -7019,8 +7019,9 @@ msgctxt "fieldMetadata.description"
 msgid "Number of spam complaints received"
 msgstr "Αριθμός παραπόνων για spam που παραλήφθηκαν"
 
-#. js-lingui-id: 5Lb4fW
+#. js-lingui-id: b/z56M
 #: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-person-standard-flat-field-metadata.util.ts
+msgctxt "fieldMetadata.description"
 msgid "Number of tasks tied to the contact that are not done"
 msgstr ""
 
@@ -7251,8 +7252,9 @@ msgctxt "fieldMetadata.label"
 msgid "Open Records In"
 msgstr "Άνοιγμα εγγραφών σε"
 
-#. js-lingui-id: VVBlwg
+#. js-lingui-id: 7Nn1/7
 #: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-person-standard-flat-field-metadata.util.ts
+msgctxt "fieldMetadata.label"
 msgid "Open tasks"
 msgstr ""
 

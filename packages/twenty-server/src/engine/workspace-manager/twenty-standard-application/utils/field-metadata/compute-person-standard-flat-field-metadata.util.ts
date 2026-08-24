@@ -261,9 +261,14 @@ export const buildPersonStandardFlatFieldMetadatas = ({
     context: {
       fieldName: 'openTaskCount',
       type: FieldMetadataType.NUMBER,
-      label: i18nLabel(msg`Open tasks`),
+      label: i18nLabel(
+        msg({ message: `Open tasks`, context: 'fieldMetadata.label' }),
+      ),
       description: i18nLabel(
-        msg`Number of tasks tied to the contact that are not done`,
+        msg({
+          message: `Number of tasks tied to the contact that are not done`,
+          context: 'fieldMetadata.description',
+        }),
       ),
       icon: 'IconCheckbox',
       isNullable: false,
