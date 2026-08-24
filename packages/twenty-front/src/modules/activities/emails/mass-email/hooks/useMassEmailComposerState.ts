@@ -30,6 +30,7 @@ type UseMassEmailComposerStateArgs = {
     subject: string;
     body: string;
   };
+  onDraftCreated?: (campaignId: string) => void;
   onSent?: () => void;
 };
 
@@ -37,6 +38,7 @@ export const useMassEmailComposerState = ({
   connectedAccountId: initialConnectedAccountId,
   personIds,
   initialDraft,
+  onDraftCreated,
   onSent,
 }: UseMassEmailComposerStateArgs) => {
   const [connectedAccountId, setConnectedAccountId] = useState(
@@ -49,7 +51,7 @@ export const useMassEmailComposerState = ({
   const [overrides, setOverrides] = useState<Record<string, MassEmailOverride>>(
     {},
   );
-  const [excludedPersonIds, setExcludedPersonIds] = useState<string[]>([]);
+  const [selectedPersonIds, setSelectedPersonIds] = useState(personIds);
   const [draftCampaignId, setDraftCampaignId] = useState<string | undefined>(
     initialDraft?.campaignId,
   );
@@ -64,18 +66,12 @@ export const useMassEmailComposerState = ({
     skippedWithoutEmail,
     skippedWithoutEmailCount,
     loading: recipientsLoading,
-  } = useMassEmailRecipients(personIds);
+  } = useMassEmailRecipients(selectedPersonIds);
 
   const { sendMassEmail, sending, sentCount } = useSendMassEmail();
   const { saveDraft, isSaving } = useMassEmailCampaignDraft();
 
-  const includedRecipients = useMemo(
-    () =>
-      recipients.filter(
-        (recipient) => !excludedPersonIds.includes(recipient.personId),
-      ),
-    [excludedPersonIds, recipients],
-  );
+  const includedRecipients = useMemo(() => recipients, [recipients]);
 
   const resolveBaseForRecipient = useCallback(
     (recipient: MassEmailRecipient) => {
@@ -178,9 +174,27 @@ export const useMassEmailComposerState = ({
     });
   }, []);
 
-  const excludeRecipient = useCallback((personId: string) => {
-    setExcludedPersonIds((previousExcluded) => [...previousExcluded, personId]);
-  }, []);
+  const setPersonSelected = useCallback(
+    (personId: string, isSelected: boolean) => {
+      setSelectedPersonIds((previousPersonIds) => {
+        const personIdsWithoutTarget = previousPersonIds.filter(
+          (previousPersonId) => previousPersonId !== personId,
+        );
+
+        return isSelected
+          ? [...personIdsWithoutTarget, personId]
+          : personIdsWithoutTarget;
+      });
+    },
+    [],
+  );
+
+  const excludeRecipient = useCallback(
+    (personId: string) => {
+      setPersonSelected(personId, false);
+    },
+    [setPersonSelected],
+  );
 
   const canSend =
     includedRecipients.length > 0 &&
@@ -206,6 +220,7 @@ export const useMassEmailComposerState = ({
 
     if (savedDraft !== null && draftCampaignId === undefined) {
       setDraftCampaignId(savedDraft.campaignId);
+      onDraftCreated?.(savedDraft.campaignId);
     }
 
     return savedDraft?.campaignId ?? draftCampaignId;
@@ -214,6 +229,7 @@ export const useMassEmailComposerState = ({
     connectedAccountId,
     draftCampaignId,
     includedRecipients,
+    onDraftCreated,
     recipientsLoading,
     saveDraft,
     subjectTemplate,
@@ -298,6 +314,8 @@ export const useMassEmailComposerState = ({
     setSubjectTemplate,
     bodyTemplate,
     setBodyTemplate,
+    selectedPersonIds,
+    setPersonSelected,
     recipients,
     includedRecipients,
     skippedWithoutEmail,

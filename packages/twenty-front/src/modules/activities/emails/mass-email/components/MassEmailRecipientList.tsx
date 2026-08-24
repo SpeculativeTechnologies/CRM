@@ -1,6 +1,7 @@
 import { styled } from '@linaria/react';
 import { useState } from 'react';
 
+import { MassEmailAddPeopleButton } from '@/activities/emails/mass-email/components/MassEmailAddPeopleButton';
 import { type MassEmailComposerState } from '@/activities/emails/mass-email/hooks/useMassEmailComposerState';
 import { massEmailRelatedSourceState } from '@/activities/emails/mass-email/states/massEmailRelatedSourceState';
 import { formatSkippedLabels } from '@/activities/emails/mass-email/utils/formatSkippedLabels';
@@ -219,6 +220,10 @@ export const MassEmailRecipientList = ({
           <StyledHint>{t`No recipients match your search.`}</StyledHint>
         )}
       </StyledList>
+      <MassEmailAddPeopleButton
+        selectedPersonIds={composerState.selectedPersonIds}
+        onPersonSelected={composerState.setPersonSelected}
+      />
       {composerState.skippedWithoutEmail.length > 0 && (
         <StyledHint>
           {t`No email address, skipped: ${formatSkippedLabels(
