@@ -58,17 +58,25 @@ gh_count() {
 report_conflict() {
   local behind="$1" conflicts="$2" body
 
-  body="$(printf 'Weekly upstream sync could not merge twentyhq/twenty main (%s commits behind) — manual merge needed:\n\n```\ngit fetch upstream && git switch -c sync/upstream-manual main && git merge upstream/main\n```\n\nReal code conflicts (locale catalogs and generated GraphQL types are excluded — resolve those by taking upstream and regenerating afterwards):\n```\n%s\n```\n\nSee the "weekly upstream sync playbook" (PR #93 and #135 bodies) for how past conflicts in these files were resolved.\n' \
+  body="$(printf 'Weekly upstream sync could not merge twentyhq/twenty main (%s commits behind) — manual merge needed:\n\n```\ngit fetch upstream && git switch -c sync/upstream-manual main && git merge upstream/main\n```\n\nReal code conflicts (locale catalogs, generated GraphQL types, and jest snapshots are excluded — resolve those by taking upstream and regenerating afterwards):\n```\n%s\n```\n\nSee the "weekly upstream sync playbook" (PR #93 and #135 bodies) for how past conflicts in these files were resolved.\n' \
     "$behind" "$conflicts")"
 
-  # Only suppress a duplicate when we can CONFIRM one is already open. If the
-  # query itself fails, report anyway — a duplicate beats silence.
-  local open_issues
-  open_issues="$(gh_count issue list -R "$REPO" --state open \
-    --search 'Upstream sync conflict in:title' --json number --jq length)"
-  if [ "${open_issues:-0}" -gt 0 ]; then
-    log "CONFLICT: issue already open — skipping duplicate"
-    return 0
+  # A conflict issue can stay open across weeks (2026-08-24: #133 was resolved
+  # by PR #135 but never closed, and this function skipped reporting a brand
+  # new conflict). Comment on the open issue instead of staying silent; only
+  # skip when the lookup itself fails AND creation also fails below.
+  local open_issue_number
+  open_issue_number="$(gh issue list -R "$REPO" --state open \
+    --search 'Upstream sync conflict in:title' \
+    --json number --jq '.[0].number // empty' 2>/dev/null)"
+  if [[ "$open_issue_number" =~ ^[0-9]+$ ]]; then
+    if gh issue comment "$open_issue_number" -R "$REPO" \
+         --body "$(printf 'New conflict on the %s run (the issue above is from an earlier week — close it once its merge lands).\n\n%s' "$(date +%Y-%m-%d)" "$body")" \
+         >/dev/null 2>&1; then
+      log "CONFLICT: commented on already-open issue #$open_issue_number"
+      return 0
+    fi
+    log "CONFLICT: issue #$open_issue_number is open but commenting failed — trying a new issue"
   fi
 
   if gh issue create -R "$REPO" \
@@ -128,7 +136,9 @@ trap cleanup EXIT
 cd "$WORKTREE"
 git switch --quiet -c "$BRANCH"
 
-if git merge --no-edit upstream/main >/dev/null 2>&1; then
+# merge.ours.driver enables the `CLAUDE.md merge=ours` attribute (the fork's
+# file always wins); the union attributes in .gitattributes need no config.
+if git -c merge.ours.driver=true merge --no-edit upstream/main >/dev/null 2>&1; then
   # Flag schema-touching changes so the reviewer knows a DB migration rides along.
   SCHEMA_CHANGES=$(git diff --name-only origin/main..upstream/main -- \
     'packages/twenty-server/src/database' '**/*.entity.ts' | head -20)
@@ -156,6 +166,7 @@ else
     'packages/twenty-front/src/locales'
     'packages/twenty-server/src/engine/core-modules/i18n/locales'
     'packages/twenty-front/src/generated-metadata/graphql.ts'
+    '*__snapshots__*'
   )
 
   # Hundreds of back-to-back index writes can trip over a not-yet-released
@@ -205,7 +216,7 @@ else
   fi
   if ! gh pr create -R "$REPO" --base main --head "$BRANCH" \
     --title "Sync upstream twentyhq/twenty ($BEHIND commits, regeneration needed)" \
-    --body "$(printf 'Automated weekly upstream sync (%s upstream commits). Only locale catalogs and generated GraphQL types conflicted; they were resolved by taking upstream, so the fork'"'"'s strings and types are MISSING until regenerated.\n\n**Do not merge yet — check out this branch and push a regeneration commit first:**\n\n```\nnpx nx run twenty-front:lingui:extract && npx nx run twenty-front:lingui:compile\nnpx nx run twenty-server:lingui:extract && npx nx run twenty-server:lingui:compile\n# with a dev server running against the merged code:\nnpx nx run twenty-front:graphql:generate --configuration=metadata\n```\n\nCI is expected to fail until that commit lands. Then verify per deploy/TEAM-WORKFLOW.md as usual.' \
+    --body "$(printf 'Automated weekly upstream sync (%s upstream commits). Only locale catalogs, generated GraphQL types, and jest snapshots conflicted; they were resolved by taking upstream, so the fork'"'"'s strings, types, and snapshot expectations are MISSING until regenerated.\n\n**Do not merge yet — check out this branch and push a regeneration commit first:**\n\n```\nnpx nx run twenty-front:lingui:extract && npx nx run twenty-front:lingui:compile\nnpx nx run twenty-server:lingui:extract && npx nx run twenty-server:lingui:compile\n# with a dev server running against the merged code:\nnpx nx run twenty-front:graphql:generate --configuration=metadata\n# if snapshots conflicted, re-record the affected suites:\nnpx jest -u <failing suites>\n```\n\nCI is expected to fail until that commit lands. Then verify per deploy/TEAM-WORKFLOW.md as usual.' \
       "$BEHIND")"; then
     log "FAIL: pushed $BRANCH but could not open the PR — open it by hand"
     notify "Upstream sync branch pushed but the PR was not created"
