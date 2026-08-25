@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
 import { TWENTY_STANDARD_APPLICATION_UNIVERSAL_IDENTIFIER } from 'twenty-shared/application';
-import { FeatureFlagKey } from 'twenty-shared/types';
 import { isDefined } from 'twenty-shared/utils';
 import { type EntityMetadata, EntitySchema, Repository } from 'typeorm';
 import { EntitySchemaTransformer } from 'typeorm/entity-schema/EntitySchemaTransformer';
@@ -14,10 +13,9 @@ import { ApplicationEntity } from 'src/engine/core-modules/application/applicati
 import { FieldMetadataEntity } from 'src/engine/metadata-modules/field-metadata/field-metadata.entity';
 import { ObjectMetadataEntity } from 'src/engine/metadata-modules/object-metadata/object-metadata.entity';
 import { EntitySchemaFactory } from 'src/engine/twenty-orm/factories/entity-schema.factory';
-import { GlobalWorkspaceOrmManager } from 'src/engine/twenty-orm/global-workspace-datasource/global-workspace-orm.manager';
+import { GlobalWorkspaceDataSourceService } from 'src/engine/twenty-orm/global-workspace-datasource/global-workspace-datasource.service';
 import { buildEntitySchemaMetadataMaps } from 'src/engine/twenty-orm/global-workspace-datasource/types/entity-schema-metadata.type';
 import { WorkspaceCache } from 'src/engine/workspace-cache/decorators/workspace-cache.decorator';
-import { WorkspaceCacheService } from 'src/engine/workspace-cache/services/workspace-cache.service';
 
 @Injectable()
 @WorkspaceCache('ORMEntityMetadatas', {
@@ -35,22 +33,16 @@ export class WorkspaceORMEntityMetadatasCacheService extends WorkspaceCacheProvi
     @InjectRepository(ApplicationEntity)
     private readonly applicationRepository: Repository<ApplicationEntity>,
     private readonly entitySchemaFactory: EntitySchemaFactory,
-    private readonly globalWorkspaceOrmManager: GlobalWorkspaceOrmManager,
-    private readonly workspaceCacheService: WorkspaceCacheService,
+    private readonly globalWorkspaceDataSourceService: GlobalWorkspaceDataSourceService,
   ) {
     super();
   }
 
+  // Fork: upstream stubbed this out to [] when it collapsed onto ORM v2, but
+  // fork machinery that still consumes the v1 data source (record label
+  // formula recomputes) needs the metadata graph. Delete once those consumers
+  // run on ORM v2.
   async computeForCache(workspaceId: string): Promise<EntityMetadata[]> {
-    const { featureFlagsMap } = await this.workspaceCacheService.getOrRecompute(
-      workspaceId,
-      ['featureFlagsMap'],
-    );
-
-    if (featureFlagsMap[FeatureFlagKey.IS_ORM_V2_READ_PATH_ENABLED]) {
-      return [];
-    }
-
     const [objectMetadatas, fieldMetadatas, twentyStandardApplication] =
       await Promise.all([
         this.objectMetadataRepository.find({
@@ -99,8 +91,11 @@ export class WorkspaceORMEntityMetadatasCacheService extends WorkspaceCacheProvi
     const transformer = new EntitySchemaTransformer();
     const metadataArgsStorage = transformer.transform(entitySchemas);
 
+    // Straight to the data source service: going through the orm manager
+    // would re-enter ensureEntityMetadatasLoaded and deadlock on the cache
+    // entry this method is computing.
     const dataSource =
-      await this.globalWorkspaceOrmManager.getGlobalWorkspaceDataSource();
+      this.globalWorkspaceDataSourceService.getGlobalWorkspaceDataSource();
     const entityMetadataBuilder = new EntityMetadataBuilder(
       dataSource,
       metadataArgsStorage,

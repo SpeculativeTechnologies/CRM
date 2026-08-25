@@ -32,6 +32,7 @@ export enum AppPath {
   EmailsNew = '/emails/new',
   EmailsCampaign = '/emails/:campaignId',
   Duplicates = '/duplicates',
+  WorkflowCoreIndexPage = '/workflow-core',
 
   Settings = `settings`,
   SettingsCatchAll = `/${Settings}/*`,

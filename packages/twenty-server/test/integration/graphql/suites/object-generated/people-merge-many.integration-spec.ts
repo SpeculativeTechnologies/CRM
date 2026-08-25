@@ -2,7 +2,6 @@ import { randomUUID } from 'crypto';
 
 import { PERSON_GQL_FIELDS } from 'test/integration/constants/person-gql-fields.constants';
 import { createManyOperationFactory } from 'test/integration/graphql/utils/create-many-operation-factory.util';
-import { createOneOperationFactory } from 'test/integration/graphql/utils/create-one-operation-factory.util';
 import { createOneOperation } from 'test/integration/graphql/utils/create-one-operation.util';
 import { findManyOperationFactory } from 'test/integration/graphql/utils/find-many-operation-factory.util';
 import { findOneOperationFactory } from 'test/integration/graphql/utils/find-one-operation-factory.util';
@@ -90,21 +89,20 @@ describe('people merge resolvers (integration)', () => {
 
       createdPersonIdsForCleaning.push(priorityPerson.id, duplicatePerson.id);
 
-      const createTimelineActivityResponse = await makeGraphqlAPIRequest(
-        createOneOperationFactory({
-          objectMetadataSingularName: 'timelineActivity',
-          gqlFields: 'id targetPersonId',
-          data: {
-            happensAt: new Date().toISOString(),
-            targetPersonId: duplicatePerson.id,
-          },
-        }),
+      // Creating a timeline activity through the API now requires a timeline
+      // activity type; the merge under test only cares that a row targets the
+      // duplicate person, so insert it directly.
+      const timelineActivity = {
+        id: randomUUID(),
+        targetPersonId: duplicatePerson.id,
+      };
+
+      await global.testDataSource.query(
+        `INSERT INTO "${TEST_SCHEMA_NAME}"."timelineActivity"
+           ("id", "targetPersonId", "name", "happensAt")
+         VALUES ($1, $2, 'message.linked', now())`,
+        [timelineActivity.id, timelineActivity.targetPersonId],
       );
-
-      expect(createTimelineActivityResponse.body.errors).toBeUndefined();
-
-      const timelineActivity =
-        createTimelineActivityResponse.body.data.createTimelineActivity;
 
       const mergeResponse = await makeGraphqlAPIRequest(
         mergeManyOperationFactory({
@@ -836,6 +834,8 @@ describe('people merge resolvers (integration)', () => {
         distinctSourceTimelineActivityId,
       );
 
+      // Direct insert: the create API now requires a timeline activity type,
+      // and this test only exercises how the merge deduplicates existing rows.
       const createTimelineActivity = async ({
         id,
         targetPersonId,
@@ -845,18 +845,13 @@ describe('people merge resolvers (integration)', () => {
         targetPersonId: string;
         happensAt: string;
       }) =>
-        createOneOperation({
-          objectMetadataSingularName: 'timelineActivity',
-          input: {
-            id,
-            targetPersonId,
-            happensAt,
-            name: 'message.linked',
-            properties: {},
-            linkedRecordCachedName: '',
-            linkedRecordId,
-          },
-        });
+        global.testDataSource.query(
+          `INSERT INTO "${TEST_SCHEMA_NAME}"."timelineActivity"
+             ("id", "targetPersonId", "name", "happensAt", "properties",
+              "linkedRecordCachedName", "linkedRecordId")
+           VALUES ($1, $2, 'message.linked', $3, '{}'::jsonb, '', $4)`,
+          [id, targetPersonId, happensAt, linkedRecordId],
+        );
 
       await Promise.all([
         createTimelineActivity({

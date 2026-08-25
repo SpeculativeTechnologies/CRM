@@ -17,6 +17,10 @@ import { type WorkspaceInternalContext } from 'src/engine/twenty-orm/interfaces/
 import { formatData } from 'src/engine/twenty-orm/utils/format-data.util';
 import { formatResult } from 'src/engine/twenty-orm/utils/format-result.util';
 import { formatTwentyOrmEventToDatabaseBatchEvent } from 'src/engine/twenty-orm/utils/format-twenty-orm-event-to-database-batch-event.util';
+import {
+  getUpdateEventRecords,
+  mergeRecordsWithUpdateValues,
+} from 'src/engine/twenty-orm/utils/merge-records-with-update-values.util';
 import { renderRowLevelPermissionFilterToSql } from 'src/engine/twenty-orm/utils/render-row-level-permission-filter-to-sql.util';
 import { resolveRowLevelPermissionRecordFilter } from 'src/engine/twenty-orm/utils/resolve-row-level-permission-record-filter.util';
 import { validateRLSPredicatesForRecords } from 'src/engine/twenty-orm/utils/validate-rls-predicates-for-records.util';
@@ -56,6 +60,10 @@ import {
   matchEntitiesForUpsert,
   partitionEntitiesForSave,
 } from 'src/engine/twenty-orm-v2/repository/utils/resolve-save-and-upsert.util';
+import {
+  getUpdateEventColumnsToReturn,
+  mergeReturnedUpdateTimestamps,
+} from 'src/engine/twenty-orm-v2/repository/utils/update-event-records.util';
 import { WorkspaceSelectQueryBuilderV2 } from 'src/engine/twenty-orm-v2/query-builder/workspace-select-query-builder-v2';
 import { compileNamedParameters } from 'src/engine/twenty-orm-v2/sql/utils/compile-named-parameters.util';
 import { escapeIdentifier } from 'src/engine/workspace-manager/workspace-migration/utils/remove-sql-injection.util';
@@ -150,6 +158,22 @@ export class WorkspaceRepositoryV2 {
       records,
       this.options.flatObjectMetadata,
       this.options.internalContext.flatObjectMetadataMaps,
+      this.options.internalContext.flatFieldMetadataMaps,
+    );
+  }
+
+  // TypeORM drops undefined properties before it validates or writes anything;
+  // strip them here so they neither throw on an unknown field nor bind as NULL
+  private formatWriteData(
+    data: Partial<ObjectRecord>,
+  ): Record<string, unknown> {
+    const definedData = Object.fromEntries(
+      Object.entries(data).filter(([, value]) => value !== undefined),
+    );
+
+    return formatData(
+      definedData,
+      this.options.flatObjectMetadata,
       this.options.internalContext.flatFieldMetadataMaps,
     );
   }
@@ -929,6 +953,10 @@ export class WorkspaceRepositoryV2 {
     const recordsBefore: ObjectRecord[] = [];
     const recordsAfter: ObjectRecord[] = [];
     const generatedMaps: ObjectRecord[] = [];
+    const updateEventColumnsToReturn = getUpdateEventColumnsToReturn(
+      columnsToReturn,
+      this.options.tableShape,
+    );
 
     const rawBeforeByInputIndex: ObjectRecord[][] = [];
     const existingRecordsMapById: Record<string, ObjectRecord> = {};
@@ -972,10 +1000,8 @@ export class WorkspaceRepositoryV2 {
     }
 
     for (const [index, input] of inputs.entries()) {
-      const { id: _id, ...setColumns } = formatData(
+      const { id: _id, ...setColumns } = this.formatWriteData(
         dataByInputIndex[index],
-        this.options.flatObjectMetadata,
-        this.options.internalContext.flatFieldMetadataMaps,
       );
 
       this.validateWriteIsPermitted({
@@ -1004,17 +1030,25 @@ export class WorkspaceRepositoryV2 {
       const result = await selectQueryBuilder
         .update()
         .set(setColumns)
-        .returning(columnsToReturn)
+        .returning(updateEventColumnsToReturn)
         .execute();
 
       generatedMaps.push(...(result.generatedMaps as ObjectRecord[]));
 
+      const recordsAfterWrite = await this.buildIdsEventSnapshotQueryBuilder([
+        input.id,
+      ]).getMany<ObjectRecord>({
+        noFormatting: true,
+      });
+
       recordsAfter.push(
-        ...(await this.buildIdsEventSnapshotQueryBuilder([
-          input.id,
-        ]).getMany<ObjectRecord>({
-          noFormatting: true,
-        })),
+        ...mergeReturnedUpdateTimestamps(
+          mergeRecordsWithUpdateValues(
+            getUpdateEventRecords(rawBeforeForInput, recordsAfterWrite),
+            setColumns,
+          ),
+          result.generatedMaps as ObjectRecord[],
+        ),
       );
     }
 
@@ -1039,11 +1073,7 @@ export class WorkspaceRepositoryV2 {
     formattedRecords: Record<string, unknown>[];
   } {
     const formattedRecords = records.map((record) =>
-      formatData(
-        record,
-        this.options.flatObjectMetadata,
-        this.options.internalContext.flatFieldMetadataMaps,
-      ),
+      this.formatWriteData(record),
     );
 
     const columnNameSet = new Set<string>();
@@ -1216,14 +1246,13 @@ export class WorkspaceRepositoryV2 {
       }
     }
 
-    const setColumns =
-      kind === 'update' && isDefined(dataToWrite)
-        ? formatData(
-            dataToWrite,
-            this.options.flatObjectMetadata,
-            this.options.internalContext.flatFieldMetadataMaps,
-          )
-        : undefined;
+    let setColumns: Record<string, unknown> | undefined;
+
+    if (kind === 'update' && isDefined(dataToWrite)) {
+      const { id: _id, ...columns } = this.formatWriteData(dataToWrite);
+
+      setColumns = columns;
+    }
 
     this.validateWriteIsPermitted({
       operationType: kind,
@@ -1243,7 +1272,13 @@ export class WorkspaceRepositoryV2 {
     const mutationResult = await this.morphAndExecute({
       selectQueryBuilder,
       kind,
-      columnsToReturn,
+      columnsToReturn:
+        kind === 'update'
+          ? getUpdateEventColumnsToReturn(
+              columnsToReturn,
+              this.options.tableShape,
+            )
+          : columnsToReturn,
       setColumns,
     });
 
@@ -1251,12 +1286,23 @@ export class WorkspaceRepositoryV2 {
       await this.filesFieldSync.updateFileEntityRecords(filesFieldFileIds);
     }
 
-    const recordsAfter =
+    const recordsAfterWrite =
       kind === 'delete'
         ? undefined
         : await eventSelectQueryBuilder.getMany<ObjectRecord>({
             noFormatting: true,
           });
+
+    const recordsAfter =
+      kind === 'update' && isDefined(setColumns)
+        ? mergeReturnedUpdateTimestamps(
+            mergeRecordsWithUpdateValues(
+              getUpdateEventRecords(recordsBefore, recordsAfterWrite ?? []),
+              setColumns,
+            ),
+            mutationResult.generatedMaps,
+          )
+        : recordsAfterWrite;
 
     this.emitMutationEvent({ kind, recordsBefore, recordsAfter });
 

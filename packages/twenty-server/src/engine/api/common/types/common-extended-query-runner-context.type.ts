@@ -13,9 +13,11 @@ export type CommonExtendedQueryRunnerContext = Omit<
   'authContext'
 > & {
   authContext: WorkspaceAuthContext;
+  // Fork: the TypeORM data source stays available for paths that still need
+  // v1 transactions (person merge) and for record label formula recomputes.
+  workspaceDataSource: GlobalWorkspaceDataSource;
   rolePermissionConfig: RolePermissionConfig;
   repository: WorkspaceRepository<ObjectLiteral>;
   commonQueryParser: GraphqlQueryParser;
-  workspaceDataSource: GlobalWorkspaceDataSource;
   featureFlagsMap: Record<FeatureFlagKey, boolean>;
 };
