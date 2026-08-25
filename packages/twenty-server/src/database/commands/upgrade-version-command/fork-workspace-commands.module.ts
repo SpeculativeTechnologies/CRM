@@ -14,7 +14,10 @@ import { AddComposeEmailToRelatedPeopleCommandMenuItemCommand } from 'src/databa
 import { BackfillMissingLabelIdentifierViewFieldsCommand } from 'src/database/commands/upgrade-version-command/2-32/2-32-workspace-command-1786838400000-backfill-missing-label-identifier-view-fields.command';
 import { MakeRequiredFieldsWithoutDefaultsOptionalCommand } from 'src/database/commands/upgrade-version-command/2-32/2-32-workspace-command-1786900000000-make-required-fields-without-defaults-optional.command';
 import { AddMessageDeliveryStatusFieldCommand } from 'src/database/commands/upgrade-version-command/2-32/2-32-workspace-command-1787262000000-add-message-delivery-status-field.command';
+import { ForkRunMissedWorkspaceCommandsCommand } from 'src/database/commands/upgrade-version-command/fork-run-missed-workspace-commands.command';
 import { ApplicationModule } from 'src/engine/core-modules/application/application.module';
+import { UpgradeStatusModule } from 'src/engine/core-modules/upgrade/upgrade-status.module';
+import { WorkspaceVersionModule } from 'src/engine/workspace-manager/workspace-version/workspace-version.module';
 import { FieldMetadataEntity } from 'src/engine/metadata-modules/field-metadata/field-metadata.entity';
 import { WorkspaceCacheModule } from 'src/engine/workspace-cache/workspace-cache.module';
 import { WorkspaceMigrationRunnerModule } from 'src/engine/workspace-manager/workspace-migration/workspace-migration-runner/workspace-migration-runner.module';
@@ -29,6 +32,8 @@ import { ConnectionModule } from 'src/modules/connection/connection.module';
 @Module({
   imports: [
     ApplicationModule,
+    UpgradeStatusModule,
+    WorkspaceVersionModule,
     ConnectionModule,
     TypeOrmModule.forFeature([FieldMetadataEntity]),
     WorkspaceCacheModule,
@@ -49,6 +54,7 @@ import { ConnectionModule } from 'src/modules/connection/connection.module';
     MakeRequiredFieldsWithoutDefaultsOptionalCommand,
     BackfillMissingLabelIdentifierViewFieldsCommand,
     AddMessageDeliveryStatusFieldCommand,
+    ForkRunMissedWorkspaceCommandsCommand,
   ],
 })
 export class ForkWorkspaceCommandsModule {}
