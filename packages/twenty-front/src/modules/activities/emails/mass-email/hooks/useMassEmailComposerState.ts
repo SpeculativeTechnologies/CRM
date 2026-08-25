@@ -272,15 +272,15 @@ export const useMassEmailComposerState = ({
     }
 
     setDraftSaveStatus('saving');
-    // The Cc list is not part of the saved draft yet: messageCampaign has no
-    // column for it, so persisting it needs a standard field plus a workspace
-    // upgrade command. Until then a reloaded draft comes back without Cc.
     const savedDraft = await saveDraft({
       campaignId: draftCampaignId,
       connectedAccountId,
       personIds: includedRecipients.map(({ personId }) => personId),
       subject: subjectTemplate,
       body: bodyTemplate,
+      // Only the shared list is persisted, matching subject and body: the
+      // per-recipient overrides have never been part of the saved draft.
+      cc: ccTemplate.map((ccRecipient) => ccRecipient.address.trim()),
     });
 
     setDraftSaveStatus(savedDraft === null ? 'error' : 'saved');
@@ -293,6 +293,7 @@ export const useMassEmailComposerState = ({
     return savedDraft?.campaignId ?? draftCampaignId;
   }, [
     bodyTemplate,
+    ccTemplate,
     connectedAccountId,
     draftCampaignId,
     includedRecipients,

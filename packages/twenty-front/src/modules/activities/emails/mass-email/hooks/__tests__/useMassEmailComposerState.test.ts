@@ -90,6 +90,7 @@ describe('useMassEmailComposerState', () => {
       personIds: ['person-1'],
       subject: '',
       body: '',
+      cc: [],
     });
     expect(onDraftCreated).toHaveBeenCalledWith('campaign-1');
   });
@@ -137,6 +138,7 @@ describe('useMassEmailComposerState', () => {
       personIds: ['person-1', 'person-2'],
       subject: 'Hello {first_name}',
       body: '<p>Hi {full_name}</p>',
+      cc: [],
     });
   });
 
@@ -366,6 +368,47 @@ describe('useMassEmailComposerState', () => {
       result.current.maxRecipients + 1,
     );
     expect(result.current.canSend).toBe(false);
+  });
+
+  it('saves the shared cc list on the draft', async () => {
+    const { result } = renderHook(() =>
+      useMassEmailComposerState({
+        connectedAccountId: 'account-1',
+        personIds: ['person-1'],
+        initialDraft: {
+          campaignId: 'campaign-1',
+          subject: 'Hello',
+          body: '<p>Hello</p>',
+        },
+      }),
+    );
+
+    act(() => {
+      result.current.setCcTemplate([
+        { address: 'boss@example.com' },
+        { address: 'assistant@example.com' },
+      ]);
+    });
+
+    act(() => {
+      result.current.setRecipientCc('person-1', [
+        { address: 'someone-else@example.com' },
+      ]);
+    });
+
+    await act(async () => {
+      await result.current.saveCurrentDraft();
+    });
+
+    // Per-recipient overrides are not persisted, matching subject and body.
+    expect(saveDraftMock).toHaveBeenLastCalledWith({
+      campaignId: 'campaign-1',
+      connectedAccountId: 'account-1',
+      personIds: ['person-1'],
+      subject: 'Hello',
+      body: '<p>Hello</p>',
+      cc: ['boss@example.com', 'assistant@example.com'],
+    });
   });
 
   it('restores a cc list from an existing draft and reveals the field', () => {

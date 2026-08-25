@@ -77,6 +77,7 @@ export class SendEmailResolver {
       personIds: input.personIds,
       subject: input.subject,
       body: input.body,
+      cc: input.cc,
       fromAddress: connectedAccount.handle,
     });
   }

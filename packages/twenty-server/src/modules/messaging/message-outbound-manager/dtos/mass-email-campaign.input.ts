@@ -49,6 +49,16 @@ export class SaveMassEmailCampaignDraftInput {
   @IsOptional()
   @IsString()
   body?: string;
+
+  // A draft holds work in progress, so a half-typed address is stored rather
+  // than rejected; addresses are validated when the campaign is sent.
+  @Field(() => [String], { nullable: true })
+  @IsOptional()
+  @IsArray()
+  @ArrayMaxSize(MAX_CC_RECIPIENTS_PER_EMAIL)
+  @IsString({ each: true })
+  @Length(0, 320, { each: true })
+  cc?: string[];
 }
 
 @InputType()

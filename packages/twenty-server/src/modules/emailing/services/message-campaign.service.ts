@@ -409,6 +409,7 @@ export class MessageCampaignService {
     personIds,
     subject,
     body,
+    cc,
     fromAddress,
   }: {
     workspaceId: string;
@@ -418,6 +419,7 @@ export class MessageCampaignService {
     personIds: string[];
     subject?: string | null;
     body?: string | null;
+    cc?: string[] | null;
     fromAddress: string;
   }): Promise<{ campaignId: string; updatedAt: Date }> {
     const roleId = await this.userRoleService.getRoleIdForUserWorkspace({
@@ -494,9 +496,13 @@ export class MessageCampaignService {
         );
 
         const now = new Date();
+        const ccAddresses = (cc ?? [])
+          .map((ccAddress) => ccAddress.trim())
+          .filter((ccAddress) => ccAddress.length > 0);
         const campaignValues = {
           subject: subject?.trim().length ? subject : null,
           bodyTemplate: body?.length ? body : null,
+          ccAddresses: ccAddresses.length > 0 ? ccAddresses.join(', ') : null,
           fromAddress: {
             primaryEmail: fromAddress.trim(),
             additionalEmails: null,

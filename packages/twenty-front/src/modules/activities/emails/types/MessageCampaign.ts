@@ -48,6 +48,7 @@ export type MessageCampaignRecipient = {
 
 export type MessageCampaignDetails = MessageCampaignSummary & {
   body: string | null;
+  ccAddresses: string | null;
   unsubscribeTopicId: string | null;
   canEdit: boolean;
   draftPersonIds: string[];

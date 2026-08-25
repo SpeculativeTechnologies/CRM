@@ -14,6 +14,7 @@ import { AddComposeEmailToRelatedPeopleCommandMenuItemCommand } from 'src/databa
 import { BackfillMissingLabelIdentifierViewFieldsCommand } from 'src/database/commands/upgrade-version-command/2-32/2-32-workspace-command-1786838400000-backfill-missing-label-identifier-view-fields.command';
 import { MakeRequiredFieldsWithoutDefaultsOptionalCommand } from 'src/database/commands/upgrade-version-command/2-32/2-32-workspace-command-1786900000000-make-required-fields-without-defaults-optional.command';
 import { AddMessageDeliveryStatusFieldCommand } from 'src/database/commands/upgrade-version-command/2-32/2-32-workspace-command-1787262000000-add-message-delivery-status-field.command';
+import { AddMessageCampaignCcAddressesFieldCommand } from 'src/database/commands/upgrade-version-command/2-35/2-35-workspace-command-1787600000000-add-message-campaign-cc-addresses-field.command';
 import { ForkRunMissedWorkspaceCommandsCommand } from 'src/database/commands/upgrade-version-command/fork-run-missed-workspace-commands.command';
 import { ApplicationModule } from 'src/engine/core-modules/application/application.module';
 import { UpgradeStatusModule } from 'src/engine/core-modules/upgrade/upgrade-status.module';
@@ -54,6 +55,7 @@ import { ConnectionModule } from 'src/modules/connection/connection.module';
     MakeRequiredFieldsWithoutDefaultsOptionalCommand,
     BackfillMissingLabelIdentifierViewFieldsCommand,
     AddMessageDeliveryStatusFieldCommand,
+    AddMessageCampaignCcAddressesFieldCommand,
     ForkRunMissedWorkspaceCommandsCommand,
   ],
 })

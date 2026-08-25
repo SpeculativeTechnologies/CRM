@@ -11,6 +11,7 @@ type SaveMassEmailCampaignDraftInput = {
   personIds: string[];
   subject?: string;
   body?: string;
+  cc?: string[];
 };
 
 export const useMassEmailCampaignDraft = () => {
