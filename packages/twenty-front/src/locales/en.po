@@ -1433,6 +1433,16 @@ msgstr "Add menu item before"
 msgid "Add Model"
 msgstr "Add Model"
 
+#. js-lingui-id: 4H+G/6
+#: src/modules/activities/emails/signature/components/EmailSignatureToggleRow.tsx
+msgid "Add my signature"
+msgstr "Add my signature"
+
+#. js-lingui-id: 1jFlXn
+#: src/modules/settings/profile/components/SettingsProfileEmailSignature.tsx
+msgid "Add my signature to new emails by default"
+msgstr "Add my signature to new emails by default"
+
 #. js-lingui-id: Hkobke
 #: src/modules/object-record/record-board/record-board-column/components/RecordBoardColumnHeader.tsx
 #: src/modules/object-record/record-list/components/RecordListAddNew.tsx
@@ -7462,6 +7472,11 @@ msgstr "Email sent successfully"
 #: src/modules/settings/billing/constants/SettingsBillingPlanComparisonRows.ts
 msgid "Email sharing"
 msgstr "Email sharing"
+
+#. js-lingui-id: iSMIhW
+#: src/pages/settings/profile/SettingsProfile.tsx
+msgid "Email signature"
+msgstr "Email signature"
 
 #. js-lingui-id: jvneza
 #: src/modules/settings/applications/components/SettingsApplicationAboutSidebar.tsx
@@ -14371,6 +14386,11 @@ msgstr "Objects and fields permissions settings"
 msgid "of"
 msgstr "of"
 
+#. js-lingui-id: EZxOWJ
+#: src/modules/settings/profile/components/SettingsProfileEmailSignature.tsx
+msgid "Off by default. You can still switch the signature on or off for each email you write."
+msgstr "Off by default. You can still switch the signature on or off for each email you write."
+
 #. js-lingui-id: KNz3EF
 #: src/pages/not-found/NotFound.tsx
 msgid "Off the beaten path"
@@ -18128,6 +18148,11 @@ msgstr "Sign-up is temporarily unavailable during maintenance."
 #: src/pages/settings/legal/SettingsLegalDpaNew.tsx
 msgid "Signatory title"
 msgstr "Signatory title"
+
+#. js-lingui-id: 0rl8O6
+#: src/pages/settings/profile/SettingsProfile.tsx
+msgid "Signature you can add to the emails you write from Twenty"
+msgstr "Signature you can add to the emails you write from Twenty"
 
 #. js-lingui-id: Lz4j8Q
 #: src/modules/settings/legal/components/SettingsDpaAgreementRow.tsx
@@ -22676,6 +22701,11 @@ msgstr "Your handler receives this object. The body is empty because GET request
 #: src/pages/settings/profile/SettingsProfile.tsx
 msgid "Your name as it will be displayed"
 msgstr "Your name as it will be displayed"
+
+#. js-lingui-id: ZV7dVk
+#: src/modules/settings/profile/components/SettingsProfileEmailSignature.tsx
+msgid "Your name, role, and anything else you want at the end of your emails"
+msgstr "Your name, role, and anything else you want at the end of your emails"
 
 #. js-lingui-id: 8mfOAZ
 #: src/modules/settings/billing/components/AddPaymentMethodForm.tsx

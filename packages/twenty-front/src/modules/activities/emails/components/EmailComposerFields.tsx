@@ -11,6 +11,7 @@ import { ComposerFieldRow } from '@/activities/components/ComposerFieldRow';
 import { ComposerHeader } from '@/activities/components/ComposerHeader';
 import { StyledComposerTextInput } from '@/activities/components/ComposerTextInput';
 import { EmailAttachmentsField } from '@/activities/emails/components/EmailAttachmentsField';
+import { EmailSignatureToggleRow } from '@/activities/emails/signature/components/EmailSignatureToggleRow';
 import { INLINE_EMAIL_BODY_EDITOR_PROFILE } from '@/activities/emails/editor/constants/InlineEmailBodyEditorProfile';
 import { useUploadEmailImage } from '@/activities/emails/hooks/useUploadEmailImage';
 import { EmailRecipientsFieldInput } from '@/activities/emails/recipients/components/EmailRecipientsFieldInput';
@@ -64,6 +65,11 @@ const StyledBody = styled.div`
   flex-direction: column;
   min-height: 0;
   padding: ${themeCssVariables.spacing[2]} ${themeCssVariables.spacing[3]};
+`;
+
+const StyledSignature = styled.div`
+  display: flex;
+  padding: 0 ${themeCssVariables.spacing[3]} ${themeCssVariables.spacing[2]};
 `;
 
 const StyledAttachments = styled.div`
@@ -288,13 +294,22 @@ export const EmailComposerFields = ({
       )}
       <StyledBody>
         <FormAdvancedTextFieldInput
-          defaultValue={composerState.initialBody}
+          key={composerState.bodyResyncKey}
+          defaultValue={composerState.body}
           onChange={composerState.setBody}
           placeholder={t`Type something or press "/" to see commands`}
           profile={INLINE_EMAIL_BODY_EDITOR_PROFILE}
           onImageUpload={uploadEmailImage}
         />
       </StyledBody>
+      {composerState.isSignatureToggleVisible && (
+        <StyledSignature>
+          <EmailSignatureToggleRow
+            isIncluded={composerState.isSignatureIncluded}
+            onChange={composerState.setSignatureIncluded}
+          />
+        </StyledSignature>
+      )}
       {(composerState.files.length > 0 || isDefined(onAttachFiles)) && (
         <StyledAttachments>
           {isDefined(onAttachFiles) && (

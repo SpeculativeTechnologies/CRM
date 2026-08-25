@@ -3363,6 +3363,12 @@ msgstr "El correu electrònic és obligatori. Proporcioneu una adreça de correu
 msgid "Email is unchanged."
 msgstr "El correu electrònic no ha canviat."
 
+#. js-lingui-id: tcEfxi
+#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-workspace-member-standard-flat-field-metadata.util.ts
+msgctxt "fieldMetadata.label"
+msgid "Email signature"
+msgstr ""
+
 #. js-lingui-id: su92Mw
 #: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-message-campaign-standard-flat-field-metadata.util.ts
 msgctxt "fieldMetadata.description"
@@ -9083,6 +9089,18 @@ msgstr "Configuració"
 msgid "Sign up is disabled."
 msgstr "El registre està desactivat."
 
+#. js-lingui-id: tF3AqN
+#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-workspace-member-standard-flat-field-metadata.util.ts
+msgctxt "fieldMetadata.label"
+msgid "Signature on by default"
+msgstr ""
+
+#. js-lingui-id: muyTrw
+#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-workspace-member-standard-flat-field-metadata.util.ts
+msgctxt "fieldMetadata.description"
+msgid "Signature this member can add to the emails they compose"
+msgstr ""
+
 #. js-lingui-id: 4AomZC
 #: src/engine/core-modules/auth/auth.exception.ts
 msgid "Single sign-on authentication failed."
@@ -11887,6 +11905,12 @@ msgstr "Quan la campanya va acabar d'enviar-se"
 msgctxt "fieldMetadata.description"
 msgid "Where records open for objects that follow the member's preference"
 msgstr "On s’obren els registres per als objectes que segueixen la preferència del membre"
+
+#. js-lingui-id: dACOxO
+#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-workspace-member-standard-flat-field-metadata.util.ts
+msgctxt "fieldMetadata.description"
+msgid "Whether new emails this member composes start with their signature"
+msgstr ""
 
 #. js-lingui-id: zSq4aO
 #: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-message-standard-flat-field-metadata.util.ts

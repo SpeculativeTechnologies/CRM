@@ -3363,6 +3363,12 @@ msgstr "E-postadress krävs. Ange en giltig e-postadress."
 msgid "Email is unchanged."
 msgstr "E-postadressen är oförändrad."
 
+#. js-lingui-id: tcEfxi
+#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-workspace-member-standard-flat-field-metadata.util.ts
+msgctxt "fieldMetadata.label"
+msgid "Email signature"
+msgstr ""
+
 #. js-lingui-id: su92Mw
 #: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-message-campaign-standard-flat-field-metadata.util.ts
 msgctxt "fieldMetadata.description"
@@ -9087,6 +9093,18 @@ msgstr "Inställningar"
 msgid "Sign up is disabled."
 msgstr "Registrering är inaktiverad."
 
+#. js-lingui-id: tF3AqN
+#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-workspace-member-standard-flat-field-metadata.util.ts
+msgctxt "fieldMetadata.label"
+msgid "Signature on by default"
+msgstr ""
+
+#. js-lingui-id: muyTrw
+#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-workspace-member-standard-flat-field-metadata.util.ts
+msgctxt "fieldMetadata.description"
+msgid "Signature this member can add to the emails they compose"
+msgstr ""
+
 #. js-lingui-id: 4AomZC
 #: src/engine/core-modules/auth/auth.exception.ts
 msgid "Single sign-on authentication failed."
@@ -11893,6 +11911,12 @@ msgstr "När kampanjen slutade skicka"
 msgctxt "fieldMetadata.description"
 msgid "Where records open for objects that follow the member's preference"
 msgstr "Var poster öppnas för objekt som följer medlemmens inställning"
+
+#. js-lingui-id: dACOxO
+#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-workspace-member-standard-flat-field-metadata.util.ts
+msgctxt "fieldMetadata.description"
+msgid "Whether new emails this member composes start with their signature"
+msgstr ""
 
 #. js-lingui-id: zSq4aO
 #: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-message-standard-flat-field-metadata.util.ts

@@ -1099,5 +1099,11 @@ export const STANDARD_OBJECT_FIELDS = {
     numberFormat: {
       universalIdentifier: '20202020-7f40-4e7f-b126-11c0eda6b141',
     },
+    emailSignature: {
+      universalIdentifier: '20202020-3f7a-4d21-b8c5-1e9d4a6c73f2',
+    },
+    isEmailSignatureIncludedByDefault: {
+      universalIdentifier: '20202020-9c14-4e86-a7d3-52b8f0c1a4e7',
+    },
   },
 } satisfies Record<string, Record<string, { universalIdentifier: string }>>;

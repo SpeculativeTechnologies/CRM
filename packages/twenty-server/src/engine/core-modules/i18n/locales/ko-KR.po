@@ -3363,6 +3363,12 @@ msgstr "이메일은 필수입니다. 유효한 이메일 주소를 입력해 �
 msgid "Email is unchanged."
 msgstr "이메일이 변경되지 않았습니다."
 
+#. js-lingui-id: tcEfxi
+#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-workspace-member-standard-flat-field-metadata.util.ts
+msgctxt "fieldMetadata.label"
+msgid "Email signature"
+msgstr ""
+
 #. js-lingui-id: su92Mw
 #: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-message-campaign-standard-flat-field-metadata.util.ts
 msgctxt "fieldMetadata.description"
@@ -9083,6 +9089,18 @@ msgstr "설정"
 msgid "Sign up is disabled."
 msgstr "가입이 비활성화되어 있습니다."
 
+#. js-lingui-id: tF3AqN
+#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-workspace-member-standard-flat-field-metadata.util.ts
+msgctxt "fieldMetadata.label"
+msgid "Signature on by default"
+msgstr ""
+
+#. js-lingui-id: muyTrw
+#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-workspace-member-standard-flat-field-metadata.util.ts
+msgctxt "fieldMetadata.description"
+msgid "Signature this member can add to the emails they compose"
+msgstr ""
+
 #. js-lingui-id: 4AomZC
 #: src/engine/core-modules/auth/auth.exception.ts
 msgid "Single sign-on authentication failed."
@@ -11887,6 +11905,12 @@ msgstr "캠페인 전송이 완료된 시점"
 msgctxt "fieldMetadata.description"
 msgid "Where records open for objects that follow the member's preference"
 msgstr "구성원의 기본 설정을 따르는 오브젝트의 레코드가 열리는 위치"
+
+#. js-lingui-id: dACOxO
+#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-workspace-member-standard-flat-field-metadata.util.ts
+msgctxt "fieldMetadata.description"
+msgid "Whether new emails this member composes start with their signature"
+msgstr ""
 
 #. js-lingui-id: zSq4aO
 #: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-message-standard-flat-field-metadata.util.ts

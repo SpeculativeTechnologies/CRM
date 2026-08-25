@@ -4,6 +4,7 @@ import { SettingsPageContainer } from '@/settings/components/SettingsPageContain
 import { SetOrChangePassword } from '@/settings/profile/components/SetOrChangePassword';
 import { DeleteAccount } from '@/settings/profile/components/DeleteAccount';
 import { SettingsProfileDevicesSection } from '@/settings/profile/devices/components/SettingsProfileDevicesSection';
+import { SettingsProfileEmailSignature } from '@/settings/profile/components/SettingsProfileEmailSignature';
 import { EmailField } from '@/settings/profile/components/EmailField';
 import { NameFields } from '@/settings/profile/components/NameFields';
 import { WorkspaceMemberPictureUploader } from '@/settings/workspace-member/components/WorkspaceMemberPictureUploader';
@@ -68,6 +69,13 @@ export const SettingsProfile = () => {
             description={t`The email associated to your account`}
           />
           <EmailField />
+        </Section>
+        <Section>
+          <H2Title
+            title={t`Email signature`}
+            description={t`Signature you can add to the emails you write from Twenty`}
+          />
+          <SettingsProfileEmailSignature key={currentWorkspaceMember.id} />
         </Section>
         <Section>
           <H2Title

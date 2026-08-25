@@ -10,10 +10,18 @@ import { EmailEditorCanvas } from '@/activities/emails/editor/components/EmailEd
 import { CAMPAIGN_BODY_EDITOR_PROFILE } from '@/activities/emails/editor/constants/CampaignBodyEditorProfile';
 import { useUploadEmailImage } from '@/activities/emails/hooks/useUploadEmailImage';
 import { activeEmailEditorState } from '@/activities/emails/states/activeEmailEditorState';
+import { EmailSignatureToggleRow } from '@/activities/emails/signature/components/EmailSignatureToggleRow';
+import { useEmailSignatureComposer } from '@/activities/emails/signature/hooks/useEmailSignatureComposer';
 import { type MessageCampaign } from '@/activities/emails/types/MessageCampaign';
 import { FormAdvancedTextFieldInput } from '@/advanced-text-editor/components/FormAdvancedTextFieldInput';
 import { AdvancedTextEditorInsertRail } from '@/advanced-text-editor/components/AdvancedTextEditorInsertRail';
 import { useSetAtomState } from '@/ui/utilities/state/jotai/hooks/useSetAtomState';
+import { themeCssVariables } from 'twenty-ui/theme-constants';
+
+const StyledSignatureRow = styled.div`
+  display: flex;
+  padding: ${themeCssVariables.spacing[2]} ${themeCssVariables.spacing[3]};
+`;
 
 const StyledContainer = styled.div`
   display: flex;
@@ -37,6 +45,13 @@ export const CampaignBodyField = ({
   const { body, setBody, flush, draftResyncKey } = useCampaignBodyState({
     campaign,
   });
+  // The body lives in a persisted draft, so the composer never seeds the
+  // signature on its own: it only offers the toggle.
+  const signatureState = useEmailSignatureComposer({
+    isEnabled: true,
+    initialBody: body,
+    shouldSeedInitialBody: false,
+  });
   const setActiveEmailEditor = useSetAtomState(activeEmailEditorState);
   const { uploadEmailImage } = useUploadEmailImage();
   const { variables } = useCampaignEmailEditorVariables();
@@ -55,7 +70,7 @@ export const CampaignBodyField = ({
   return (
     <StyledContainer onBlur={() => flush()}>
       <FormAdvancedTextFieldInput
-        key={draftResyncKey}
+        key={`${draftResyncKey}-${signatureState.signatureResyncKey}`}
         defaultValue={body}
         onChange={setBody}
         placeholder={t`Type something or press "/" to see commands`}
@@ -64,6 +79,16 @@ export const CampaignBodyField = ({
         onEditorReady={handleEditorReady}
         onImageUpload={uploadEmailImage}
       />
+      {signatureState.isSignatureToggleVisible && (
+        <StyledSignatureRow>
+          <EmailSignatureToggleRow
+            isIncluded={signatureState.isSignatureIncludedIn(body)}
+            onChange={(isIncluded) =>
+              setBody(signatureState.applySignatureInclusion(body, isIncluded))
+            }
+          />
+        </StyledSignatureRow>
+      )}
       {isDefined(bodyEditor) && (
         <AdvancedTextEditorInsertRail
           editor={bodyEditor}
