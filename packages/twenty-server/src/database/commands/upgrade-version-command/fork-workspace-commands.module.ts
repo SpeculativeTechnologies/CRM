@@ -13,6 +13,7 @@ import { HideReciprocalsFromConnectionsViewCommand } from 'src/database/commands
 import { AddComposeEmailToRelatedPeopleCommandMenuItemCommand } from 'src/database/commands/upgrade-version-command/2-32/2-32-workspace-command-1786400000000-add-compose-email-to-related-people-command-menu-item.command';
 import { BackfillMissingLabelIdentifierViewFieldsCommand } from 'src/database/commands/upgrade-version-command/2-32/2-32-workspace-command-1786838400000-backfill-missing-label-identifier-view-fields.command';
 import { MakeRequiredFieldsWithoutDefaultsOptionalCommand } from 'src/database/commands/upgrade-version-command/2-32/2-32-workspace-command-1786900000000-make-required-fields-without-defaults-optional.command';
+import { AddMessageDeliveryStatusFieldCommand } from 'src/database/commands/upgrade-version-command/2-32/2-32-workspace-command-1787262000000-add-message-delivery-status-field.command';
 import { ApplicationModule } from 'src/engine/core-modules/application/application.module';
 import { FieldMetadataEntity } from 'src/engine/metadata-modules/field-metadata/field-metadata.entity';
 import { WorkspaceCacheModule } from 'src/engine/workspace-cache/workspace-cache.module';
@@ -47,6 +48,7 @@ import { ConnectionModule } from 'src/modules/connection/connection.module';
     AddComposeEmailToRelatedPeopleCommandMenuItemCommand,
     MakeRequiredFieldsWithoutDefaultsOptionalCommand,
     BackfillMissingLabelIdentifierViewFieldsCommand,
+    AddMessageDeliveryStatusFieldCommand,
   ],
 })
 export class ForkWorkspaceCommandsModule {}
