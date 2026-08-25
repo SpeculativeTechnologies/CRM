@@ -56,6 +56,30 @@ describe('getViewFiltersToCreate', () => {
     expect(result).toEqual([newFilterWithDifferentFieldMetadata]);
   });
 
+  it('should persist a second numeric condition on the same field', () => {
+    const lowerBoundFilter = {
+      ...baseFilter,
+      id: 'lower-bound-filter',
+      operand: ViewFilterOperand.GREATER_THAN_OR_EQUAL,
+      value: '100',
+      viewFilterGroupId: null,
+    } satisfies ViewFilter;
+    const upperBoundFilter = {
+      ...baseFilter,
+      id: 'upper-bound-filter',
+      operand: ViewFilterOperand.LESS_THAN_OR_EQUAL,
+      value: '500',
+      viewFilterGroupId: null,
+    } satisfies ViewFilter;
+
+    const result = getViewFiltersToCreate(
+      [lowerBoundFilter],
+      [lowerBoundFilter, upperBoundFilter],
+    );
+
+    expect(result).toEqual([upperBoundFilter]);
+  });
+
   it('should handle empty arrays for both inputs', () => {
     const currentViewFilters: ViewFilter[] = [];
     const newViewFilters: ViewFilter[] = [];

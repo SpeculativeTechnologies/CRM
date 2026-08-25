@@ -76,6 +76,11 @@ export const MassEmailPage = () => {
         <MassEmailWorkspace
           connectedAccountId={connectedAccountId}
           personIds={massEmailPersonIds}
+          onDraftCreated={(campaignId) =>
+            navigateApp(AppPath.EmailsCampaign, { campaignId }, undefined, {
+              replace: true,
+            })
+          }
           onSent={goToPeople}
         />
       )}

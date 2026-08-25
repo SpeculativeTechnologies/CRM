@@ -25,6 +25,21 @@ const recipients = [
       company: '',
     },
   },
+  {
+    personId: 'person-2',
+    email: 'grace@example.com',
+    displayName: 'Grace Hopper',
+    avatarUrl: null,
+    placeholderValues: {
+      first_name: 'Grace',
+      last_name: 'Hopper',
+      full_name: 'Grace Hopper',
+      email: 'grace@example.com',
+      job_title: '',
+      city: '',
+      company: '',
+    },
+  },
 ];
 const saveDraftMock = jest.fn(() =>
   Promise.resolve({ campaignId: 'campaign-1', updatedAt: '2026-07-31' }),
@@ -36,12 +51,14 @@ const sendMassEmailMock = jest.fn(() =>
 describe('useMassEmailComposerState', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    jest.mocked(useMassEmailRecipients).mockReturnValue({
-      recipients,
+    jest.mocked(useMassEmailRecipients).mockImplementation((personIds) => ({
+      recipients: recipients.filter(({ personId }) =>
+        personIds.includes(personId),
+      ),
       skippedWithoutEmail: [],
       skippedWithoutEmailCount: 0,
       loading: false,
-    });
+    }));
     jest.mocked(useMassEmailCampaignDraft).mockReturnValue({
       saveDraft: saveDraftMock,
       isSaving: false,
@@ -54,10 +71,12 @@ describe('useMassEmailComposerState', () => {
   });
 
   it('creates a campaign draft for the selected people', async () => {
+    const onDraftCreated = jest.fn();
     const { result } = renderHook(() =>
       useMassEmailComposerState({
         connectedAccountId: 'account-1',
         personIds: ['person-1'],
+        onDraftCreated,
       }),
     );
 
@@ -71,6 +90,53 @@ describe('useMassEmailComposerState', () => {
       personIds: ['person-1'],
       subject: '',
       body: '',
+    });
+    expect(onDraftCreated).toHaveBeenCalledWith('campaign-1');
+  });
+
+  it('uses the current template as the base email for added people', async () => {
+    const { result } = renderHook(() =>
+      useMassEmailComposerState({
+        connectedAccountId: 'account-1',
+        personIds: ['person-1'],
+        initialDraft: {
+          campaignId: 'campaign-1',
+          subject: '',
+          body: '',
+        },
+      }),
+    );
+
+    act(() => {
+      result.current.setSubjectTemplate('Hello {first_name}');
+      result.current.setBodyTemplate('<p>Hi {full_name}</p>');
+      result.current.setPersonSelected('person-2', true);
+    });
+
+    const addedRecipient = result.current.includedRecipients.find(
+      ({ personId }) => personId === 'person-2',
+    );
+
+    if (addedRecipient === undefined) {
+      throw new Error('Added recipient was not resolved');
+    }
+
+    expect(result.current.resolveForRecipient(addedRecipient)).toMatchObject({
+      subject: 'Hello Grace',
+      body: '<p>Hi Grace Hopper</p>',
+      isCustomized: false,
+    });
+
+    await act(async () => {
+      await result.current.saveCurrentDraft();
+    });
+
+    expect(saveDraftMock).toHaveBeenLastCalledWith({
+      campaignId: 'campaign-1',
+      connectedAccountId: 'account-1',
+      personIds: ['person-1', 'person-2'],
+      subject: 'Hello {first_name}',
+      body: '<p>Hi {full_name}</p>',
     });
   });
 

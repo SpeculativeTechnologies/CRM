@@ -5,6 +5,8 @@ import { Provider as JotaiProvider } from 'jotai';
 import { objectFilterDropdownFilterIsSelectedComponentState } from '@/object-record/object-filter-dropdown/states/objectFilterDropdownFilterIsSelectedComponentState';
 import { selectedOperandInDropdownComponentState } from '@/object-record/object-filter-dropdown/states/selectedOperandInDropdownComponentState';
 import { relationTargetFieldMetadataIdUsedInDropdownComponentState } from '@/object-record/object-filter-dropdown/states/relationTargetFieldMetadataIdUsedInDropdownComponentState';
+import { useApplyObjectFilterDropdownFilterValue } from '@/object-record/object-filter-dropdown/hooks/useApplyObjectFilterDropdownFilterValue';
+import { useApplyObjectFilterDropdownOperand } from '@/object-record/object-filter-dropdown/hooks/useApplyObjectFilterDropdownOperand';
 import { useInitializeFilterOnFieldMetadataItemFromViewBarFilterDropdown } from '@/views/hooks/useInitializeFilterOnFieldMetadataItemFromViewBarFilterDropdown';
 
 import {
@@ -24,6 +26,7 @@ import { useAtomComponentStateValue } from '@/ui/utilities/state/jotai/hooks/use
 import { useSetAtomComponentState } from '@/ui/utilities/state/jotai/hooks/useSetAtomComponentState';
 import { ViewBarFilterDropdownIds } from '@/views/constants/ViewBarFilterDropdownIds';
 import { getFilterTypeFromFieldType } from 'twenty-shared/utils';
+import { ViewFilterOperand } from 'twenty-shared/types';
 import { getTestEnrichedObjectMetadataItemsMock } from '~/testing/utils/getTestEnrichedObjectMetadataItemsMock';
 import { getMockObjectMetadataItemOrThrow } from '~/testing/utils/getMockObjectMetadataItemOrThrow';
 import { setTestObjectMetadataItemsInMetadataStore } from '~/testing/utils/setTestObjectMetadataItemsInMetadataStore';
@@ -49,6 +52,10 @@ const personCreatedAtFieldMetadataItemMock =
   );
 const companyNameFieldMetadataItemMock =
   companyObjectMetadataItemMock.fields.find((field) => field.name === 'name');
+const companyEmployeesFieldMetadataItemMock =
+  companyObjectMetadataItemMock.fields.find(
+    (field) => field.name === 'employees',
+  );
 
 const wrapper = ({ children }: { children: React.ReactNode }) => {
   setTestObjectMetadataItemsInMetadataStore(
@@ -325,6 +332,85 @@ describe('useInitializeFilterOnFieldMetadataItemFromViewBarFilterDropdown', () =
 
     expect(result.current.objectFilterDropdownCurrentRecordFilter).toBe(
       mockExistingFilterOnCity,
+    );
+  });
+
+  it('should create a second simple numeric filter on the same field', () => {
+    const { result } = renderHook(
+      () => {
+        const { initializeFilterOnFieldMetataItemFromViewBarFilterDropdown } =
+          useInitializeFilterOnFieldMetadataItemFromViewBarFilterDropdown();
+        const { applyObjectFilterDropdownOperand } =
+          useApplyObjectFilterDropdownOperand();
+        const { applyObjectFilterDropdownFilterValue } =
+          useApplyObjectFilterDropdownFilterValue();
+        const setCurrentRecordFilters = useSetAtomComponentState(
+          currentRecordFiltersComponentState,
+          'test',
+        );
+        const currentRecordFilters = useAtomComponentStateValue(
+          currentRecordFiltersComponentState,
+          'test',
+        );
+
+        return {
+          initializeFilterOnFieldMetataItemFromViewBarFilterDropdown,
+          applyObjectFilterDropdownOperand,
+          applyObjectFilterDropdownFilterValue,
+          setCurrentRecordFilters,
+          currentRecordFilters,
+        };
+      },
+      { wrapper },
+    );
+
+    if (!companyEmployeesFieldMetadataItemMock) {
+      throw new Error('companyEmployeesFieldMetadataItemMock is not defined');
+    }
+
+    const lowerBoundFilter: RecordFilter = {
+      id: 'lower-bound-filter-id',
+      fieldMetadataId: companyEmployeesFieldMetadataItemMock.id,
+      operand: ViewFilterOperand.GREATER_THAN_OR_EQUAL,
+      displayValue: '100',
+      label: companyEmployeesFieldMetadataItemMock.label,
+      type: getFilterTypeFromFieldType(
+        companyEmployeesFieldMetadataItemMock.type,
+      ),
+      value: '100',
+    };
+
+    act(() => {
+      result.current.setCurrentRecordFilters([lowerBoundFilter]);
+    });
+
+    act(() => {
+      result.current.initializeFilterOnFieldMetataItemFromViewBarFilterDropdown(
+        companyEmployeesFieldMetadataItemMock,
+      );
+    });
+
+    act(() => {
+      result.current.applyObjectFilterDropdownOperand(
+        ViewFilterOperand.LESS_THAN_OR_EQUAL,
+      );
+    });
+
+    act(() => {
+      result.current.applyObjectFilterDropdownFilterValue('500');
+    });
+
+    expect(result.current.currentRecordFilters).toHaveLength(2);
+    expect(result.current.currentRecordFilters[0]).toEqual(lowerBoundFilter);
+    expect(result.current.currentRecordFilters[1]).toMatchObject({
+      fieldMetadataId: companyEmployeesFieldMetadataItemMock.id,
+      operand: ViewFilterOperand.LESS_THAN_OR_EQUAL,
+      displayValue: '500',
+      type: 'NUMBER',
+      value: '500',
+    });
+    expect(result.current.currentRecordFilters[1].id).not.toBe(
+      lowerBoundFilter.id,
     );
   });
 
