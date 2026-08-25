@@ -133,6 +133,7 @@ export type MassEmailCampaignSendOutcome = {
   email: string;
   subject: string;
   body: string;
+  cc?: string[];
   success: boolean;
   messageId?: string;
 };
@@ -1228,6 +1229,15 @@ export class MessageCampaignService {
         personId: outcome.personId,
         messageCampaignId: campaignId,
       },
+      // Cc'd people are not campaign recipients, so they carry no
+      // messageCampaignId and stay out of the per-recipient delivery stats.
+      ...(outcome.cc ?? []).map((ccHandle) => ({
+        id: v4(),
+        messageId,
+        role: MessageParticipantRole.CC,
+        handle: ccHandle,
+        displayName: ccHandle,
+      })),
     ]);
   }
 
