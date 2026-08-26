@@ -9,6 +9,7 @@ import { useLocalFirstPersonRecords } from '@/local-first/hooks/useLocalFirstPer
 import { startSyncingPersonShapeToLocalFirstDatabase } from '@/local-first/services/syncPersonShapeToLocalFirstDatabase';
 import { localFirstShadowReportState } from '@/local-first/states/localFirstShadowReportState';
 import { localFirstSyncStatusState } from '@/local-first/states/localFirstSyncStatusState';
+import { localFirstSyncedColumnsState } from '@/local-first/states/localFirstSyncedColumnsState';
 import { getSseClientAuthHeaders } from '@/sse-db-event/utils/getSseClientAuthHeaders';
 
 const StyledPanel = styled.div`
@@ -38,6 +39,9 @@ const StyledRow = styled.div`
 export const LocalFirstDebugPanel = () => {
   const [status, setStatus] = useAtom(localFirstSyncStatusState);
   const [shadowReport] = useAtom(localFirstShadowReportState);
+  const [syncedColumns, setSyncedColumns] = useAtom(
+    localFirstSyncedColumnsState,
+  );
   const { records, totalCount } = useLocalFirstPersonRecords();
   const store = useStore();
 
@@ -56,14 +60,16 @@ export const LocalFirstDebugPanel = () => {
   useEffect(() => {
     startSyncingPersonShapeToLocalFirstDatabase({
       onStatusChange: setStatus,
+      onColumnsResolved: setSyncedColumns,
       getAuthHeaders,
     });
-  }, [setStatus, getAuthHeaders]);
+  }, [setStatus, setSyncedColumns, getAuthHeaders]);
 
   return (
     <StyledPanel>
       <div>
-        local-first spike: {status} · {totalCount} rows locally
+        local-first spike: {status} · {totalCount} rows · {syncedColumns.length}{' '}
+        cols
       </div>
       <StyledRow>
         shadow reads: {shadowReport.matchCount} agreed ·{' '}

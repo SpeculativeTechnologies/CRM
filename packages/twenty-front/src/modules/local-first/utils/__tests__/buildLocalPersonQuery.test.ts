@@ -1,12 +1,24 @@
 import { buildLocalPersonQuery } from '@/local-first/utils/buildLocalPersonQuery';
 
+const SYNCED_COLUMNS = [
+  'id',
+  'nameFirstName',
+  'nameLastName',
+  'jobTitle',
+  'emailsPrimaryEmail',
+  'position',
+  'createdAt',
+  'updatedAt',
+  'deletedAt',
+];
+
 const SOFT_DELETE_OPT_IN_FILTER = {
   or: [{ deletedAt: { is: 'NULL' } }, { deletedAt: { is: 'NOT_NULL' } }],
 };
 
 describe('buildLocalPersonQuery', () => {
   it('should hide soft-deleted rows when no filter is given, matching the API default', () => {
-    const result = buildLocalPersonQuery({});
+    const result = buildLocalPersonQuery({ syncedColumns: SYNCED_COLUMNS });
 
     expect(result).toMatchObject({ isSupported: true });
     if (!result.isSupported) return;
@@ -14,7 +26,10 @@ describe('buildLocalPersonQuery', () => {
   });
 
   it('should treat an empty filter object the same as no filter', () => {
-    const result = buildLocalPersonQuery({ filter: {} });
+    const result = buildLocalPersonQuery({
+      filter: {},
+      syncedColumns: SYNCED_COLUMNS,
+    });
 
     expect(result).toMatchObject({ isSupported: true });
     if (!result.isSupported) return;
@@ -23,6 +38,7 @@ describe('buildLocalPersonQuery', () => {
 
   it('should include soft-deleted rows when the query opts in', () => {
     const result = buildLocalPersonQuery({
+      syncedColumns: SYNCED_COLUMNS,
       filter: SOFT_DELETE_OPT_IN_FILTER,
     });
 
@@ -33,6 +49,7 @@ describe('buildLocalPersonQuery', () => {
 
   it('should translate the default view ordering', () => {
     const result = buildLocalPersonQuery({
+      syncedColumns: SYNCED_COLUMNS,
       orderBy: [{ position: 'AscNullsFirst' }],
       limit: 30,
     });
@@ -46,6 +63,7 @@ describe('buildLocalPersonQuery', () => {
 
   it('should translate multi-field ordering in order', () => {
     const result = buildLocalPersonQuery({
+      syncedColumns: SYNCED_COLUMNS,
       orderBy: [
         { nameLastName: 'DescNullsLast' },
         { position: 'AscNullsFirst' },
@@ -60,7 +78,11 @@ describe('buildLocalPersonQuery', () => {
   });
 
   it('should number limit and offset params independently', () => {
-    const result = buildLocalPersonQuery({ limit: 30, offset: 60 });
+    const result = buildLocalPersonQuery({
+      limit: 30,
+      offset: 60,
+      syncedColumns: SYNCED_COLUMNS,
+    });
 
     expect(result).toMatchObject({ isSupported: true });
     if (!result.isSupported) return;
@@ -74,6 +96,7 @@ describe('buildLocalPersonQuery', () => {
   it('should refuse a filter it cannot express', () => {
     expect(
       buildLocalPersonQuery({
+        syncedColumns: SYNCED_COLUMNS,
         filter: { nameFirstName: { ilike: '%mark%' } },
       }),
     ).toEqual({ isSupported: false, reason: 'unsupported filter' });
@@ -82,6 +105,7 @@ describe('buildLocalPersonQuery', () => {
   it('should refuse a filter that only looks like the soft-delete opt-in', () => {
     expect(
       buildLocalPersonQuery({
+        syncedColumns: SYNCED_COLUMNS,
         filter: {
           or: [
             { deletedAt: { is: 'NULL' } },
@@ -94,7 +118,10 @@ describe('buildLocalPersonQuery', () => {
 
   it('should refuse ordering by a field that is not synced', () => {
     expect(
-      buildLocalPersonQuery({ orderBy: [{ city: 'AscNullsLast' }] }),
+      buildLocalPersonQuery({
+        orderBy: [{ city: 'AscNullsLast' }],
+        syncedColumns: SYNCED_COLUMNS,
+      }),
     ).toEqual({
       isSupported: false,
       reason: 'orderBy on unsynced field "city"',
@@ -104,6 +131,7 @@ describe('buildLocalPersonQuery', () => {
   it('should refuse ordering by a composite subfield or relation', () => {
     expect(
       buildLocalPersonQuery({
+        syncedColumns: SYNCED_COLUMNS,
         orderBy: [{ company: { name: 'AscNullsLast' } }],
       }),
     ).toMatchObject({ isSupported: false });
@@ -111,7 +139,10 @@ describe('buildLocalPersonQuery', () => {
 
   it('should refuse an unknown order direction', () => {
     expect(
-      buildLocalPersonQuery({ orderBy: [{ position: 'Sideways' }] }),
+      buildLocalPersonQuery({
+        orderBy: [{ position: 'Sideways' }],
+        syncedColumns: SYNCED_COLUMNS,
+      }),
     ).toEqual({
       isSupported: false,
       reason: 'unknown orderBy direction "Sideways"',
@@ -121,13 +152,16 @@ describe('buildLocalPersonQuery', () => {
   it('should refuse cursor pagination', () => {
     expect(
       buildLocalPersonQuery({
+        syncedColumns: SYNCED_COLUMNS,
         cursorFilter: { cursor: 'abc', cursorDirection: 'after' },
       }),
     ).toEqual({ isSupported: false, reason: 'cursor pagination' });
   });
 
   it('should refuse a non-integer limit', () => {
-    expect(buildLocalPersonQuery({ limit: 'all' })).toEqual({
+    expect(
+      buildLocalPersonQuery({ limit: 'all', syncedColumns: SYNCED_COLUMNS }),
+    ).toEqual({
       isSupported: false,
       reason: 'non-integer limit',
     });

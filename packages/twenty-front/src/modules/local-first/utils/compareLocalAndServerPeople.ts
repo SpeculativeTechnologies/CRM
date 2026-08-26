@@ -1,3 +1,11 @@
+import { type RequestedNodeField } from '@/local-first/utils/extractRequestedNodeFields';
+import { normalizeComparableValue } from '@/local-first/utils/normalizeComparableValue';
+import {
+  type LocalFieldSource,
+  readLocalFieldValue,
+  resolveLocalFieldSource,
+} from '@/local-first/utils/resolveLocalFieldSource';
+
 export type LocalFirstComparisonResult = {
   isMatch: boolean;
   serverCount: number;
@@ -9,27 +17,11 @@ export type LocalFirstComparisonResult = {
 
 const MAX_REPORTED_DIFFERENCES = 5;
 
-// Local column -> path in the GraphQL node. The API exposes composite fields
-// as nested objects (name.firstName) while the synced table is flat
-// (nameFirstName), so comparing by column name alone reports every row as
-// divergent.
-//
-// Only displayed data is compared. position/createdAt/updatedAt/deletedAt are
-// excluded: the server serialises timestamps differently and position is a
-// float, so comparing them would report formatting as divergence. Ordering
-// already proves position agrees, and the row set proves deletedAt does.
-const COMPARED_FIELD_PATHS: Record<string, readonly string[]> = {
-  nameFirstName: ['name', 'firstName'],
-  nameLastName: ['name', 'lastName'],
-  jobTitle: ['jobTitle'],
-  emailsPrimaryEmail: ['emails', 'primaryEmail'],
-};
-
 const NOT_REQUESTED = Symbol('notRequested');
 
-// Walks the path, distinguishing "the query did not ask for this field" from
-// "the field is null". A field the current view does not select is absent from
-// the response and must not count as a divergence.
+// Distinguishes "the query did not select this field" from "the value is
+// null": a field a view does not display is absent from the response, and
+// absence must not count as a divergence.
 const readServerValue = (
   record: Record<string, unknown>,
   path: readonly string[],
@@ -37,13 +29,8 @@ const readServerValue = (
   let current: unknown = record;
 
   for (const key of path) {
-    if (typeof current !== 'object' || current === null) {
-      return NOT_REQUESTED;
-    }
-
-    if (!(key in current)) {
-      return NOT_REQUESTED;
-    }
+    if (typeof current !== 'object' || current === null) return NOT_REQUESTED;
+    if (!(key in current)) return NOT_REQUESTED;
 
     current = (current as Record<string, unknown>)[key];
   }
@@ -51,8 +38,51 @@ const readServerValue = (
   return current;
 };
 
-const normalizeValue = (value: unknown): string =>
-  value === null || value === undefined ? '' : String(value);
+// Every (server path, local source) pair a query asked for. Relations are
+// skipped: they live in other tables, and the coverage check refuses queries
+// that request them before a local read is attempted.
+const toComparablePairs = (
+  requestedFields: RequestedNodeField[],
+  syncedColumns: ReadonlySet<string>,
+) => {
+  const pairs: { path: string[]; source: LocalFieldSource; label: string }[] =
+    [];
+
+  for (const field of requestedFields) {
+    if (field.hasNestedSelections) continue;
+
+    if (field.subFields.length === 0) {
+      const source = resolveLocalFieldSource({
+        fieldName: field.name,
+        syncedColumns,
+      });
+
+      if (source) {
+        pairs.push({ path: [field.name], source, label: field.name });
+      }
+
+      continue;
+    }
+
+    for (const subField of field.subFields) {
+      const source = resolveLocalFieldSource({
+        fieldName: field.name,
+        subFieldName: subField,
+        syncedColumns,
+      });
+
+      if (source) {
+        pairs.push({
+          path: [field.name, subField],
+          source,
+          label: `${field.name}.${subField}`,
+        });
+      }
+    }
+  }
+
+  return pairs;
+};
 
 // Compares what the server returned for a FindManyPeople query against what
 // the local database returned for the translated query. Order matters: a local
@@ -61,9 +91,13 @@ const normalizeValue = (value: unknown): string =>
 export const compareLocalAndServerPeople = ({
   serverRecords,
   localRecords,
+  requestedFields,
+  syncedColumns,
 }: {
   serverRecords: Record<string, unknown>[];
   localRecords: Record<string, unknown>[];
+  requestedFields: RequestedNodeField[];
+  syncedColumns: readonly string[];
 }): LocalFirstComparisonResult => {
   const differences: string[] = [];
   let comparedFieldCount = 0;
@@ -80,6 +114,10 @@ export const compareLocalAndServerPeople = ({
     );
   }
 
+  const comparablePairs = toComparablePairs(
+    requestedFields,
+    new Set(syncedColumns),
+  );
   const comparedLength = Math.min(serverRecords.length, localRecords.length);
 
   for (let index = 0; index < comparedLength; index++) {
@@ -93,19 +131,21 @@ export const compareLocalAndServerPeople = ({
       continue;
     }
 
-    for (const [column, path] of Object.entries(COMPARED_FIELD_PATHS)) {
-      const serverValue = readServerValue(serverRecord, path);
+    for (const pair of comparablePairs) {
+      const serverValue = readServerValue(serverRecord, pair.path);
 
       if (serverValue === NOT_REQUESTED) continue;
 
       comparedFieldCount += 1;
 
-      const normalizedServerValue = normalizeValue(serverValue);
-      const normalizedLocalValue = normalizeValue(localRecord[column]);
+      const normalizedServerValue = normalizeComparableValue(serverValue);
+      const normalizedLocalValue = normalizeComparableValue(
+        readLocalFieldValue({ record: localRecord, source: pair.source }),
+      );
 
       if (normalizedServerValue !== normalizedLocalValue) {
         addDifference(
-          `${String(serverRecord.id)}.${column}: server "${normalizedServerValue}", local "${normalizedLocalValue}"`,
+          `${String(serverRecord.id)}.${pair.label}: server "${normalizedServerValue}", local "${normalizedLocalValue}"`,
         );
       }
     }

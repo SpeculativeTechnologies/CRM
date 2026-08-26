@@ -1,4 +1,33 @@
 import { compareLocalAndServerPeople } from '@/local-first/utils/compareLocalAndServerPeople';
+import { type RequestedNodeField } from '@/local-first/utils/extractRequestedNodeFields';
+
+// What the People view asks for on each record, in the shape the query parser
+// reports it.
+const SYNCED_COLUMNS = [
+  'id',
+  'nameFirstName',
+  'nameLastName',
+  'jobTitle',
+  'emailsPrimaryEmail',
+  'position',
+  'updatedAt',
+  'avatarFile',
+];
+
+const REQUESTED_FIELDS: RequestedNodeField[] = [
+  { name: 'id', subFields: [], hasNestedSelections: false },
+  {
+    name: 'name',
+    subFields: ['firstName', 'lastName'],
+    hasNestedSelections: false,
+  },
+  { name: 'jobTitle', subFields: [], hasNestedSelections: false },
+  {
+    name: 'emails',
+    subFields: ['primaryEmail'],
+    hasNestedSelections: false,
+  },
+];
 
 // The API returns composite fields nested; the synced table stores them flat.
 const buildServerPerson = (overrides: Record<string, unknown> = {}) => ({
@@ -23,10 +52,13 @@ describe('compareLocalAndServerPeople', () => {
     const result = compareLocalAndServerPeople({
       serverRecords: [buildServerPerson()],
       localRecords: [buildLocalPerson()],
+      requestedFields: REQUESTED_FIELDS,
+      syncedColumns: SYNCED_COLUMNS,
     });
 
     expect(result).toMatchObject({ isMatch: true, differences: [] });
-    expect(result.comparedFieldCount).toBe(4);
+    // id, name.firstName, name.lastName, jobTitle, emails.primaryEmail
+    expect(result.comparedFieldCount).toBe(5);
   });
 
   it('should treat null and undefined values as equal', () => {
@@ -34,6 +66,8 @@ describe('compareLocalAndServerPeople', () => {
       compareLocalAndServerPeople({
         serverRecords: [buildServerPerson({ jobTitle: null })],
         localRecords: [buildLocalPerson({ jobTitle: undefined })],
+        requestedFields: REQUESTED_FIELDS,
+        syncedColumns: SYNCED_COLUMNS,
       }).isMatch,
     ).toBe(true);
   });
@@ -45,16 +79,21 @@ describe('compareLocalAndServerPeople', () => {
     const result = compareLocalAndServerPeople({
       serverRecords: [{ id: 'person-1', name: { firstName: 'Mark' } }],
       localRecords: [buildLocalPerson()],
+      requestedFields: REQUESTED_FIELDS,
+      syncedColumns: SYNCED_COLUMNS,
     });
 
     expect(result.isMatch).toBe(true);
-    expect(result.comparedFieldCount).toBe(1);
+    // Only id and name.firstName were selected; the rest are absent.
+    expect(result.comparedFieldCount).toBe(2);
   });
 
   it('should still compare a requested field that is null', () => {
     const result = compareLocalAndServerPeople({
       serverRecords: [buildServerPerson({ jobTitle: null })],
       localRecords: [buildLocalPerson({ jobTitle: 'Surveyor' })],
+      requestedFields: REQUESTED_FIELDS,
+      syncedColumns: SYNCED_COLUMNS,
     });
 
     expect(result.isMatch).toBe(false);
@@ -67,6 +106,8 @@ describe('compareLocalAndServerPeople', () => {
     const result = compareLocalAndServerPeople({
       serverRecords: [buildServerPerson()],
       localRecords: [buildLocalPerson(), buildLocalPerson({ id: 'person-2' })],
+      requestedFields: REQUESTED_FIELDS,
+      syncedColumns: SYNCED_COLUMNS,
     });
 
     expect(result.isMatch).toBe(false);
@@ -82,6 +123,8 @@ describe('compareLocalAndServerPeople', () => {
         buildServerPerson({ id: 'person-2' }),
       ],
       localRecords: [buildLocalPerson({ id: 'person-2' }), buildLocalPerson()],
+      requestedFields: REQUESTED_FIELDS,
+      syncedColumns: SYNCED_COLUMNS,
     });
 
     expect(result.isMatch).toBe(false);
@@ -92,6 +135,8 @@ describe('compareLocalAndServerPeople', () => {
     const result = compareLocalAndServerPeople({
       serverRecords: [buildServerPerson({ jobTitle: 'Midwife' })],
       localRecords: [buildLocalPerson({ jobTitle: 'Surveyor' })],
+      requestedFields: REQUESTED_FIELDS,
+      syncedColumns: SYNCED_COLUMNS,
     });
 
     expect(result.isMatch).toBe(false);
@@ -100,22 +145,31 @@ describe('compareLocalAndServerPeople', () => {
     );
   });
 
-  it('should ignore timestamp and position serialisation differences', () => {
+  // The API sends ISO strings and JSON numbers; PGlite returns Date objects
+  // and floats. Without normalisation every row looks divergent.
+  it('should ignore timestamp and float serialisation differences', () => {
     const result = compareLocalAndServerPeople({
       serverRecords: [
         buildServerPerson({
           updatedAt: '2026-08-25T00:00:00.000Z',
-          position: 1,
+          position: 1.0000001,
         }),
       ],
       localRecords: [
         buildLocalPerson({
-          updatedAt: new Date('2026-08-25'),
-          position: 1.0000001,
+          updatedAt: new Date('2026-08-25T00:00:00.000Z'),
+          position: 1.00000009,
         }),
       ],
+      requestedFields: [
+        ...REQUESTED_FIELDS,
+        { name: 'updatedAt', subFields: [], hasNestedSelections: false },
+        { name: 'position', subFields: [], hasNestedSelections: false },
+      ],
+      syncedColumns: SYNCED_COLUMNS,
     });
 
+    expect(result.differences).toEqual([]);
     expect(result.isMatch).toBe(true);
   });
 
@@ -127,7 +181,12 @@ describe('compareLocalAndServerPeople', () => {
       buildLocalPerson({ id: `person-${index}`, jobTitle: 'local' }),
     );
 
-    const result = compareLocalAndServerPeople({ serverRecords, localRecords });
+    const result = compareLocalAndServerPeople({
+      serverRecords,
+      localRecords,
+      requestedFields: REQUESTED_FIELDS,
+      syncedColumns: SYNCED_COLUMNS,
+    });
 
     expect(result.differences).toHaveLength(5);
   });

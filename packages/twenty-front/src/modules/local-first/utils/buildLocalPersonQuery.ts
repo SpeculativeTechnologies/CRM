@@ -1,8 +1,6 @@
 import { type OrderBy } from 'twenty-shared/types';
 import { isDefined } from 'twenty-shared/utils';
 
-import { LOCAL_FIRST_PERSON_COLUMNS } from '@/local-first/constants/LOCAL_FIRST_PERSON_COLUMNS';
-
 export type LocalPersonQueryTranslation =
   | { isSupported: true; sql: string; params: unknown[] }
   | { isSupported: false; reason: string };
@@ -13,12 +11,6 @@ const ORDER_BY_SQL: Record<OrderBy, string> = {
   DescNullsFirst: 'desc nulls first',
   DescNullsLast: 'desc nulls last',
 };
-
-const SYNCED_COLUMNS = new Set<string>(LOCAL_FIRST_PERSON_COLUMNS);
-
-const selectedColumns = LOCAL_FIRST_PERSON_COLUMNS.map(
-  (column) => `"${column}"`,
-).join(', ');
 
 // The API hides soft-deleted records unless the caller opts in, and it opts in
 // with exactly this filter (see useFindManyRecords). Recognising it is what
@@ -43,6 +35,7 @@ const isSoftDeleteOptInFilter = (filter: Record<string, unknown>): boolean => {
 
 const translateOrderBy = (
   orderBy: unknown,
+  syncedColumns: Set<string>,
 ): { orderBySql: string } | { reason: string } => {
   if (!isDefined(orderBy)) return { orderBySql: '' };
 
@@ -65,7 +58,7 @@ const translateOrderBy = (
 
     const [fieldName, direction] = entries[0];
 
-    if (!SYNCED_COLUMNS.has(fieldName)) {
+    if (!syncedColumns.has(fieldName)) {
       return { reason: `orderBy on unsynced field "${fieldName}"` };
     }
 
@@ -100,13 +93,19 @@ export const buildLocalPersonQuery = ({
   limit,
   offset,
   cursorFilter,
+  syncedColumns,
 }: {
   filter?: unknown;
   orderBy?: unknown;
   limit?: unknown;
   offset?: unknown;
   cursorFilter?: unknown;
+  syncedColumns: readonly string[];
 }): LocalPersonQueryTranslation => {
+  if (syncedColumns.length === 0) {
+    return { isSupported: false, reason: 'schema not resolved yet' };
+  }
+
   if (isDefined(cursorFilter)) {
     return { isSupported: false, reason: 'cursor pagination' };
   }
@@ -121,7 +120,7 @@ export const buildLocalPersonQuery = ({
     whereSql = '';
   }
 
-  const orderByResult = translateOrderBy(orderBy);
+  const orderByResult = translateOrderBy(orderBy, new Set(syncedColumns));
 
   if ('reason' in orderByResult) {
     return { isSupported: false, reason: orderByResult.reason };
@@ -151,7 +150,7 @@ export const buildLocalPersonQuery = ({
 
   return {
     isSupported: true,
-    sql: `select ${selectedColumns} from person${whereSql}${orderByResult.orderBySql}${limitSql}${offsetSql}`,
+    sql: `select ${syncedColumns.map((column) => `"${column}"`).join(', ')} from person${whereSql}${orderByResult.orderBySql}${limitSql}${offsetSql}`,
     params,
   };
 };

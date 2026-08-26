@@ -3,23 +3,25 @@ import { ApiPath } from 'twenty-shared/types';
 import { isDefined } from 'twenty-shared/utils';
 
 import { IS_LOCAL_FIRST_ENABLED } from '@/local-first/constants/IS_LOCAL_FIRST_ENABLED';
-import { LOCAL_FIRST_PERSON_COLUMNS } from '@/local-first/constants/LOCAL_FIRST_PERSON_COLUMNS';
-import { getLocalFirstDatabase } from '@/local-first/services/getLocalFirstDatabase';
+import {
+  getLocalFirstPersonMirror,
+  LOCAL_FIRST_PERSON_TABLE,
+} from '@/local-first/services/getLocalFirstPersonMirror';
 import { type LocalFirstSyncStatus } from '@/local-first/states/localFirstSyncStatusState';
 import { REACT_APP_SERVER_BASE_URL } from '~/config';
 
-type LocalFirstPersonColumn = (typeof LOCAL_FIRST_PERSON_COLUMNS)[number];
-
-type ElectricPersonRow = { id: string } & Partial<
-  Record<LocalFirstPersonColumn, string | number | null>
->;
+type ElectricRow = Record<string, string | number | boolean | null>;
 
 type ElectricMessage = {
   headers?: { operation?: 'insert' | 'update' | 'delete' };
-  value?: ElectricPersonRow;
+  value?: ElectricRow;
 };
 
 const UPSERT_BATCH_SIZE = 500;
+const POLL_INTERVAL_MS = 3000;
+
+const localFirstUrl = (path: string) =>
+  `${REACT_APP_SERVER_BASE_URL}/${ApiPath.LocalFirst}/${path}`;
 
 // The shape request goes through the server's local-first proxy, which
 // resolves the caller's workspace schema from their auth and forwards to
@@ -44,7 +46,7 @@ const fetchShapeBatch = async ({
   if (isDefined(handle)) params.set('handle', handle);
 
   const response = await fetch(
-    `${REACT_APP_SERVER_BASE_URL}/${ApiPath.LocalFirst}/shape/person?${params}`,
+    `${localFirstUrl(`shape/${LOCAL_FIRST_PERSON_TABLE}`)}?${params}`,
     {
       credentials: 'include',
       headers: getAuthHeaders(),
@@ -69,51 +71,55 @@ const fetchShapeBatch = async ({
   return { messages, nextOffset, nextHandle, upToDate };
 };
 
-const quotedColumns = LOCAL_FIRST_PERSON_COLUMNS.map(
-  (column) => `"${column}"`,
-).join(', ');
+const buildUpsertStatement = (columnNames: string[], rowCount: number) => {
+  const quotedColumns = columnNames.map((column) => `"${column}"`).join(', ');
+  const assignments = columnNames
+    .filter((column) => column !== 'id')
+    .map((column) => `"${column}" = excluded."${column}"`)
+    .join(', ');
 
-// Every column but the primary key, which `on conflict` matches on.
-const updateAssignments = LOCAL_FIRST_PERSON_COLUMNS.filter(
-  (column) => column !== 'id',
-)
-  .map((column) => `"${column}" = excluded."${column}"`)
-  .join(', ');
+  const valuesSql = Array.from({ length: rowCount }, (_, rowIndex) => {
+    const placeholders = columnNames.map(
+      (_column, columnIndex) =>
+        `$${rowIndex * columnNames.length + columnIndex + 1}`,
+    );
 
-const upsertPersonRows = async (tx: Transaction, rows: ElectricPersonRow[]) => {
-  const columnCount = LOCAL_FIRST_PERSON_COLUMNS.length;
-  const valuesSql = rows
-    .map(
-      (_, rowIndex) =>
-        `(${LOCAL_FIRST_PERSON_COLUMNS.map(
-          (_, columnIndex) => `$${rowIndex * columnCount + columnIndex + 1}`,
-        ).join(',')})`,
-    )
-    .join(',');
+    return `(${placeholders.join(',')})`;
+  }).join(',');
 
-  await tx.query(
-    `insert into person (${quotedColumns})
-     values ${valuesSql}
-     on conflict (id) do update set ${updateAssignments}`,
-    rows.flatMap((row) =>
-      LOCAL_FIRST_PERSON_COLUMNS.map((column) => row[column] ?? null),
-    ),
-  );
+  return `insert into "${LOCAL_FIRST_PERSON_TABLE}" (${quotedColumns})
+          values ${valuesSql}
+          on conflict (id) do update set ${assignments}`;
 };
 
 // Applies a shape batch in one transaction, batching consecutive upserts into
 // multi-row inserts (row-by-row inserts made the initial sync take minutes).
 // Message order is preserved: an upsert buffer is flushed before any delete,
 // so delete-then-reinsert sequences replay correctly.
-const applyMessages = async (pg: PGlite, messages: ElectricMessage[]) => {
+const applyMessages = async ({
+  pg,
+  messages,
+  columnNames,
+}: {
+  pg: PGlite;
+  messages: ElectricMessage[];
+  columnNames: string[];
+}) => {
   let applied = 0;
 
-  await pg.transaction(async (tx) => {
-    let upsertBuffer: ElectricPersonRow[] = [];
+  await pg.transaction(async (tx: Transaction) => {
+    let upsertBuffer: ElectricRow[] = [];
 
     const flushUpserts = async () => {
       if (upsertBuffer.length === 0) return;
-      await upsertPersonRows(tx, upsertBuffer);
+
+      await tx.query(
+        buildUpsertStatement(columnNames, upsertBuffer.length),
+        upsertBuffer.flatMap((row) =>
+          columnNames.map((column) => row[column] ?? null),
+        ),
+      );
+
       applied += upsertBuffer.length;
       upsertBuffer = [];
     };
@@ -125,7 +131,10 @@ const applyMessages = async (pg: PGlite, messages: ElectricMessage[]) => {
 
       if (operation === 'delete') {
         await flushUpserts();
-        await tx.query('delete from person where id = $1', [row.id]);
+        await tx.query(
+          `delete from "${LOCAL_FIRST_PERSON_TABLE}" where id = $1`,
+          [row.id],
+        );
         applied += 1;
       } else {
         upsertBuffer.push(row);
@@ -145,9 +154,11 @@ let syncLoopStarted = false;
 
 export const startSyncingPersonShapeToLocalFirstDatabase = ({
   onStatusChange,
+  onColumnsResolved,
   getAuthHeaders,
 }: {
   onStatusChange: (status: LocalFirstSyncStatus) => void;
+  onColumnsResolved: (columnNames: string[]) => void;
   getAuthHeaders: () => Record<string, string>;
 }) => {
   if (syncLoopStarted || !IS_LOCAL_FIRST_ENABLED) return;
@@ -157,23 +168,36 @@ export const startSyncingPersonShapeToLocalFirstDatabase = ({
   let handle: string | null = null;
 
   const runLoop = async () => {
-    const pg = await getLocalFirstDatabase();
+    let pg: PGlite | null = null;
+    let columnNames: string[] = [];
 
     while (true) {
       try {
         onStatusChange('syncing');
+
+        // The local table is built from the server's column list, so this has
+        // to succeed before any row can be applied.
+        if (!isDefined(pg)) {
+          const mirror = await getLocalFirstPersonMirror();
+
+          pg = mirror.pg;
+          columnNames = mirror.columnNames;
+          onColumnsResolved(columnNames);
+        }
+
         const batch = await fetchShapeBatch({ offset, handle, getAuthHeaders });
+
         offset = batch.nextOffset;
         handle = batch.nextHandle;
-        await applyMessages(pg, batch.messages);
+        await applyMessages({ pg, messages: batch.messages, columnNames });
 
         if (batch.upToDate) {
           onStatusChange('upToDate');
-          await new Promise((resolve) => setTimeout(resolve, 3000));
+          await new Promise((resolve) => setTimeout(resolve, POLL_INTERVAL_MS));
         }
       } catch {
         onStatusChange('offline');
-        await new Promise((resolve) => setTimeout(resolve, 3000));
+        await new Promise((resolve) => setTimeout(resolve, POLL_INTERVAL_MS));
       }
     }
   };

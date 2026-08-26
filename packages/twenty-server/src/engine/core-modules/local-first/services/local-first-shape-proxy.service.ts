@@ -8,7 +8,7 @@ import { isNonEmptyString } from '@sniptt/guards';
 import { type Response } from 'express';
 import { isDefined } from 'twenty-shared/utils';
 
-import { LOCAL_FIRST_SYNCED_TABLES } from 'src/engine/core-modules/local-first/constants/local-first-synced-tables.constant';
+import { LocalFirstSchemaService } from 'src/engine/core-modules/local-first/services/local-first-schema.service';
 import { TwentyConfigService } from 'src/engine/core-modules/twenty-config/twenty-config.service';
 
 // Electric drives shape pagination/liveness through these; the client may set
@@ -27,7 +27,10 @@ const FORWARDED_RESPONSE_HEADERS = [
 
 @Injectable()
 export class LocalFirstShapeProxyService {
-  constructor(private readonly twentyConfigService: TwentyConfigService) {}
+  constructor(
+    private readonly twentyConfigService: TwentyConfigService,
+    private readonly localFirstSchemaService: LocalFirstSchemaService,
+  ) {}
 
   async proxyShapeRequest({
     tableName,
@@ -48,17 +51,14 @@ export class LocalFirstShapeProxyService {
       );
     }
 
-    const columns = LOCAL_FIRST_SYNCED_TABLES[tableName];
-
-    if (!isDefined(columns)) {
-      throw new NotFoundException(
-        `Table "${tableName}" is not available for local-first sync`,
-      );
-    }
+    const columns = await this.localFirstSchemaService.getSyncableColumns({
+      workspaceSchema,
+      tableName,
+    });
 
     const params = new URLSearchParams({
       table: `"${workspaceSchema}"."${tableName}"`,
-      columns: columns.map((column) => `"${column}"`).join(','),
+      columns: columns.map((column) => `"${column.name}"`).join(','),
     });
 
     for (const param of FORWARDED_QUERY_PARAMS) {

@@ -8,7 +8,9 @@ import {
 } from '@/local-first/states/localFirstShadowReportState';
 import { appendLocalFirstShadowReport } from '@/local-first/utils/appendLocalFirstShadowReport';
 import { buildLocalPersonQuery } from '@/local-first/utils/buildLocalPersonQuery';
+import { assessLocalPersonFieldCoverage } from '@/local-first/utils/assessLocalPersonFieldCoverage';
 import { compareLocalAndServerPeople } from '@/local-first/utils/compareLocalAndServerPeople';
+import { extractRequestedNodeFields } from '@/local-first/utils/extractRequestedNodeFields';
 import { jotaiStore } from '@/ui/utilities/state/jotai/jotaiStore';
 import { logDebug } from '~/utils/logDebug';
 
@@ -53,7 +55,18 @@ export const createLocalFirstShadowCompareLink = () =>
         // response the app is rendering from.
         void (async () => {
           try {
-            const translation = buildLocalPersonQuery(operation.variables);
+            // Awaiting the shared mirror rather than reading state avoids
+            // racing the schema fetch: the first list query of a page load
+            // otherwise arrives before any columns are known.
+            const { getLocalFirstPersonMirror } =
+              await import('@/local-first/services/getLocalFirstPersonMirror');
+            const { pg, columnNames: syncedColumns } =
+              await getLocalFirstPersonMirror();
+
+            const translation = buildLocalPersonQuery({
+              ...operation.variables,
+              syncedColumns,
+            });
 
             if (!translation.isSupported) {
               recordReport({
@@ -65,12 +78,26 @@ export const createLocalFirstShadowCompareLink = () =>
               return;
             }
 
+            const requestedFields = extractRequestedNodeFields({
+              query: operation.query,
+              listFieldName: 'people',
+            });
+            const coverage = assessLocalPersonFieldCoverage({
+              requestedFields,
+              syncedColumns,
+            });
+
+            if (!coverage.isCovered) {
+              recordReport({
+                operationName: operation.operationName ?? 'unknown',
+                outcome: 'unsupported',
+                detail: `fields not synced: ${coverage.missingFields.join(', ')}`,
+              });
+
+              return;
+            }
+
             const serverRecords = extractServerRecords(result.data);
-            // Imported here rather than at module scope so that PGlite stays
-            // out of the bundle when the local-first flag is off.
-            const { getLocalFirstDatabase } =
-              await import('@/local-first/services/getLocalFirstDatabase');
-            const pg = await getLocalFirstDatabase();
             const localResult = await pg.query<Record<string, unknown>>(
               translation.sql,
               translation.params,
@@ -79,6 +106,8 @@ export const createLocalFirstShadowCompareLink = () =>
             const comparison = compareLocalAndServerPeople({
               serverRecords,
               localRecords: localResult.rows,
+              requestedFields,
+              syncedColumns,
             });
 
             recordReport({

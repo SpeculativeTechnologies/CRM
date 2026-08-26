@@ -2,48 +2,76 @@ import { PGlite } from '@electric-sql/pglite';
 import { live } from '@electric-sql/pglite/live';
 import { isDefined } from 'twenty-shared/utils';
 
-import { LOCAL_FIRST_PERSON_COLUMN_TYPES } from '@/local-first/constants/LOCAL_FIRST_PERSON_COLUMN_TYPES';
-import { LOCAL_FIRST_PERSON_COLUMNS } from '@/local-first/constants/LOCAL_FIRST_PERSON_COLUMNS';
+import { toLocalColumnDefinition } from '@/local-first/utils/toLocalColumnDefinition';
+
+export type LocalFirstColumn = {
+  name: string;
+  dataType: string;
+};
 
 // Bump the suffix when the local table shape changes: `create table if not
 // exists` won't migrate an existing IndexedDB database, so a new name is the
 // spike's schema-migration story.
-const LOCAL_FIRST_DATA_DIR = 'idb://twenty-local-first-v3';
+const LOCAL_FIRST_DATA_DIR = 'idb://twenty-local-first-v4';
 
-const personColumnDefinitions = LOCAL_FIRST_PERSON_COLUMNS.map(
-  (column) => `"${column}" ${LOCAL_FIRST_PERSON_COLUMN_TYPES[column]}`,
-).join(', ');
+let localFirstDatabasePromise: ReturnType<typeof openDatabase> | null = null;
 
-let localFirstDatabasePromise: ReturnType<
-  typeof createLocalFirstDatabase
-> | null = null;
-
-const createLocalFirstDatabase = async () => {
-  const pg = await PGlite.create({
+const openDatabase = async () =>
+  PGlite.create({
     dataDir: LOCAL_FIRST_DATA_DIR,
     extensions: { live },
   });
 
-  await pg.exec(
-    `create table if not exists person (${personColumnDefinitions});`,
-  );
-
-  // The standard views page by position and hide soft-deleted rows, so this
-  // is the index every local read of person hits.
-  await pg.exec(
-    'create index if not exists person_deleted_at_position_idx on person ("deletedAt", position);',
-  );
-
-  return pg;
-};
-
 // Spike-only singleton: one PGlite instance per tab, lazily opened on first
-// use. A real implementation would manage this through a provider/context
-// instead of module-level state.
+// use. It must stay a singleton -- two instances on the same IndexedDB dataDir
+// block each other. A real implementation would own this in a provider.
 export const getLocalFirstDatabase = () => {
   if (!isDefined(localFirstDatabasePromise)) {
-    localFirstDatabasePromise = createLocalFirstDatabase();
+    localFirstDatabasePromise = openDatabase();
   }
 
   return localFirstDatabasePromise;
+};
+
+const ensuredTables = new Set<string>();
+
+// Creates the local mirror of a table from the column list the server reported,
+// rather than a hardcoded shape, so every non-generated column of the object
+// syncs. Record pages request every field, so a partial mirror can never
+// answer a query.
+export const ensureLocalFirstTable = async ({
+  tableName,
+  columns,
+}: {
+  tableName: string;
+  columns: LocalFirstColumn[];
+}) => {
+  const pg = await getLocalFirstDatabase();
+
+  if (ensuredTables.has(tableName)) return pg;
+
+  const columnDefinitions = columns
+    .map((column) =>
+      toLocalColumnDefinition({
+        name: column.name,
+        dataType: column.dataType,
+        isPrimaryKey: column.name === 'id',
+      }),
+    )
+    .join(', ');
+
+  await pg.exec(
+    `create table if not exists "${tableName}" (${columnDefinitions});`,
+  );
+
+  // Standard views hide soft-deleted rows and order by position, so this is
+  // the index every local list read hits.
+  await pg.exec(
+    `create index if not exists "${tableName}_deleted_at_position_idx"
+     on "${tableName}" ("deletedAt", position);`,
+  );
+
+  ensuredTables.add(tableName);
+
+  return pg;
 };
