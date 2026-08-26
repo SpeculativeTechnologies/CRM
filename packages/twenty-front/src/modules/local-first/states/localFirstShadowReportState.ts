@@ -2,12 +2,12 @@ import { atom } from 'jotai';
 
 export type LocalFirstShadowReport = {
   operationName: string;
-  // 'match' | 'divergence' | 'unsupported' | 'error'
-  outcome: 'match' | 'divergence' | 'unsupported' | 'error';
+  outcome: 'servedLocally' | 'match' | 'divergence' | 'unsupported' | 'error';
   detail: string;
 };
 
 export type LocalFirstShadowReportState = {
+  servedLocallyCount: number;
   matchCount: number;
   divergenceCount: number;
   unsupportedCount: number;
@@ -17,6 +17,7 @@ export type LocalFirstShadowReportState = {
 
 export const LOCAL_FIRST_SHADOW_REPORT_INITIAL_STATE: LocalFirstShadowReportState =
   {
+    servedLocallyCount: 0,
     matchCount: 0,
     divergenceCount: 0,
     unsupportedCount: 0,

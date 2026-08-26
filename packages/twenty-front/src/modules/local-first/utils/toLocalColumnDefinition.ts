@@ -21,6 +21,9 @@ const LOCAL_COLUMN_TYPES: Record<string, string> = {
   ARRAY: 'text[]',
 };
 
+export const toLocalColumnType = (dataType: string): string =>
+  LOCAL_COLUMN_TYPES[dataType] ?? 'text';
+
 export const toLocalColumnDefinition = ({
   name,
   dataType,
@@ -30,7 +33,7 @@ export const toLocalColumnDefinition = ({
   dataType: string;
   isPrimaryKey: boolean;
 }): string => {
-  const localType = LOCAL_COLUMN_TYPES[dataType] ?? 'text';
+  const localType = toLocalColumnType(dataType);
 
   return `"${name}" ${localType}${isPrimaryKey ? ' primary key' : ''}`;
 };

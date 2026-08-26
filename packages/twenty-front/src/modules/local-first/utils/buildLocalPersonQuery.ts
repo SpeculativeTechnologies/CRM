@@ -93,17 +93,22 @@ export const buildLocalPersonQuery = ({
   limit,
   offset,
   cursorFilter,
-  syncedColumns,
+  selectColumns,
+  orderableColumns,
 }: {
   filter?: unknown;
   orderBy?: unknown;
   limit?: unknown;
   offset?: unknown;
   cursorFilter?: unknown;
-  syncedColumns: readonly string[];
+  // Columns the plan needs selected.
+  selectColumns: readonly string[];
+  // Columns that exist on the table, which ordering may reference even when
+  // the query does not display them.
+  orderableColumns: readonly string[];
 }): LocalPersonQueryTranslation => {
-  if (syncedColumns.length === 0) {
-    return { isSupported: false, reason: 'schema not resolved yet' };
+  if (selectColumns.length === 0) {
+    return { isSupported: false, reason: 'no columns to select' };
   }
 
   if (isDefined(cursorFilter)) {
@@ -120,7 +125,7 @@ export const buildLocalPersonQuery = ({
     whereSql = '';
   }
 
-  const orderByResult = translateOrderBy(orderBy, new Set(syncedColumns));
+  const orderByResult = translateOrderBy(orderBy, new Set(orderableColumns));
 
   if ('reason' in orderByResult) {
     return { isSupported: false, reason: orderByResult.reason };
@@ -150,7 +155,7 @@ export const buildLocalPersonQuery = ({
 
   return {
     isSupported: true,
-    sql: `select ${syncedColumns.map((column) => `"${column}"`).join(', ')} from person${whereSql}${orderByResult.orderBySql}${limitSql}${offsetSql}`,
+    sql: `select ${selectColumns.map((column) => `"${column}"`).join(', ')} from person${whereSql}${orderByResult.orderBySql}${limitSql}${offsetSql}`,
     params,
   };
 };

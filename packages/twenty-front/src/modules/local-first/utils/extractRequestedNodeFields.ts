@@ -1,12 +1,20 @@
 import { type DocumentNode, Kind, type SelectionSetNode } from 'graphql';
 
+export type RequestedRelation = {
+  // 'toOne' selects the related record directly; 'toMany' wraps it in a
+  // connection (edges { node { ... } }).
+  kind: 'toOne' | 'toMany';
+  // Fields requested on the related record, in the same shape as the root.
+  nodeFields: RequestedNodeField[];
+};
+
 export type RequestedNodeField = {
   name: string;
-  // Sub-selections, e.g. name { firstName lastName }. Empty for scalars.
+  // Sub-selections of a composite, e.g. name { firstName lastName }. Empty
+  // for scalars and for relations.
   subFields: string[];
-  // A sub-selection that itself has sub-selections is a relation, not a
-  // composite: composites are one level deep and flatten onto columns.
-  hasNestedSelections: boolean;
+  // Set when this field is a relation rather than a composite.
+  relation: RequestedRelation | null;
 };
 
 const findFieldSelectionSet = (
@@ -17,14 +25,86 @@ const findFieldSelectionSet = (
 
   for (const selection of selectionSet.selections) {
     if (selection.kind !== Kind.FIELD) continue;
-
-    if (selection.name.value === fieldName) {
-      return selection.selectionSet;
-    }
+    if (selection.name.value === fieldName) return selection.selectionSet;
   }
 
   return undefined;
 };
+
+const isDataField = (name: string) => !name.startsWith('__');
+
+const readSelectionFields = (
+  selectionSet: SelectionSetNode | undefined,
+): RequestedNodeField[] => {
+  if (!selectionSet) return [];
+
+  const fields: RequestedNodeField[] = [];
+
+  for (const selection of selectionSet.selections) {
+    if (selection.kind !== Kind.FIELD) continue;
+    if (!isDataField(selection.name.value)) continue;
+
+    const subSelectionSet = selection.selectionSet;
+
+    if (!subSelectionSet) {
+      fields.push({
+        name: selection.name.value,
+        subFields: [],
+        relation: null,
+      });
+      continue;
+    }
+
+    // A connection: the relation's records live under edges { node { ... } }.
+    const connectionNodeSelectionSet = findFieldSelectionSet(
+      findFieldSelectionSet(subSelectionSet, 'edges'),
+      'node',
+    );
+
+    if (connectionNodeSelectionSet) {
+      fields.push({
+        name: selection.name.value,
+        subFields: [],
+        relation: {
+          kind: 'toMany',
+          nodeFields: readSelectionFields(connectionNodeSelectionSet),
+        },
+      });
+      continue;
+    }
+
+    const subFields = subSelectionSet.selections
+      .filter((sub) => sub.kind === Kind.FIELD)
+      .map((sub) => (sub as { name: { value: string } }).name.value)
+      .filter(isDataField);
+
+    // A composite is one level deep and flattens onto columns; anything with
+    // deeper selections is a to-one relation to another record.
+    const hasDeeperSelections = subSelectionSet.selections.some(
+      (sub) => sub.kind === Kind.FIELD && isDefinedSelectionSet(sub),
+    );
+
+    if (hasDeeperSelections) {
+      fields.push({
+        name: selection.name.value,
+        subFields: [],
+        relation: {
+          kind: 'toOne',
+          nodeFields: readSelectionFields(subSelectionSet),
+        },
+      });
+      continue;
+    }
+
+    fields.push({ name: selection.name.value, subFields, relation: null });
+  }
+
+  return fields;
+};
+
+const isDefinedSelectionSet = (selection: {
+  selectionSet?: SelectionSetNode;
+}) => selection.selectionSet !== undefined;
 
 // Reads the fields a list query asks for on each record, so a local read can
 // refuse any query whose selection it cannot fully answer. Returns [] when the
@@ -40,46 +120,17 @@ export const extractRequestedNodeFields = ({
   for (const definition of query.definitions) {
     if (definition.kind !== Kind.OPERATION_DEFINITION) continue;
 
-    const listSelectionSet = findFieldSelectionSet(
-      definition.selectionSet,
-      listFieldName,
+    const nodeSelectionSet = findFieldSelectionSet(
+      findFieldSelectionSet(
+        findFieldSelectionSet(definition.selectionSet, listFieldName),
+        'edges',
+      ),
+      'node',
     );
-    const edgesSelectionSet = findFieldSelectionSet(listSelectionSet, 'edges');
-    const nodeSelectionSet = findFieldSelectionSet(edgesSelectionSet, 'node');
 
     if (!nodeSelectionSet) continue;
 
-    const fields: RequestedNodeField[] = [];
-
-    for (const selection of nodeSelectionSet.selections) {
-      if (selection.kind !== Kind.FIELD) continue;
-
-      // __typename is added by Apollo and is not data.
-      if (selection.name.value.startsWith('__')) continue;
-
-      const subSelections = selection.selectionSet?.selections ?? [];
-      const subFields: string[] = [];
-      let hasNestedSelections = false;
-
-      for (const subSelection of subSelections) {
-        if (subSelection.kind !== Kind.FIELD) continue;
-        if (subSelection.name.value.startsWith('__')) continue;
-
-        subFields.push(subSelection.name.value);
-
-        if (subSelection.selectionSet) {
-          hasNestedSelections = true;
-        }
-      }
-
-      fields.push({
-        name: selection.name.value,
-        subFields,
-        hasNestedSelections,
-      });
-    }
-
-    return fields;
+    return readSelectionFields(nodeSelectionSet);
   }
 
   return [];

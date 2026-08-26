@@ -26,6 +26,10 @@ export const normalizeComparableValue = (value: unknown): string => {
     return value;
   }
 
+  // An empty list and no list are the same absence of values: the API returns
+  // [] for these fields while the column holds SQL NULL.
+  if (Array.isArray(value) && value.length === 0) return '';
+
   // jsonb columns (additionalEmails, secondaryLinks) come back parsed on both
   // sides; key order is stable because both derive from the same stored JSON.
   try {

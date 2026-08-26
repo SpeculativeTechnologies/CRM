@@ -3,7 +3,7 @@ import { useMemo } from 'react';
 import { useApolloFactory } from '@/apollo/hooks/useApolloFactory';
 
 import { IS_LOCAL_FIRST_ENABLED } from '@/local-first/constants/IS_LOCAL_FIRST_ENABLED';
-import { createLocalFirstShadowCompareLink } from '@/local-first/services/createLocalFirstShadowCompareLink';
+import { createLocalFirstReadLink } from '@/local-first/services/createLocalFirstReadLink';
 import { ApolloCoreClientContext } from '@/object-metadata/contexts/ApolloCoreClientContext';
 
 export const ApolloCoreProvider = ({
@@ -11,11 +11,12 @@ export const ApolloCoreProvider = ({
 }: {
   children: React.ReactNode;
 }) => {
-  // Observes record list responses and compares them against the locally
-  // synced database without altering them. Off unless the local-first flag is
-  // set; the link itself pulls in PGlite only on first comparison.
+  // Answers people list queries from the local mirror when it can, and
+  // compares against the server when it cannot (or when serving is off). Off
+  // unless the local-first flag is set; the link pulls in PGlite only on the
+  // first list query.
   const extraLinks = useMemo(
-    () => (IS_LOCAL_FIRST_ENABLED ? [createLocalFirstShadowCompareLink()] : []),
+    () => (IS_LOCAL_FIRST_ENABLED ? [createLocalFirstReadLink()] : []),
     [],
   );
 

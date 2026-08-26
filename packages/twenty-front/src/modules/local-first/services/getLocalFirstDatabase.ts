@@ -65,11 +65,24 @@ export const ensureLocalFirstTable = async ({
   );
 
   // Standard views hide soft-deleted rows and order by position, so this is
-  // the index every local list read hits.
-  await pg.exec(
-    `create index if not exists "${tableName}_deleted_at_position_idx"
-     on "${tableName}" ("deletedAt", position);`,
-  );
+  // the index local list reads hit. Join objects are looked up by their
+  // foreign keys instead, so those get indexed too.
+  const columnNames = new Set(columns.map((column) => column.name));
+  const indexedColumnSets = [
+    ['deletedAt', 'position'],
+    ...[...columnNames]
+      .filter((column) => column !== 'id' && column.endsWith('Id'))
+      .map((column) => [column]),
+  ];
+
+  for (const indexedColumns of indexedColumnSets) {
+    if (!indexedColumns.every((column) => columnNames.has(column))) continue;
+
+    await pg.exec(
+      `create index if not exists "${tableName}_${indexedColumns.join('_')}_idx"
+       on "${tableName}" (${indexedColumns.map((column) => `"${column}"`).join(', ')});`,
+    );
+  }
 
   ensuredTables.add(tableName);
 

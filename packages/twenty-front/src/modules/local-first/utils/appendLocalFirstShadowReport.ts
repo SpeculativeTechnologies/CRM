@@ -6,6 +6,7 @@ import {
 const MAX_RETAINED_REPORTS = 20;
 
 const OUTCOME_COUNT_KEYS = {
+  servedLocally: 'servedLocallyCount',
   match: 'matchCount',
   divergence: 'divergenceCount',
   unsupported: 'unsupportedCount',
