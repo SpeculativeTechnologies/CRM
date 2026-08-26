@@ -19,8 +19,25 @@ export type LocalFirstMirror = {
   columnsByTable: Record<string, string[]>;
 };
 
-let mirrorPromise: Promise<LocalFirstMirror> | null = null;
-let resolvedMirror: LocalFirstMirror | null = null;
+// Shared across module instances for the same reason the database handle is:
+// a second mirror would open a second PGlite on the same IndexedDB directory
+// and deadlock.
+const MIRROR_SINGLETON_KEY = '__twentyLocalFirstMirror';
+
+type MirrorSingletonHolder = {
+  [MIRROR_SINGLETON_KEY]?: {
+    promise: Promise<LocalFirstMirror> | null;
+    resolved: LocalFirstMirror | null;
+  };
+};
+
+const getMirrorHolder = () => {
+  const holder = globalThis as unknown as MirrorSingletonHolder;
+
+  holder[MIRROR_SINGLETON_KEY] ??= { promise: null, resolved: null };
+
+  return holder[MIRROR_SINGLETON_KEY];
+};
 
 const fetchTableColumns = async (
   tableName: string,
@@ -86,23 +103,25 @@ const createMirror = async (): Promise<LocalFirstMirror> => {
 // and making a user wait on local infrastructure is strictly worse than going
 // to the network. Local serving is opportunistic by design.
 export const tryGetReadyLocalFirstMirror = (): LocalFirstMirror | null =>
-  resolvedMirror;
+  getMirrorHolder().resolved;
 
 export const getLocalFirstMirror = () => {
-  if (!isDefined(mirrorPromise)) {
-    mirrorPromise = createMirror()
+  const holder = getMirrorHolder();
+
+  if (!isDefined(holder.promise)) {
+    holder.promise = createMirror()
       .then((mirror) => {
-        resolvedMirror = mirror;
+        holder.resolved = mirror;
 
         return mirror;
       })
       .catch((error) => {
         // A failed setup must not be cached, or one early failure (e.g. a
         // request before auth is ready) would disable local reads for the tab.
-        mirrorPromise = null;
+        holder.promise = null;
         throw error;
       });
   }
 
-  return mirrorPromise;
+  return holder.promise;
 };

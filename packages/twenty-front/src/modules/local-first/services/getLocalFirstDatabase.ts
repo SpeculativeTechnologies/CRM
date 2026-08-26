@@ -14,26 +14,46 @@ export type LocalFirstColumn = {
 // spike's schema-migration story.
 const LOCAL_FIRST_DATA_DIR = 'idb://twenty-local-first-v4';
 
-let localFirstDatabasePromise: ReturnType<typeof openDatabase> | null = null;
-
 const openDatabase = async () =>
   PGlite.create({
     dataDir: LOCAL_FIRST_DATA_DIR,
     extensions: { live },
   });
 
-// Spike-only singleton: one PGlite instance per tab, lazily opened on first
-// use. It must stay a singleton -- two instances on the same IndexedDB dataDir
-// block each other. A real implementation would own this in a provider.
-export const getLocalFirstDatabase = () => {
-  if (!isDefined(localFirstDatabasePromise)) {
-    localFirstDatabasePromise = openDatabase();
-  }
+// The singleton lives on globalThis, not in module scope: two PGlite instances
+// on the same IndexedDB directory block each other forever, and a bundler or
+// dev server that hands out two instances of this module (a dynamic import
+// resolving to a different URL than a static one, for example) would do
+// exactly that. This was not theoretical -- it deadlocked local reads while
+// sync kept working, because each side held its own instance.
+const DATABASE_SINGLETON_KEY = '__twentyLocalFirstDatabase';
 
-  return localFirstDatabasePromise;
+type DatabaseSingletonHolder = {
+  [DATABASE_SINGLETON_KEY]?: ReturnType<typeof openDatabase>;
 };
 
-const ensuredTables = new Set<string>();
+export const getLocalFirstDatabase = () => {
+  const holder = globalThis as unknown as DatabaseSingletonHolder;
+
+  if (!isDefined(holder[DATABASE_SINGLETON_KEY])) {
+    holder[DATABASE_SINGLETON_KEY] = openDatabase();
+  }
+
+  return holder[DATABASE_SINGLETON_KEY];
+};
+
+// Shared for the same reason as the database handle above.
+const ENSURED_TABLES_KEY = '__twentyLocalFirstEnsuredTables';
+
+const getEnsuredTables = (): Set<string> => {
+  const holder = globalThis as unknown as {
+    [ENSURED_TABLES_KEY]?: Set<string>;
+  };
+
+  holder[ENSURED_TABLES_KEY] ??= new Set<string>();
+
+  return holder[ENSURED_TABLES_KEY];
+};
 
 // Creates the local mirror of a table from the column list the server reported,
 // rather than a hardcoded shape, so every non-generated column of the object
@@ -47,6 +67,8 @@ export const ensureLocalFirstTable = async ({
   columns: LocalFirstColumn[];
 }) => {
   const pg = await getLocalFirstDatabase();
+
+  const ensuredTables = getEnsuredTables();
 
   if (ensuredTables.has(tableName)) return pg;
 

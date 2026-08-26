@@ -1,5 +1,4 @@
 import { ApolloLink, Observable } from '@apollo/client';
-import { tap } from 'rxjs';
 
 import { IS_LOCAL_FIRST_READS_ENABLED } from '@/local-first/constants/IS_LOCAL_FIRST_READS_ENABLED';
 import {
@@ -11,7 +10,6 @@ import { buildLocalPersonQuery } from '@/local-first/utils/buildLocalPersonQuery
 import { compareLocalAndServerPeople } from '@/local-first/utils/compareLocalAndServerPeople';
 import { extractRequestedNodeFields } from '@/local-first/utils/extractRequestedNodeFields';
 import { jotaiStore } from '@/ui/utilities/state/jotai/jotaiStore';
-import { isDefined } from 'twenty-shared/utils';
 
 const PEOPLE_OPERATION_NAME = 'FindManyPeople';
 const PEOPLE_LIST_FIELD = 'people';
@@ -40,7 +38,7 @@ export const resolveLocalPeople = async (
   | { isSupported: false; reason: string }
 > => {
   const [
-    { tryGetReadyLocalFirstMirror },
+    { getLocalFirstMirror },
     { buildLocalReadPlan },
     { executeLocalReadPlan },
   ] = await Promise.all([
@@ -49,15 +47,10 @@ export const resolveLocalPeople = async (
     import('@/local-first/services/executeLocalReadPlan'),
   ]);
 
-  // Only serve from a mirror that is already built. Waiting for PGlite to boot
-  // would make a cold page slower than simply asking the server.
-  const mirror = tryGetReadyLocalFirstMirror();
-
-  if (!isDefined(mirror)) {
-    return { isSupported: false, reason: 'mirror not ready yet' };
-  }
-
-  const { pg, columnsByTable } = mirror;
+  // Waiting for the mirror is safe because the caller races this against the
+  // network: if booting PGlite takes seconds, the network answer simply wins
+  // and this result is used only for the comparison.
+  const { pg, columnsByTable } = await getLocalFirstMirror();
 
   const planResult = buildLocalReadPlan({
     table: PERSON_TABLE,
@@ -122,99 +115,141 @@ const toConnectionResponse = ({ nodes, totalCount }: LocalPeopleResult) => ({
   },
 });
 
-// Answers people list queries from the local mirror when it can, and forwards
-// to the network when it cannot. Serving locally takes the network out of the
-// interactive path entirely; anything the plan does not fully understand falls
-// through and behaves exactly as before.
+// Races the local mirror against the network and renders whichever answers
+// first. Waiting for the mirror instead would make a cold page slower than
+// simply asking the server (booting PGlite takes seconds), while gating on
+// "is the mirror ready" meant a page load never used it at all. Racing gives
+// the local read every chance to win without ever costing latency when it
+// loses.
+//
+// The network request is always made: it keeps the cache fresh and provides
+// the answer to compare the local read against. Cutting it is a later
+// optimisation, and one that should only happen with evidence.
 export const createLocalFirstReadLink = () =>
   new ApolloLink((operation, forward) => {
     if (operation.operationName !== PEOPLE_OPERATION_NAME) {
       return forward(operation);
     }
 
+    const operationName = operation.operationName ?? 'unknown';
+
     return new Observable((observer) => {
       let isCancelled = false;
+      let hasEmitted = false;
+      let localOutcome: Awaited<ReturnType<typeof resolveLocalPeople>> | null =
+        null;
+      let serverRecords: Record<string, unknown>[] | null = null;
+      let hasCompared = false;
+
+      const emit = (value: unknown) => {
+        if (isCancelled || hasEmitted) return false;
+
+        hasEmitted = true;
+        observer.next(value as Parameters<typeof observer.next>[0]);
+        observer.complete();
+
+        return true;
+      };
+
+      // Called from whichever side finishes second: the verdict needs both
+      // answers, and either can arrive first. Deliberately not gated on the
+      // subscription still being alive: on a fast connection the network
+      // answers and Apollo unsubscribes long before the local read lands, and
+      // suppressing the verdict then would hide every comparison.
+      const compareWhenBothArrived = (servedLocally: boolean) => {
+        if (hasCompared) return;
+        if (localOutcome?.isSupported !== true || serverRecords === null)
+          return;
+
+        hasCompared = true;
+
+        const comparison = compareLocalAndServerPeople({
+          serverRecords,
+          localRecords: localOutcome.result.nodes,
+          requestedFields: extractRequestedNodeFields({
+            query: operation.query,
+            listFieldName: PEOPLE_LIST_FIELD,
+          }),
+        });
+
+        const source = servedLocally ? 'served local' : 'served network';
+
+        recordReport({
+          operationName,
+          outcome: comparison.isMatch ? 'match' : 'divergence',
+          detail: comparison.isMatch
+            ? `${source}, ${comparison.serverCount} rows agreed (${comparison.comparedFieldCount} fields)`
+            : comparison.differences.join('; '),
+        });
+      };
 
       void (async () => {
-        let localResult: Awaited<ReturnType<typeof resolveLocalPeople>> | null =
-          null;
-
         try {
-          localResult = await resolveLocalPeople(operation);
+          localOutcome = await resolveLocalPeople(operation);
         } catch (error) {
           recordReport({
-            operationName: operation.operationName ?? 'unknown',
+            operationName,
             outcome: 'error',
             detail: error instanceof Error ? error.message : String(error),
           });
-        }
-
-        if (isCancelled) return;
-
-        if (localResult?.isSupported === true && IS_LOCAL_FIRST_READS_ENABLED) {
-          recordReport({
-            operationName: operation.operationName ?? 'unknown',
-            outcome: 'servedLocally',
-            detail: `${localResult.result.nodes.length} rows from local`,
-          });
-
-          observer.next(toConnectionResponse(localResult.result));
-          observer.complete();
 
           return;
         }
 
-        // Not served locally: forward, and use the response to check what the
-        // local read would have returned.
-        forward(operation)
-          .pipe(
-            tap((response) => {
-              if (localResult?.isSupported !== true) {
-                recordReport({
-                  operationName: operation.operationName ?? 'unknown',
-                  outcome: 'unsupported',
-                  detail: localResult?.reason ?? 'local read unavailable',
-                });
-
-                return;
-              }
-
-              const serverEdges =
-                (
-                  response.data as {
-                    people?: { edges?: { node?: Record<string, unknown> }[] };
-                  }
-                )?.people?.edges ?? [];
-
-              const comparison = compareLocalAndServerPeople({
-                serverRecords: serverEdges
-                  .map((edge) => edge?.node)
-                  .filter((node): node is Record<string, unknown> => !!node),
-                localRecords: localResult.result.nodes,
-                requestedFields: extractRequestedNodeFields({
-                  query: operation.query,
-                  listFieldName: PEOPLE_LIST_FIELD,
-                }),
-              });
-
-              recordReport({
-                operationName: operation.operationName ?? 'unknown',
-                outcome: comparison.isMatch ? 'match' : 'divergence',
-                detail: comparison.isMatch
-                  ? `${comparison.serverCount} rows agreed (${comparison.comparedFieldCount} fields)`
-                  : comparison.differences.join('; '),
-              });
-            }),
-          )
-          .subscribe({
-            next: (value) => observer.next(value),
-            error: (error) => observer.error(error),
-            complete: () => observer.complete(),
+        if (!localOutcome.isSupported) {
+          recordReport({
+            operationName,
+            outcome: 'unsupported',
+            detail: localOutcome.reason,
           });
+
+          return;
+        }
+
+        const servedLocally =
+          IS_LOCAL_FIRST_READS_ENABLED &&
+          emit(toConnectionResponse(localOutcome.result));
+
+        if (servedLocally) {
+          recordReport({
+            operationName,
+            outcome: 'servedLocally',
+            detail: `${localOutcome.result.nodes.length} rows from local`,
+          });
+        }
+
+        compareWhenBothArrived(servedLocally);
       })();
+
+      const subscription = forward(operation).subscribe({
+        next: (response) => {
+          const servedLocally = hasEmitted;
+
+          emit(response);
+
+          serverRecords = (
+            (
+              response.data as {
+                people?: { edges?: { node?: Record<string, unknown> }[] };
+              }
+            )?.people?.edges ?? []
+          )
+            .map((edge) => edge?.node)
+            .filter((node): node is Record<string, unknown> => !!node);
+
+          compareWhenBothArrived(servedLocally);
+        },
+        error: (error) => {
+          if (!hasEmitted) observer.error(error);
+        },
+        complete: () => {
+          if (!hasEmitted) observer.complete();
+        },
+      });
 
       return () => {
         isCancelled = true;
+        subscription.unsubscribe();
       };
     });
   });
