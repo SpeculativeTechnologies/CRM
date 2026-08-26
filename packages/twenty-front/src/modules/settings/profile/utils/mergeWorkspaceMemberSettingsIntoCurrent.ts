@@ -1,4 +1,4 @@
-import { isNull, isNumber, isString } from '@sniptt/guards';
+import { isBoolean, isNull, isNumber, isString } from '@sniptt/guards';
 
 import { type CurrentWorkspaceMember } from '@/auth/states/currentWorkspaceMemberState';
 import { type ColorScheme } from '@/workspace-member/types/WorkspaceMember';
@@ -29,6 +29,8 @@ export type WorkspaceMemberSettingsUpdateInput = {
   timeFormat?: string;
   numberFormat?: string;
   position?: number;
+  emailSignature?: string | null;
+  isEmailSignatureIncludedByDefault?: boolean;
 };
 
 const isColorScheme = (value: unknown): value is ColorScheme =>
@@ -182,6 +184,26 @@ export const mergeWorkspaceMemberSettingsIntoCurrent = (
     } else if (isNumber(value) && Number.isFinite(value)) {
       next = { ...next, calendarStartDay: value };
     }
+  }
+
+  if ('emailSignature' in payload) {
+    const value = payload.emailSignature;
+    if (isNull(value)) {
+      next = { ...next, emailSignature: null };
+    } else if (isString(value)) {
+      next = { ...next, emailSignature: value };
+    }
+  }
+
+  if (
+    'isEmailSignatureIncludedByDefault' in payload &&
+    isBoolean(payload.isEmailSignatureIncludedByDefault)
+  ) {
+    next = {
+      ...next,
+      isEmailSignatureIncludedByDefault:
+        payload.isEmailSignatureIncludedByDefault,
+    };
   }
 
   return next;

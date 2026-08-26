@@ -10,4 +10,5 @@ export * from './resolve-canvas-theme';
 export * from './tiptap-mark-types';
 export * from './tiptap-marks-render-order';
 export * from './tiptap-node-types';
+export * from './tiptap-text-colors';
 export * from './transform-email-document-strings';

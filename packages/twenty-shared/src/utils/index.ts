@@ -262,6 +262,7 @@ export type { TipTapDocument } from './tiptap/tiptap-document';
 export type {
   TipTapMarkType,
   LinkMarkAttributes,
+  TextColorMarkAttributes,
   TipTapMark,
 } from './tiptap/tiptap-mark-types';
 export { TIPTAP_MARK_TYPES } from './tiptap/tiptap-mark-types';
@@ -269,6 +270,13 @@ export { TIPTAP_MARKS_RENDER_ORDER } from './tiptap/tiptap-marks-render-order';
 export type { TipTapNodeType } from './tiptap/tiptap-node-types';
 export { TIPTAP_NODE_TYPES } from './tiptap/tiptap-node-types';
 export type { TipTapNode } from './tiptap/tiptap-node';
+export type { TipTapTextColorName } from './tiptap/tiptap-text-colors';
+export {
+  TIPTAP_TEXT_COLORS,
+  TIPTAP_TEXT_COLOR_NAMES,
+  isTipTapTextColorName,
+  resolveTipTapTextColor,
+} from './tiptap/tiptap-text-colors';
 export { transformEmailDocumentStrings } from './tiptap/transform-email-document-strings';
 export type { StringPropertyKeys } from './trim-and-remove-duplicated-whitespaces-from-object-string-properties';
 export { trimAndRemoveDuplicatedWhitespacesFromObjectStringProperties } from './trim-and-remove-duplicated-whitespaces-from-object-string-properties';

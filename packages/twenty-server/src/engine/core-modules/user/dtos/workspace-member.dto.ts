@@ -70,4 +70,10 @@ export class WorkspaceMemberDTO {
 
   @Field(() => WorkspaceMemberNumberFormatEnum, { nullable: true })
   numberFormat?: WorkspaceMemberNumberFormatEnum;
+
+  @Field({ nullable: true })
+  emailSignature?: string;
+
+  @Field({ nullable: true })
+  isEmailSignatureIncludedByDefault?: boolean;
 }

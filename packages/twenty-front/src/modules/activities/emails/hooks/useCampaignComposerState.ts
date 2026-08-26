@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { useMessageCampaignDraft } from '@/activities/emails/hooks/useMessageCampaignDraft';
 import { useSendMessageCampaign } from '@/activities/emails/hooks/useSendMessageCampaign';
+import { useEmailSignatureComposer } from '@/activities/emails/signature/hooks/useEmailSignatureComposer';
 
 type UseCampaignComposerStateArgs = {
   campaignId?: string;
@@ -32,7 +33,11 @@ export const useCampaignComposerState = ({
     initialValues?.fromAddress ?? '',
   );
   const [subject, setSubject] = useState(initialValues?.subject ?? '');
-  const [body, setBody] = useState(initialValues?.body ?? '');
+  const signatureState = useEmailSignatureComposer({
+    isEnabled: true,
+    initialBody: initialValues?.body ?? '',
+  });
+  const [body, setBody] = useState(signatureState.initialBody);
   const [draftCampaignId, setDraftCampaignId] = useState(campaignId);
   const [draftSaveStatus, setDraftSaveStatus] = useState<
     'saving' | 'saved' | 'error'
@@ -96,6 +101,10 @@ export const useCampaignComposerState = ({
     return () => window.clearTimeout(timeoutId);
   }, [autoSaveDraft, draftCampaignId, saveCurrentDraft]);
 
+  const setSignatureIncluded = (isIncluded: boolean) => {
+    setBody(signatureState.applySignatureInclusion(body, isIncluded));
+  };
+
   const canSend =
     listId !== null &&
     fromAddress.trim().length > 0 &&
@@ -142,5 +151,9 @@ export const useCampaignComposerState = ({
     loading: isSending,
     isSaving,
     draftSaveStatus,
+    isSignatureToggleVisible: signatureState.isSignatureToggleVisible,
+    isSignatureIncluded: signatureState.isSignatureIncludedIn(body),
+    setSignatureIncluded,
+    signatureResyncKey: signatureState.signatureResyncKey,
   };
 };

@@ -143,4 +143,42 @@ describe('mergeWorkspaceMemberSettingsIntoCurrent', () => {
     expect(result.locale).toBe('es');
     expect('unknownField' in result).toBe(false);
   });
+
+  it('should merge the email signature and its default-on preference', () => {
+    const previous = createBaseWorkspaceMember();
+
+    const result = mergeWorkspaceMemberSettingsIntoCurrent(previous, {
+      emailSignature: '{"type":"doc"}',
+      isEmailSignatureIncludedByDefault: true,
+    });
+
+    expect(result.emailSignature).toBe('{"type":"doc"}');
+    expect(result.isEmailSignatureIncludedByDefault).toBe(true);
+  });
+
+  it('should clear the email signature when it is set to null', () => {
+    const previous = {
+      ...createBaseWorkspaceMember(),
+      emailSignature: '{"type":"doc"}',
+    };
+
+    const result = mergeWorkspaceMemberSettingsIntoCurrent(previous, {
+      emailSignature: null,
+    });
+
+    expect(result.emailSignature).toBeNull();
+  });
+
+  it('should ignore a non-boolean default-on preference', () => {
+    const previous = {
+      ...createBaseWorkspaceMember(),
+      isEmailSignatureIncludedByDefault: true,
+    };
+
+    const result = mergeWorkspaceMemberSettingsIntoCurrent(previous, {
+      isEmailSignatureIncludedByDefault: 'yes',
+    } as Record<string, unknown>);
+
+    expect(result.isEmailSignatureIncludedByDefault).toBe(true);
+  });
 });

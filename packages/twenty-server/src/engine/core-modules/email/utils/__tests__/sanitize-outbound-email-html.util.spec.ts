@@ -70,6 +70,27 @@ describe('outbound email sanitization', () => {
     ).resolves.toBe('Hello');
   });
 
+  // The colour a signature or body carries only survives as an inline style,
+  // so the sanitizer keeping that declaration is part of the feature rather
+  // than an incidental detail.
+  it('should preserve the inline colour of text colour marks', async () => {
+    const sanitized = await sanitizeOutboundEmailHtml(
+      '<p><span style="color:#ce2c31">Regards</span></p>',
+    );
+
+    expect(sanitized).toBe('<p><span style="color:#ce2c31">Regards</span></p>');
+  });
+
+  it('should still drop scripting around coloured text', async () => {
+    const sanitized = await sanitizeOutboundEmailHtml(
+      '<p><span style="color:#3a5bc7" onclick="alert(1)">Regards</span><script>alert(2)</script></p>',
+    );
+
+    expect(sanitized).toContain('style="color:#3a5bc7"');
+    expect(sanitized).not.toContain('onclick');
+    expect(sanitized).not.toContain('<script>');
+  });
+
   it('should always sanitize subjects as plain text', async () => {
     await expect(
       sanitizeOutboundEmailSubject(

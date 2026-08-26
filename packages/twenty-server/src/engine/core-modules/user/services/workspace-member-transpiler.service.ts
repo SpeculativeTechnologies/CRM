@@ -77,6 +77,8 @@ export class WorkspaceMemberTranspiler {
       dateFormat,
       calendarStartDay,
       numberFormat,
+      emailSignature,
+      isEmailSignatureIncludedByDefault,
     } = workspaceMemberEntity;
 
     const avatarUrl = await this.generateSignedAvatarUrl({
@@ -111,6 +113,9 @@ export class WorkspaceMemberTranspiler {
       roles,
       calendarStartDay,
       numberFormat: numberFormat as WorkspaceMemberNumberFormatEnum,
+      emailSignature: emailSignature ?? undefined,
+      isEmailSignatureIncludedByDefault:
+        isEmailSignatureIncludedByDefault ?? false,
     } satisfies WorkspaceMemberDTO;
   }
 

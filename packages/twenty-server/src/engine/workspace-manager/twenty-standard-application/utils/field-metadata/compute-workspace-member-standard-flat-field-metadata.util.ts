@@ -637,6 +637,60 @@ export const buildWorkspaceMemberStandardFlatFieldMetadatas = ({
     twentyStandardApplicationId,
     now,
   }),
+  emailSignature: createStandardFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      fieldName: 'emailSignature',
+      type: FieldMetadataType.TEXT,
+      label: i18nLabel(
+        msg({ message: `Email signature`, context: 'fieldMetadata.label' }),
+      ),
+      description: i18nLabel(
+        msg({
+          message: `Signature this member can add to the emails they compose`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconSignature',
+      isSystem: true,
+      isNullable: true,
+      isUIEditable: false,
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
+  isEmailSignatureIncludedByDefault: createStandardFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      fieldName: 'isEmailSignatureIncludedByDefault',
+      type: FieldMetadataType.BOOLEAN,
+      label: i18nLabel(
+        msg({
+          message: `Signature on by default`,
+          context: 'fieldMetadata.label',
+        }),
+      ),
+      description: i18nLabel(
+        msg({
+          message: `Whether new emails this member composes start with their signature`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconSignature',
+      isSystem: true,
+      isNullable: false,
+      isUIEditable: false,
+      defaultValue: false,
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
   searchVector: createStandardFieldFlatMetadata({
     objectName,
     workspaceId,

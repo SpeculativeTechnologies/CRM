@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { INLINE_EMAIL_BODY_EDITOR_PROFILE } from '@/activities/emails/editor/constants/InlineEmailBodyEditorProfile';
 import { type MassEmailComposerState } from '@/activities/emails/mass-email/hooks/useMassEmailComposerState';
 import { EMAIL_PLACEHOLDER_KEYS } from '@/activities/emails/mass-email/utils/emailPlaceholders';
+import { EmailSignatureToggleRow } from '@/activities/emails/signature/components/EmailSignatureToggleRow';
 import { FormAdvancedTextFieldInput } from '@/advanced-text-editor/components/FormAdvancedTextFieldInput';
 import { GET_MY_CONNECTED_ACCOUNTS } from '@/settings/accounts/graphql/queries/getMyConnectedAccounts';
 import { Select } from '@/ui/input/components/Select';
@@ -99,6 +100,11 @@ const StyledPlaceholderToken = styled.code`
   padding: 0 ${themeCssVariables.spacing[1]};
 `;
 
+const StyledSignatureRow = styled.div`
+  display: flex;
+  padding: 0 ${themeCssVariables.spacing[4]} ${themeCssVariables.spacing[2]};
+`;
+
 const StyledMissingWarning = styled.div`
   color: ${themeCssVariables.color.yellow};
   font-size: ${themeCssVariables.font.size.xs};
@@ -162,7 +168,7 @@ export const MassEmailComposeCard = ({
 
   const recipientCount = composerState.includedRecipients.length;
 
-  const editorKey = `${selectedPersonId ?? 'template'}:${resetNonce}`;
+  const editorKey = `${selectedPersonId ?? 'template'}:${resetNonce}:${composerState.signatureResyncKey}`;
 
   const handleReset = () => {
     if (!isDefined(selectedRecipient)) {
@@ -268,6 +274,15 @@ export const MassEmailComposeCard = ({
             minHeight={260}
           />
         </StyledBodyContainer>
+        {!isDefined(selectedRecipient) &&
+          composerState.isSignatureToggleVisible && (
+            <StyledSignatureRow>
+              <EmailSignatureToggleRow
+                isIncluded={composerState.isSignatureIncluded}
+                onChange={composerState.setSignatureIncluded}
+              />
+            </StyledSignatureRow>
+          )}
         {!isDefined(selectedRecipient) && (
           <StyledTokensRow>
             {t`Personalize for each recipient with placeholders:`}{' '}

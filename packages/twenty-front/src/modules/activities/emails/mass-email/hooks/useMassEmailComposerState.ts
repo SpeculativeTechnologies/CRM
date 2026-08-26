@@ -4,6 +4,7 @@ import { isDefined } from 'twenty-shared/utils';
 import { useMassEmailCampaignDraft } from '@/activities/emails/mass-email/hooks/useMassEmailCampaignDraft';
 import { useMassEmailRecipients } from '@/activities/emails/mass-email/hooks/useMassEmailRecipients';
 import { useSendMassEmail } from '@/activities/emails/mass-email/hooks/useSendMassEmail';
+import { useEmailSignatureComposer } from '@/activities/emails/signature/hooks/useEmailSignatureComposer';
 import { type MassEmailRecipient } from '@/activities/emails/mass-email/types/MassEmailRecipient';
 import {
   type EmailPlaceholderKey,
@@ -47,7 +48,11 @@ export const useMassEmailComposerState = ({
   const [subjectTemplate, setSubjectTemplate] = useState(
     initialDraft?.subject ?? '',
   );
-  const [bodyTemplate, setBodyTemplate] = useState(initialDraft?.body ?? '');
+  const signatureState = useEmailSignatureComposer({
+    isEnabled: true,
+    initialBody: initialDraft?.body ?? '',
+  });
+  const [bodyTemplate, setBodyTemplate] = useState(signatureState.initialBody);
   const [overrides, setOverrides] = useState<Record<string, MassEmailOverride>>(
     {},
   );
@@ -196,6 +201,14 @@ export const useMassEmailComposerState = ({
     [setPersonSelected],
   );
 
+  // The signature belongs to the shared template, not to a per-recipient
+  // override, so the card only offers the toggle on the template.
+  const setSignatureIncluded = (isIncluded: boolean) => {
+    setBodyTemplate(
+      signatureState.applySignatureInclusion(bodyTemplate, isIncluded),
+    );
+  };
+
   const canSend =
     includedRecipients.length > 0 &&
     connectedAccountId.length > 0 &&
@@ -334,6 +347,10 @@ export const useMassEmailComposerState = ({
     saveCurrentDraft,
     isSaving,
     draftSaveStatus,
+    isSignatureToggleVisible: signatureState.isSignatureToggleVisible,
+    isSignatureIncluded: signatureState.isSignatureIncludedIn(bodyTemplate),
+    setSignatureIncluded,
+    signatureResyncKey: signatureState.signatureResyncKey,
   };
 };
 

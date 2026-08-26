@@ -1443,6 +1443,16 @@ msgstr "إضافة عنصر قائمة قبله"
 msgid "Add Model"
 msgstr "إضافة نموذج"
 
+#. js-lingui-id: 4H+G/6
+#: src/modules/activities/emails/signature/components/EmailSignatureToggleRow.tsx
+msgid "Add my signature"
+msgstr ""
+
+#. js-lingui-id: 1jFlXn
+#: src/modules/settings/profile/components/SettingsProfileEmailSignature.tsx
+msgid "Add my signature to new emails by default"
+msgstr ""
+
 #. js-lingui-id: Hkobke
 #: src/modules/object-record/record-board/record-board-column/components/RecordBoardColumnHeader.tsx
 #: src/modules/object-record/record-list/components/RecordListAddNew.tsx
@@ -3294,6 +3304,7 @@ msgid "Blocks"
 msgstr "الكتل"
 
 #. js-lingui-id: Zn5crm
+#: src/modules/advanced-text-editor/constants/TextColorLabels.ts
 #: src/modules/settings/data-model/fields/forms/select/components/SettingsDataModelFieldSelectFormOptionRow.tsx
 msgid "Blue"
 msgstr "أزرق"
@@ -3369,6 +3380,7 @@ msgid "Bronze"
 msgstr "برونزي"
 
 #. js-lingui-id: JLxwQS
+#: src/modules/advanced-text-editor/constants/TextColorLabels.ts
 #: src/modules/settings/data-model/fields/forms/select/components/SettingsDataModelFieldSelectFormOptionRow.tsx
 msgid "Brown"
 msgstr "بني"
@@ -6255,6 +6267,7 @@ msgid "default"
 msgstr "الإعداد الافتراضي"
 
 #. js-lingui-id: ovBPCi
+#: src/modules/advanced-text-editor/components/TextColorDropdown.tsx
 #: src/modules/settings/data-model/fields/forms/address/components/MultiSelectAddressFields.tsx
 #: src/modules/settings/data-model/fields/forms/date/utils/getDisplayFormatLabel.ts
 #: src/modules/settings/experience/components/UiScalePicker.tsx
@@ -7472,6 +7485,11 @@ msgstr "تم إرسال البريد الإلكتروني بنجاح"
 #: src/modules/settings/billing/constants/SettingsBillingPlanComparisonRows.ts
 msgid "Email sharing"
 msgstr "مشاركة البريد الإلكتروني"
+
+#. js-lingui-id: iSMIhW
+#: src/pages/settings/profile/SettingsProfile.tsx
+msgid "Email signature"
+msgstr ""
 
 #. js-lingui-id: jvneza
 #: src/modules/settings/applications/components/SettingsApplicationAboutSidebar.tsx
@@ -9768,6 +9786,7 @@ msgid "Grass"
 msgstr "عشبي"
 
 #. js-lingui-id: qS5//Q
+#: src/modules/advanced-text-editor/constants/TextColorLabels.ts
 #: src/modules/settings/data-model/fields/forms/select/components/SettingsDataModelFieldSelectFormOptionRow.tsx
 msgid "Gray"
 msgstr "رمادي"
@@ -9783,6 +9802,7 @@ msgid "Greek"
 msgstr "اليونانية"
 
 #. js-lingui-id: VmkjGB
+#: src/modules/advanced-text-editor/constants/TextColorLabels.ts
 #: src/modules/settings/data-model/fields/forms/select/components/SettingsDataModelFieldSelectFormOptionRow.tsx
 msgid "Green"
 msgstr "أخضر"
@@ -14381,6 +14401,11 @@ msgstr "إعدادات أذونات الكائنات والحقول"
 msgid "of"
 msgstr "من"
 
+#. js-lingui-id: EZxOWJ
+#: src/modules/settings/profile/components/SettingsProfileEmailSignature.tsx
+msgid "Off by default. You can still switch the signature on or off for each email you write."
+msgstr ""
+
 #. js-lingui-id: KNz3EF
 #: src/pages/not-found/NotFound.tsx
 msgid "Off the beaten path"
@@ -14728,6 +14753,7 @@ msgid "Or"
 msgstr "أو"
 
 #. js-lingui-id: 4OE5Sf
+#: src/modules/advanced-text-editor/constants/TextColorLabels.ts
 #: src/modules/settings/data-model/fields/forms/select/components/SettingsDataModelFieldSelectFormOptionRow.tsx
 msgid "Orange"
 msgstr "برتقالي"
@@ -15284,6 +15310,7 @@ msgid "Pin tab"
 msgstr "تثبيت علامة التبويب"
 
 #. js-lingui-id: 2FIjLb
+#: src/modules/advanced-text-editor/constants/TextColorLabels.ts
 #: src/modules/settings/data-model/fields/forms/select/components/SettingsDataModelFieldSelectFormOptionRow.tsx
 msgid "Pink"
 msgstr "وردي"
@@ -15718,6 +15745,7 @@ msgid "Publish your app to the marketplace so others can install it"
 msgstr "انشر تطبيقك في سوق التطبيقات ليتمكن الآخرون من تثبيته"
 
 #. js-lingui-id: mF9LxA
+#: src/modules/advanced-text-editor/constants/TextColorLabels.ts
 #: src/modules/settings/data-model/fields/forms/select/components/SettingsDataModelFieldSelectFormOptionRow.tsx
 msgid "Purple"
 msgstr "أرجواني"
@@ -16068,6 +16096,7 @@ msgid "Records"
 msgstr "السجلات"
 
 #. js-lingui-id: wRTiSD
+#: src/modules/advanced-text-editor/constants/TextColorLabels.ts
 #: src/modules/settings/data-model/fields/forms/select/components/SettingsDataModelFieldSelectFormOptionRow.tsx
 msgid "Red"
 msgstr "أحمر"
@@ -18139,6 +18168,11 @@ msgstr "التسجيل غير متاح مؤقتًا أثناء الصيانة."
 msgid "Signatory title"
 msgstr "المسمّى الوظيفي للموقِّع"
 
+#. js-lingui-id: 0rl8O6
+#: src/pages/settings/profile/SettingsProfile.tsx
+msgid "Signature you can add to the emails you write from Twenty"
+msgstr ""
+
 #. js-lingui-id: Lz4j8Q
 #: src/modules/settings/legal/components/SettingsDpaAgreementRow.tsx
 msgid "Signed copy"
@@ -18274,6 +18308,7 @@ msgid "Skipped without a linked {0}: {1}"
 msgstr ""
 
 #. js-lingui-id: BIZl8w
+#: src/modules/advanced-text-editor/constants/TextColorLabels.ts
 #: src/modules/settings/data-model/fields/forms/select/components/SettingsDataModelFieldSelectFormOptionRow.tsx
 msgid "Sky"
 msgstr "سمائي"
@@ -20362,6 +20397,7 @@ msgid "Turn Not Found"
 msgstr "الدورة غير موجودة"
 
 #. js-lingui-id: EdHWDU
+#: src/modules/advanced-text-editor/constants/TextColorLabels.ts
 #: src/modules/settings/data-model/fields/forms/select/components/SettingsDataModelFieldSelectFormOptionRow.tsx
 msgid "Turquoise"
 msgstr "فيروزي"
@@ -22422,6 +22458,7 @@ msgid "years"
 msgstr "سنوات"
 
 #. js-lingui-id: QyCqHT
+#: src/modules/advanced-text-editor/constants/TextColorLabels.ts
 #: src/modules/settings/data-model/fields/forms/select/components/SettingsDataModelFieldSelectFormOptionRow.tsx
 msgid "Yellow"
 msgstr "أصفر"
@@ -22683,6 +22720,11 @@ msgstr "يتلقّى المعالج لديك هذا الكائن. يكون \"bod
 #: src/pages/settings/profile/SettingsProfile.tsx
 msgid "Your name as it will be displayed"
 msgstr "اسمك كما سيتم عرضه"
+
+#. js-lingui-id: ZV7dVk
+#: src/modules/settings/profile/components/SettingsProfileEmailSignature.tsx
+msgid "Your name, role, and anything else you want at the end of your emails"
+msgstr ""
 
 #. js-lingui-id: 8mfOAZ
 #: src/modules/settings/billing/components/AddPaymentMethodForm.tsx

@@ -3,6 +3,7 @@ import { MAX_EMAIL_RECIPIENTS } from 'twenty-shared/constants';
 import { type EmailAttachment } from 'twenty-shared/types';
 
 import { useSendEmail } from '@/activities/emails/hooks/useSendEmail';
+import { useEmailSignatureComposer } from '@/activities/emails/signature/hooks/useEmailSignatureComposer';
 import { type EmailRecipient } from '@/activities/emails/recipients/types/EmailRecipient';
 import { isValidEmailRecipientAddress } from '@/activities/emails/recipients/utils/isValidEmailRecipientAddress';
 import { parseEmailRecipients } from '@/activities/emails/recipients/utils/parseEmailRecipients';
@@ -16,6 +17,9 @@ type UseEmailComposerStateArgs = {
   defaultTo?: string;
   defaultSubject?: string;
   defaultInReplyTo?: string;
+  // Only the standalone New Email composer offers a signature; the thread
+  // reply composer reuses this hook and must stay untouched.
+  isSignatureEnabled?: boolean;
   onSent?: (messageThreadId: string | null) => void;
 };
 
@@ -30,13 +34,21 @@ export const useEmailComposerState = ({
   defaultTo = '',
   defaultSubject = '',
   defaultInReplyTo,
+  isSignatureEnabled = false,
   onSent,
 }: UseEmailComposerStateArgs) => {
   const initialTo = draftPrefill?.to ?? defaultTo;
   const initialCc = draftPrefill?.cc ?? '';
   const initialBcc = draftPrefill?.bcc ?? '';
   const initialSubject = draftPrefill?.subject ?? defaultSubject;
-  const initialBody = draftPrefill?.body ?? '';
+  const upstreamInitialBody = draftPrefill?.body ?? '';
+
+  const signatureState = useEmailSignatureComposer({
+    isEnabled: isSignatureEnabled,
+    initialBody: upstreamInitialBody,
+  });
+
+  const initialBody = signatureState.initialBody;
 
   const [sender, setSender] = useState<ConnectedAccountSender>({
     connectedAccountId: initialConnectedAccountId,
@@ -66,6 +78,10 @@ export const useEmailComposerState = ({
     initialCc.length > 0 || initialBcc.length > 0,
   );
   const [files, setFiles] = useState<EmailAttachment[]>([]);
+
+  const setSignatureIncluded = (isIncluded: boolean) => {
+    setBody(signatureState.applySignatureInclusion(body, isIncluded));
+  };
 
   const { sendEmail, loading } = useSendEmail();
 
@@ -151,6 +167,10 @@ export const useEmailComposerState = ({
     canSend,
     initialSubject,
     initialBody,
+    isSignatureToggleVisible: signatureState.isSignatureToggleVisible,
+    isSignatureIncluded: signatureState.isSignatureIncludedIn(body),
+    setSignatureIncluded,
+    bodyResyncKey: signatureState.signatureResyncKey,
     recipientCount,
     exceedsRecipientLimit,
     maxRecipients: MAX_EMAIL_RECIPIENTS,

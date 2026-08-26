@@ -1,7 +1,9 @@
 import { StyledBubbleMenuContainer } from '@/advanced-text-editor/components/StyledBubbleMenuContainer';
 import { BubbleMenuIconButton } from '@/advanced-text-editor/components/BubbleMenuIconButton';
 import { EditLinkPopover } from '@/advanced-text-editor/components/EditLinkPopover';
+import { TextColorDropdown } from '@/advanced-text-editor/components/TextColorDropdown';
 import { TurnIntoBlockDropdown } from '@/advanced-text-editor/components/TurnIntoBlockDropdown';
+import { TEXT_COLOR_MARK_NAME } from '@/advanced-text-editor/extensions/text-color/TextColorMark';
 import { useTextBubbleState } from '@/advanced-text-editor/hooks/useTextBubbleState';
 import { hasEditorExtension } from '@/advanced-text-editor/utils/hasEditorExtension';
 import { isTextSelected } from '@/advanced-text-editor/utils/isTextSelected';
@@ -96,6 +98,9 @@ export const TextBubbleMenu = ({ editor }: TextBubbleMenuProps) => {
             />
           );
         })}
+        {hasEditorExtension(editor, TEXT_COLOR_MARK_NAME) && (
+          <TextColorDropdown editor={editor} activeColor={state.textColor} />
+        )}
         {hasEditorExtension(editor, 'link') && (
           <EditLinkPopover defaultValue={state.linkHref} editor={editor} />
         )}
