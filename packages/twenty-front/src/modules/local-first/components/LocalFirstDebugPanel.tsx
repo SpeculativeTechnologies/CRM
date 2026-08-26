@@ -7,6 +7,7 @@ import { isCookieAuthActiveState } from '@/auth/states/isCookieAuthActiveState';
 import { tokenPairState } from '@/auth/states/tokenPairState';
 import { useLocalFirstPersonRecords } from '@/local-first/hooks/useLocalFirstPersonRecords';
 import { startSyncingPersonShapeToLocalFirstDatabase } from '@/local-first/services/syncPersonShapeToLocalFirstDatabase';
+import { localFirstShadowReportState } from '@/local-first/states/localFirstShadowReportState';
 import { localFirstSyncStatusState } from '@/local-first/states/localFirstSyncStatusState';
 import { getSseClientAuthHeaders } from '@/sse-db-event/utils/getSseClientAuthHeaders';
 
@@ -36,6 +37,7 @@ const StyledRow = styled.div`
 // local-first reads into the actual record tables/pages.
 export const LocalFirstDebugPanel = () => {
   const [status, setStatus] = useAtom(localFirstSyncStatusState);
+  const [shadowReport] = useAtom(localFirstShadowReportState);
   const { records, totalCount } = useLocalFirstPersonRecords();
   const store = useStore();
 
@@ -63,7 +65,18 @@ export const LocalFirstDebugPanel = () => {
       <div>
         local-first spike: {status} · {totalCount} rows locally
       </div>
-      {records.map((record) => (
+      <StyledRow>
+        shadow reads: {shadowReport.matchCount} agreed ·{' '}
+        {shadowReport.divergenceCount} diverged ·{' '}
+        {shadowReport.unsupportedCount} skipped · {shadowReport.errorCount}{' '}
+        errored
+      </StyledRow>
+      {shadowReport.recentReports.slice(0, 4).map((report, index) => (
+        <StyledRow key={`${report.outcome}-${index}`}>
+          {report.outcome}: {report.detail}
+        </StyledRow>
+      ))}
+      {records.slice(0, 5).map((record) => (
         <StyledRow key={record.id}>
           {record.nameFirstName} — {record.jobTitle ?? 'n/a'}
         </StyledRow>

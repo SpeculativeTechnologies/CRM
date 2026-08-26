@@ -38,6 +38,42 @@ the real record-table/record-board data path yet.
   `constants/LOCAL_FIRST_PERSON_COLUMNS.ts`, mirrored server-side in the
   synced-tables whitelist).
 
+## Shadow reads (Phase 3, in progress)
+
+The app still renders entirely from Apollo/GraphQL. What exists now is a
+read-path *correctness harness*, not a read path:
+
+- `services/createLocalFirstShadowCompareLink.ts` is an Apollo link that
+  watches `FindManyPeople` responses, runs the equivalent query against the
+  local database, and records whether they agree. It never modifies the
+  response, so it is safe to leave on while confidence is built.
+- `utils/buildLocalPersonQuery.ts` translates GraphQL variables into local
+  SQL, or **refuses**. Refusing is the point: the supported subset is
+  no-filter (or the soft-delete opt-in filter), ordering on synced scalar
+  columns, and limit/offset. Anything else -- a real filter, a composite or
+  relation sort, cursor pagination -- is reported as `unsupported` rather
+  than answered approximately. A read path built on approximations would
+  serve wrong rows.
+- `utils/compareLocalAndServerPeople.ts` compares row count, order and
+  displayed field values, mapping the API's nested composite fields
+  (`name.firstName`) onto the flat synced columns (`nameFirstName`), and
+  skipping fields the query did not select.
+- Verdicts show in the debug panel (agreed / diverged / skipped / errored).
+
+Two correctness bugs this harness has already caught, both of which would
+have served wrong data had reads been switched over first:
+
+1. **Soft-deleted rows.** The API hides them by default; logical replication
+   ships them. `deletedAt` was not synced, so local reads could not have
+   filtered them. Now synced and filtered (verified by soft-deleting a
+   person and watching local drop 1200 -> 1199 while still agreeing).
+2. **Composite field shape.** The first live comparison reported every row as
+   divergent because the API returns `name: { firstName }` while the table
+   stores `nameFirstName`.
+
+`position` and `createdAt` are synced for the same reason: the standard views
+order by `position`, so without it local ordering cannot match.
+
 ## Known issues / deliberate shortcuts
 
 1. **Hand-rolled sync loop instead of the official Electric client.** In
@@ -85,15 +121,16 @@ the real record-table/record-board data path yet.
 
 In rough order:
 
-1. **Real UI integration**: this is the big one. Right now the actual
-   Companies/People pages still go through Apollo -> GraphQL -> Postgres for
-   every read, exactly as before -- local-first isn't visible anywhere except
-   the debug panel. Making the app actually feel local-first means rewiring
-   `useFindManyRecords` (or a new parallel hook) and the record-table/
-   record-board rendering path to read from the local PGlite database for
-   synced object types, instead of firing a GraphQL query. That's a
-   significant, invasive change to `packages/twenty-front/src/modules/object-record`
-   and needs its own design pass, not a quick patch.
+1. **Serve reads from local for supported queries.** The harness above is the
+   prerequisite, and it now reports agreement for the default People view.
+   The remaining work is to let `useFindManyRecords` (or a parallel hook)
+   return local rows when `buildLocalPersonQuery` supports the query and the
+   sync is caught up, falling back to GraphQL otherwise -- so the network
+   leaves the interactive path for the common case while every unsupported
+   query behaves exactly as it does today. Before flipping it, widen the
+   supported subset (view filters and sorts are the common cases currently
+   reported as `unsupported`) and let the divergence counters sit at zero
+   through real use.
 2. **Write path**: local mutation outbox -- queue create/update/delete
    locally when offline, replay through the existing GraphQL mutations
    (reusing/extending `modules/apollo/optimistic-effect/`) when back online.

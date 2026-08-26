@@ -8,14 +8,11 @@ import { getLocalFirstDatabase } from '@/local-first/services/getLocalFirstDatab
 import { type LocalFirstSyncStatus } from '@/local-first/states/localFirstSyncStatusState';
 import { REACT_APP_SERVER_BASE_URL } from '~/config';
 
-type ElectricPersonRow = {
-  id: string;
-  nameFirstName: string | null;
-  nameLastName: string | null;
-  jobTitle: string | null;
-  emailsPrimaryEmail: string | null;
-  updatedAt: string | null;
-};
+type LocalFirstPersonColumn = (typeof LOCAL_FIRST_PERSON_COLUMNS)[number];
+
+type ElectricPersonRow = { id: string } & Partial<
+  Record<LocalFirstPersonColumn, string | number | null>
+>;
 
 type ElectricMessage = {
   headers?: { operation?: 'insert' | 'update' | 'delete' };
@@ -72,6 +69,17 @@ const fetchShapeBatch = async ({
   return { messages, nextOffset, nextHandle, upToDate };
 };
 
+const quotedColumns = LOCAL_FIRST_PERSON_COLUMNS.map(
+  (column) => `"${column}"`,
+).join(', ');
+
+// Every column but the primary key, which `on conflict` matches on.
+const updateAssignments = LOCAL_FIRST_PERSON_COLUMNS.filter(
+  (column) => column !== 'id',
+)
+  .map((column) => `"${column}" = excluded."${column}"`)
+  .join(', ');
+
 const upsertPersonRows = async (tx: Transaction, rows: ElectricPersonRow[]) => {
   const columnCount = LOCAL_FIRST_PERSON_COLUMNS.length;
   const valuesSql = rows
@@ -84,22 +92,12 @@ const upsertPersonRows = async (tx: Transaction, rows: ElectricPersonRow[]) => {
     .join(',');
 
   await tx.query(
-    `insert into person (id, "nameFirstName", "nameLastName", "jobTitle", "emailsPrimaryEmail", "updatedAt")
+    `insert into person (${quotedColumns})
      values ${valuesSql}
-     on conflict (id) do update set
-       "nameFirstName" = excluded."nameFirstName",
-       "nameLastName" = excluded."nameLastName",
-       "jobTitle" = excluded."jobTitle",
-       "emailsPrimaryEmail" = excluded."emailsPrimaryEmail",
-       "updatedAt" = excluded."updatedAt"`,
-    rows.flatMap((row) => [
-      row.id,
-      row.nameFirstName,
-      row.nameLastName,
-      row.jobTitle,
-      row.emailsPrimaryEmail,
-      row.updatedAt,
-    ]),
+     on conflict (id) do update set ${updateAssignments}`,
+    rows.flatMap((row) =>
+      LOCAL_FIRST_PERSON_COLUMNS.map((column) => row[column] ?? null),
+    ),
   );
 };
 

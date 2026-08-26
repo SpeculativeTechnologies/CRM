@@ -22,16 +22,19 @@ export const useLocalFirstPersonRecords = () => {
     const setup = async () => {
       const pg = await getLocalFirstDatabase();
 
+      // Soft-deleted rows are excluded to match what the API returns by
+      // default; replication ships them, so filtering is on us.
       const rowsLiveQuery = await pg.live.query<LocalFirstPersonRecord>(
         `select id, "nameFirstName", "nameLastName", "jobTitle", "emailsPrimaryEmail", "updatedAt"
-         from person order by "updatedAt" desc nulls last limit 25`,
+         from person where "deletedAt" is null
+         order by "updatedAt" desc nulls last limit 25`,
         [],
         (results) => {
           if (isMounted) setRecords(results.rows);
         },
       );
       const countLiveQuery = await pg.live.query<{ count: number }>(
-        'select count(*)::int as count from person',
+        'select count(*)::int as count from person where "deletedAt" is null',
         [],
         (results) => {
           if (isMounted) setTotalCount(results.rows[0]?.count ?? 0);
