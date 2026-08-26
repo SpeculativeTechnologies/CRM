@@ -39,6 +39,20 @@ const StyledLabel = styled.label<{
   user-select: none;
 `;
 
+// Kept in the accessibility tree but out of the layout, for rows whose
+// placeholder already names the field on screen.
+const StyledHiddenLabel = styled.label`
+  border: 0;
+  clip-path: inset(50%);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+`;
+
 const StyledContent = styled.div`
   align-items: center;
   display: flex;
@@ -62,6 +76,10 @@ type ComposerFieldRowProps = {
   // Id of the input the row wraps. Rows around a single text input pass it so
   // the label names that input and clicking the label focuses it.
   labelFor?: string;
+  // Hides the label on screen without dropping it from the accessibility tree.
+  // For rows whose control carries a placeholder that already names the field,
+  // where a second visible label reads as the field's value.
+  isLabelHidden?: boolean;
 };
 
 // Rows wrap composite controls such as recipient chip fields and selects, which
@@ -75,6 +93,7 @@ export const ComposerFieldRow = ({
   onClick,
   labelMinWidth,
   labelFor,
+  isLabelHidden = false,
 }: ComposerFieldRowProps) => {
   const isLabelAssociatedWithInput = isDefined(labelFor);
 
@@ -85,14 +104,18 @@ export const ComposerFieldRow = ({
       $clickable={isDefined(onClick)}
       onClick={onClick}
     >
-      <StyledLabel
-        htmlFor={labelFor}
-        aria-hidden={isLabelAssociatedWithInput ? undefined : 'true'}
-        $isAssociatedWithInput={isLabelAssociatedWithInput}
-        $minWidth={labelMinWidth}
-      >
-        {label}
-      </StyledLabel>
+      {isLabelHidden ? (
+        <StyledHiddenLabel htmlFor={labelFor}>{label}</StyledHiddenLabel>
+      ) : (
+        <StyledLabel
+          htmlFor={labelFor}
+          aria-hidden={isLabelAssociatedWithInput ? undefined : 'true'}
+          $isAssociatedWithInput={isLabelAssociatedWithInput}
+          $minWidth={labelMinWidth}
+        >
+          {label}
+        </StyledLabel>
+      )}
       <StyledContent>{children}</StyledContent>
       {isDefined(trailing) && (
         <StyledTrailing onClick={(event) => event.stopPropagation()}>

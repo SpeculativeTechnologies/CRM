@@ -267,7 +267,11 @@ export const EmailComposerFields = ({
                 </ComposerFieldRow>
               </>
             )}
-            <ComposerFieldRow label={t`Subject`} labelFor={subjectInputId}>
+            <ComposerFieldRow
+              label={t`Subject`}
+              labelFor={subjectInputId}
+              isLabelHidden
+            >
               <StyledComposerTextInput
                 id={subjectInputId}
                 type="text"

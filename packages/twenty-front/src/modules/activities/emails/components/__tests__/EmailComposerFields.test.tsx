@@ -90,16 +90,18 @@ describe('EmailComposerFields', () => {
     ).toBeInTheDocument();
   });
 
-  it('should focus the subject input when the subject label is clicked', async () => {
+  // The label is hidden with CSS that Linaria extracts at build time, so jsdom
+  // cannot assert it is off screen. What is checkable here is that hiding it
+  // did not cost the field its accessible name.
+  it('should keep naming the subject field for assistive technology', async () => {
     renderComposer();
 
     const subjectInput = await screen.findByRole('textbox', {
       name: 'Subject',
     });
 
-    await userEvent.click(screen.getByText('Subject'));
-
-    expect(subjectInput).toHaveFocus();
+    expect(subjectInput).toHaveAttribute('placeholder', 'Add a subject');
+    expect(screen.getByText('Subject').tagName).toBe('LABEL');
   });
 
   it('should keep the typed subject when the Cc and Bcc fields open', async () => {
