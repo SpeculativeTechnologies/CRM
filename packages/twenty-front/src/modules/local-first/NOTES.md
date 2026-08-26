@@ -38,41 +38,73 @@ the real record-table/record-board data path yet.
   `constants/LOCAL_FIRST_PERSON_COLUMNS.ts`, mirrored server-side in the
   synced-tables whitelist).
 
-## Shadow reads (Phase 3, in progress)
+## Local reads (Phase 3)
 
-The app still renders entirely from Apollo/GraphQL. What exists now is a
-read-path *correctness harness*, not a read path:
+The People list can now be answered from the browser's Postgres with no list
+query on the wire. Two independent flags:
 
-- `services/createLocalFirstShadowCompareLink.ts` is an Apollo link that
-  watches `FindManyPeople` responses, runs the equivalent query against the
-  local database, and records whether they agree. It never modifies the
-  response, so it is safe to leave on while confidence is built.
-- `utils/buildLocalPersonQuery.ts` translates GraphQL variables into local
-  SQL, or **refuses**. Refusing is the point: the supported subset is
-  no-filter (or the soft-delete opt-in filter), ordering on synced scalar
-  columns, and limit/offset. Anything else -- a real filter, a composite or
-  relation sort, cursor pagination -- is reported as `unsupported` rather
-  than answered approximately. A read path built on approximations would
-  serve wrong rows.
-- `utils/compareLocalAndServerPeople.ts` compares row count, order and
-  displayed field values, mapping the API's nested composite fields
-  (`name.firstName`) onto the flat synced columns (`nameFirstName`), and
-  skipping fields the query did not select.
-- Verdicts show in the debug panel (agreed / diverged / skipped / errored).
+- `REACT_APP_IS_LOCAL_FIRST_ENABLED` -- sync and compare. Local reads are
+  computed and checked against the server's answer, but the server's answer is
+  what renders.
+- `REACT_APP_IS_LOCAL_FIRST_READS_ENABLED` -- also serve them. Only meaningful
+  with the first flag on.
 
-Two correctness bugs this harness has already caught, both of which would
-have served wrong data had reads been switched over first:
+Shape of it:
 
-1. **Soft-deleted rows.** The API hides them by default; logical replication
-   ships them. `deletedAt` was not synced, so local reads could not have
-   filtered them. Now synced and filtered (verified by soft-deleting a
-   person and watching local drop 1200 -> 1199 while still agreeing).
-2. **Composite field shape.** The first live comparison reported every row as
-   divergent because the API returns `name: { firstName }` while the table
-   stores `nameFirstName`.
+- `services/getLocalFirstMirror.ts` builds the mirror once: fetches each
+  table's columns from `GET /local-first/schema/:table` and creates the local
+  tables from that. `tryGetReadyLocalFirstMirror()` returns it only if already
+  built -- reads never wait on PGlite booting, because that made a cold page
+  slower than asking the server.
+- `services/startLocalFirstSync.ts` runs one independent loop per table, so a
+  lagging table does not stall the others.
+- `utils/buildLocalReadPlan.ts` turns a query's selection into a plan, or
+  refuses. It only understands declared relations
+  (`constants/LOCAL_FIRST_RELATION_SOURCES.ts`) and mirrored columns.
+- `services/executeLocalReadPlan.ts` runs the plan and assembles API-shaped
+  records, fetching each relation once per page rather than per row.
+- `services/createLocalFirstReadLink.ts` serves the result when serving is on,
+  and otherwise forwards and compares.
 
-`position` and `createdAt` are synced for the same reason: the standard views
-order by `position`, so without it local ordering cannot match.
+Why five tables for one list: the record table requests every field of the
+object plus its relations, and a local read must answer the whole selection or
+fall back. Twenty models many-to-many through a first-class join object, so
+People reaches person, company, `_petCareAgreement`, `_pet` and
+`_employmentHistory`.
+
+Verified: 60 of 60 rows agree with the server across 2136 compared fields,
+relations included; the table renders from local with zero GraphQL calls.
+
+### Traps found here, do not re-learn them
+
+1. **Boolean and numeric columns silently synced nothing.** Electric sends
+   Postgres text format ("false", "1234.5") and PGlite's parameter serialiser
+   rejects it. `utils/coerceValueForLocalColumn.ts` coerces by column type.
+2. **The sync advanced its offset before applying**, so any apply failure
+   skipped that batch forever -- which is why the above was invisible rather
+   than loud.
+3. **To-many relations came back empty** because the target plan did not
+   select the back-reference column it groups by.
+4. **Serving is not comparing.** The comparison normalises a `Date` and an ISO
+   string to equal on purpose, so it could not catch that serving handed the
+   UI a `Date` where the API sends a string -- which crashed the date field
+   and blanked the table via the error boundary. `utils/toApiValue.ts`.
+5. **Composites flatten two ways**: `name { firstName }` is the column
+   `nameFirstName`, `avatarFile { url }` is one jsonb column.
+   `utils/resolveLocalFieldSource.ts` handles both.
+6. **Absence is not a divergence.** A field a view does not display is not
+   selected, so it is missing from the response.
+7. Two PGlite instances on one IndexedDB directory block each other; the
+   mirror must stay a singleton.
+
+### Not yet measured
+
+The speed claim is **not** demonstrated. Warm tab switches were already
+instant from Apollo's cache in both modes, and dev-server timings are
+meaningless for paint (see the `twenty-front-perf-benchmark` skill). Proving
+the win needs a production build with emulated tunnel latency, measuring
+`roundTripsToPaint` on the paths that actually hit the network: first view of
+a page, pagination, filter and sort changes, and post-resync refetches.
 
 ## Known issues / deliberate shortcuts
 
@@ -121,16 +153,15 @@ order by `position`, so without it local ordering cannot match.
 
 In rough order:
 
-1. **Serve reads from local for supported queries.** The harness above is the
-   prerequisite, and it now reports agreement for the default People view.
-   The remaining work is to let `useFindManyRecords` (or a parallel hook)
-   return local rows when `buildLocalPersonQuery` supports the query and the
-   sync is caught up, falling back to GraphQL otherwise -- so the network
-   leaves the interactive path for the common case while every unsupported
-   query behaves exactly as it does today. Before flipping it, widen the
-   supported subset (view filters and sorts are the common cases currently
-   reported as `unsupported`) and let the divergence counters sit at zero
-   through real use.
+1. **Measure it.** Production build, emulated latency, `roundTripsToPaint`
+   before and after. Until that exists there is no evidence this is faster,
+   only that it is correct.
+2. **Widen the supported subset.** View filters and sorts are the common
+   cases still reported `unsupported`, and they are what people actually use.
+   Cursor pagination too.
+3. **Cold start.** The mirror takes seconds to build on a fresh page, so the
+   first view of a session always falls back. Persisting the schema and
+   keeping PGlite warm across navigations would close that.
 2. **Write path**: local mutation outbox -- queue create/update/delete
    locally when offline, replay through the existing GraphQL mutations
    (reusing/extending `modules/apollo/optimistic-effect/`) when back online.
