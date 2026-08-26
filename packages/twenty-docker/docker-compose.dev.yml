@@ -19,6 +19,7 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: default
+    command: ["postgres", "-c", "wal_level=logical"]
     healthcheck:
       test: pg_isready -U postgres -h localhost -d postgres
       interval: 5s
@@ -36,6 +37,24 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
+    restart: unless-stopped
+
+  # Local-first sync spike (packages/twenty-front local-first work): streams
+  # workspace schema changes off Postgres logical replication. Not part of
+  # the standard dev stack yet -- only started via the `local-first` profile.
+  electric:
+    image: electricsql/electric:latest
+    profiles: ["local-first"]
+    # Loopback only: Electric itself is unauthenticated (ELECTRIC_INSECURE);
+    # everything but the twenty-server proxy on this machine must stay out.
+    ports:
+      - "127.0.0.1:3010:3000"
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/default
+      ELECTRIC_INSECURE: "true"
+    depends_on:
+      db:
+        condition: service_healthy
     restart: unless-stopped
 
 volumes:

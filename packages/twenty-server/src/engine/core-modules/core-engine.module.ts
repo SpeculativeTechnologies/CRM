@@ -43,6 +43,7 @@ import { HealthModule } from 'src/engine/core-modules/health/health.module';
 import { ImapSmtpCaldavModule } from 'src/engine/core-modules/imap-smtp-caldav-connection/imap-smtp-caldav-connection.module';
 import { ImpersonationModule } from 'src/engine/core-modules/impersonation/impersonation.module';
 import { LabModule } from 'src/engine/core-modules/lab/lab.module';
+import { LocalFirstModule } from 'src/engine/core-modules/local-first/local-first.module';
 import { LoggerModule } from 'src/engine/core-modules/logger/logger.module';
 import { loggerModuleFactory } from 'src/engine/core-modules/logger/logger.module-factory';
 import { LogicFunctionModule } from 'src/engine/core-modules/logic-function/logic-function.module';
@@ -130,6 +131,7 @@ import { FileModule } from './file/file.module';
     TelemetryModule,
     AdminPanelModule,
     LabModule,
+    LocalFirstModule,
     RoleModule,
     RedisClientModule,
     WorkspaceQueryRunnerModule,

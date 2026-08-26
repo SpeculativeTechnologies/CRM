@@ -14,6 +14,7 @@ export enum ApiPath {
   Files = 'files',
   GraphQL = 'graphql',
   Health = 'healthz',
+  LocalFirst = 'local-first',
   Mcp = 'mcp',
   Metadata = 'metadata',
   OAuth = 'oauth',
