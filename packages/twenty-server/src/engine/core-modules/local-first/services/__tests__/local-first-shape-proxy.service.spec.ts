@@ -1,7 +1,4 @@
-import {
-  BadGatewayException,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadGatewayException, NotFoundException } from '@nestjs/common';
 
 import { type Response } from 'express';
 
