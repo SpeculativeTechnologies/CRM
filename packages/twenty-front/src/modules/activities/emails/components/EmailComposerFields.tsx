@@ -1,5 +1,5 @@
 import { useQuery } from '@apollo/client/react';
-import { useContext } from 'react';
+import { useContext, useId } from 'react';
 import { DragDropProvider } from '@dnd-kit/react';
 import { styled } from '@linaria/react';
 import { t } from '@lingui/core/macro';
@@ -113,6 +113,7 @@ export const EmailComposerFields = ({
   onAttachFiles,
 }: EmailComposerFieldsProps) => {
   const { theme } = useContext(ThemeContext);
+  const subjectInputId = useId();
   const { uploadEmailImage } = useUploadEmailImage();
   const { handleFocus: handleSubjectFocus, handleBlur: handleSubjectBlur } =
     useTextInputFocusStack({ focusId: 'email-composer-subject' });
@@ -266,10 +267,15 @@ export const EmailComposerFields = ({
                 </ComposerFieldRow>
               </>
             )}
-            <ComposerFieldRow label={t`Subject`}>
+            <ComposerFieldRow
+              label={t`Subject`}
+              labelFor={subjectInputId}
+              isLabelHidden
+            >
               <StyledComposerTextInput
+                id={subjectInputId}
                 type="text"
-                aria-label={t`Subject`}
+                placeholder={t`Add a subject`}
                 defaultValue={composerState.initialSubject}
                 onChange={(event) =>
                   composerState.setSubject(event.target.value)

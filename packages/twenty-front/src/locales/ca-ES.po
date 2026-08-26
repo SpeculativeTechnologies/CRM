@@ -1232,6 +1232,11 @@ msgstr "Afegeix un registre"
 msgid "Add a step"
 msgstr "Afegeix un pas"
 
+#. js-lingui-id: Ope30e
+#: src/modules/activities/emails/components/EmailComposerFields.tsx
+msgid "Add a subject"
+msgstr ""
+
 #. js-lingui-id: KKfos4
 #: src/modules/workflow/workflow-diagram/workflow-nodes/components/WorkflowDiagramEmptyTriggerEditable.tsx
 #: src/modules/workflow/workflow-diagram/workflow-nodes/components/WorkflowDiagramEmptyTriggerReadonly.tsx
@@ -18722,7 +18727,6 @@ msgstr ""
 #: src/modules/activities/emails/components/CampaignDetailsFields.tsx
 #: src/modules/activities/emails/components/CampaignDetailsFields.tsx
 #: src/modules/activities/emails/components/CampaignSentEnvelope.tsx
-#: src/modules/activities/emails/components/EmailComposerFields.tsx
 #: src/modules/activities/emails/components/EmailComposerFields.tsx
 #: src/modules/activities/emails/mass-email/components/MassEmailComposeCard.tsx
 #: src/modules/workflow/workflow-steps/workflow-actions/components/WorkflowEditActionEmailBase.tsx
