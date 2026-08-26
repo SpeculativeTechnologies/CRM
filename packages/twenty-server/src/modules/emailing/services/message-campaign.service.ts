@@ -133,6 +133,7 @@ export type MassEmailCampaignSendOutcome = {
   email: string;
   subject: string;
   body: string;
+  cc?: string[];
   success: boolean;
   messageId?: string;
 };
@@ -408,6 +409,7 @@ export class MessageCampaignService {
     personIds,
     subject,
     body,
+    cc,
     fromAddress,
   }: {
     workspaceId: string;
@@ -417,6 +419,7 @@ export class MessageCampaignService {
     personIds: string[];
     subject?: string | null;
     body?: string | null;
+    cc?: string[] | null;
     fromAddress: string;
   }): Promise<{ campaignId: string; updatedAt: Date }> {
     const roleId = await this.userRoleService.getRoleIdForUserWorkspace({
@@ -493,9 +496,13 @@ export class MessageCampaignService {
         );
 
         const now = new Date();
+        const ccAddresses = (cc ?? [])
+          .map((ccAddress) => ccAddress.trim())
+          .filter((ccAddress) => ccAddress.length > 0);
         const campaignValues = {
           subject: subject?.trim().length ? subject : null,
           bodyTemplate: body?.length ? body : null,
+          ccAddresses: ccAddresses.length > 0 ? ccAddresses.join(', ') : null,
           fromAddress: {
             primaryEmail: fromAddress.trim(),
             additionalEmails: null,
@@ -1228,6 +1235,15 @@ export class MessageCampaignService {
         personId: outcome.personId,
         messageCampaignId: campaignId,
       },
+      // Cc'd people are not campaign recipients, so they carry no
+      // messageCampaignId and stay out of the per-recipient delivery stats.
+      ...(outcome.cc ?? []).map((ccHandle) => ({
+        id: v4(),
+        messageId,
+        role: MessageParticipantRole.CC,
+        handle: ccHandle,
+        displayName: ccHandle,
+      })),
     ]);
   }
 

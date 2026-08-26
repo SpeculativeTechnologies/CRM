@@ -11,6 +11,7 @@ import { bold } from '@/utils/email-renderer/marks/bold';
 import { italic } from '@/utils/email-renderer/marks/italic';
 import { link } from '@/utils/email-renderer/marks/link';
 import { strike } from '@/utils/email-renderer/marks/strike';
+import { textColor } from '@/utils/email-renderer/marks/text-color';
 import { underline } from '@/utils/email-renderer/marks/underline';
 
 const MARK_RENDERERS = {
@@ -19,6 +20,7 @@ const MARK_RENDERERS = {
   [TIPTAP_MARK_TYPES.UNDERLINE]: underline,
   [TIPTAP_MARK_TYPES.STRIKE]: strike,
   [TIPTAP_MARK_TYPES.LINK]: link,
+  [TIPTAP_MARK_TYPES.TEXT_COLOR]: textColor,
 } as const satisfies Record<
   EmailDocumentMarkType,
   (mark: TipTapMark, children: ReactNode) => ReactNode

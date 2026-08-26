@@ -4,6 +4,7 @@ import { INLINE_EMAIL_BODY_EDITOR_PROFILE } from '@/activities/emails/editor/con
 import { useCampaignAudiencePreview } from '@/activities/emails/hooks/useCampaignAudiencePreview';
 import { type useCampaignComposerState } from '@/activities/emails/hooks/useCampaignComposerState';
 import { useUnsubscribeTopics } from '@/activities/emails/hooks/useUnsubscribeTopics';
+import { EmailSignatureToggleRow } from '@/activities/emails/signature/components/EmailSignatureToggleRow';
 import { useCreateOneRecord } from '@/object-record/hooks/useCreateOneRecord';
 import { FormAdvancedTextFieldInput } from '@/advanced-text-editor/components/FormAdvancedTextFieldInput';
 import { FormSingleRecordPicker } from '@/object-record/record-field/ui/form-types/components/FormSingleRecordPicker';
@@ -141,11 +142,18 @@ export const CampaignComposerFields = ({
         placeholder={t`Subject`}
       />
       <FormAdvancedTextFieldInput
+        key={campaignState.signatureResyncKey}
         defaultValue={campaignState.body}
         onChange={campaignState.setBody}
         placeholder={t`Type something or press "/" to see commands`}
         profile={INLINE_EMAIL_BODY_EDITOR_PROFILE}
       />
+      {campaignState.isSignatureToggleVisible && (
+        <EmailSignatureToggleRow
+          isIncluded={campaignState.isSignatureIncluded}
+          onChange={campaignState.setSignatureIncluded}
+        />
+      )}
     </StyledFieldsContainer>
   );
 };

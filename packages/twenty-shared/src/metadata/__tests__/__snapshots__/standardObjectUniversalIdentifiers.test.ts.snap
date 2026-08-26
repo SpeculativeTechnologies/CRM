@@ -1058,6 +1058,9 @@ exports[`STANDARD_OBJECTS universal identifiers should never change without an e
       "bouncedCount": {
         "universalIdentifier": "20d884a9-34dd-4667-8ecb-ceec224258e2",
       },
+      "ccAddresses": {
+        "universalIdentifier": "5552de17-c256-412f-8561-d17f14cc589c",
+      },
       "complainedCount": {
         "universalIdentifier": "82842cfa-f12a-4bab-bbde-b2cf587d0406",
       },
@@ -3214,8 +3217,14 @@ exports[`STANDARD_OBJECTS universal identifiers should never change without an e
       "deletedAt": {
         "universalIdentifier": "0c39c6a8-a1bf-54fb-8c86-ca2981820fd0",
       },
+      "emailSignature": {
+        "universalIdentifier": "20202020-3f7a-4d21-b8c5-1e9d4a6c73f2",
+      },
       "id": {
         "universalIdentifier": "d77dff76-dcfd-52a3-b352-832898b28b9d",
+      },
+      "isEmailSignatureIncludedByDefault": {
+        "universalIdentifier": "20202020-9c14-4e86-a7d3-52b8f0c1a4e7",
       },
       "jobTitle": {
         "universalIdentifier": "20202020-4dd4-4619-826e-08f6c06b374d",

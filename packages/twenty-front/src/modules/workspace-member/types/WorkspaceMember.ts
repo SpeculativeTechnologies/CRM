@@ -34,6 +34,10 @@ export type WorkspaceMember = {
   timeFormat?: WorkspaceMemberTimeFormatEnum | null;
   numberFormat?: WorkspaceMemberNumberFormatEnum | null;
   calendarStartDay?: number | null;
+  // Serialized TipTap document, or null/undefined on workspaces that predate
+  // the field and on workspace members cached before it existed.
+  emailSignature?: string | null;
+  isEmailSignatureIncludedByDefault?: boolean | null;
 };
 
 export type WorkspaceInvitation = {

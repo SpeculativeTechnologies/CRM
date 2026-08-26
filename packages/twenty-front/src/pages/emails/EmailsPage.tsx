@@ -816,6 +816,7 @@ const MassEmailDraftEditor = ({
           campaignId: campaign.id,
           subject: campaign.subject ?? '',
           body: campaign.body ?? '',
+          cc: campaign.ccAddresses ?? '',
         }}
         onSent={() => navigate(AppPath.Emails)}
       />

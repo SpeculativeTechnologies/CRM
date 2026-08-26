@@ -24,6 +24,22 @@ const markSchema = z.discriminatedUnion('type', [
     type: z.literal(TIPTAP_MARK_TYPES.LINK),
     attrs: z.looseObject({ href: z.string().max(4_000) }).optional(),
   }),
+  // Only a bare palette name is accepted. The renderer maps the name to a
+  // colour and ignores anything it does not know, so this bound is a second
+  // line of defence rather than the only one.
+  z.looseObject({
+    type: z.literal(TIPTAP_MARK_TYPES.TEXT_COLOR),
+    attrs: z
+      .looseObject({
+        color: z
+          .string()
+          .regex(/^[a-z]+$/)
+          .max(32)
+          .nullable()
+          .optional(),
+      })
+      .optional(),
+  }),
 ]);
 
 const textNodeSchema = z.looseObject({

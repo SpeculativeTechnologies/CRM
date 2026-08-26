@@ -77,6 +77,7 @@ export class SendEmailResolver {
       personIds: input.personIds,
       subject: input.subject,
       body: input.body,
+      cc: input.cc,
       fromAddress: connectedAccount.handle,
     });
   }
@@ -125,7 +126,11 @@ export class SendEmailResolver {
       try {
         const composed = await this.emailComposerService.composeEmail(
           {
-            recipients: { to: email.to, cc: '', bcc: '' },
+            recipients: {
+              to: email.to,
+              cc: (email.cc ?? []).join(', '),
+              bcc: '',
+            },
             subject: email.subject,
             body: email.body,
             connectedAccountId: input.connectedAccountId,

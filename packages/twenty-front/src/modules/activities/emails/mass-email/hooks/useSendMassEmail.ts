@@ -9,6 +9,9 @@ type MassEmailToSend = {
   to: string;
   subject: string;
   body: string;
+  // Applies to this recipient's own email only, so each person keeps seeing a
+  // single-recipient message.
+  cc?: string[];
 };
 
 type SendMassEmailParams = {

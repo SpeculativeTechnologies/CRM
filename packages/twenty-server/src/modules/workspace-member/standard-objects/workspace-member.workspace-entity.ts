@@ -78,4 +78,7 @@ export class WorkspaceMemberWorkspaceEntity extends BaseWorkspaceEntity {
   ownedOpportunities: Relation<OpportunityWorkspaceEntity[]>;
   searchVector: string;
   numberFormat: string;
+  // Serialized TipTap document, same shape as a message campaign body template.
+  emailSignature: string | null;
+  isEmailSignatureIncludedByDefault: boolean;
 }

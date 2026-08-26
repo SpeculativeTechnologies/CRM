@@ -18,6 +18,7 @@ type MassEmailWorkspaceProps = {
     campaignId: string;
     subject: string;
     body: string;
+    cc?: string;
   };
   onDraftCreated?: (campaignId: string) => void;
   onSent: () => void;

@@ -489,6 +489,9 @@ export const STANDARD_OBJECT_FIELDS = {
     fromAddress: {
       universalIdentifier: '91e1a33c-c1ff-411a-b720-9085e13c05db',
     },
+    ccAddresses: {
+      universalIdentifier: '5552de17-c256-412f-8561-d17f14cc589c',
+    },
     status: { universalIdentifier: 'c7117256-3de6-48e1-87df-c99c32bad610' },
     sentAt: { universalIdentifier: 'e2315b4f-9edf-4df2-96b9-961e76368671' },
     sentCount: {
@@ -1098,6 +1101,12 @@ export const STANDARD_OBJECT_FIELDS = {
     },
     numberFormat: {
       universalIdentifier: '20202020-7f40-4e7f-b126-11c0eda6b141',
+    },
+    emailSignature: {
+      universalIdentifier: '20202020-3f7a-4d21-b8c5-1e9d4a6c73f2',
+    },
+    isEmailSignatureIncludedByDefault: {
+      universalIdentifier: '20202020-9c14-4e86-a7d3-52b8f0c1a4e7',
     },
   },
 } satisfies Record<string, Record<string, { universalIdentifier: string }>>;
