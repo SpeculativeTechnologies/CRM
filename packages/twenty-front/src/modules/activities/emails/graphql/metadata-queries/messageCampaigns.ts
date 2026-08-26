@@ -50,6 +50,7 @@ export const GET_MESSAGE_CAMPAIGN = gql`
       bouncedCount
       complainedCount
       body
+      ccAddresses
       unsubscribeTopicId
       canEdit
       draftPersonIds

@@ -205,6 +205,7 @@ export class MessageCampaignQueryService {
         return {
           ...this.toSummary(campaign, recipientCount),
           body: campaign.bodyTemplate,
+          ccAddresses: campaign.ccAddresses ?? null,
           unsubscribeTopicId: campaign.unsubscribeTopicId,
           canEdit:
             campaign.status === MessageCampaignStatus.DRAFT &&

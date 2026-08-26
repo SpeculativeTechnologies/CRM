@@ -9,6 +9,9 @@ export class MessageCampaignDetailsDTO extends MessageCampaignSummaryDTO {
   body: string | null;
 
   @Field(() => String, { nullable: true })
+  ccAddresses: string | null;
+
+  @Field(() => String, { nullable: true })
   unsubscribeTopicId: string | null;
 
   @Field(() => Boolean)

@@ -90,6 +90,7 @@ describe('useMassEmailComposerState', () => {
       personIds: ['person-1'],
       subject: '',
       body: '',
+      cc: [],
     });
     expect(onDraftCreated).toHaveBeenCalledWith('campaign-1');
   });
@@ -137,6 +138,7 @@ describe('useMassEmailComposerState', () => {
       personIds: ['person-1', 'person-2'],
       subject: 'Hello {first_name}',
       body: '<p>Hi {full_name}</p>',
+      cc: [],
     });
   });
 
@@ -176,6 +178,258 @@ describe('useMassEmailComposerState', () => {
       ],
     });
     expect(onSent).toHaveBeenCalledTimes(1);
+  });
+
+  it('applies the shared cc list to every recipient email', async () => {
+    const { result } = renderHook(() =>
+      useMassEmailComposerState({
+        connectedAccountId: 'account-1',
+        personIds: ['person-1', 'person-2'],
+        initialDraft: {
+          campaignId: 'campaign-1',
+          subject: 'Hello',
+          body: '<p>Hello</p>',
+        },
+      }),
+    );
+
+    expect(result.current.isCcFieldVisible).toBe(false);
+
+    act(() => {
+      result.current.setCcTemplate([{ address: 'boss@example.com' }]);
+    });
+
+    for (const recipient of result.current.includedRecipients) {
+      expect(result.current.resolveForRecipient(recipient)).toMatchObject({
+        cc: [{ address: 'boss@example.com' }],
+        isCustomized: false,
+      });
+    }
+
+    await act(async () => {
+      await result.current.handleSend();
+    });
+
+    expect(sendMassEmailMock).toHaveBeenCalledWith({
+      campaignId: 'campaign-1',
+      connectedAccountId: 'account-1',
+      emails: [
+        {
+          personId: 'person-1',
+          to: 'ada@example.com',
+          subject: 'Hello',
+          body: '<p>Hello</p>',
+          cc: ['boss@example.com'],
+        },
+        {
+          personId: 'person-2',
+          to: 'grace@example.com',
+          subject: 'Hello',
+          body: '<p>Hello</p>',
+          cc: ['boss@example.com'],
+        },
+      ],
+    });
+  });
+
+  it('overrides the cc list for a single recipient and resets it', async () => {
+    const { result } = renderHook(() =>
+      useMassEmailComposerState({
+        connectedAccountId: 'account-1',
+        personIds: ['person-1', 'person-2'],
+        initialDraft: {
+          campaignId: 'campaign-1',
+          subject: 'Hello',
+          body: '<p>Hello</p>',
+        },
+      }),
+    );
+
+    act(() => {
+      result.current.setCcTemplate([{ address: 'boss@example.com' }]);
+    });
+
+    act(() => {
+      result.current.setRecipientCc('person-1', [
+        { address: 'assistant@example.com' },
+      ]);
+    });
+
+    const [firstRecipient, secondRecipient] = result.current.includedRecipients;
+
+    expect(result.current.resolveForRecipient(firstRecipient)).toMatchObject({
+      cc: [{ address: 'assistant@example.com' }],
+      isCustomized: true,
+    });
+    expect(result.current.resolveForRecipient(secondRecipient)).toMatchObject({
+      cc: [{ address: 'boss@example.com' }],
+      isCustomized: false,
+    });
+
+    await act(async () => {
+      await result.current.handleSend();
+    });
+
+    expect(sendMassEmailMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        emails: [
+          expect.objectContaining({
+            personId: 'person-1',
+            cc: ['assistant@example.com'],
+          }),
+          expect.objectContaining({
+            personId: 'person-2',
+            cc: ['boss@example.com'],
+          }),
+        ],
+      }),
+    );
+
+    act(() => {
+      result.current.resetRecipientOverride('person-1');
+    });
+
+    expect(result.current.resolveForRecipient(firstRecipient)).toMatchObject({
+      cc: [{ address: 'boss@example.com' }],
+      isCustomized: false,
+    });
+  });
+
+  it('drops the cc override when it matches the shared list again', () => {
+    const { result } = renderHook(() =>
+      useMassEmailComposerState({
+        connectedAccountId: 'account-1',
+        personIds: ['person-1'],
+        initialDraft: {
+          campaignId: 'campaign-1',
+          subject: 'Hello',
+          body: '<p>Hello</p>',
+        },
+      }),
+    );
+
+    act(() => {
+      result.current.setCcTemplate([{ address: 'boss@example.com' }]);
+    });
+
+    act(() => {
+      result.current.setRecipientCc('person-1', [
+        { address: 'assistant@example.com' },
+      ]);
+    });
+
+    act(() => {
+      result.current.setRecipientCc('person-1', [
+        { address: 'boss@example.com' },
+      ]);
+    });
+
+    const [firstRecipient] = result.current.includedRecipients;
+
+    expect(result.current.resolveForRecipient(firstRecipient)).toMatchObject({
+      cc: [{ address: 'boss@example.com' }],
+      isCustomized: false,
+    });
+  });
+
+  it('blocks sending when a cc address is invalid or the limit is exceeded', () => {
+    const { result } = renderHook(() =>
+      useMassEmailComposerState({
+        connectedAccountId: 'account-1',
+        personIds: ['person-1'],
+        initialDraft: {
+          campaignId: 'campaign-1',
+          subject: 'Hello',
+          body: '<p>Hello</p>',
+        },
+      }),
+    );
+
+    expect(result.current.canSend).toBe(true);
+
+    act(() => {
+      result.current.setCcTemplate([{ address: 'not-an-email' }]);
+    });
+
+    expect(result.current.hasInvalidCcRecipients).toBe(true);
+    expect(result.current.canSend).toBe(false);
+
+    act(() => {
+      result.current.setCcTemplate(
+        Array.from(
+          { length: result.current.maxRecipients },
+          (_unused, index) => ({ address: `person-${index}@example.com` }),
+        ),
+      );
+    });
+
+    expect(result.current.exceedsRecipientLimit).toBe(true);
+    expect(result.current.largestRecipientCount).toBe(
+      result.current.maxRecipients + 1,
+    );
+    expect(result.current.canSend).toBe(false);
+  });
+
+  it('saves the shared cc list on the draft', async () => {
+    const { result } = renderHook(() =>
+      useMassEmailComposerState({
+        connectedAccountId: 'account-1',
+        personIds: ['person-1'],
+        initialDraft: {
+          campaignId: 'campaign-1',
+          subject: 'Hello',
+          body: '<p>Hello</p>',
+        },
+      }),
+    );
+
+    act(() => {
+      result.current.setCcTemplate([
+        { address: 'boss@example.com' },
+        { address: 'assistant@example.com' },
+      ]);
+    });
+
+    act(() => {
+      result.current.setRecipientCc('person-1', [
+        { address: 'someone-else@example.com' },
+      ]);
+    });
+
+    await act(async () => {
+      await result.current.saveCurrentDraft();
+    });
+
+    // Per-recipient overrides are not persisted, matching subject and body.
+    expect(saveDraftMock).toHaveBeenLastCalledWith({
+      campaignId: 'campaign-1',
+      connectedAccountId: 'account-1',
+      personIds: ['person-1'],
+      subject: 'Hello',
+      body: '<p>Hello</p>',
+      cc: ['boss@example.com', 'assistant@example.com'],
+    });
+  });
+
+  it('restores a cc list from an existing draft and reveals the field', () => {
+    const { result } = renderHook(() =>
+      useMassEmailComposerState({
+        connectedAccountId: 'account-1',
+        personIds: ['person-1'],
+        initialDraft: {
+          campaignId: 'campaign-1',
+          subject: 'Existing subject',
+          body: '<p>Existing body</p>',
+          cc: 'Boss <boss@example.com>, second@example.com',
+        },
+      }),
+    );
+
+    expect(result.current.isCcFieldVisible).toBe(true);
+    expect(result.current.ccTemplate).toEqual([
+      { address: 'boss@example.com', displayName: 'Boss' },
+      { address: 'second@example.com', displayName: undefined },
+    ]);
   });
 
   it('resumes an existing draft without creating another campaign', async () => {

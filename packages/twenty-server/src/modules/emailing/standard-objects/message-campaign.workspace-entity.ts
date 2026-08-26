@@ -12,6 +12,7 @@ export class MessageCampaignWorkspaceEntity extends BaseWorkspaceEntity {
   subject: string | null;
   bodyTemplate: string | null;
   fromAddress: EmailsMetadata | null;
+  ccAddresses: string | null;
   status: string;
   sentAt: Date | null;
   sentCount: number;

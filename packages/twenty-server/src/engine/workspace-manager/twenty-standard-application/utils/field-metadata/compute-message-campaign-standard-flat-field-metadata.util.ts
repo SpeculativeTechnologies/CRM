@@ -289,6 +289,25 @@ export const buildMessageCampaignStandardFlatFieldMetadatas = ({
         },
       },
     }),
+    ccAddresses: createStandardFieldFlatMetadata({
+      ...base,
+      context: {
+        fieldName: 'ccAddresses',
+        type: FieldMetadataType.TEXT,
+        label: i18nLabel(
+          msg({ message: `Cc addresses`, context: 'fieldMetadata.label' }),
+        ),
+        description: i18nLabel(
+          msg({
+            message: `Comma separated addresses copied on every recipient's email`,
+            context: 'fieldMetadata.description',
+          }),
+        ),
+        icon: 'IconAt',
+        isNullable: true,
+        isUIEditable: false,
+      },
+    }),
     status: createStandardFieldFlatMetadata({
       ...base,
       context: {

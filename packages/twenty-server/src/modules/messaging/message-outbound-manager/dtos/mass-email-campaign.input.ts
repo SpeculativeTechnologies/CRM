@@ -13,7 +13,13 @@ import {
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
+import { MAX_EMAIL_RECIPIENTS } from 'twenty-shared/constants';
+
 import { MAX_CAMPAIGN_RECIPIENTS } from 'src/engine/core-modules/emailing-domain/constants/campaign.constant';
+
+// Each mass email is addressed to exactly one person, so its Cc list is what
+// decides whether the per-email recipient cap is exceeded.
+const MAX_CC_RECIPIENTS_PER_EMAIL = MAX_EMAIL_RECIPIENTS - 1;
 
 @InputType()
 export class SaveMassEmailCampaignDraftInput {
@@ -43,6 +49,16 @@ export class SaveMassEmailCampaignDraftInput {
   @IsOptional()
   @IsString()
   body?: string;
+
+  // A draft holds work in progress, so a half-typed address is stored rather
+  // than rejected; addresses are validated when the campaign is sent.
+  @Field(() => [String], { nullable: true })
+  @IsOptional()
+  @IsArray()
+  @ArrayMaxSize(MAX_CC_RECIPIENTS_PER_EMAIL)
+  @IsString({ each: true })
+  @Length(0, 320, { each: true })
+  cc?: string[];
 }
 
 @InputType()
@@ -54,6 +70,13 @@ export class MassEmailCampaignRecipientInput {
   @Field(() => String)
   @IsEmail()
   to: string;
+
+  @Field(() => [String], { nullable: true })
+  @IsOptional()
+  @IsArray()
+  @ArrayMaxSize(MAX_CC_RECIPIENTS_PER_EMAIL)
+  @IsEmail({}, { each: true })
+  cc?: string[];
 
   @Field(() => String)
   @IsString()

@@ -1,15 +1,24 @@
 import { useQuery } from '@apollo/client/react';
+import { DragDropProvider } from '@dnd-kit/react';
 import { styled } from '@linaria/react';
 import { useState } from 'react';
 
 import { INLINE_EMAIL_BODY_EDITOR_PROFILE } from '@/activities/emails/editor/constants/InlineEmailBodyEditorProfile';
 import { type MassEmailComposerState } from '@/activities/emails/mass-email/hooks/useMassEmailComposerState';
 import { EMAIL_PLACEHOLDER_KEYS } from '@/activities/emails/mass-email/utils/emailPlaceholders';
+import { EmailRecipientsFieldInput } from '@/activities/emails/recipients/components/EmailRecipientsFieldInput';
+import { useEmailRecipientsDragAndDrop } from '@/activities/emails/recipients/hooks/useEmailRecipientsDragAndDrop';
+import { type EmailRecipient } from '@/activities/emails/recipients/types/EmailRecipient';
+import { type EmailRecipientDragData } from '@/activities/emails/recipients/types/EmailRecipientDragData';
+import { getEmailRecipientKey } from '@/activities/emails/recipients/utils/getEmailRecipientKey';
 import { EmailSignatureToggleRow } from '@/activities/emails/signature/components/EmailSignatureToggleRow';
 import { FormAdvancedTextFieldInput } from '@/advanced-text-editor/components/FormAdvancedTextFieldInput';
 import { GET_MY_CONNECTED_ACCOUNTS } from '@/settings/accounts/graphql/queries/getMyConnectedAccounts';
 import { Select } from '@/ui/input/components/Select';
 import { useTextInputFocusStack } from '@/ui/input/hooks/useTextInputFocusStack';
+import { DND_KIT_PROVIDER_PLUGINS_WITHOUT_DROP_ANIMATION } from '@/ui/utilities/drag-and-drop/constants/DndKitProviderPluginsWithoutDropAnimation';
+import { DND_KIT_SENSORS } from '@/ui/utilities/drag-and-drop/constants/DndKitSensors';
+import { DragDropItemDndContext } from '@/ui/utilities/drag-and-drop/context/DragDropItemDndContext';
 import { t } from '@lingui/core/macro';
 import { isDefined } from 'twenty-shared/utils';
 import { Avatar } from 'twenty-ui/data-display';
@@ -63,6 +72,37 @@ const StyledFieldValue = styled.div`
 
 const StyledSecondaryText = styled.span`
   color: ${themeCssVariables.font.color.tertiary};
+`;
+
+const StyledCcToggle = styled.button`
+  all: unset;
+  color: ${themeCssVariables.font.color.tertiary};
+  cursor: pointer;
+  flex-shrink: 0;
+  font-size: ${themeCssVariables.font.size.md};
+  padding: 0 ${themeCssVariables.spacing[1]};
+
+  &:hover {
+    color: ${themeCssVariables.font.color.secondary};
+  }
+
+  &:focus-visible {
+    outline: 2px solid ${themeCssVariables.color.blue};
+    outline-offset: 2px;
+  }
+`;
+
+const StyledRecipientLimitWarning = styled.div`
+  color: ${themeCssVariables.color.red};
+  font-size: ${themeCssVariables.font.size.xs};
+  padding: ${themeCssVariables.spacing[1]} ${themeCssVariables.spacing[4]};
+`;
+
+const StyledCcFieldValue = styled.div`
+  align-items: center;
+  display: flex;
+  flex: 1;
+  min-width: 0;
 `;
 
 const StyledSubjectInput = styled.input`
@@ -170,6 +210,42 @@ export const MassEmailComposeCard = ({
 
   const editorKey = `${selectedPersonId ?? 'template'}:${resetNonce}:${composerState.signatureResyncKey}`;
 
+  // Selecting a recipient shows that recipient's effective Cc; the "Everyone"
+  // view shows the shared list applied to every email.
+  const effectiveCc = isDefined(resolved)
+    ? resolved.cc
+    : composerState.ccTemplate;
+
+  const handleCcChange = (nextCc: EmailRecipient[]) => {
+    // Editing pins the field open, so clearing every chip does not make the
+    // field it was typed in disappear.
+    composerState.setIsCcFieldVisible(true);
+
+    if (isDefined(selectedRecipient)) {
+      composerState.setRecipientCc(selectedRecipient.personId, nextCc);
+    } else {
+      composerState.setCcTemplate(nextCc);
+    }
+  };
+
+  const { contextValues, draggedRecipients, handlers } =
+    useEmailRecipientsDragAndDrop({
+      recipientsByFieldId: { to: [], cc: effectiveCc, bcc: [] },
+      onRecipientsByFieldIdChange: ({ cc }) => handleCcChange(cc),
+    });
+
+  const draggedSourceIndices =
+    draggedRecipients?.fieldId === 'cc' ? draggedRecipients.indices : null;
+
+  // A Cc that already has addresses reveals the field on its own, so a restored
+  // value is never hidden behind the toggle.
+  const isCcFieldVisible =
+    composerState.isCcFieldVisible || effectiveCc.length > 0;
+
+  const ccRecipientKeys = effectiveCc.map((ccRecipient) =>
+    getEmailRecipientKey(ccRecipient.address),
+  );
+
   const handleReset = () => {
     if (!isDefined(selectedRecipient)) {
       return;
@@ -232,7 +308,45 @@ export const MassEmailComposeCard = ({
               </>
             )}
           </StyledFieldValue>
+          {!isCcFieldVisible && (
+            <StyledCcToggle
+              type="button"
+              onClick={() => composerState.setIsCcFieldVisible(true)}
+            >
+              {t`Cc`}
+            </StyledCcToggle>
+          )}
         </StyledFieldRow>
+        {isCcFieldVisible && (
+          <StyledFieldRow role="group" aria-label={t`Cc`}>
+            <StyledFieldLabel aria-hidden="true">{t`Cc`}</StyledFieldLabel>
+            <StyledCcFieldValue>
+              <DragDropItemDndContext.Provider value={contextValues}>
+                <DragDropProvider<EmailRecipientDragData>
+                  sensors={DND_KIT_SENSORS}
+                  plugins={DND_KIT_PROVIDER_PLUGINS_WITHOUT_DROP_ANIMATION}
+                  onDragStart={handlers.onDragStart}
+                  onDragMove={handlers.onDragMove}
+                  onDragEnd={handlers.onDragEnd}
+                >
+                  <EmailRecipientsFieldInput
+                    fieldId="cc"
+                    draggedSourceIndices={draggedSourceIndices}
+                    label={t`Cc`}
+                    recipients={effectiveCc}
+                    onChange={handleCcChange}
+                    excludedSuggestionKeys={ccRecipientKeys}
+                  />
+                </DragDropProvider>
+              </DragDropItemDndContext.Provider>
+            </StyledCcFieldValue>
+          </StyledFieldRow>
+        )}
+        {composerState.exceedsRecipientLimit && (
+          <StyledRecipientLimitWarning>
+            {t`Too many recipients (${composerState.largestRecipientCount}/${composerState.maxRecipients}).`}
+          </StyledRecipientLimitWarning>
+        )}
         <StyledSubjectInput
           value={
             isDefined(resolved)
