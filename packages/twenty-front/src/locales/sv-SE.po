@@ -3299,6 +3299,7 @@ msgid "Blocks"
 msgstr "Block"
 
 #. js-lingui-id: Zn5crm
+#: src/modules/advanced-text-editor/constants/TextColorLabels.ts
 #: src/modules/settings/data-model/fields/forms/select/components/SettingsDataModelFieldSelectFormOptionRow.tsx
 msgid "Blue"
 msgstr "Blå"
@@ -3374,6 +3375,7 @@ msgid "Bronze"
 msgstr "Brons"
 
 #. js-lingui-id: JLxwQS
+#: src/modules/advanced-text-editor/constants/TextColorLabels.ts
 #: src/modules/settings/data-model/fields/forms/select/components/SettingsDataModelFieldSelectFormOptionRow.tsx
 msgid "Brown"
 msgstr "Brun"
@@ -6260,6 +6262,7 @@ msgid "default"
 msgstr "standard"
 
 #. js-lingui-id: ovBPCi
+#: src/modules/advanced-text-editor/components/TextColorDropdown.tsx
 #: src/modules/settings/data-model/fields/forms/address/components/MultiSelectAddressFields.tsx
 #: src/modules/settings/data-model/fields/forms/date/utils/getDisplayFormatLabel.ts
 #: src/modules/settings/experience/components/UiScalePicker.tsx
@@ -9778,6 +9781,7 @@ msgid "Grass"
 msgstr "Gräs"
 
 #. js-lingui-id: qS5//Q
+#: src/modules/advanced-text-editor/constants/TextColorLabels.ts
 #: src/modules/settings/data-model/fields/forms/select/components/SettingsDataModelFieldSelectFormOptionRow.tsx
 msgid "Gray"
 msgstr "Grå"
@@ -9793,6 +9797,7 @@ msgid "Greek"
 msgstr "Greek"
 
 #. js-lingui-id: VmkjGB
+#: src/modules/advanced-text-editor/constants/TextColorLabels.ts
 #: src/modules/settings/data-model/fields/forms/select/components/SettingsDataModelFieldSelectFormOptionRow.tsx
 msgid "Green"
 msgstr "Grön"
@@ -14745,6 +14750,7 @@ msgid "Or"
 msgstr "Eller"
 
 #. js-lingui-id: 4OE5Sf
+#: src/modules/advanced-text-editor/constants/TextColorLabels.ts
 #: src/modules/settings/data-model/fields/forms/select/components/SettingsDataModelFieldSelectFormOptionRow.tsx
 msgid "Orange"
 msgstr "Orange"
@@ -15301,6 +15307,7 @@ msgid "Pin tab"
 msgstr "Fäst flik"
 
 #. js-lingui-id: 2FIjLb
+#: src/modules/advanced-text-editor/constants/TextColorLabels.ts
 #: src/modules/settings/data-model/fields/forms/select/components/SettingsDataModelFieldSelectFormOptionRow.tsx
 msgid "Pink"
 msgstr "Rosa"
@@ -15735,6 +15742,7 @@ msgid "Publish your app to the marketplace so others can install it"
 msgstr "Publicera din app på marknadsplatsen så att andra kan installera den"
 
 #. js-lingui-id: mF9LxA
+#: src/modules/advanced-text-editor/constants/TextColorLabels.ts
 #: src/modules/settings/data-model/fields/forms/select/components/SettingsDataModelFieldSelectFormOptionRow.tsx
 msgid "Purple"
 msgstr "Lila"
@@ -16085,6 +16093,7 @@ msgid "Records"
 msgstr "Poster"
 
 #. js-lingui-id: wRTiSD
+#: src/modules/advanced-text-editor/constants/TextColorLabels.ts
 #: src/modules/settings/data-model/fields/forms/select/components/SettingsDataModelFieldSelectFormOptionRow.tsx
 msgid "Red"
 msgstr "Röd"
@@ -18298,6 +18307,7 @@ msgid "Skipped without a linked {0}: {1}"
 msgstr ""
 
 #. js-lingui-id: BIZl8w
+#: src/modules/advanced-text-editor/constants/TextColorLabels.ts
 #: src/modules/settings/data-model/fields/forms/select/components/SettingsDataModelFieldSelectFormOptionRow.tsx
 msgid "Sky"
 msgstr "Himmelsblå"
@@ -20391,6 +20401,7 @@ msgid "Turn Not Found"
 msgstr ""
 
 #. js-lingui-id: EdHWDU
+#: src/modules/advanced-text-editor/constants/TextColorLabels.ts
 #: src/modules/settings/data-model/fields/forms/select/components/SettingsDataModelFieldSelectFormOptionRow.tsx
 msgid "Turquoise"
 msgstr "Turkos"
@@ -22451,6 +22462,7 @@ msgid "years"
 msgstr "år"
 
 #. js-lingui-id: QyCqHT
+#: src/modules/advanced-text-editor/constants/TextColorLabels.ts
 #: src/modules/settings/data-model/fields/forms/select/components/SettingsDataModelFieldSelectFormOptionRow.tsx
 msgid "Yellow"
 msgstr "Gul"

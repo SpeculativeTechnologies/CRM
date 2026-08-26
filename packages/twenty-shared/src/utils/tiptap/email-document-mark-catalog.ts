@@ -15,6 +15,9 @@ export const EMAIL_DOCUMENT_MARK_CATALOG = {
   [TIPTAP_MARK_TYPES.LINK]: {
     stringAttributes: { href: 'url' },
   },
+  // The colour attribute holds a palette name, not user-visible text and not a
+  // URL, so variable interpolation and escaping must leave it alone.
+  [TIPTAP_MARK_TYPES.TEXT_COLOR]: { stringAttributes: {} },
 } as const satisfies Partial<
   Record<TipTapMarkType, EmailDocumentMarkDefinition>
 >;

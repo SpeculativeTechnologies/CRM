@@ -1,6 +1,7 @@
 import { ResizableImage } from '@/advanced-text-editor/extensions/resizable-image/ResizableImage';
 import { UploadImageExtension } from '@/advanced-text-editor/extensions/resizable-image/UploadImageExtension';
 import { SlashCommand } from '@/advanced-text-editor/extensions/slash-command/SlashCommand';
+import { TextColorMark } from '@/advanced-text-editor/extensions/text-color/TextColorMark';
 import { VariableTag } from '@/advanced-text-editor/extensions/variable-tag/VariableTag';
 import { type AdvancedTextEditorExtensionContext } from '@/advanced-text-editor/types/AdvancedTextEditorExtensionContext';
 import { type AnyExtension } from '@tiptap/core';
@@ -19,6 +20,7 @@ export const buildFullRichTextExtensions = (
   Italic,
   Strike,
   Underline,
+  TextColorMark,
   Heading.configure({ levels: [1, 2, 3] }),
   ListKit,
   Link.configure({ openOnClick: false }),

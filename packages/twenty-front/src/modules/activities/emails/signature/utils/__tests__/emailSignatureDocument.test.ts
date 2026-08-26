@@ -27,6 +27,26 @@ const paragraph = (text: string): TipTapNode => ({
 
 const emptyParagraph: TipTapNode = { type: 'paragraph' };
 
+// Written as a plain literal rather than a typed TipTapNode: this suite
+// resolves twenty-shared through its build output, so the shared mark type
+// union only lists the text colour mark once twenty-shared is rebuilt.
+const colouredParagraph = {
+  type: 'paragraph',
+  content: [
+    {
+      type: 'text',
+      text: 'Ada Lovelace',
+      marks: [{ type: 'textColor', attrs: { color: 'blue' } }],
+    },
+  ],
+};
+
+const colouredSignature = JSON.stringify({
+  type: 'doc',
+  attrs: { schemaVersion: TIPTAP_DOCUMENT_SCHEMA_VERSION },
+  content: [colouredParagraph],
+});
+
 const signature = serializeDocument([
   paragraph('Ada Lovelace'),
   paragraph('Analyst, Speculative Technologies'),
@@ -87,6 +107,43 @@ describe('emailSignatureDocument', () => {
         paragraph('Ada Lovelace'),
         paragraph('Analyst, Speculative Technologies'),
       ]);
+    });
+
+    // The colour lives on a mark, so it only reaches the sent email if the
+    // blocks are carried across verbatim rather than rebuilt from their text.
+    it('should carry the text colour of a coloured signature into the body', () => {
+      const nextBody = insertEmailSignature({
+        serializedBody: serializeDocument([paragraph('Hello Grace')]),
+        serializedSignature: colouredSignature,
+      });
+
+      expect(parseContent(nextBody)).toEqual([
+        paragraph('Hello Grace'),
+        emptyParagraph,
+        colouredParagraph,
+      ]);
+    });
+
+    it('should recognise and remove a coloured signature it inserted', () => {
+      const body = insertEmailSignature({
+        serializedBody: serializeDocument([paragraph('Hello Grace')]),
+        serializedSignature: colouredSignature,
+      });
+
+      expect(
+        hasEmailSignature({
+          serializedBody: body,
+          serializedSignature: colouredSignature,
+        }),
+      ).toBe(true);
+      expect(
+        parseContent(
+          removeEmailSignature({
+            serializedBody: body,
+            serializedSignature: colouredSignature,
+          }),
+        ),
+      ).toEqual([paragraph('Hello Grace')]);
     });
 
     it('should append the signature to an empty body and keep a line to type in', () => {
