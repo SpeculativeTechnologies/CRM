@@ -130,7 +130,10 @@ export const useResetVirtualizationBecauseDataChanged = (
     store.set(totalNumberOfRecordsToVirtualizeCallbackState, totalCount);
   }, [
     findManyRecordsLazy,
-    scrollWrapperHTMLElement?.clientHeight,
+    // The element, not its clientHeight: reading layout in a dependency array
+    // forces a reflow on every render, and the callback already reads the live
+    // height when it runs.
+    scrollWrapperHTMLElement,
     lastScrollPositionCallbackState,
     totalNumberOfRecordsToVirtualizeCallbackState,
     dataPagesLoadedCallbackState,
