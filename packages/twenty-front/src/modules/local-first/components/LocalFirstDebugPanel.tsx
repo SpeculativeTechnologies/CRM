@@ -5,7 +5,6 @@ import { themeCssVariables } from 'twenty-ui/theme-constants';
 
 import { isCookieAuthActiveState } from '@/auth/states/isCookieAuthActiveState';
 import { tokenPairState } from '@/auth/states/tokenPairState';
-import { IS_LOCAL_FIRST_ENABLED } from '@/local-first/constants/IS_LOCAL_FIRST_ENABLED';
 import { useLocalFirstPersonRecords } from '@/local-first/hooks/useLocalFirstPersonRecords';
 import { startSyncingPersonShapeToLocalFirstDatabase } from '@/local-first/services/syncPersonShapeToLocalFirstDatabase';
 import { localFirstSyncStatusState } from '@/local-first/states/localFirstSyncStatusState';
@@ -58,8 +57,6 @@ export const LocalFirstDebugPanel = () => {
       getAuthHeaders,
     });
   }, [setStatus, getAuthHeaders]);
-
-  if (!IS_LOCAL_FIRST_ENABLED) return null;
 
   return (
     <StyledPanel>

@@ -4,7 +4,7 @@ import { ApolloDevLogEffect } from '@/debug/components/ApolloDevLogEffect';
 import { AppErrorBoundary } from '@/error-handler/components/AppErrorBoundary';
 import { AppRootErrorFallback } from '@/error-handler/components/AppRootErrorFallback';
 import { ExceptionHandlerProvider } from '@/error-handler/components/ExceptionHandlerProvider';
-import { LocalFirstDebugPanel } from '@/local-first/components/LocalFirstDebugPanel';
+import { LocalFirstDebugPanelGate } from '@/local-first/components/LocalFirstDebugPanelGate';
 import { SnackBarComponentInstanceContext } from '@/ui/feedback/snack-bar-manager/contexts/SnackBarComponentInstanceContext';
 import { ClickOutsideListenerContext } from '@/ui/utilities/pointer-event/contexts/ClickOutsideListenerContext';
 import { i18n } from '@lingui/core';
@@ -27,7 +27,7 @@ export const App = () => {
         <I18nActivationGate>
           <I18nProvider i18n={i18n}>
             <ApolloDevLogEffect />
-            <LocalFirstDebugPanel />
+            <LocalFirstDebugPanelGate />
             <SnackBarComponentInstanceContext.Provider
               value={{ instanceId: 'snack-bar-manager' }}
             >
