@@ -45,8 +45,10 @@ services:
   electric:
     image: electricsql/electric:latest
     profiles: ["local-first"]
+    # Loopback only: Electric itself is unauthenticated (ELECTRIC_INSECURE);
+    # everything but the twenty-server proxy on this machine must stay out.
     ports:
-      - "3010:3000"
+      - "127.0.0.1:3010:3000"
     environment:
       DATABASE_URL: postgresql://postgres:postgres@db:5432/default
       ELECTRIC_INSECURE: "true"

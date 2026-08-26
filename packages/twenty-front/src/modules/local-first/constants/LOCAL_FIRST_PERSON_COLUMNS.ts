@@ -6,6 +6,6 @@ export const LOCAL_FIRST_PERSON_COLUMNS = [
   'nameFirstName',
   'nameLastName',
   'jobTitle',
-  'city',
+  'emailsPrimaryEmail',
   'updatedAt',
 ] as const;

@@ -7,7 +7,7 @@ export type LocalFirstPersonRecord = {
   nameFirstName: string | null;
   nameLastName: string | null;
   jobTitle: string | null;
-  city: string | null;
+  emailsPrimaryEmail: string | null;
   updatedAt: string | null;
 };
 
@@ -23,7 +23,7 @@ export const useLocalFirstPersonRecords = () => {
       const pg = await getLocalFirstDatabase();
 
       const rowsLiveQuery = await pg.live.query<LocalFirstPersonRecord>(
-        `select id, "nameFirstName", "nameLastName", "jobTitle", city, "updatedAt"
+        `select id, "nameFirstName", "nameLastName", "jobTitle", "emailsPrimaryEmail", "updatedAt"
          from person order by "updatedAt" desc nulls last limit 25`,
         [],
         (results) => {

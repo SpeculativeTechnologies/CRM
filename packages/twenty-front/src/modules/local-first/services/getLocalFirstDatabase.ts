@@ -2,7 +2,10 @@ import { PGlite } from '@electric-sql/pglite';
 import { live } from '@electric-sql/pglite/live';
 import { isDefined } from 'twenty-shared/utils';
 
-const LOCAL_FIRST_DATA_DIR = 'idb://twenty-local-first';
+// Bump the suffix when the local table shape changes: `create table if not
+// exists` won't migrate an existing IndexedDB database, so a new name is the
+// spike's schema-migration story.
+const LOCAL_FIRST_DATA_DIR = 'idb://twenty-local-first-v2';
 
 let localFirstDatabasePromise: ReturnType<
   typeof createLocalFirstDatabase
@@ -20,7 +23,7 @@ const createLocalFirstDatabase = async () => {
       "nameFirstName" text,
       "nameLastName" text,
       "jobTitle" text,
-      city text,
+      "emailsPrimaryEmail" text,
       "updatedAt" timestamptz
     );
   `);

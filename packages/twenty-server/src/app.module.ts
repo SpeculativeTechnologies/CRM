@@ -140,6 +140,16 @@ export class AppModule {
       .forRoutes({ path: ApiPath.AdminPanel, method: RequestMethod.ALL });
 
     consumer
+      .apply(
+        GraphQLHydrateRequestFromTokenMiddleware,
+        WorkspaceAuthContextMiddleware,
+      )
+      .forRoutes({
+        path: `${ApiPath.LocalFirst}/*path`,
+        method: RequestMethod.ALL,
+      });
+
+    consumer
       .apply(McpMethodGuardMiddleware)
       .forRoutes({ path: ApiPath.Mcp, method: RequestMethod.ALL });
 

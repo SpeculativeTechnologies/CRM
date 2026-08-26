@@ -1,18 +1,19 @@
-import { type PGlite } from '@electric-sql/pglite';
+import { type PGlite, type Transaction } from '@electric-sql/pglite';
+import { ApiPath } from 'twenty-shared/types';
 import { isDefined } from 'twenty-shared/utils';
 
+import { IS_LOCAL_FIRST_ENABLED } from '@/local-first/constants/IS_LOCAL_FIRST_ENABLED';
 import { LOCAL_FIRST_PERSON_COLUMNS } from '@/local-first/constants/LOCAL_FIRST_PERSON_COLUMNS';
-import { LOCAL_FIRST_ELECTRIC_URL } from '@/local-first/constants/LOCAL_FIRST_ELECTRIC_URL';
-import { LOCAL_FIRST_WORKSPACE_SCHEMA } from '@/local-first/constants/LOCAL_FIRST_WORKSPACE_SCHEMA';
 import { getLocalFirstDatabase } from '@/local-first/services/getLocalFirstDatabase';
 import { type LocalFirstSyncStatus } from '@/local-first/states/localFirstSyncStatusState';
+import { REACT_APP_SERVER_BASE_URL } from '~/config';
 
 type ElectricPersonRow = {
   id: string;
   nameFirstName: string | null;
   nameLastName: string | null;
   jobTitle: string | null;
-  city: string | null;
+  emailsPrimaryEmail: string | null;
   updatedAt: string | null;
 };
 
@@ -21,68 +22,123 @@ type ElectricMessage = {
   value?: ElectricPersonRow;
 };
 
-const quotedColumns = LOCAL_FIRST_PERSON_COLUMNS.map(
-  (column) => `"${column}"`,
-).join(',');
+const UPSERT_BATCH_SIZE = 500;
 
-// Hand-rolled polling sync against Electric's HTTP shape API, rather than the
-// official @electric-sql/client ShapeStream: in manual browser testing the
-// official client never issued a request (no error either), while this same
-// request/response cycle worked reliably over plain fetch. Worth revisiting
-// once that's root-caused; this is the known-working fallback.
-const fetchShapeBatch = async (offset: string, handle: string | null) => {
-  const params = new URLSearchParams({
-    table: `${LOCAL_FIRST_WORKSPACE_SCHEMA}.person`,
-    columns: quotedColumns,
-    offset,
-  });
+// The shape request goes through the server's local-first proxy, which
+// resolves the caller's workspace schema from their auth and forwards to
+// Electric — the browser never talks to Electric directly and never names a
+// schema or column list.
+//
+// Hand-rolled polling sync rather than the official @electric-sql/client
+// ShapeStream: in manual browser testing the official client never issued a
+// request (no error either), while this same request/response cycle worked
+// reliably over plain fetch. Worth revisiting once that's root-caused; this
+// is the known-working fallback.
+const fetchShapeBatch = async ({
+  offset,
+  handle,
+  getAuthHeaders,
+}: {
+  offset: string;
+  handle: string | null;
+  getAuthHeaders: () => Record<string, string>;
+}) => {
+  const params = new URLSearchParams({ offset });
   if (isDefined(handle)) params.set('handle', handle);
 
-  const response = await fetch(`${LOCAL_FIRST_ELECTRIC_URL}?${params}`);
+  const response = await fetch(
+    `${REACT_APP_SERVER_BASE_URL}/${ApiPath.LocalFirst}/shape/person?${params}`,
+    {
+      credentials: 'include',
+      headers: getAuthHeaders(),
+    },
+  );
   if (!response.ok) {
-    throw new Error(`Electric responded ${response.status}`);
+    throw new Error(`Local-first shape proxy responded ${response.status}`);
   }
 
   const nextOffset = response.headers.get('electric-offset') ?? offset;
   const nextHandle = response.headers.get('electric-handle') ?? handle;
   const upToDate = response.headers.get('electric-up-to-date') !== null;
+
+  // A response whose sync headers are unreadable (e.g. not CORS-exposed)
+  // would otherwise re-fetch the whole shape from offset -1 in a tight loop.
+  if (!upToDate && nextOffset === offset) {
+    throw new Error('Shape response did not advance the sync offset');
+  }
+
   const messages = (await response.json()) as ElectricMessage[];
 
   return { messages, nextOffset, nextHandle, upToDate };
 };
 
+const upsertPersonRows = async (tx: Transaction, rows: ElectricPersonRow[]) => {
+  const columnCount = LOCAL_FIRST_PERSON_COLUMNS.length;
+  const valuesSql = rows
+    .map(
+      (_, rowIndex) =>
+        `(${LOCAL_FIRST_PERSON_COLUMNS.map(
+          (_, columnIndex) => `$${rowIndex * columnCount + columnIndex + 1}`,
+        ).join(',')})`,
+    )
+    .join(',');
+
+  await tx.query(
+    `insert into person (id, "nameFirstName", "nameLastName", "jobTitle", "emailsPrimaryEmail", "updatedAt")
+     values ${valuesSql}
+     on conflict (id) do update set
+       "nameFirstName" = excluded."nameFirstName",
+       "nameLastName" = excluded."nameLastName",
+       "jobTitle" = excluded."jobTitle",
+       "emailsPrimaryEmail" = excluded."emailsPrimaryEmail",
+       "updatedAt" = excluded."updatedAt"`,
+    rows.flatMap((row) => [
+      row.id,
+      row.nameFirstName,
+      row.nameLastName,
+      row.jobTitle,
+      row.emailsPrimaryEmail,
+      row.updatedAt,
+    ]),
+  );
+};
+
+// Applies a shape batch in one transaction, batching consecutive upserts into
+// multi-row inserts (row-by-row inserts made the initial sync take minutes).
+// Message order is preserved: an upsert buffer is flushed before any delete,
+// so delete-then-reinsert sequences replay correctly.
 const applyMessages = async (pg: PGlite, messages: ElectricMessage[]) => {
   let applied = 0;
 
-  for (const message of messages) {
-    const operation = message.headers?.operation;
-    const row = message.value;
-    if (!isDefined(operation) || !isDefined(row)) continue; // control message, no row payload
+  await pg.transaction(async (tx) => {
+    let upsertBuffer: ElectricPersonRow[] = [];
 
-    if (operation === 'delete') {
-      await pg.query('delete from person where id = $1', [row.id]);
-    } else {
-      await pg.query(
-        `insert into person (id, "nameFirstName", "nameLastName", "jobTitle", city, "updatedAt")
-         values ($1,$2,$3,$4,$5,$6)
-         on conflict (id) do update set
-           "nameFirstName" = excluded."nameFirstName",
-           "nameLastName" = excluded."nameLastName",
-           "jobTitle" = excluded."jobTitle",
-           city = excluded.city,
-           "updatedAt" = excluded."updatedAt"`,
-        [
-          row.id,
-          row.nameFirstName,
-          row.nameLastName,
-          row.jobTitle,
-          row.city,
-          row.updatedAt,
-        ],
-      );
+    const flushUpserts = async () => {
+      if (upsertBuffer.length === 0) return;
+      await upsertPersonRows(tx, upsertBuffer);
+      applied += upsertBuffer.length;
+      upsertBuffer = [];
+    };
+
+    for (const message of messages) {
+      const operation = message.headers?.operation;
+      const row = message.value;
+      if (!isDefined(operation) || !isDefined(row)) continue; // control message, no row payload
+
+      if (operation === 'delete') {
+        await flushUpserts();
+        await tx.query('delete from person where id = $1', [row.id]);
+        applied += 1;
+      } else {
+        upsertBuffer.push(row);
+        if (upsertBuffer.length >= UPSERT_BATCH_SIZE) {
+          await flushUpserts();
+        }
+      }
     }
-    applied += 1;
-  }
+
+    await flushUpserts();
+  });
 
   return applied;
 };
@@ -91,10 +147,12 @@ let syncLoopStarted = false;
 
 export const startSyncingPersonShapeToLocalFirstDatabase = ({
   onStatusChange,
+  getAuthHeaders,
 }: {
   onStatusChange: (status: LocalFirstSyncStatus) => void;
+  getAuthHeaders: () => Record<string, string>;
 }) => {
-  if (syncLoopStarted || !isDefined(LOCAL_FIRST_WORKSPACE_SCHEMA)) return;
+  if (syncLoopStarted || !IS_LOCAL_FIRST_ENABLED) return;
   syncLoopStarted = true;
 
   let offset = '-1';
@@ -106,7 +164,7 @@ export const startSyncingPersonShapeToLocalFirstDatabase = ({
     while (true) {
       try {
         onStatusChange('syncing');
-        const batch = await fetchShapeBatch(offset, handle);
+        const batch = await fetchShapeBatch({ offset, handle, getAuthHeaders });
         offset = batch.nextOffset;
         handle = batch.nextHandle;
         await applyMessages(pg, batch.messages);
