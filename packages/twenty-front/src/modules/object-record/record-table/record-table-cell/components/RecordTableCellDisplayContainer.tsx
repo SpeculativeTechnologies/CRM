@@ -3,20 +3,16 @@ import { styled } from '@linaria/react';
 import { type Ref } from 'react';
 import { themeCssVariables } from 'twenty-ui/theme-constants';
 
+// One container, not two: the inner element carried the same flex, height,
+// overflow and width as the outer one and differed only by white-space, so it
+// was a DOM node per cell for nothing. At ~14 cells a row and 80 rows mounted
+// that is over a thousand nodes a table has to build on every view switch.
 const StyledOuterContainer = styled.div`
   align-items: center;
   display: flex;
   height: 100%;
   overflow: hidden;
   padding-left: 8px;
-  width: 100%;
-`;
-
-const StyledInnerContainer = styled.div`
-  align-items: center;
-  display: flex;
-  height: 100%;
-  overflow: hidden;
   white-space: nowrap;
   width: 100%;
 `;
@@ -56,7 +52,7 @@ export const RecordTableCellDisplayContainer = ({
         {t`Set ${placeholderForEmptyCell}`}
       </StyledEmptyPlaceholderField>
     ) : (
-      <StyledInnerContainer>{children}</StyledInnerContainer>
+      children
     )}
   </StyledOuterContainer>
 );
