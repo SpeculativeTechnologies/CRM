@@ -109,7 +109,11 @@ export const useTriggerTableWithoutGroupDragAndDropOptimisticUpdate = () => {
       lastScrollPositionCallbackState,
       loadRecordsToVirtualRows,
       recordIdByRealIndexCallbackSelector,
-      scrollWrapperHTMLElement?.clientHeight,
+      // The element, not its clientHeight: a layout read in a dependency array
+      // runs on every render, and interleaving reads with the DOM mutations of
+      // a view switch forces a full layout recalculation each time. The
+      // callback reads the live height when it actually runs.
+      scrollWrapperHTMLElement,
       store,
       totalNumberOfRecordsToVirtualizeCallbackState,
     ],
