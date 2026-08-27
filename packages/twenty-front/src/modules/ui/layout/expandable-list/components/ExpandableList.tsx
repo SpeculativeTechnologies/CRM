@@ -106,8 +106,11 @@ export const ExpandableList = ({
   const [childrenContainerElement, setChildrenContainerElement] =
     useState<HTMLDivElement | null>(null);
 
+  // Lazy initialiser: a plain expression here is evaluated on every render even
+  // though React keeps only the first value, so this read forced a layout on
+  // each render of every multi-value cell.
   const [previousChildrenContainerWidth, setPreviousChildrenContainerWidth] =
-    useState(childrenContainerElement?.clientWidth ?? 0);
+    useState(() => childrenContainerElement?.clientWidth ?? 0);
 
   const containerRef = useRef<HTMLDivElement>(null);
 
