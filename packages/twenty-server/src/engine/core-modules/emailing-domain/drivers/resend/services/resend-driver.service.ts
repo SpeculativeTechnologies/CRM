@@ -23,6 +23,7 @@ import { EmailingDomainStatus } from 'src/engine/core-modules/emailing-domain/dr
 import { type EmailingDomainSendEmailRequest } from 'src/engine/core-modules/emailing-domain/drivers/types/emailing-domain-send-email-input.type';
 import { type EmailingDomainSendEmailResult } from 'src/engine/core-modules/emailing-domain/drivers/types/emailing-domain-send-email-result.type';
 import { getUnsubscribeBaseUrl } from 'src/engine/core-modules/emailing-domain/drivers/utils/get-unsubscribe-base-url.util';
+import { type EngagementTrackingContentService } from 'src/engine/core-modules/emailing-domain/services/engagement-tracking-content.service';
 import { type UnsubscribeContentService } from 'src/engine/core-modules/emailing-domain/services/unsubscribe-content.service';
 
 export class ResendDriver implements EmailingDomainDriverInterface {
@@ -32,6 +33,7 @@ export class ResendDriver implements EmailingDomainDriverInterface {
     private readonly config: ResendDriverConfig,
     private readonly resendApiClientService: ResendApiClientService,
     private readonly unsubscribeContentService: UnsubscribeContentService,
+    private readonly engagementTrackingContentService: EngagementTrackingContentService,
   ) {}
 
   // Resend has no per-workspace resources: domains are account-level and
@@ -124,8 +126,11 @@ export class ResendDriver implements EmailingDomainDriverInterface {
     }
 
     const unsubscribeBaseUrl = getUnsubscribeBaseUrl(input.emailingDomain);
+    // Tracking is injected before the unsubscribe footer so the unsubscribe
+    // link itself is never wrapped in a click redirect. Both are served from
+    // the same sender-domain hostname.
     const emailToSend = this.unsubscribeContentService.addTo(
-      input,
+      this.engagementTrackingContentService.addTo(input, unsubscribeBaseUrl),
       unsubscribeBaseUrl,
     );
 

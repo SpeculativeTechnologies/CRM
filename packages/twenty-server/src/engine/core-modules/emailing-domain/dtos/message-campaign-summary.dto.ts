@@ -49,4 +49,10 @@ export class MessageCampaignSummaryDTO {
 
   @Field(() => Int)
   complainedCount: number;
+
+  @Field(() => Int)
+  openedCount: number;
+
+  @Field(() => Int)
+  clickedCount: number;
 }

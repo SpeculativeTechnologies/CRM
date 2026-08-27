@@ -2031,6 +2031,18 @@ msgstr "Phát hiện vòng phụ thuộc trong hệ phân cấp Nhóm Bộ Lọc
 msgid "Claiming is not configured on this server. Ask an administrator to configure the GitHub OAuth app."
 msgstr "Tính năng yêu cầu quyền sở hữu chưa được cấu hình trên máy chủ này. Hãy yêu cầu quản trị viên cấu hình ứng dụng GitHub OAuth."
 
+#. js-lingui-id: hWeWDv
+#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-message-standard-flat-field-metadata.util.ts
+msgctxt "fieldMetadata.label"
+msgid "Click count"
+msgstr ""
+
+#. js-lingui-id: fLO69b
+#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-message-campaign-standard-flat-field-metadata.util.ts
+msgctxt "fieldMetadata.label"
+msgid "Clicked count"
+msgstr ""
+
 #. js-lingui-id: J7dFKa
 #: src/engine/core-modules/application/connection-provider/connection-provider.exception.ts
 msgid "Client credentials are not configured for this OAuth provider."
@@ -4195,10 +4207,22 @@ msgstr "Không hỗ trợ lọc hoặc sắp xếp thông qua quan hệ này."
 msgid "Find"
 msgstr "Tìm"
 
+#. js-lingui-id: 2oBmWf
+#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-message-standard-flat-field-metadata.util.ts
+msgctxt "fieldMetadata.label"
+msgid "First clicked at"
+msgstr ""
+
 #. js-lingui-id: 4GaFCQ
 #: src/engine/workspace-manager/workspace-migration/interceptors/utils/__tests__/build-metadata-validation-error-payload.util.spec.ts
 msgid "First friendly message"
 msgstr "Thông báo thân thiện đầu tiên"
+
+#. js-lingui-id: 54OZDp
+#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-message-standard-flat-field-metadata.util.ts
+msgctxt "fieldMetadata.label"
+msgid "First opened at"
+msgstr ""
 
 #. js-lingui-id: BUBVGN
 #: src/engine/metadata-modules/page-layout-tab/constants/standard-page-layout-tab-titles.ts
@@ -7031,6 +7055,24 @@ msgctxt "fieldMetadata.description"
 msgid "Number of emails that failed to send"
 msgstr "Số lượng email gửi không thành công"
 
+#. js-lingui-id: uQtsD5
+#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-message-standard-flat-field-metadata.util.ts
+msgctxt "fieldMetadata.description"
+msgid "Number of link clicks recorded for this campaign email"
+msgstr ""
+
+#. js-lingui-id: l08rF/
+#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-message-campaign-standard-flat-field-metadata.util.ts
+msgctxt "fieldMetadata.description"
+msgid "Number of recipients who clicked a link in this campaign"
+msgstr ""
+
+#. js-lingui-id: bYfvni
+#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-message-campaign-standard-flat-field-metadata.util.ts
+msgctxt "fieldMetadata.description"
+msgid "Number of recipients who opened this campaign"
+msgstr ""
+
 #. js-lingui-id: bgG8mY
 #: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-message-campaign-standard-flat-field-metadata.util.ts
 msgctxt "fieldMetadata.description"
@@ -7041,6 +7083,12 @@ msgstr "Số lượng khiếu nại spam nhận được"
 #: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-person-standard-flat-field-metadata.util.ts
 msgctxt "fieldMetadata.description"
 msgid "Number of tasks tied to the contact that are not done"
+msgstr ""
+
+#. js-lingui-id: VCnORW
+#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-message-standard-flat-field-metadata.util.ts
+msgctxt "fieldMetadata.description"
+msgid "Number of times this campaign email was opened"
 msgstr ""
 
 #. js-lingui-id: MKdH/S
@@ -7264,6 +7312,12 @@ msgstr "Lỗi duy nhất"
 msgid "Only field restrictions are allowed."
 msgstr "Chỉ cho phép giới hạn trường."
 
+#. js-lingui-id: UsW4F7
+#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-message-standard-flat-field-metadata.util.ts
+msgctxt "fieldMetadata.label"
+msgid "Open count"
+msgstr ""
+
 #. js-lingui-id: lWLaJ5
 #: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-workspace-member-standard-flat-field-metadata.util.ts
 msgctxt "fieldMetadata.label"
@@ -7274,6 +7328,12 @@ msgstr "Mở bản ghi trong"
 #: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-person-standard-flat-field-metadata.util.ts
 msgctxt "fieldMetadata.label"
 msgid "Open tasks"
+msgstr ""
+
+#. js-lingui-id: EN4rfX
+#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-message-campaign-standard-flat-field-metadata.util.ts
+msgctxt "fieldMetadata.label"
+msgid "Opened count"
 msgstr ""
 
 #. js-lingui-id: e/+ykp
@@ -11906,11 +11966,23 @@ msgstr "Thứ Tư"
 msgid "Welcome to Twenty: Please Confirm Your Email"
 msgstr "Chào mừng đến với Twenty: Vui lòng xác nhận email của bạn"
 
+#. js-lingui-id: H5XCbW
+#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-message-standard-flat-field-metadata.util.ts
+msgctxt "fieldMetadata.description"
+msgid "When a link in this campaign email was first clicked by its recipient"
+msgstr ""
+
 #. js-lingui-id: ofdfh5
 #: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-message-campaign-standard-flat-field-metadata.util.ts
 msgctxt "fieldMetadata.description"
 msgid "When the campaign finished sending"
 msgstr "Thời điểm chiến dịch hoàn tất việc gửi"
+
+#. js-lingui-id: /uWsJG
+#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-message-standard-flat-field-metadata.util.ts
+msgctxt "fieldMetadata.description"
+msgid "When this campaign email was first opened by its recipient"
+msgstr ""
 
 #. js-lingui-id: Kx3ltI
 #: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-workspace-member-standard-flat-field-metadata.util.ts

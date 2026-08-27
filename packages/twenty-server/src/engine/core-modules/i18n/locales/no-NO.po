@@ -2031,6 +2031,18 @@ msgstr "Sirkulær avhengighet oppdaget i visningsfiltergruppehierarkiet"
 msgid "Claiming is not configured on this server. Ask an administrator to configure the GitHub OAuth app."
 msgstr "Funksjonen for å kreve eierskap er ikke konfigurert på denne serveren. Be en administrator om å konfigurere GitHub OAuth-appen."
 
+#. js-lingui-id: hWeWDv
+#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-message-standard-flat-field-metadata.util.ts
+msgctxt "fieldMetadata.label"
+msgid "Click count"
+msgstr ""
+
+#. js-lingui-id: fLO69b
+#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-message-campaign-standard-flat-field-metadata.util.ts
+msgctxt "fieldMetadata.label"
+msgid "Clicked count"
+msgstr ""
+
 #. js-lingui-id: J7dFKa
 #: src/engine/core-modules/application/connection-provider/connection-provider.exception.ts
 msgid "Client credentials are not configured for this OAuth provider."
@@ -4195,10 +4207,22 @@ msgstr "Filtrering eller sortering gjennom denne relasjonen støttes ikke."
 msgid "Find"
 msgstr "Finn"
 
+#. js-lingui-id: 2oBmWf
+#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-message-standard-flat-field-metadata.util.ts
+msgctxt "fieldMetadata.label"
+msgid "First clicked at"
+msgstr ""
+
 #. js-lingui-id: 4GaFCQ
 #: src/engine/workspace-manager/workspace-migration/interceptors/utils/__tests__/build-metadata-validation-error-payload.util.spec.ts
 msgid "First friendly message"
 msgstr "Første brukervennlige melding"
+
+#. js-lingui-id: 54OZDp
+#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-message-standard-flat-field-metadata.util.ts
+msgctxt "fieldMetadata.label"
+msgid "First opened at"
+msgstr ""
 
 #. js-lingui-id: BUBVGN
 #: src/engine/metadata-modules/page-layout-tab/constants/standard-page-layout-tab-titles.ts
@@ -7031,6 +7055,24 @@ msgctxt "fieldMetadata.description"
 msgid "Number of emails that failed to send"
 msgstr "Antall e-poster som ikke kunne sendes"
 
+#. js-lingui-id: uQtsD5
+#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-message-standard-flat-field-metadata.util.ts
+msgctxt "fieldMetadata.description"
+msgid "Number of link clicks recorded for this campaign email"
+msgstr ""
+
+#. js-lingui-id: l08rF/
+#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-message-campaign-standard-flat-field-metadata.util.ts
+msgctxt "fieldMetadata.description"
+msgid "Number of recipients who clicked a link in this campaign"
+msgstr ""
+
+#. js-lingui-id: bYfvni
+#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-message-campaign-standard-flat-field-metadata.util.ts
+msgctxt "fieldMetadata.description"
+msgid "Number of recipients who opened this campaign"
+msgstr ""
+
 #. js-lingui-id: bgG8mY
 #: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-message-campaign-standard-flat-field-metadata.util.ts
 msgctxt "fieldMetadata.description"
@@ -7041,6 +7083,12 @@ msgstr "Antall mottatte spamklager"
 #: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-person-standard-flat-field-metadata.util.ts
 msgctxt "fieldMetadata.description"
 msgid "Number of tasks tied to the contact that are not done"
+msgstr ""
+
+#. js-lingui-id: VCnORW
+#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-message-standard-flat-field-metadata.util.ts
+msgctxt "fieldMetadata.description"
+msgid "Number of times this campaign email was opened"
 msgstr ""
 
 #. js-lingui-id: MKdH/S
@@ -7264,6 +7312,12 @@ msgstr "Eneste feil"
 msgid "Only field restrictions are allowed."
 msgstr "Kun feltbegrensninger er tillatt."
 
+#. js-lingui-id: UsW4F7
+#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-message-standard-flat-field-metadata.util.ts
+msgctxt "fieldMetadata.label"
+msgid "Open count"
+msgstr ""
+
 #. js-lingui-id: lWLaJ5
 #: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-workspace-member-standard-flat-field-metadata.util.ts
 msgctxt "fieldMetadata.label"
@@ -7274,6 +7328,12 @@ msgstr "Åpne poster i"
 #: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-person-standard-flat-field-metadata.util.ts
 msgctxt "fieldMetadata.label"
 msgid "Open tasks"
+msgstr ""
+
+#. js-lingui-id: EN4rfX
+#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-message-campaign-standard-flat-field-metadata.util.ts
+msgctxt "fieldMetadata.label"
+msgid "Opened count"
 msgstr ""
 
 #. js-lingui-id: e/+ykp
@@ -11906,11 +11966,23 @@ msgstr "Onsdag"
 msgid "Welcome to Twenty: Please Confirm Your Email"
 msgstr "Velkommen til Twenty: Vennligst bekreft din e-post"
 
+#. js-lingui-id: H5XCbW
+#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-message-standard-flat-field-metadata.util.ts
+msgctxt "fieldMetadata.description"
+msgid "When a link in this campaign email was first clicked by its recipient"
+msgstr ""
+
 #. js-lingui-id: ofdfh5
 #: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-message-campaign-standard-flat-field-metadata.util.ts
 msgctxt "fieldMetadata.description"
 msgid "When the campaign finished sending"
 msgstr "Når kampanjen var ferdig med å sende"
+
+#. js-lingui-id: /uWsJG
+#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-message-standard-flat-field-metadata.util.ts
+msgctxt "fieldMetadata.description"
+msgid "When this campaign email was first opened by its recipient"
+msgstr ""
 
 #. js-lingui-id: Kx3ltI
 #: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-workspace-member-standard-flat-field-metadata.util.ts

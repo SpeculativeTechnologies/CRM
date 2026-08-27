@@ -1,6 +1,7 @@
 import {
   CAMPAIGN_TRACKING_POLL_INTERVAL_MILLISECONDS,
   formatCampaignRate,
+  formatCampaignRecipientEngagement,
   getCampaignRecipientTrackingMessage,
   getCampaignTrackingPollInterval,
   isCampaignInFlight,
@@ -9,6 +10,23 @@ import {
 } from '@/activities/emails/utils/campaignDisplay';
 
 const campaign = (status: string) => ({ status });
+
+const recipient = (
+  overrides: Partial<{
+    deliveryStatus: string;
+    openedAt: string | null;
+    openCount: number;
+    clickedAt: string | null;
+    clickCount: number;
+  }> = {},
+) => ({
+  deliveryStatus: 'SENT',
+  openedAt: null,
+  openCount: 0,
+  clickedAt: null,
+  clickCount: 0,
+  ...overrides,
+});
 
 describe('campaignDisplay', () => {
   it('formats trustworthy delivery counts as rates with counts', () => {
@@ -54,9 +72,56 @@ describe('campaignDisplay', () => {
   });
 
   it('keeps queued and skipped recipients reachable through the filters', () => {
-    expect(matchesCampaignRecipientStatus('QUEUED', 'ALL')).toBe(true);
-    expect(matchesCampaignRecipientStatus('QUEUED', 'QUEUED')).toBe(true);
-    expect(matchesCampaignRecipientStatus('SKIPPED', 'SKIPPED')).toBe(true);
-    expect(matchesCampaignRecipientStatus('QUEUED', 'SENT')).toBe(false);
+    const queued = recipient({ deliveryStatus: 'QUEUED' });
+
+    expect(matchesCampaignRecipientStatus(queued, 'ALL')).toBe(true);
+    expect(matchesCampaignRecipientStatus(queued, 'QUEUED')).toBe(true);
+    expect(
+      matchesCampaignRecipientStatus(
+        recipient({ deliveryStatus: 'SKIPPED' }),
+        'SKIPPED',
+      ),
+    ).toBe(true);
+    expect(matchesCampaignRecipientStatus(queued, 'SENT')).toBe(false);
+  });
+
+  it('filters engagement independently of delivery status', () => {
+    const opened = recipient({ openedAt: '2026-08-25T10:00:00.000Z' });
+
+    expect(matchesCampaignRecipientStatus(opened, 'SENT')).toBe(true);
+    expect(matchesCampaignRecipientStatus(opened, 'OPENED')).toBe(true);
+    expect(matchesCampaignRecipientStatus(opened, 'CLICKED')).toBe(false);
+
+    const clicked = recipient({
+      openedAt: '2026-08-25T10:00:00.000Z',
+      clickedAt: '2026-08-25T10:01:00.000Z',
+    });
+
+    expect(matchesCampaignRecipientStatus(clicked, 'OPENED')).toBe(true);
+    expect(matchesCampaignRecipientStatus(clicked, 'CLICKED')).toBe(true);
+  });
+
+  it('summarises recipient engagement, counting a pixel-less open as one', () => {
+    expect(formatCampaignRecipientEngagement(recipient())).toBeNull();
+    expect(
+      formatCampaignRecipientEngagement(
+        recipient({ openedAt: '2026-08-25T10:00:00.000Z', openCount: 1 }),
+      ),
+    ).toBe('1 open');
+    expect(
+      formatCampaignRecipientEngagement(
+        recipient({ openedAt: '2026-08-25T10:00:00.000Z', openCount: 3 }),
+      ),
+    ).toBe('3 opens');
+    expect(
+      formatCampaignRecipientEngagement(
+        recipient({
+          openedAt: '2026-08-25T10:00:00.000Z',
+          openCount: 0,
+          clickedAt: '2026-08-25T10:01:00.000Z',
+          clickCount: 2,
+        }),
+      ),
+    ).toBe('1 open · 2 clicks');
   });
 });

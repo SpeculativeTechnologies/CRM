@@ -506,6 +506,12 @@ export const STANDARD_OBJECT_FIELDS = {
     complainedCount: {
       universalIdentifier: '82842cfa-f12a-4bab-bbde-b2cf587d0406',
     },
+    openedCount: {
+      universalIdentifier: 'a06f3d18-9c74-4bd5-8e21-5f7a4c093b6e',
+    },
+    clickedCount: {
+      universalIdentifier: '4e7b21ca-5d38-49f6-b013-8ca2f57d9e40',
+    },
     unsubscribeTopicId: {
       universalIdentifier: '0648e7ad-1769-4ff6-a4d5-72da79ef169c',
     },
@@ -659,6 +665,18 @@ export const STANDARD_OBJECT_FIELDS = {
     },
     deliveryStatus: {
       universalIdentifier: '209254fa-2b89-429d-a72a-c401c4bd5a78',
+    },
+    openedAt: {
+      universalIdentifier: '3f1c8a52-6d40-4b7e-9a13-2c5f8e7b41d9',
+    },
+    openCount: {
+      universalIdentifier: '7b2e4d91-0a63-4c58-8f27-d1a63b9e5c04',
+    },
+    clickedAt: {
+      universalIdentifier: 'c94a7f30-8b15-4e62-a7d9-16f0c3b84e75',
+    },
+    clickCount: {
+      universalIdentifier: '15d8b6ec-4f29-4a03-b8c1-7e94d20a5f63',
     },
     isDraft: {
       universalIdentifier: '20202020-4d3a-4b6e-9c1f-2a5e7b9d0c34',

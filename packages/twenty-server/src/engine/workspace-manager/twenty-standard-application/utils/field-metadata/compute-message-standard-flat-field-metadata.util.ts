@@ -535,6 +535,106 @@ export const buildMessageStandardFlatFieldMetadatas = ({
     twentyStandardApplicationId,
     now,
   }),
+  openedAt: createStandardFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      fieldName: 'openedAt',
+      type: FieldMetadataType.DATE_TIME,
+      label: i18nLabel(
+        msg({ message: `First opened at`, context: 'fieldMetadata.label' }),
+      ),
+      description: i18nLabel(
+        msg({
+          message: `When this campaign email was first opened by its recipient`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconMailOpened',
+      isNullable: true,
+      isUIEditable: false,
+      settings: { displayFormat: DateDisplayFormat.RELATIVE },
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
+  openCount: createStandardFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      fieldName: 'openCount',
+      type: FieldMetadataType.NUMBER,
+      label: i18nLabel(
+        msg({ message: `Open count`, context: 'fieldMetadata.label' }),
+      ),
+      description: i18nLabel(
+        msg({
+          message: `Number of times this campaign email was opened`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconMailOpened',
+      isNullable: false,
+      isUIEditable: false,
+      defaultValue: 0,
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
+  clickedAt: createStandardFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      fieldName: 'clickedAt',
+      type: FieldMetadataType.DATE_TIME,
+      label: i18nLabel(
+        msg({ message: `First clicked at`, context: 'fieldMetadata.label' }),
+      ),
+      description: i18nLabel(
+        msg({
+          message: `When a link in this campaign email was first clicked by its recipient`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconHandClick',
+      isNullable: true,
+      isUIEditable: false,
+      settings: { displayFormat: DateDisplayFormat.RELATIVE },
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
+  clickCount: createStandardFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      fieldName: 'clickCount',
+      type: FieldMetadataType.NUMBER,
+      label: i18nLabel(
+        msg({ message: `Click count`, context: 'fieldMetadata.label' }),
+      ),
+      description: i18nLabel(
+        msg({
+          message: `Number of link clicks recorded for this campaign email`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconHandClick',
+      isNullable: false,
+      isUIEditable: false,
+      defaultValue: 0,
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
   isDraft: createStandardFieldFlatMetadata({
     objectName,
     workspaceId,

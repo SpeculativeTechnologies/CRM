@@ -16,6 +16,7 @@ import { MakeRequiredFieldsWithoutDefaultsOptionalCommand } from 'src/database/c
 import { AddMessageDeliveryStatusFieldCommand } from 'src/database/commands/upgrade-version-command/2-32/2-32-workspace-command-1787262000000-add-message-delivery-status-field.command';
 import { AddMessageCampaignCcAddressesFieldCommand } from 'src/database/commands/upgrade-version-command/2-35/2-35-workspace-command-1787600000000-add-message-campaign-cc-addresses-field.command';
 import { AddWorkspaceMemberEmailSignatureFieldsCommand } from 'src/database/commands/upgrade-version-command/2-35/2-35-workspace-command-1787620000000-add-workspace-member-email-signature-fields.command';
+import { AddMessageEngagementTrackingFieldsCommand } from 'src/database/commands/upgrade-version-command/2-35/2-35-workspace-command-1787640000000-add-message-engagement-tracking-fields.command';
 import { ForkRunMissedWorkspaceCommandsCommand } from 'src/database/commands/upgrade-version-command/fork-run-missed-workspace-commands.command';
 import { ApplicationModule } from 'src/engine/core-modules/application/application.module';
 import { UpgradeStatusModule } from 'src/engine/core-modules/upgrade/upgrade-status.module';
@@ -58,6 +59,7 @@ import { ConnectionModule } from 'src/modules/connection/connection.module';
     AddMessageDeliveryStatusFieldCommand,
     AddMessageCampaignCcAddressesFieldCommand,
     AddWorkspaceMemberEmailSignatureFieldsCommand,
+    AddMessageEngagementTrackingFieldsCommand,
     ForkRunMissedWorkspaceCommandsCommand,
   ],
 })

@@ -15,6 +15,8 @@ export type MessageCampaign = {
   failedCount: number;
   bouncedCount: number;
   complainedCount: number;
+  openedCount: number;
+  clickedCount: number;
 };
 
 export type MessageCampaignSummary = {
@@ -34,6 +36,8 @@ export type MessageCampaignSummary = {
   failedCount: number;
   bouncedCount: number;
   complainedCount: number;
+  openedCount: number;
+  clickedCount: number;
 };
 
 export type MessageCampaignRecipient = {
@@ -42,6 +46,10 @@ export type MessageCampaignRecipient = {
   displayName: string;
   email: string;
   deliveryStatus: string;
+  openedAt: string | null;
+  openCount: number;
+  clickedAt: string | null;
+  clickCount: number;
   subject: string | null;
   body: string | null;
 };

@@ -478,6 +478,46 @@ export const buildMessageCampaignStandardFlatFieldMetadatas = ({
         defaultValue: 0,
       },
     }),
+    openedCount: createStandardFieldFlatMetadata({
+      ...base,
+      context: {
+        fieldName: 'openedCount',
+        type: FieldMetadataType.NUMBER,
+        label: i18nLabel(
+          msg({ message: `Opened count`, context: 'fieldMetadata.label' }),
+        ),
+        description: i18nLabel(
+          msg({
+            message: `Number of recipients who opened this campaign`,
+            context: 'fieldMetadata.description',
+          }),
+        ),
+        icon: 'IconMailOpened',
+        isNullable: false,
+        isUIEditable: false,
+        defaultValue: 0,
+      },
+    }),
+    clickedCount: createStandardFieldFlatMetadata({
+      ...base,
+      context: {
+        fieldName: 'clickedCount',
+        type: FieldMetadataType.NUMBER,
+        label: i18nLabel(
+          msg({ message: `Clicked count`, context: 'fieldMetadata.label' }),
+        ),
+        description: i18nLabel(
+          msg({
+            message: `Number of recipients who clicked a link in this campaign`,
+            context: 'fieldMetadata.description',
+          }),
+        ),
+        icon: 'IconHandClick',
+        isNullable: false,
+        isUIEditable: false,
+        defaultValue: 0,
+      },
+    }),
     unsubscribeTopicId: createStandardFieldFlatMetadata({
       ...base,
       context: {

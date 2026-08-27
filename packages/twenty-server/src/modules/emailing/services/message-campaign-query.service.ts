@@ -187,6 +187,10 @@ export class MessageCampaignQueryService {
               'Unknown recipient',
             email: participant.handle ?? '',
             deliveryStatus: message?.deliveryStatus ?? 'QUEUED',
+            openedAt: message?.openedAt ?? null,
+            openCount: message?.openCount ?? 0,
+            clickedAt: message?.clickedAt ?? null,
+            clickCount: message?.clickCount ?? 0,
             subject: renderCampaignTemplate(campaign.subject ?? '', variables, {
               escapeValues: false,
             }),
@@ -238,6 +242,8 @@ export class MessageCampaignQueryService {
       failedCount: campaign.failedCount,
       bouncedCount: campaign.bouncedCount,
       complainedCount: campaign.complainedCount,
+      openedCount: campaign.openedCount,
+      clickedCount: campaign.clickedCount,
     };
   }
 

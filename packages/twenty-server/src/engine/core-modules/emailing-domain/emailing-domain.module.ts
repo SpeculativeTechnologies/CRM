@@ -17,6 +17,8 @@ import { EmailingDomainEntity } from 'src/engine/core-modules/emailing-domain/em
 import { EmailingDomainResolver } from 'src/engine/core-modules/emailing-domain/emailing-domain.resolver';
 import { EmailingDomainWorkspaceCleanupJob } from 'src/engine/core-modules/emailing-domain/jobs/emailing-domain-workspace-cleanup.job';
 import { EmailingDomainTenantStatusService } from 'src/engine/core-modules/emailing-domain/services/emailing-domain-tenant-status.service';
+import { EngagementTrackingContentService } from 'src/engine/core-modules/emailing-domain/services/engagement-tracking-content.service';
+import { EngagementTrackingTokenService } from 'src/engine/core-modules/emailing-domain/services/engagement-tracking-token.service';
 import { EmailingDomainService } from 'src/engine/core-modules/emailing-domain/services/emailing-domain.service';
 import { UnsubscribeContentService } from 'src/engine/core-modules/emailing-domain/services/unsubscribe-content.service';
 import { UnsubscribeHostnameService } from 'src/engine/core-modules/emailing-domain/services/unsubscribe-hostname.service';
@@ -44,6 +46,7 @@ import { provideWorkspaceScopedRepository } from 'src/engine/twenty-orm/workspac
     EmailingDomainTenantStatusService,
     EmailingDomainDriverFactory,
     UnsubscribeTokenService,
+    EngagementTrackingTokenService,
     EmailGroupAccessService,
   ],
   providers: [
@@ -52,6 +55,8 @@ import { provideWorkspaceScopedRepository } from 'src/engine/twenty-orm/workspac
     EmailingDomainTenantStatusService,
     UnsubscribeTokenService,
     UnsubscribeContentService,
+    EngagementTrackingTokenService,
+    EngagementTrackingContentService,
     UnsubscribeHostnameService,
     EmailingDomainResolver,
     EmailingDomainDriverFactory,

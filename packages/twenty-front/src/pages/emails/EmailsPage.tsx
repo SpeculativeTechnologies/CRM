@@ -26,6 +26,7 @@ import {
   type CampaignRecipientStatusFilter,
   formatCampaignDate,
   formatCampaignRate,
+  formatCampaignRecipientEngagement,
   getCampaignRecipientTrackingMessage,
   isDraftCampaign,
   matchesCampaignRecipientStatus,
@@ -465,13 +466,15 @@ const CampaignTable = ({
 }) => (
   <StyledTable>
     <colgroup>
-      <col style={{ width: '34%' }} />
-      <col style={{ width: '10%' }} />
+      <col style={{ width: '26%' }} />
       <col style={{ width: '9%' }} />
-      <col style={{ width: '9%' }} />
+      <col style={{ width: '8%' }} />
+      <col style={{ width: '7%' }} />
       <col style={{ width: '12%' }} />
       <col style={{ width: '12%' }} />
-      <col style={{ width: '14%' }} />
+      <col style={{ width: '9%' }} />
+      <col style={{ width: '9%' }} />
+      <col style={{ width: '8%' }} />
     </colgroup>
     <thead>
       <tr>
@@ -479,6 +482,8 @@ const CampaignTable = ({
         <th>Status</th>
         <th>Recipients</th>
         <th>Sent</th>
+        <th>Opened</th>
+        <th>Clicked</th>
         <th>Failed</th>
         <th>Bounced</th>
         <th>Complaints</th>
@@ -499,6 +504,12 @@ const CampaignTable = ({
           </td>
           <td>{campaign.recipientCount}</td>
           <td>{campaign.sentCount}</td>
+          <td>
+            {formatCampaignRate(campaign.openedCount, campaign.sentCount)}
+          </td>
+          <td>
+            {formatCampaignRate(campaign.clickedCount, campaign.sentCount)}
+          </td>
           <td>
             {formatCampaignRate(campaign.failedCount, campaign.recipientCount)}
           </td>
@@ -605,7 +616,7 @@ const CampaignDetail = ({ campaign }: { campaign: MessageCampaignDetails }) => {
     () =>
       campaign.recipients.filter(
         (recipient) =>
-          matchesCampaignRecipientStatus(recipient.deliveryStatus, status) &&
+          matchesCampaignRecipientStatus(recipient, status) &&
           `${recipient.displayName} ${recipient.email}`
             .toLowerCase()
             .includes(search.toLowerCase()),
@@ -633,8 +644,8 @@ const CampaignDetail = ({ campaign }: { campaign: MessageCampaignDetails }) => {
         <StyledRecipientPanel>
           <StyledRecipientTabs>
             {CAMPAIGN_RECIPIENT_STATUS_FILTERS.map((filter) => {
-              const count = campaign.recipients.filter(({ deliveryStatus }) =>
-                matchesCampaignRecipientStatus(deliveryStatus, filter),
+              const count = campaign.recipients.filter((recipient) =>
+                matchesCampaignRecipientStatus(recipient, filter),
               ).length;
 
               return (
@@ -737,14 +748,19 @@ const RecipientRow = ({
   recipient: MessageCampaignRecipient;
   isActive: boolean;
   onClick: () => void;
-}) => (
-  <StyledRecipient isActive={isActive} onClick={onClick}>
-    <StyledName>{recipient.displayName}</StyledName>
-    <StyledMeta>
-      {recipient.email} · {recipient.deliveryStatus.toLowerCase()}
-    </StyledMeta>
-  </StyledRecipient>
-);
+}) => {
+  const engagement = formatCampaignRecipientEngagement(recipient);
+
+  return (
+    <StyledRecipient isActive={isActive} onClick={onClick}>
+      <StyledName>{recipient.displayName}</StyledName>
+      <StyledMeta>
+        {recipient.email} · {recipient.deliveryStatus.toLowerCase()}
+        {engagement === null ? '' : ` · ${engagement}`}
+      </StyledMeta>
+    </StyledRecipient>
+  );
+};
 
 const ExistingCampaignPage = ({ campaignId }: { campaignId: string }) => {
   const { campaign, loading, error } = useMessageCampaign(campaignId);

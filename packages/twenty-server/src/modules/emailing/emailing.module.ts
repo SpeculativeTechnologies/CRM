@@ -15,11 +15,13 @@ import { WorkspaceManyOrAllFlatEntityMapsCacheModule } from 'src/engine/metadata
 import { provideWorkspaceScopedRepository } from 'src/engine/twenty-orm/workspace-scoped-repository/provide-workspace-scoped-repository';
 import { WorkspaceCacheModule } from 'src/engine/workspace-cache/workspace-cache.module';
 import { WorkspaceEventEmitterModule } from 'src/engine/workspace-event-emitter/workspace-event-emitter.module';
+import { EngagementTrackingController } from 'src/modules/emailing/controllers/engagement-tracking.controller';
 import { UnsubscribeController } from 'src/modules/emailing/controllers/unsubscribe.controller';
 import { EmailingSendResolver } from 'src/modules/emailing/resolvers/emailing-send.resolver';
 import { MessageCampaignResolver } from 'src/modules/emailing/resolvers/message-campaign.resolver';
 import { MessageSuppressionResolver } from 'src/modules/emailing/resolvers/message-suppression.resolver';
 import { UnsubscribeTopicResolver } from 'src/modules/emailing/resolvers/unsubscribe-topic.resolver';
+import { CampaignStatsRefreshSchedulerService } from 'src/modules/emailing/services/campaign-stats-refresh-scheduler.service';
 import { CampaignVariableService } from 'src/modules/emailing/services/campaign-variable.service';
 import { EmailBillingService } from 'src/modules/emailing/services/email-billing.service';
 import { EmailingDomainSenderService } from 'src/modules/emailing/services/emailing-domain-sender.service';
@@ -27,6 +29,7 @@ import { MessageCampaignDraftService } from 'src/modules/emailing/services/messa
 import { MessageCampaignStatisticsService } from 'src/modules/emailing/services/message-campaign-statistics.service';
 import { MessageCampaignQueryService } from 'src/modules/emailing/services/message-campaign-query.service';
 import { MessageCampaignService } from 'src/modules/emailing/services/message-campaign.service';
+import { MessageEngagementService } from 'src/modules/emailing/services/message-engagement.service';
 import { MessageSuppressionService } from 'src/modules/emailing/services/message-suppression.service';
 import { UnsubscribeTopicService } from 'src/modules/emailing/services/unsubscribe-topic.service';
 import { SaveCampaignTool } from 'src/modules/emailing/tools/save-campaign-tool';
@@ -49,14 +52,16 @@ import { SaveCampaignTool } from 'src/modules/emailing/tools/save-campaign-tool'
       UnsubscribeTopicEntity,
     ]),
   ],
-  controllers: [UnsubscribeController],
+  controllers: [UnsubscribeController, EngagementTrackingController],
   providers: [
+    CampaignStatsRefreshSchedulerService,
     CampaignVariableService,
     EmailBillingService,
     MessageCampaignService,
     MessageCampaignDraftService,
     MessageCampaignQueryService,
     MessageCampaignStatisticsService,
+    MessageEngagementService,
     MessageSuppressionService,
     UnsubscribeTopicService,
     EmailingDomainSenderService,
