@@ -3,12 +3,24 @@ import { BadGatewayException, NotFoundException } from '@nestjs/common';
 import { type Response } from 'express';
 
 import { LocalFirstShapeProxyService } from 'src/engine/core-modules/local-first/services/local-first-shape-proxy.service';
+import { type LocalFirstSchemaService } from 'src/engine/core-modules/local-first/services/local-first-schema.service';
 import { type TwentyConfigService } from 'src/engine/core-modules/twenty-config/twenty-config.service';
 
-const buildService = (electricUrl: string | undefined) =>
-  new LocalFirstShapeProxyService({
-    get: jest.fn().mockReturnValue(electricUrl),
-  } as unknown as TwentyConfigService);
+const PERSON_COLUMNS = [
+  { name: 'id', dataType: 'uuid' },
+  { name: 'nameFirstName', dataType: 'text' },
+];
+
+const buildService = (
+  electricUrl: string | undefined,
+  getSyncableColumns: jest.Mock = jest.fn().mockResolvedValue(PERSON_COLUMNS),
+) =>
+  new LocalFirstShapeProxyService(
+    {
+      get: jest.fn().mockReturnValue(electricUrl),
+    } as unknown as TwentyConfigService,
+    { getSyncableColumns } as unknown as LocalFirstSchemaService,
+  );
 
 const buildResponse = () => {
   const response = {
@@ -52,8 +64,11 @@ describe('LocalFirstShapeProxyService', () => {
     ).rejects.toThrow(NotFoundException);
   });
 
-  it('should answer 404 for a table outside the whitelist', async () => {
-    const service = buildService('http://127.0.0.1:3010');
+  it('should propagate the refusal for a table outside the syncable list', async () => {
+    const service = buildService(
+      'http://127.0.0.1:3010',
+      jest.fn().mockRejectedValue(new NotFoundException('not syncable')),
+    );
 
     await expect(
       service.proxyShapeRequest({
@@ -91,7 +106,9 @@ describe('LocalFirstShapeProxyService', () => {
     expect(requestedUrl.searchParams.get('table')).toBe(
       '"workspace_abc"."person"',
     );
-    expect(requestedUrl.searchParams.get('columns')).toContain('"id"');
+    expect(requestedUrl.searchParams.get('columns')).toBe(
+      '"id","nameFirstName"',
+    );
     expect(requestedUrl.searchParams.get('columns')).not.toContain('secret');
     expect(requestedUrl.searchParams.get('offset')).toBe('-1');
     expect(requestedUrl.searchParams.get('handle')).toBe('h1');

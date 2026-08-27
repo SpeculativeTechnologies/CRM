@@ -12,6 +12,19 @@ const LocalFirstDebugPanel = lazy(() =>
   })),
 );
 
+// Booting PGlite takes long enough that a list query issued during page load
+// beats it and falls back to the network. Starting the mirror as early as the
+// module graph allows, rather than waiting for the panel to mount, is what
+// lets the first query of a page actually be served locally.
+if (IS_LOCAL_FIRST_ENABLED) {
+  void import('@/local-first/services/getLocalFirstMirror').then(
+    ({ getLocalFirstMirror }) => {
+      // Failures are the sync loop's problem to report and retry.
+      void getLocalFirstMirror().catch(() => {});
+    },
+  );
+}
+
 export const LocalFirstDebugPanelGate = () => {
   if (!IS_LOCAL_FIRST_ENABLED) return null;
 
