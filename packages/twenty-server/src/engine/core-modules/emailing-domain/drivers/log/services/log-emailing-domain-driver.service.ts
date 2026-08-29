@@ -14,6 +14,7 @@ import {
 import { EmailingDomainStatus } from 'src/engine/core-modules/emailing-domain/drivers/types/emailing-domain-status.type';
 import { type EmailingDomainSendEmailRequest } from 'src/engine/core-modules/emailing-domain/drivers/types/emailing-domain-send-email-input.type';
 import { type EmailingDomainSendEmailResult } from 'src/engine/core-modules/emailing-domain/drivers/types/emailing-domain-send-email-result.type';
+import { EngagementTrackingContentService } from 'src/engine/core-modules/emailing-domain/services/engagement-tracking-content.service';
 import { UnsubscribeContentService } from 'src/engine/core-modules/emailing-domain/services/unsubscribe-content.service';
 import { TwentyConfigService } from 'src/engine/core-modules/twenty-config/twenty-config.service';
 import { WorkspaceEntity } from 'src/engine/core-modules/workspace/workspace.entity';
@@ -25,6 +26,7 @@ export class LogEmailingDomainDriver implements EmailingDomainDriverInterface {
   constructor(
     private readonly twentyConfigService: TwentyConfigService,
     private readonly unsubscribeContentService: UnsubscribeContentService,
+    private readonly engagementTrackingContentService: EngagementTrackingContentService,
     @InjectRepository(WorkspaceEntity)
     private readonly workspaceRepository: Repository<WorkspaceEntity>,
   ) {}
@@ -112,8 +114,11 @@ export class LogEmailingDomainDriver implements EmailingDomainDriverInterface {
     const unsubscribeBaseUrl = await this.getUnsubscribeBaseUrl(
       input.workspaceId,
     );
+    // Tracking is injected before the unsubscribe footer so the unsubscribe
+    // link itself is never wrapped in a click redirect. Both are served from
+    // the same sender-domain hostname.
     const emailToSend = this.unsubscribeContentService.addTo(
-      input,
+      this.engagementTrackingContentService.addTo(input, unsubscribeBaseUrl),
       unsubscribeBaseUrl,
     );
 

@@ -1,4 +1,4 @@
-import { Field, ObjectType } from '@nestjs/graphql';
+import { Field, Int, ObjectType } from '@nestjs/graphql';
 
 @ObjectType('MessageCampaignRecipient')
 export class MessageCampaignRecipientDTO {
@@ -16,6 +16,18 @@ export class MessageCampaignRecipientDTO {
 
   @Field(() => String)
   deliveryStatus: string;
+
+  @Field(() => Date, { nullable: true })
+  openedAt: Date | null;
+
+  @Field(() => Int)
+  openCount: number;
+
+  @Field(() => Date, { nullable: true })
+  clickedAt: Date | null;
+
+  @Field(() => Int)
+  clickCount: number;
 
   @Field(() => String, { nullable: true })
   subject: string | null;

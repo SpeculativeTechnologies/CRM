@@ -1,5 +1,6 @@
 import { type EmailingDomainAttachment } from 'src/engine/core-modules/emailing-domain/drivers/types/emailing-domain-attachment.type';
 import { type EmailingDomainHeader } from 'src/engine/core-modules/emailing-domain/drivers/types/emailing-domain-header.type';
+import { type EngagementTrackingContext } from 'src/engine/core-modules/emailing-domain/drivers/types/engagement-tracking-context.type';
 
 export type EmailingDomainEmailContent = {
   from: string;
@@ -13,4 +14,5 @@ export type EmailingDomainEmailContent = {
   attachments?: EmailingDomainAttachment[];
   headers?: EmailingDomainHeader[];
   unsubscribeTopicId?: string;
+  engagementTracking?: EngagementTrackingContext;
 };

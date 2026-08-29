@@ -957,6 +957,12 @@ exports[`STANDARD_OBJECTS universal identifiers should never change without an e
   },
   "message": {
     "fields": {
+      "clickCount": {
+        "universalIdentifier": "15d8b6ec-4f29-4a03-b8c1-7e94d20a5f63",
+      },
+      "clickedAt": {
+        "universalIdentifier": "c94a7f30-8b15-4e62-a7d9-16f0c3b84e75",
+      },
       "createdAt": {
         "universalIdentifier": "74d0ddc0-4dbe-5c29-8d4a-2e512c1e66ab",
       },
@@ -989,6 +995,12 @@ exports[`STANDARD_OBJECTS universal identifiers should never change without an e
       },
       "messageThread": {
         "universalIdentifier": "20202020-30f2-4ccd-9f5c-e41bb9d26214",
+      },
+      "openCount": {
+        "universalIdentifier": "7b2e4d91-0a63-4c58-8f27-d1a63b9e5c04",
+      },
+      "openedAt": {
+        "universalIdentifier": "3f1c8a52-6d40-4b7e-9a13-2c5f8e7b41d9",
       },
       "position": {
         "universalIdentifier": "44735eaf-ce39-5023-8d32-3ba27ef7d11d",
@@ -1061,6 +1073,9 @@ exports[`STANDARD_OBJECTS universal identifiers should never change without an e
       "ccAddresses": {
         "universalIdentifier": "5552de17-c256-412f-8561-d17f14cc589c",
       },
+      "clickedCount": {
+        "universalIdentifier": "4e7b21ca-5d38-49f6-b013-8ca2f57d9e40",
+      },
       "complainedCount": {
         "universalIdentifier": "82842cfa-f12a-4bab-bbde-b2cf587d0406",
       },
@@ -1090,6 +1105,9 @@ exports[`STANDARD_OBJECTS universal identifiers should never change without an e
       },
       "name": {
         "universalIdentifier": "dc8bca0e-37c4-4b78-814d-2e91124274e3",
+      },
+      "openedCount": {
+        "universalIdentifier": "a06f3d18-9c74-4bd5-8e21-5f7a4c093b6e",
       },
       "position": {
         "universalIdentifier": "e43f6c94-602c-54af-a398-559510beb43b",

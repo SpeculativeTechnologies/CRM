@@ -15,10 +15,8 @@ import { v4, v5 } from 'uuid';
 import {
   CAMPAIGN_MESSAGE_DELIVERY_STATUS,
   CAMPAIGN_MESSAGE_ID_NAMESPACE,
-  CAMPAIGN_STATS_REFRESH_DELAY_MS,
   MATERIALIZE_CAMPAIGN_JOB,
   MAX_CAMPAIGN_RECIPIENTS,
-  REFRESH_CAMPAIGN_STATS_JOB,
   SEND_CAMPAIGN_EMAIL_JOB,
 } from 'src/engine/core-modules/emailing-domain/constants/campaign.constant';
 import {
@@ -37,13 +35,9 @@ import { type CampaignRecipient } from 'src/engine/core-modules/emailing-domain/
 import { type CampaignSkippedBreakdown } from 'src/engine/core-modules/emailing-domain/types/campaign-skipped-breakdown.type';
 import { type MaterializeCampaignJobData } from 'src/engine/core-modules/emailing-domain/types/materialize-campaign-job-data.type';
 import { type RawCampaignRecipient } from 'src/engine/core-modules/emailing-domain/types/raw-campaign-recipient.type';
-import { type RefreshCampaignStatsJobData } from 'src/engine/core-modules/emailing-domain/types/refresh-campaign-stats-job-data.type';
 import { type SendCampaignEmailJobData } from 'src/engine/core-modules/emailing-domain/types/send-campaign-email-job-data.type';
 import { normalizeCampaignRecipients } from 'src/engine/core-modules/emailing-domain/utils/normalize-campaign-recipients.util';
 import { buildCreatedByFromFullNameMetadata } from 'src/engine/core-modules/actor/utils/build-created-by-from-full-name-metadata.util';
-import { InjectCacheStorage } from 'src/engine/core-modules/cache-storage/decorators/cache-storage.decorator';
-import { CacheStorageService } from 'src/engine/core-modules/cache-storage/services/cache-storage.service';
-import { CacheStorageNamespace } from 'src/engine/core-modules/cache-storage/types/cache-storage-namespace.enum';
 import { InjectMessageQueue } from 'src/engine/core-modules/message-queue/decorators/message-queue.decorator';
 import { MessageQueue } from 'src/engine/core-modules/message-queue/message-queue.constants';
 import { MessageQueueService } from 'src/engine/core-modules/message-queue/services/message-queue.service';
@@ -53,6 +47,7 @@ import { GlobalWorkspaceOrmManager } from 'src/engine/twenty-orm/global-workspac
 import { buildSystemAuthContext } from 'src/engine/twenty-orm/utils/build-system-auth-context.util';
 import { InjectWorkspaceScopedRepository } from 'src/engine/twenty-orm/workspace-scoped-repository/inject-workspace-scoped-repository.decorator';
 import { WorkspaceScopedRepository } from 'src/engine/twenty-orm/workspace-scoped-repository/workspace-scoped-repository';
+import { CampaignStatsRefreshSchedulerService } from 'src/modules/emailing/services/campaign-stats-refresh-scheduler.service';
 import { CampaignVariableService } from 'src/modules/emailing/services/campaign-variable.service';
 import { EmailBillingService } from 'src/modules/emailing/services/email-billing.service';
 import { EmailingDomainSenderService } from 'src/modules/emailing/services/emailing-domain-sender.service';
@@ -166,8 +161,7 @@ export class MessageCampaignService {
     private readonly messageCampaignStatisticsService: MessageCampaignStatisticsService,
     private readonly emailBillingService: EmailBillingService,
     private readonly campaignVariableService: CampaignVariableService,
-    @InjectCacheStorage(CacheStorageNamespace.ModuleEmailing)
-    private readonly cacheStorageService: CacheStorageService,
+    private readonly campaignStatsRefreshSchedulerService: CampaignStatsRefreshSchedulerService,
   ) {}
 
   private getRoleScopedRepository<T extends ObjectLiteral>(
@@ -959,6 +953,10 @@ export class MessageCampaignService {
 
     let result: EmailingDomainSendEmailResult;
 
+    // The one gate for open and click tracking. A campaign or workspace opt-out
+    // would be read here and leave the rest of the pipeline untouched.
+    const engagementTracking = { campaignId, messageId };
+
     try {
       result = await this.emailingDomainSenderService.sendEmail(
         workspaceId,
@@ -970,6 +968,7 @@ export class MessageCampaignService {
           text: compiledContent.plainText,
           html: compiledContent.html,
           unsubscribeTopicId,
+          engagementTracking,
         },
       );
     } catch (error) {
@@ -1065,7 +1064,7 @@ export class MessageCampaignService {
 
       await messageRepository.update(message.id, { deliveryStatus });
 
-      await this.scheduleCampaignStatsRefresh({
+      await this.campaignStatsRefreshSchedulerService.schedule({
         workspaceId,
         campaignId: message.messageCampaignId,
       });
@@ -1393,33 +1392,10 @@ export class MessageCampaignService {
       },
     );
 
-    await this.scheduleCampaignStatsRefresh({
+    await this.campaignStatsRefreshSchedulerService.schedule({
       workspaceId,
       campaignId,
     });
-  }
-
-  private async scheduleCampaignStatsRefresh({
-    workspaceId,
-    campaignId,
-  }: {
-    workspaceId: string;
-    campaignId: string;
-  }): Promise<void> {
-    const acquired = await this.cacheStorageService.acquireLock(
-      `campaign-stats-refresh:${workspaceId}:${campaignId}`,
-      CAMPAIGN_STATS_REFRESH_DELAY_MS,
-    );
-
-    if (!acquired) {
-      return;
-    }
-
-    await this.messageQueueService.add<RefreshCampaignStatsJobData>(
-      REFRESH_CAMPAIGN_STATS_JOB,
-      { workspaceId, campaignId },
-      { delay: CAMPAIGN_STATS_REFRESH_DELAY_MS },
-    );
   }
 
   async previewAudience({

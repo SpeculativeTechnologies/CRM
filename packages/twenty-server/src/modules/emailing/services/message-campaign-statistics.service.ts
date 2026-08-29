@@ -1,5 +1,7 @@
 import { Injectable } from '@nestjs/common';
 
+import { IsNull, Not } from 'typeorm';
+
 import { CAMPAIGN_MESSAGE_DELIVERY_STATUS } from 'src/engine/core-modules/emailing-domain/constants/campaign.constant';
 import { GlobalWorkspaceOrmManager } from 'src/engine/twenty-orm/global-workspace-datasource/global-workspace-orm.manager';
 import { buildSystemAuthContext } from 'src/engine/twenty-orm/utils/build-system-auth-context.util';
@@ -59,6 +61,17 @@ export class MessageCampaignStatisticsService {
           CAMPAIGN_MESSAGE_DELIVERY_STATUS.COMPLAINED,
         ) ?? 0;
 
+      // Engagement is counted per recipient, not per hit, so a recipient who
+      // opens six times still moves the campaign open rate by one.
+      const [openedCount, clickedCount] = await Promise.all([
+        messageRepository.count({
+          where: { messageCampaignId: campaignId, openedAt: Not(IsNull()) },
+        }),
+        messageRepository.count({
+          where: { messageCampaignId: campaignId, clickedAt: Not(IsNull()) },
+        }),
+      ]);
+
       const campaignRepository =
         await this.globalWorkspaceOrmManager.getRepository(
           workspaceId,
@@ -68,7 +81,14 @@ export class MessageCampaignStatisticsService {
 
       await campaignRepository.update(
         { id: campaignId },
-        { sentCount, failedCount, bouncedCount, complainedCount },
+        {
+          sentCount,
+          failedCount,
+          bouncedCount,
+          complainedCount,
+          openedCount,
+          clickedCount,
+        },
       );
     }, buildSystemAuthContext(workspaceId));
   }

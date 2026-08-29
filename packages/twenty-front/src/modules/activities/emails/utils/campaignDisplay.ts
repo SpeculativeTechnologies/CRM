@@ -6,6 +6,8 @@ export const CAMPAIGN_RECIPIENT_STATUS_FILTERS = [
   'ALL',
   'QUEUED',
   'SENT',
+  'OPENED',
+  'CLICKED',
   'FAILED',
   'BOUNCED',
   'COMPLAINED',
@@ -14,6 +16,14 @@ export const CAMPAIGN_RECIPIENT_STATUS_FILTERS = [
 
 export type CampaignRecipientStatusFilter =
   (typeof CAMPAIGN_RECIPIENT_STATUS_FILTERS)[number];
+
+type CampaignRecipientEngagement = {
+  deliveryStatus: string;
+  openedAt: string | null;
+  openCount: number;
+  clickedAt: string | null;
+  clickCount: number;
+};
 
 export const isDraftCampaign = (campaign: { status: string }) =>
   campaign.status === 'DRAFT';
@@ -44,10 +54,46 @@ export const getCampaignRecipientTrackingMessage = (campaign: {
   return 'No per-recipient tracking was recorded for this campaign.';
 };
 
+// Opens and clicks are not delivery states, so they sit alongside deliveryStatus
+// rather than replacing it: a recipient can be both SENT and OPENED.
 export const matchesCampaignRecipientStatus = (
-  deliveryStatus: string,
+  recipient: CampaignRecipientEngagement,
   filter: CampaignRecipientStatusFilter,
-) => filter === 'ALL' || deliveryStatus === filter;
+) => {
+  if (filter === 'ALL') {
+    return true;
+  }
+
+  if (filter === 'OPENED') {
+    return recipient.openedAt !== null;
+  }
+
+  if (filter === 'CLICKED') {
+    return recipient.clickedAt !== null;
+  }
+
+  return recipient.deliveryStatus === filter;
+};
+
+const pluralize = (count: number, noun: string) =>
+  `${count} ${noun}${count === 1 ? '' : 's'}`;
+
+// A click backfills openedAt without touching openCount, so a recipient can be
+// known to have opened while the pixel never fired. Report at least one.
+export const formatCampaignRecipientEngagement = (
+  recipient: CampaignRecipientEngagement,
+) => {
+  const parts = [
+    recipient.openedAt === null
+      ? null
+      : pluralize(Math.max(recipient.openCount, 1), 'open'),
+    recipient.clickedAt === null
+      ? null
+      : pluralize(Math.max(recipient.clickCount, 1), 'click'),
+  ].filter((part): part is string => part !== null);
+
+  return parts.length === 0 ? null : parts.join(' · ');
+};
 
 export const formatCampaignRate = (count: number, total: number) => {
   if (total === 0) {

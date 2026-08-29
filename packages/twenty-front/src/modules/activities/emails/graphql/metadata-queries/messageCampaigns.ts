@@ -18,6 +18,8 @@ export const MESSAGE_CAMPAIGN_SUMMARY_FIELDS = gql`
     failedCount
     bouncedCount
     complainedCount
+    openedCount
+    clickedCount
   }
 `;
 
@@ -49,6 +51,8 @@ export const GET_MESSAGE_CAMPAIGN = gql`
       failedCount
       bouncedCount
       complainedCount
+      openedCount
+      clickedCount
       body
       ccAddresses
       unsubscribeTopicId
@@ -60,6 +64,10 @@ export const GET_MESSAGE_CAMPAIGN = gql`
         displayName
         email
         deliveryStatus
+        openedAt
+        openCount
+        clickedAt
+        clickCount
         subject
         body
       }

@@ -23,6 +23,7 @@ import {
 import { type EmailingDomainSendEmailRequest } from 'src/engine/core-modules/emailing-domain/drivers/types/emailing-domain-send-email-input.type';
 import { type EmailingDomainSendEmailResult } from 'src/engine/core-modules/emailing-domain/drivers/types/emailing-domain-send-email-result.type';
 import { getUnsubscribeBaseUrl } from 'src/engine/core-modules/emailing-domain/drivers/utils/get-unsubscribe-base-url.util';
+import { type EngagementTrackingContentService } from 'src/engine/core-modules/emailing-domain/services/engagement-tracking-content.service';
 import { type UnsubscribeContentService } from 'src/engine/core-modules/emailing-domain/services/unsubscribe-content.service';
 
 import { AWS_SES_RESOURCE_NAME_PREFIX } from 'src/engine/core-modules/emailing-domain/drivers/aws-ses/constants/aws-ses-resource-name-prefix.constant';
@@ -43,6 +44,7 @@ export class AwsSesDriver implements EmailingDomainDriverInterface {
     private readonly awsSesRegisterDomainService: AwsSesRegisterDomainService,
     private readonly awsSesSendEmailService: AwsSesSendEmailService,
     private readonly unsubscribeContentService: UnsubscribeContentService,
+    private readonly engagementTrackingContentService: EngagementTrackingContentService,
   ) {}
 
   async verifyDomain(
@@ -131,8 +133,11 @@ export class AwsSesDriver implements EmailingDomainDriverInterface {
     input: EmailingDomainSendEmailRequest,
   ): Promise<EmailingDomainSendEmailResult> {
     const unsubscribeBaseUrl = getUnsubscribeBaseUrl(input.emailingDomain);
+    // Tracking is injected before the unsubscribe footer so the unsubscribe
+    // link itself is never wrapped in a click redirect. Both are served from
+    // the same sender-domain hostname.
     const emailToSend = this.unsubscribeContentService.addTo(
-      input,
+      this.engagementTrackingContentService.addTo(input, unsubscribeBaseUrl),
       unsubscribeBaseUrl,
     );
 
