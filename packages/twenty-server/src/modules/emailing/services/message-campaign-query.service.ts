@@ -191,6 +191,7 @@ export class MessageCampaignQueryService {
             openCount: message?.openCount ?? 0,
             clickedAt: message?.clickedAt ?? null,
             clickCount: message?.clickCount ?? 0,
+            repliedAt: message?.repliedAt ?? null,
             subject: renderCampaignTemplate(campaign.subject ?? '', variables, {
               escapeValues: false,
             }),
@@ -244,6 +245,7 @@ export class MessageCampaignQueryService {
       complainedCount: campaign.complainedCount,
       openedCount: campaign.openedCount,
       clickedCount: campaign.clickedCount,
+      repliedCount: campaign.repliedCount,
     };
   }
 

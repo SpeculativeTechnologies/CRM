@@ -4224,6 +4224,12 @@ msgctxt "fieldMetadata.label"
 msgid "First opened at"
 msgstr ""
 
+#. js-lingui-id: Are5zn
+#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-message-standard-flat-field-metadata.util.ts
+msgctxt "fieldMetadata.label"
+msgid "First replied at"
+msgstr ""
+
 #. js-lingui-id: BUBVGN
 #: src/engine/metadata-modules/page-layout-tab/constants/standard-page-layout-tab-titles.ts
 msgctxt "pageLayoutTab.title"
@@ -7073,6 +7079,12 @@ msgctxt "fieldMetadata.description"
 msgid "Number of recipients who opened this campaign"
 msgstr ""
 
+#. js-lingui-id: JIJQFU
+#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-message-campaign-standard-flat-field-metadata.util.ts
+msgctxt "fieldMetadata.description"
+msgid "Number of recipients who replied to this campaign"
+msgstr ""
+
 #. js-lingui-id: bgG8mY
 #: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-message-campaign-standard-flat-field-metadata.util.ts
 msgctxt "fieldMetadata.description"
@@ -8404,6 +8416,12 @@ msgstr "Verwijder deze machtiging uit alle rollen voordat u deze verwijdert"
 msgctxt "timelineActivityType.label"
 msgid "removed an attachment"
 msgstr "heeft een bijlage verwijderd"
+
+#. js-lingui-id: yYK27/
+#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-message-campaign-standard-flat-field-metadata.util.ts
+msgctxt "fieldMetadata.label"
+msgid "Replied count"
+msgstr ""
 
 #. js-lingui-id: U4APCE
 #: src/engine/workspace-manager/twenty-standard-application/constants/standard-command-menu-item.constant.ts
@@ -11982,6 +12000,12 @@ msgstr "Wanneer de campagne klaar was met verzenden"
 #: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-message-standard-flat-field-metadata.util.ts
 msgctxt "fieldMetadata.description"
 msgid "When this campaign email was first opened by its recipient"
+msgstr ""
+
+#. js-lingui-id: 7+YQ4x
+#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-message-standard-flat-field-metadata.util.ts
+msgctxt "fieldMetadata.description"
+msgid "When this campaign email was first replied to by its recipient"
 msgstr ""
 
 #. js-lingui-id: Kx3ltI

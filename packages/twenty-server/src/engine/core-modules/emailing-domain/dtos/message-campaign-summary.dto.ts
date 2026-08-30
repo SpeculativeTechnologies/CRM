@@ -55,4 +55,7 @@ export class MessageCampaignSummaryDTO {
 
   @Field(() => Int)
   clickedCount: number;
+
+  @Field(() => Int)
+  repliedCount: number;
 }

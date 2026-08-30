@@ -20,6 +20,7 @@ export type Message = Omit<
   | 'openCount'
   | 'clickedAt'
   | 'clickCount'
+  | 'repliedAt'
 > & {
   attachments: {
     filename: string;

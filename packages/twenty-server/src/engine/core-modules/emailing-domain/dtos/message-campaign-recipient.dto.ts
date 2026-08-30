@@ -29,6 +29,9 @@ export class MessageCampaignRecipientDTO {
   @Field(() => Int)
   clickCount: number;
 
+  @Field(() => Date, { nullable: true })
+  repliedAt: Date | null;
+
   @Field(() => String, { nullable: true })
   subject: string | null;
 

@@ -31,9 +31,13 @@ describe('MessageCampaignStatisticsService', () => {
       SKIPPED: 3,
     });
     campaignUpdateMock = jest.fn().mockResolvedValue(undefined);
-    messageCountMock = jest.fn(async ({ where }) =>
-      where.openedAt !== undefined ? 5 : 2,
-    );
+    messageCountMock = jest.fn(async ({ where }) => {
+      if (where.openedAt !== undefined) {
+        return 5;
+      }
+
+      return where.clickedAt !== undefined ? 2 : 1;
+    });
 
     const queryBuilder = {
       select: jest.fn().mockReturnThis(),
@@ -82,6 +86,7 @@ describe('MessageCampaignStatisticsService', () => {
         complainedCount: 1,
         openedCount: 5,
         clickedCount: 2,
+        repliedCount: 1,
       },
     );
   });
@@ -94,6 +99,9 @@ describe('MessageCampaignStatisticsService', () => {
     });
     expect(messageCountMock).toHaveBeenCalledWith({
       where: { messageCampaignId: CAMPAIGN_ID, clickedAt: Not(IsNull()) },
+    });
+    expect(messageCountMock).toHaveBeenCalledWith({
+      where: { messageCampaignId: CAMPAIGN_ID, repliedAt: Not(IsNull()) },
     });
   });
 
@@ -112,6 +120,7 @@ describe('MessageCampaignStatisticsService', () => {
         complainedCount: 0,
         openedCount: 0,
         clickedCount: 0,
+        repliedCount: 0,
       },
     );
   });

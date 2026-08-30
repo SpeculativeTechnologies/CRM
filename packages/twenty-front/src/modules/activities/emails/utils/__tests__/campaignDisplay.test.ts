@@ -18,6 +18,7 @@ const recipient = (
     openCount: number;
     clickedAt: string | null;
     clickCount: number;
+    repliedAt: string | null;
   }> = {},
 ) => ({
   deliveryStatus: 'SENT',
@@ -25,6 +26,7 @@ const recipient = (
   openCount: 0,
   clickedAt: null,
   clickCount: 0,
+  repliedAt: null,
   ...overrides,
 });
 
@@ -99,6 +101,13 @@ describe('campaignDisplay', () => {
 
     expect(matchesCampaignRecipientStatus(clicked, 'OPENED')).toBe(true);
     expect(matchesCampaignRecipientStatus(clicked, 'CLICKED')).toBe(true);
+
+    const replied = recipient({ repliedAt: '2026-08-25T10:05:00.000Z' });
+
+    expect(matchesCampaignRecipientStatus(replied, 'REPLIED')).toBe(true);
+    expect(matchesCampaignRecipientStatus(replied, 'SENT')).toBe(true);
+    expect(matchesCampaignRecipientStatus(replied, 'OPENED')).toBe(false);
+    expect(matchesCampaignRecipientStatus(recipient(), 'REPLIED')).toBe(false);
   });
 
   it('summarises recipient engagement, counting a pixel-less open as one', () => {
@@ -123,5 +132,22 @@ describe('campaignDisplay', () => {
         }),
       ),
     ).toBe('1 open · 2 clicks');
+  });
+
+  it('reports a reply without a count, since only the first one is recorded', () => {
+    expect(
+      formatCampaignRecipientEngagement(
+        recipient({ repliedAt: '2026-08-25T10:05:00.000Z' }),
+      ),
+    ).toBe('replied');
+    expect(
+      formatCampaignRecipientEngagement(
+        recipient({
+          openedAt: '2026-08-25T10:00:00.000Z',
+          openCount: 2,
+          repliedAt: '2026-08-25T10:05:00.000Z',
+        }),
+      ),
+    ).toBe('2 opens · replied');
   });
 });

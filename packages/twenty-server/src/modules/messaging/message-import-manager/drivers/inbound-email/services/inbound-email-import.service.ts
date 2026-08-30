@@ -2,10 +2,18 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
 import { isNonEmptyString } from '@sniptt/guards';
-import { MessageChannelType } from 'twenty-shared/types';
+import {
+  MessageChannelType,
+  MessageParticipantRole,
+} from 'twenty-shared/types';
 import { isDefined } from 'twenty-shared/utils';
 import { Repository } from 'typeorm';
 
+import { ATTRIBUTE_CAMPAIGN_REPLY_JOB } from 'src/engine/core-modules/emailing-domain/constants/campaign.constant';
+import { type AttributeCampaignReplyJobData } from 'src/engine/core-modules/emailing-domain/types/attribute-campaign-reply-job-data.type';
+import { InjectMessageQueue } from 'src/engine/core-modules/message-queue/decorators/message-queue.decorator';
+import { MessageQueue } from 'src/engine/core-modules/message-queue/message-queue.constants';
+import { MessageQueueService } from 'src/engine/core-modules/message-queue/services/message-queue.service';
 import { TwentyConfigService } from 'src/engine/core-modules/twenty-config/twenty-config.service';
 import { ConnectedAccountEntity } from 'src/engine/metadata-modules/connected-account/entities/connected-account.entity';
 import { MessageChannelEntity } from 'src/engine/metadata-modules/message-channel/entities/message-channel.entity';
@@ -15,6 +23,9 @@ import { InboundEmailMessageSourceResolverService } from 'src/modules/messaging/
 import { type InboundEmailImportOutcome } from 'src/modules/messaging/message-import-manager/drivers/inbound-email/types/inbound-email-import-outcome.type';
 import { type InboundEmailMessageReference } from 'src/modules/messaging/message-import-manager/drivers/inbound-email/types/inbound-email-message-reference.type';
 import { MessagingSaveMessagesAndEnqueueContactCreationService } from 'src/modules/messaging/message-import-manager/services/messaging-save-messages-and-enqueue-contact-creation.service';
+import { type MessageWithParticipants } from 'src/modules/messaging/message-import-manager/types/message';
+import { extractReplyHeaderMessageIds } from 'src/modules/messaging/message-import-manager/utils/extract-reply-header-message-ids.util';
+import { isAutoReplyMessage } from 'src/modules/messaging/message-import-manager/utils/is-auto-reply-message.util';
 
 type ImportInboundMessageParams = {
   messageReference: InboundEmailMessageReference;
@@ -34,6 +45,8 @@ export class InboundEmailImportService {
     private readonly messageChannelRepository: Repository<MessageChannelEntity>,
     @InjectRepository(ConnectedAccountEntity)
     private readonly connectedAccountRepository: Repository<ConnectedAccountEntity>,
+    @InjectMessageQueue(MessageQueue.emailQueue)
+    private readonly messageQueueService: MessageQueueService,
   ) {}
 
   async importInboundMessage(
@@ -119,6 +132,8 @@ export class InboundEmailImportService {
       { lite: true },
     );
 
+    await this.enqueueCampaignReplyAttribution(message, workspaceId);
+
     await messageSource.cleanup(messageReference.reference);
 
     return {
@@ -126,6 +141,39 @@ export class InboundEmailImportService {
       workspaceId,
       messageChannelId: messageChannel.id,
     };
+  }
+
+  // Attribution runs on the email queue rather than inline: the campaign lookup
+  // is unrelated to importing the message, and must not fail the import.
+  private async enqueueCampaignReplyAttribution(
+    message: MessageWithParticipants,
+    workspaceId: string,
+  ): Promise<void> {
+    const headers = message.messageHeaders ?? [];
+    const replyHeaderMessageIds = extractReplyHeaderMessageIds(headers);
+    const senderHandle = message.participants.find(
+      ({ role }) => role === MessageParticipantRole.FROM,
+    )?.handle;
+
+    if (replyHeaderMessageIds.length === 0 || !isNonEmptyString(senderHandle)) {
+      return;
+    }
+
+    // An out-of-office answers the campaign message's In-Reply-To just as a
+    // human would, and counting it would inflate reply rate the same way image
+    // prefetching inflates opens.
+    if (isAutoReplyMessage(headers)) {
+      this.logger.log(
+        `Not counting auto-reply ${message.headerMessageId} as a campaign reply`,
+      );
+
+      return;
+    }
+
+    await this.messageQueueService.add<AttributeCampaignReplyJobData>(
+      ATTRIBUTE_CAMPAIGN_REPLY_JOB,
+      { workspaceId, replyHeaderMessageIds, senderHandle },
+    );
   }
 
   private matchInboundRecipient(

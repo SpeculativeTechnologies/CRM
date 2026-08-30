@@ -518,6 +518,26 @@ export const buildMessageCampaignStandardFlatFieldMetadatas = ({
         defaultValue: 0,
       },
     }),
+    repliedCount: createStandardFieldFlatMetadata({
+      ...base,
+      context: {
+        fieldName: 'repliedCount',
+        type: FieldMetadataType.NUMBER,
+        label: i18nLabel(
+          msg({ message: `Replied count`, context: 'fieldMetadata.label' }),
+        ),
+        description: i18nLabel(
+          msg({
+            message: `Number of recipients who replied to this campaign`,
+            context: 'fieldMetadata.description',
+          }),
+        ),
+        icon: 'IconMailForward',
+        isNullable: false,
+        isUIEditable: false,
+        defaultValue: 0,
+      },
+    }),
     unsubscribeTopicId: createStandardFieldFlatMetadata({
       ...base,
       context: {
