@@ -76,6 +76,7 @@ import { SaveCampaignTool } from 'src/modules/emailing/tools/save-campaign-tool'
   ],
   exports: [
     EmailingDomainSenderService,
+    MessageEngagementService,
     MessageCampaignService,
     MessageCampaignDraftService,
     MessageCampaignStatisticsService,

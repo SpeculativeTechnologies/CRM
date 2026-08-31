@@ -512,6 +512,9 @@ export const STANDARD_OBJECT_FIELDS = {
     clickedCount: {
       universalIdentifier: '4e7b21ca-5d38-49f6-b013-8ca2f57d9e40',
     },
+    repliedCount: {
+      universalIdentifier: 'b8f04d61-9a27-4c53-8e70-3d1a6b5f2c98',
+    },
     unsubscribeTopicId: {
       universalIdentifier: '0648e7ad-1769-4ff6-a4d5-72da79ef169c',
     },
@@ -677,6 +680,9 @@ export const STANDARD_OBJECT_FIELDS = {
     },
     clickCount: {
       universalIdentifier: '15d8b6ec-4f29-4a03-b8c1-7e94d20a5f63',
+    },
+    repliedAt: {
+      universalIdentifier: '6a3e91d7-2f48-4b05-9c86-e4d70b1a5f32',
     },
     isDraft: {
       universalIdentifier: '20202020-4d3a-4b6e-9c1f-2a5e7b9d0c34',

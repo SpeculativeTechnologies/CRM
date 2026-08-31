@@ -635,6 +635,31 @@ export const buildMessageStandardFlatFieldMetadatas = ({
     twentyStandardApplicationId,
     now,
   }),
+  repliedAt: createStandardFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      fieldName: 'repliedAt',
+      type: FieldMetadataType.DATE_TIME,
+      label: i18nLabel(
+        msg({ message: `First replied at`, context: 'fieldMetadata.label' }),
+      ),
+      description: i18nLabel(
+        msg({
+          message: `When this campaign email was first replied to by its recipient`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconMailForward',
+      isNullable: true,
+      isUIEditable: false,
+      settings: { displayFormat: DateDisplayFormat.RELATIVE },
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
   isDraft: createStandardFieldFlatMetadata({
     objectName,
     workspaceId,

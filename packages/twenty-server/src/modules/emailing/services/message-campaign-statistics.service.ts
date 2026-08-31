@@ -63,12 +63,15 @@ export class MessageCampaignStatisticsService {
 
       // Engagement is counted per recipient, not per hit, so a recipient who
       // opens six times still moves the campaign open rate by one.
-      const [openedCount, clickedCount] = await Promise.all([
+      const [openedCount, clickedCount, repliedCount] = await Promise.all([
         messageRepository.count({
           where: { messageCampaignId: campaignId, openedAt: Not(IsNull()) },
         }),
         messageRepository.count({
           where: { messageCampaignId: campaignId, clickedAt: Not(IsNull()) },
+        }),
+        messageRepository.count({
+          where: { messageCampaignId: campaignId, repliedAt: Not(IsNull()) },
         }),
       ]);
 
@@ -88,6 +91,7 @@ export class MessageCampaignStatisticsService {
           complainedCount,
           openedCount,
           clickedCount,
+          repliedCount,
         },
       );
     }, buildSystemAuthContext(workspaceId));

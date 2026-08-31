@@ -4219,6 +4219,12 @@ msgctxt "fieldMetadata.label"
 msgid "First opened at"
 msgstr "First opened at"
 
+#. js-lingui-id: Are5zn
+#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-message-standard-flat-field-metadata.util.ts
+msgctxt "fieldMetadata.label"
+msgid "First replied at"
+msgstr "First replied at"
+
 #. js-lingui-id: BUBVGN
 #: src/engine/metadata-modules/page-layout-tab/constants/standard-page-layout-tab-titles.ts
 msgctxt "pageLayoutTab.title"
@@ -7068,6 +7074,12 @@ msgctxt "fieldMetadata.description"
 msgid "Number of recipients who opened this campaign"
 msgstr "Number of recipients who opened this campaign"
 
+#. js-lingui-id: JIJQFU
+#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-message-campaign-standard-flat-field-metadata.util.ts
+msgctxt "fieldMetadata.description"
+msgid "Number of recipients who replied to this campaign"
+msgstr "Number of recipients who replied to this campaign"
+
 #. js-lingui-id: bgG8mY
 #: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-message-campaign-standard-flat-field-metadata.util.ts
 msgctxt "fieldMetadata.description"
@@ -8399,6 +8411,12 @@ msgstr "Remove this permission from all roles before deleting it"
 msgctxt "timelineActivityType.label"
 msgid "removed an attachment"
 msgstr "removed an attachment"
+
+#. js-lingui-id: yYK27/
+#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-message-campaign-standard-flat-field-metadata.util.ts
+msgctxt "fieldMetadata.label"
+msgid "Replied count"
+msgstr "Replied count"
 
 #. js-lingui-id: U4APCE
 #: src/engine/workspace-manager/twenty-standard-application/constants/standard-command-menu-item.constant.ts
@@ -11978,6 +11996,12 @@ msgstr "When the campaign finished sending"
 msgctxt "fieldMetadata.description"
 msgid "When this campaign email was first opened by its recipient"
 msgstr "When this campaign email was first opened by its recipient"
+
+#. js-lingui-id: 7+YQ4x
+#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-message-standard-flat-field-metadata.util.ts
+msgctxt "fieldMetadata.description"
+msgid "When this campaign email was first replied to by its recipient"
+msgstr "When this campaign email was first replied to by its recipient"
 
 #. js-lingui-id: Kx3ltI
 #: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-workspace-member-standard-flat-field-metadata.util.ts

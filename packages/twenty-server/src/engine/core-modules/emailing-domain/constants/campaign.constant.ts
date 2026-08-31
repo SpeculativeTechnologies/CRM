@@ -10,6 +10,7 @@ export const CAMPAIGN_MESSAGE_DELIVERY_STATUS = {
 export const MATERIALIZE_CAMPAIGN_JOB = 'MaterializeCampaignJob';
 export const SEND_CAMPAIGN_EMAIL_JOB = 'SendCampaignEmailJob';
 export const REFRESH_CAMPAIGN_STATS_JOB = 'RefreshCampaignStatsJob';
+export const ATTRIBUTE_CAMPAIGN_REPLY_JOB = 'AttributeCampaignReplyJob';
 
 export const CAMPAIGN_STATS_REFRESH_DEBOUNCE_MS = 10_000;
 export const CAMPAIGN_STATS_REFRESH_DELAY_MS =

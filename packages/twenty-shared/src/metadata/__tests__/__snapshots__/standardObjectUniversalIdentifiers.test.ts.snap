@@ -1008,6 +1008,9 @@ exports[`STANDARD_OBJECTS universal identifiers should never change without an e
       "receivedAt": {
         "universalIdentifier": "20202020-140a-4a2a-9f86-f13b6a979afc",
       },
+      "repliedAt": {
+        "universalIdentifier": "6a3e91d7-2f48-4b05-9c86-e4d70b1a5f32",
+      },
       "searchVector": {
         "universalIdentifier": "22b10c43-5f5c-53c2-bd68-c77811314633",
       },
@@ -1025,6 +1028,9 @@ exports[`STANDARD_OBJECTS universal identifiers should never change without an e
       },
     },
     "indexes": {
+      "headerMessageIdIndex": {
+        "universalIdentifier": "d4a1f28b-6c53-4e07-9b32-58ac71e0d946",
+      },
       "messageCampaignIdIndex": {
         "universalIdentifier": "79e777ca-7008-46c5-b3a6-3108b7c7dfb6",
       },
@@ -1114,6 +1120,9 @@ exports[`STANDARD_OBJECTS universal identifiers should never change without an e
       },
       "recipients": {
         "universalIdentifier": "05a3271c-5b91-493c-8f30-2d27b31d019e",
+      },
+      "repliedCount": {
+        "universalIdentifier": "b8f04d61-9a27-4c53-8e70-3d1a6b5f2c98",
       },
       "searchVector": {
         "universalIdentifier": "f4cf203c-6ef6-561f-864c-5532e07f94ad",

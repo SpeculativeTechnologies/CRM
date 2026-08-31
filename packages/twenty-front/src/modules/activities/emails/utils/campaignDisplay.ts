@@ -8,6 +8,7 @@ export const CAMPAIGN_RECIPIENT_STATUS_FILTERS = [
   'SENT',
   'OPENED',
   'CLICKED',
+  'REPLIED',
   'FAILED',
   'BOUNCED',
   'COMPLAINED',
@@ -23,6 +24,7 @@ type CampaignRecipientEngagement = {
   openCount: number;
   clickedAt: string | null;
   clickCount: number;
+  repliedAt: string | null;
 };
 
 export const isDraftCampaign = (campaign: { status: string }) =>
@@ -54,8 +56,8 @@ export const getCampaignRecipientTrackingMessage = (campaign: {
   return 'No per-recipient tracking was recorded for this campaign.';
 };
 
-// Opens and clicks are not delivery states, so they sit alongside deliveryStatus
-// rather than replacing it: a recipient can be both SENT and OPENED.
+// Engagement is not a delivery state, so it sits alongside deliveryStatus rather
+// than replacing it: a recipient can be both SENT and OPENED.
 export const matchesCampaignRecipientStatus = (
   recipient: CampaignRecipientEngagement,
   filter: CampaignRecipientStatusFilter,
@@ -70,6 +72,10 @@ export const matchesCampaignRecipientStatus = (
 
   if (filter === 'CLICKED') {
     return recipient.clickedAt !== null;
+  }
+
+  if (filter === 'REPLIED') {
+    return recipient.repliedAt !== null;
   }
 
   return recipient.deliveryStatus === filter;
@@ -90,6 +96,7 @@ export const formatCampaignRecipientEngagement = (
     recipient.clickedAt === null
       ? null
       : pluralize(Math.max(recipient.clickCount, 1), 'click'),
+    recipient.repliedAt === null ? null : 'replied',
   ].filter((part): part is string => part !== null);
 
   return parts.length === 0 ? null : parts.join(' · ');

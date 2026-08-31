@@ -40,4 +40,18 @@ export const buildMessageStandardFlatIndexMetadatas = ({
     twentyStandardApplicationId,
     now,
   }),
+  // Provider events and campaign replies both resolve a message by the id the
+  // provider assigned it, against a table holding every synced message.
+  headerMessageIdIndex: createStandardIndexFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      indexName: 'headerMessageIdIndex',
+      relatedFieldNames: ['headerMessageId'],
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
 });

@@ -17,6 +17,7 @@ export type MessageCampaign = {
   complainedCount: number;
   openedCount: number;
   clickedCount: number;
+  repliedCount: number;
 };
 
 export type MessageCampaignSummary = {
@@ -38,6 +39,7 @@ export type MessageCampaignSummary = {
   complainedCount: number;
   openedCount: number;
   clickedCount: number;
+  repliedCount: number;
 };
 
 export type MessageCampaignRecipient = {
@@ -50,6 +52,7 @@ export type MessageCampaignRecipient = {
   openCount: number;
   clickedAt: string | null;
   clickCount: number;
+  repliedAt: string | null;
   subject: string | null;
   body: string | null;
 };

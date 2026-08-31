@@ -466,15 +466,16 @@ const CampaignTable = ({
 }) => (
   <StyledTable>
     <colgroup>
-      <col style={{ width: '26%' }} />
-      <col style={{ width: '9%' }} />
+      <col style={{ width: '23%' }} />
       <col style={{ width: '8%' }} />
       <col style={{ width: '7%' }} />
-      <col style={{ width: '12%' }} />
-      <col style={{ width: '12%' }} />
-      <col style={{ width: '9%' }} />
-      <col style={{ width: '9%' }} />
+      <col style={{ width: '6%' }} />
+      <col style={{ width: '11%' }} />
+      <col style={{ width: '11%' }} />
+      <col style={{ width: '11%' }} />
       <col style={{ width: '8%' }} />
+      <col style={{ width: '8%' }} />
+      <col style={{ width: '7%' }} />
     </colgroup>
     <thead>
       <tr>
@@ -484,6 +485,7 @@ const CampaignTable = ({
         <th>Sent</th>
         <th>Opened</th>
         <th>Clicked</th>
+        <th>Replied</th>
         <th>Failed</th>
         <th>Bounced</th>
         <th>Complaints</th>
@@ -509,6 +511,9 @@ const CampaignTable = ({
           </td>
           <td>
             {formatCampaignRate(campaign.clickedCount, campaign.sentCount)}
+          </td>
+          <td>
+            {formatCampaignRate(campaign.repliedCount, campaign.sentCount)}
           </td>
           <td>
             {formatCampaignRate(campaign.failedCount, campaign.recipientCount)}

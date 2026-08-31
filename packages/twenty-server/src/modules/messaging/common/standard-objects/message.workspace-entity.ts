@@ -23,5 +23,6 @@ export class MessageWorkspaceEntity extends BaseWorkspaceEntity {
   openCount: number;
   clickedAt: Date | null;
   clickCount: number;
+  repliedAt: Date | null;
   isDraft: boolean;
 }

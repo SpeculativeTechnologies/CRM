@@ -24,6 +24,7 @@ import { OnboardingModule } from 'src/engine/core-modules/onboarding/onboarding.
 import { EmailSenderJob } from 'src/engine/core-modules/email/email-sender.job';
 import { EmailModule } from 'src/engine/core-modules/email/email.module';
 import { EmailingModule } from 'src/modules/emailing/emailing.module';
+import { AttributeCampaignReplyJob } from 'src/modules/emailing/jobs/attribute-campaign-reply.job';
 import { MaterializeCampaignJob } from 'src/modules/emailing/jobs/materialize-campaign.job';
 import { RefreshCampaignStatsJob } from 'src/modules/emailing/jobs/refresh-campaign-stats.job';
 import { SendCampaignEmailJob } from 'src/modules/emailing/jobs/send-campaign-email.job';
@@ -112,6 +113,7 @@ import { WorkflowModule } from 'src/modules/workflow/workflow.module';
     SendCampaignEmailJob,
     MaterializeCampaignJob,
     RefreshCampaignStatsJob,
+    AttributeCampaignReplyJob,
     UpdateSubscriptionQuantityJob,
     HandleWorkspaceMemberDeletedJob,
     WorkspaceDeletionApplicationUninstallJob,
