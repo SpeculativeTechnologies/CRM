@@ -9,6 +9,8 @@ import { GraphqlQueryFilterConditionParser } from 'src/engine/api/graphql/graphq
 import { type FlatEntityMaps } from 'src/engine/metadata-modules/flat-entity/types/flat-entity-maps.type';
 import { type FlatFieldMetadata } from 'src/engine/metadata-modules/flat-field-metadata/types/flat-field-metadata.type';
 import { type FlatObjectMetadata } from 'src/engine/metadata-modules/flat-object-metadata/types/flat-object-metadata.type';
+import { WorkspaceSelectQueryBuilderV2 } from 'src/engine/twenty-orm-v2/query-builder/workspace-select-query-builder-v2';
+import { type WorkspaceTableShape } from 'src/engine/twenty-orm-v2/table-shape/types/workspace-table-shape.type';
 import { type WorkspaceSelectQueryBuilder } from 'src/engine/twenty-orm/repository/workspace-select-query-builder';
 
 const createFlatFieldMetadata = (
@@ -446,6 +448,152 @@ describe('GraphqlQueryFilterConditionParser', () => {
           sql: 'EXISTS (SELECT 1 FROM fellowship)',
         }),
       });
+    });
+
+    it('uses the ORM v2 correlated exists path for a non-empty one-to-many relation', () => {
+      const sourceRelationField = createFlatFieldMetadata({
+        id: 'fellowships-field-id',
+        name: 'fellowships',
+        type: FieldMetadataType.RELATION,
+        objectMetadataId: 'person-object-id',
+        universalIdentifier: 'fellowships-field-universal-id',
+        relationTargetObjectMetadataId: 'fellowship-object-id',
+        relationTargetFieldMetadataId: 'person-field-id',
+        settings: { relationType: RelationType.ONE_TO_MANY },
+      });
+      const targetRelationField = createFlatFieldMetadata({
+        id: 'person-field-id',
+        name: 'person',
+        type: FieldMetadataType.RELATION,
+        objectMetadataId: 'fellowship-object-id',
+        universalIdentifier: 'person-field-universal-id',
+        relationTargetObjectMetadataId: 'person-object-id',
+        relationTargetFieldMetadataId: 'fellowships-field-id',
+        settings: { relationType: RelationType.MANY_TO_ONE },
+      });
+      const idField = createFlatFieldMetadata({
+        id: 'fellowship-id-field-id',
+        name: 'id',
+        type: FieldMetadataType.UUID,
+        objectMetadataId: 'fellowship-object-id',
+        universalIdentifier: 'fellowship-id-field-universal-id',
+      });
+      const personObjectMetadata = {
+        id: 'person-object-id',
+        nameSingular: 'person',
+        namePlural: 'people',
+        fieldIds: [sourceRelationField.id],
+        universalIdentifier: 'person-object-universal-id',
+      } as FlatObjectMetadata;
+      const fellowshipObjectMetadata = {
+        id: 'fellowship-object-id',
+        nameSingular: 'fellowship',
+        namePlural: 'fellowships',
+        fieldIds: [targetRelationField.id, idField.id],
+        universalIdentifier: 'fellowship-object-universal-id',
+      } as FlatObjectMetadata;
+      const relationFieldMaps = {
+        byUniversalIdentifier: Object.fromEntries(
+          [sourceRelationField, targetRelationField, idField].map((field) => [
+            field.universalIdentifier,
+            field,
+          ]),
+        ),
+        universalIdentifierById: Object.fromEntries(
+          [sourceRelationField, targetRelationField, idField].map((field) => [
+            field.id,
+            field.universalIdentifier,
+          ]),
+        ),
+        universalIdentifiersByApplicationId: {},
+      } as FlatEntityMaps<FlatFieldMetadata>;
+      const objectMetadataMaps = {
+        byUniversalIdentifier: {
+          [personObjectMetadata.universalIdentifier]: personObjectMetadata,
+          [fellowshipObjectMetadata.universalIdentifier]:
+            fellowshipObjectMetadata,
+        },
+        universalIdentifierById: {
+          [personObjectMetadata.id]: personObjectMetadata.universalIdentifier,
+          [fellowshipObjectMetadata.id]:
+            fellowshipObjectMetadata.universalIdentifier,
+        },
+        universalIdentifiersByApplicationId: {},
+      } as FlatEntityMaps<FlatObjectMetadata>;
+      const fellowshipTableShape: WorkspaceTableShape = {
+        objectMetadataId: fellowshipObjectMetadata.id,
+        nameSingular: 'fellowship',
+        schemaName: 'workspace_test',
+        tableName: 'fellowship',
+        columnShapeByColumnName: {
+          id: {
+            columnName: 'id',
+            fieldMetadataId: idField.id,
+            fieldName: 'id',
+            fieldMetadataType: FieldMetadataType.UUID,
+          },
+          personId: {
+            columnName: 'personId',
+            fieldMetadataId: targetRelationField.id,
+            fieldName: 'person',
+            fieldMetadataType: FieldMetadataType.UUID,
+          },
+        },
+        columnNames: ['id', 'personId'],
+        relationShapeByFieldName: {
+          person: {
+            fieldName: 'person',
+            fieldMetadataId: targetRelationField.id,
+            relationType: RelationType.MANY_TO_ONE,
+            targetObjectMetadataId: personObjectMetadata.id,
+            targetFieldMetadataId: sourceRelationField.id,
+            joinColumnName: 'personId',
+          },
+        },
+        hasDeletedAtColumn: false,
+      };
+      const personTableShape: WorkspaceTableShape = {
+        objectMetadataId: personObjectMetadata.id,
+        nameSingular: 'person',
+        schemaName: 'workspace_test',
+        tableName: 'person',
+        columnShapeByColumnName: {},
+        columnNames: [],
+        relationShapeByFieldName: {
+          fellowships: {
+            fieldName: 'fellowships',
+            fieldMetadataId: sourceRelationField.id,
+            relationType: RelationType.ONE_TO_MANY,
+            targetObjectMetadataId: fellowshipObjectMetadata.id,
+            targetFieldMetadataId: targetRelationField.id,
+          },
+        },
+        hasDeletedAtColumn: false,
+      };
+      const queryBuilder = new WorkspaceSelectQueryBuilderV2('person', {
+        tableShape: personTableShape,
+        executor: { execute: async () => [] },
+        objectRecordsPermissions: {},
+        tableShapeByObjectMetadataId: (objectMetadataId) =>
+          objectMetadataId === fellowshipObjectMetadata.id
+            ? fellowshipTableShape
+            : personTableShape,
+        onBeforeExecute: () => undefined,
+        formatResult: (records) => records as never,
+      });
+      const parser = new GraphqlQueryFilterConditionParser(
+        personObjectMetadata,
+        relationFieldMaps,
+        objectMetadataMaps,
+      );
+
+      parser.parse(queryBuilder, 'person', {
+        fellowships: { id: { is: 'NOT_NULL' } },
+      });
+
+      expect(queryBuilder.getQuery()).toContain(
+        'EXISTS (SELECT 1 FROM "workspace_test"."fellowship" AS "person_fellowships_filter" WHERE "person_fellowships_filter"."personId" = "person"."id" AND (("person_fellowships_filter"."id" IS NOT NULL)))',
+      );
     });
   });
 });
