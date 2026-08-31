@@ -19,6 +19,7 @@ describe('MessageEngagementService', () => {
   let findOneMock: jest.Mock;
   let findMock: jest.Mock;
   let findParticipantsMock: jest.Mock;
+  let findOneParticipantMock: jest.Mock;
   let scheduleMock: jest.Mock;
 
   beforeEach(() => {
@@ -27,6 +28,7 @@ describe('MessageEngagementService', () => {
       .mockResolvedValue({ id: MESSAGE_ID, openCount: 2, clickCount: 0 });
     findMock = jest.fn().mockResolvedValue([]);
     findParticipantsMock = jest.fn().mockResolvedValue([]);
+    findOneParticipantMock = jest.fn().mockResolvedValue(null);
     updateMock = jest.fn().mockResolvedValue(undefined);
     scheduleMock = jest.fn().mockResolvedValue(undefined);
 
@@ -34,7 +36,7 @@ describe('MessageEngagementService', () => {
       executeInWorkspaceContext: (work: () => Promise<void>) => work(),
       getRepository: async (_workspaceId: string, entity: unknown) =>
         entity === MessageParticipantWorkspaceEntity
-          ? { find: findParticipantsMock }
+          ? { find: findParticipantsMock, findOne: findOneParticipantMock }
           : {
               findOne: findOneMock,
               find: findMock,
@@ -114,6 +116,48 @@ describe('MessageEngagementService', () => {
     expect(updateMock).not.toHaveBeenCalled();
     expect(scheduleMock).not.toHaveBeenCalled();
   });
+  describe('a token that names the recipient instead of the message', () => {
+    const PERSON_ID = '20202020-0000-0000-0000-0000000000p1';
+
+    const personArgs = {
+      workspaceId: WORKSPACE_ID,
+      campaignId: CAMPAIGN_ID,
+      personId: PERSON_ID,
+    };
+
+    it('resolves the campaign message through the recipient participant', async () => {
+      findOneParticipantMock.mockResolvedValue({ messageId: MESSAGE_ID });
+
+      await service.recordOpen(personArgs);
+
+      expect(findOneParticipantMock).toHaveBeenCalledWith({
+        where: {
+          messageCampaignId: CAMPAIGN_ID,
+          personId: PERSON_ID,
+          role: MessageParticipantRole.TO,
+        },
+        order: { createdAt: 'DESC' },
+      });
+      expect(updateMock).toHaveBeenCalledWith(SCOPE, { openCount: 3 });
+    });
+
+    // A recipient can open before the send loop has written the message row.
+    it('discards a hit that arrives before the message row exists', async () => {
+      await service.recordOpen(personArgs);
+
+      expect(findOneMock).not.toHaveBeenCalled();
+      expect(updateMock).not.toHaveBeenCalled();
+      expect(scheduleMock).not.toHaveBeenCalled();
+    });
+
+    it('prefers an explicit messageId and never looks up a participant', async () => {
+      await service.recordClick({ ...personArgs, messageId: MESSAGE_ID });
+
+      expect(findOneParticipantMock).not.toHaveBeenCalled();
+      expect(updateMock).toHaveBeenCalledWith(SCOPE, { clickCount: 1 });
+    });
+  });
+
   describe('recordReply', () => {
     const HEADER_MESSAGE_ID = '0100019abc-000000';
     const ANCESTOR_HEADER_MESSAGE_ID = '0100019xyz-000000';

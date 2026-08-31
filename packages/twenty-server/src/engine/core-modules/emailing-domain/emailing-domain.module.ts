@@ -47,6 +47,7 @@ import { provideWorkspaceScopedRepository } from 'src/engine/twenty-orm/workspac
     EmailingDomainDriverFactory,
     UnsubscribeTokenService,
     EngagementTrackingTokenService,
+    EngagementTrackingContentService,
     EmailGroupAccessService,
   ],
   providers: [

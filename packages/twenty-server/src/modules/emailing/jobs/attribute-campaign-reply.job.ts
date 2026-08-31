@@ -13,10 +13,15 @@ export class AttributeCampaignReplyJob {
 
   @Process(ATTRIBUTE_CAMPAIGN_REPLY_JOB)
   async handle(data: AttributeCampaignReplyJobData): Promise<void> {
-    await this.messageEngagementService.recordReply({
-      workspaceId: data.workspaceId,
-      replyHeaderMessageIds: data.replyHeaderMessageIds,
-      senderHandle: data.senderHandle,
-    });
+    // `replies` replaced a single-reply payload, so a job enqueued by the
+    // previous version and still sitting in the queue carries neither shape's
+    // full data. It is dropped rather than crashing the handler.
+    for (const reply of data.replies ?? []) {
+      await this.messageEngagementService.recordReply({
+        workspaceId: data.workspaceId,
+        replyHeaderMessageIds: reply.replyHeaderMessageIds,
+        senderHandle: reply.senderHandle,
+      });
+    }
   }
 }

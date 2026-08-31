@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
+import { WorkspaceIteratorModule } from 'src/database/commands/command-runners/workspace-iterator.module';
 import { BillingModule } from 'src/engine/core-modules/billing/billing.module';
 import { EmailingDomainModule } from 'src/engine/core-modules/emailing-domain/emailing-domain.module';
 import { EmailingDomainEntity } from 'src/engine/core-modules/emailing-domain/emailing-domain.entity';
@@ -15,6 +16,7 @@ import { WorkspaceManyOrAllFlatEntityMapsCacheModule } from 'src/engine/metadata
 import { provideWorkspaceScopedRepository } from 'src/engine/twenty-orm/workspace-scoped-repository/provide-workspace-scoped-repository';
 import { WorkspaceCacheModule } from 'src/engine/workspace-cache/workspace-cache.module';
 import { WorkspaceEventEmitterModule } from 'src/engine/workspace-event-emitter/workspace-event-emitter.module';
+import { BackfillCampaignRepliesCommand } from 'src/modules/emailing/commands/backfill-campaign-replies.command';
 import { EngagementTrackingController } from 'src/modules/emailing/controllers/engagement-tracking.controller';
 import { UnsubscribeController } from 'src/modules/emailing/controllers/unsubscribe.controller';
 import { EmailingSendResolver } from 'src/modules/emailing/resolvers/emailing-send.resolver';
@@ -45,6 +47,7 @@ import { SaveCampaignTool } from 'src/modules/emailing/tools/save-campaign-tool'
     WorkspaceEventEmitterModule,
     WorkspaceCacheModule,
     WorkspaceManyOrAllFlatEntityMapsCacheModule,
+    WorkspaceIteratorModule,
     TypeOrmModule.forFeature([
       MessageChannelEntity,
       EmailingDomainEntity,
@@ -54,6 +57,7 @@ import { SaveCampaignTool } from 'src/modules/emailing/tools/save-campaign-tool'
   ],
   controllers: [UnsubscribeController, EngagementTrackingController],
   providers: [
+    BackfillCampaignRepliesCommand,
     CampaignStatsRefreshSchedulerService,
     CampaignVariableService,
     EmailBillingService,

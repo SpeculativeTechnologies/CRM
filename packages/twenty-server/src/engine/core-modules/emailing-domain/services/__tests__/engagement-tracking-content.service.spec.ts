@@ -92,4 +92,42 @@ describe('EngagementTrackingContentService', () => {
 
     expect(result.text).toBe('Hello');
   });
+
+  describe('addToHtml', () => {
+    const HTML =
+      '<html><body><a href="https://example.com/offer">Offer</a></body></html>';
+
+    it('signs a recipient token when the message row does not exist yet', () => {
+      const result = service.addToHtml({
+        html: HTML,
+        workspaceId: 'workspace-1',
+        tracking: { campaignId: 'campaign-1', personId: 'person-1' },
+        trackingBaseUrl: TRACKING_BASE_URL,
+      });
+
+      expect(signMock).toHaveBeenCalledWith({
+        workspaceId: 'workspace-1',
+        campaignId: 'campaign-1',
+        personId: 'person-1',
+      });
+      expect(result).toContain(
+        `${TRACKING_BASE_URL}/emailing/track/open?t=token-open`,
+      );
+      expect(result).toContain(
+        `${TRACKING_BASE_URL}/emailing/track/click?t=token-click`,
+      );
+    });
+
+    it('returns the body untouched without a tracking hostname', () => {
+      const result = service.addToHtml({
+        html: HTML,
+        workspaceId: 'workspace-1',
+        tracking: { campaignId: 'campaign-1', personId: 'person-1' },
+        trackingBaseUrl: null,
+      });
+
+      expect(result).toBe(HTML);
+      expect(signMock).not.toHaveBeenCalled();
+    });
+  });
 });

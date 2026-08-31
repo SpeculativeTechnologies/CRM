@@ -52,6 +52,7 @@ export class EngagementTrackingController {
           workspaceId: payload.workspaceId,
           campaignId: payload.campaignId,
           messageId: payload.messageId,
+          personId: payload.personId,
         }),
       );
     }
@@ -91,6 +92,7 @@ export class EngagementTrackingController {
         workspaceId: payload.workspaceId,
         campaignId: payload.campaignId,
         messageId: payload.messageId,
+        personId: payload.personId,
       }),
     );
 
