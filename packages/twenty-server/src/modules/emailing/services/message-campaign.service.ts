@@ -25,6 +25,7 @@ import {
 } from 'src/engine/core-modules/emailing-domain/drivers/exceptions/emailing-domain-driver.exception';
 import { compileOutboundEmailContent } from 'src/engine/core-modules/email/utils/compile-outbound-email-content.util';
 import { EmailingDomainStatus } from 'src/engine/core-modules/emailing-domain/drivers/types/emailing-domain-status.type';
+import { UnsubscribeHostnameStatus } from 'src/engine/core-modules/emailing-domain/drivers/types/unsubscribe-hostname-status.type';
 import {
   EmailingDomainException,
   EmailingDomainExceptionCode,
@@ -720,6 +721,14 @@ export class MessageCampaignService {
         },
       );
     });
+
+    // The counts above come from the send loop's outcomes; the recount derives
+    // them from the message rows, which is also where engagement lands, so a
+    // mass campaign's counters normalise onto the same source as a regular one.
+    await this.campaignStatsRefreshSchedulerService.schedule({
+      workspaceId,
+      campaignId,
+    });
   }
 
   async deleteDraft({
@@ -756,6 +765,44 @@ export class MessageCampaignService {
         return true;
       },
     );
+  }
+
+  // Open and click tracking on the mass-compose path reuses the emailing
+  // domain's unsubscribe hostname, the only host the workspace has already
+  // pointed at this instance. A workspace that has not set one up sends
+  // untracked rather than not at all.
+  async resolveCampaignTrackingBaseUrl({
+    workspaceId,
+    fromAddress,
+  }: {
+    workspaceId: string;
+    fromAddress: string;
+  }): Promise<string | null> {
+    const fromDomain = getDomainFromEmail(fromAddress)?.toLowerCase();
+
+    if (!isNonEmptyString(fromDomain)) {
+      return null;
+    }
+
+    const emailingDomain = await this.emailingDomainRepository.findOne(
+      workspaceId,
+      { where: { domain: fromDomain, status: EmailingDomainStatus.VERIFIED } },
+    );
+
+    if (
+      !isDefined(emailingDomain) ||
+      emailingDomain.unsubscribeHostnameStatus !==
+        UnsubscribeHostnameStatus.ACTIVE ||
+      !isNonEmptyString(emailingDomain.unsubscribeHostname)
+    ) {
+      this.logger.warn(
+        `Sending campaign from ${fromAddress} without engagement tracking: no verified emailing domain with an active unsubscribe hostname`,
+      );
+
+      return null;
+    }
+
+    return `https://${emailingDomain.unsubscribeHostname}`;
   }
 
   private async findVerifiedEmailingDomainOrThrow(

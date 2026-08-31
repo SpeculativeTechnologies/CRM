@@ -13,7 +13,8 @@ import { MessageWorkspaceEntity } from 'src/modules/messaging/common/standard-ob
 type RecordEngagementArgs = {
   workspaceId: string;
   campaignId: string;
-  messageId: string;
+  messageId?: string;
+  personId?: string;
 };
 
 type RecordReplyArgs = {
@@ -149,10 +150,49 @@ export class MessageEngagementService {
     );
   }
 
+  // The mass-compose path signs its tokens before the campaign message row
+  // exists, so the recipient participant is what resolves the message at hit
+  // time. A hit that lands before the row is written is dropped rather than
+  // retried: the pixel and the redirect must answer regardless.
+  private async resolveCampaignMessageId({
+    workspaceId,
+    campaignId,
+    messageId,
+    personId,
+  }: RecordEngagementArgs): Promise<string | null> {
+    if (isDefined(messageId)) {
+      return messageId;
+    }
+
+    if (!isDefined(personId)) {
+      return null;
+    }
+
+    const participantRepository =
+      await this.globalWorkspaceOrmManager.getRepository(
+        workspaceId,
+        MessageParticipantWorkspaceEntity,
+        { shouldBypassPermissionChecks: true },
+      );
+
+    const participant = await participantRepository.findOne({
+      where: {
+        messageCampaignId: campaignId,
+        personId,
+        role: MessageParticipantRole.TO,
+      },
+      order: { createdAt: 'DESC' },
+    });
+
+    return participant?.messageId ?? null;
+  }
+
   private async record(
-    { workspaceId, campaignId, messageId }: RecordEngagementArgs,
+    args: RecordEngagementArgs,
     { isClick }: { isClick: boolean },
   ): Promise<void> {
+    const { workspaceId, campaignId } = args;
+
     await this.globalWorkspaceOrmManager.executeInWorkspaceContext(async () => {
       const messageRepository =
         await this.globalWorkspaceOrmManager.getRepository(
@@ -160,6 +200,16 @@ export class MessageEngagementService {
           MessageWorkspaceEntity,
           { shouldBypassPermissionChecks: true },
         );
+
+      const messageId = await this.resolveCampaignMessageId(args);
+
+      if (!isDefined(messageId)) {
+        this.logger.warn(
+          `Discarded tracking hit for campaign ${campaignId}: no message matches person ${args.personId}`,
+        );
+
+        return;
+      }
 
       const scope = { id: messageId, messageCampaignId: campaignId };
 

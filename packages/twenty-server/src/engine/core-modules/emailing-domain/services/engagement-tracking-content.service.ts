@@ -4,6 +4,7 @@ import { isNonEmptyString } from '@sniptt/guards';
 import { isDefined } from 'twenty-shared/utils';
 
 import { type EmailingDomainSendEmailInput } from 'src/engine/core-modules/emailing-domain/drivers/types/emailing-domain-send-email-input.type';
+import { type EngagementTrackingContext } from 'src/engine/core-modules/emailing-domain/drivers/types/engagement-tracking-context.type';
 import { EngagementTrackingTokenService } from 'src/engine/core-modules/emailing-domain/services/engagement-tracking-token.service';
 import { addEngagementTrackingToHtml } from 'src/engine/core-modules/emailing-domain/utils/add-engagement-tracking-to-html.util';
 import {
@@ -33,22 +34,50 @@ export class EngagementTrackingContentService {
       return email;
     }
 
+    return {
+      ...email,
+      html: this.addToHtml({
+        html: email.html,
+        workspaceId: email.workspaceId,
+        tracking,
+        trackingBaseUrl,
+      }),
+    };
+  }
+
+  addToHtml({
+    html,
+    workspaceId,
+    tracking,
+    trackingBaseUrl,
+  }: {
+    html: string;
+    workspaceId: string;
+    tracking: EngagementTrackingContext;
+    trackingBaseUrl: string | null;
+  }): string {
+    if (!isNonEmptyString(trackingBaseUrl) || !isNonEmptyString(html)) {
+      return html;
+    }
+
     const signTokenFor = (destinationUrl?: string): string =>
       this.engagementTrackingTokenService.sign({
-        workspaceId: email.workspaceId,
+        workspaceId,
         campaignId: tracking.campaignId,
-        messageId: tracking.messageId,
+        ...(isNonEmptyString(tracking.messageId)
+          ? { messageId: tracking.messageId }
+          : {}),
+        ...(isNonEmptyString(tracking.personId)
+          ? { personId: tracking.personId }
+          : {}),
         ...(isNonEmptyString(destinationUrl) ? { destinationUrl } : {}),
       });
 
-    return {
-      ...email,
-      html: addEngagementTrackingToHtml({
-        html: email.html,
-        openUrl: buildOpenTrackingUrl(trackingBaseUrl, signTokenFor()),
-        buildClickUrl: (destinationUrl) =>
-          buildClickTrackingUrl(trackingBaseUrl, signTokenFor(destinationUrl)),
-      }),
-    };
+    return addEngagementTrackingToHtml({
+      html,
+      openUrl: buildOpenTrackingUrl(trackingBaseUrl, signTokenFor()),
+      buildClickUrl: (destinationUrl) =>
+        buildClickTrackingUrl(trackingBaseUrl, signTokenFor(destinationUrl)),
+    });
   }
 }

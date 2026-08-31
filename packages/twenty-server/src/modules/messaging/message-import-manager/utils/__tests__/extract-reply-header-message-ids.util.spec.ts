@@ -10,7 +10,7 @@ describe('extractReplyHeaderMessageIds', () => {
     ).toEqual([]);
   });
 
-  it('offers the bare provider id alongside the full header id', () => {
+  it('offers the bracketed, unbracketed and bare provider forms of one id', () => {
     expect(
       extractReplyHeaderMessageIds([
         {
@@ -19,9 +19,19 @@ describe('extractReplyHeaderMessageIds', () => {
         },
       ]),
     ).toEqual([
+      '<0100019abc-000000@eu-west-1.amazonses.com>',
       '0100019abc-000000@eu-west-1.amazonses.com',
       '0100019abc-000000',
     ]);
+  });
+
+  // A connected-account send stores the header verbatim, brackets included.
+  it('matches a headerMessageId stored as the raw header value', () => {
+    expect(
+      extractReplyHeaderMessageIds([
+        { name: 'In-Reply-To', value: '<c0ffee@spec.tech>' },
+      ]),
+    ).toContain('<c0ffee@spec.tech>');
   });
 
   it('prefers the answered message over its ancestors', () => {
@@ -36,7 +46,7 @@ describe('extractReplyHeaderMessageIds', () => {
     expect(candidates.indexOf('newest@example.com')).toBeLessThan(
       candidates.indexOf('oldest@example.com'),
     );
-    expect(candidates[0]).toBe('newest@example.com');
+    expect(candidates[0]).toBe('<newest@example.com>');
   });
 
   it('reads References folded across lines and deduplicates', () => {
@@ -45,7 +55,14 @@ describe('extractReplyHeaderMessageIds', () => {
         { name: 'references', value: '<a@example.com>\r\n <b@example.com>' },
         { name: 'In-Reply-To', value: '<b@example.com>' },
       ]),
-    ).toEqual(['b@example.com', 'b', 'a@example.com', 'a']);
+    ).toEqual([
+      '<b@example.com>',
+      'b@example.com',
+      'b',
+      '<a@example.com>',
+      'a@example.com',
+      'a',
+    ]);
   });
 
   it('ignores empty and malformed header values', () => {
@@ -62,6 +79,6 @@ describe('extractReplyHeaderMessageIds', () => {
       extractReplyHeaderMessageIds([
         { name: 'In-Reply-To', value: '<log-1234>' },
       ]),
-    ).toEqual(['log-1234']);
+    ).toEqual(['<log-1234>', 'log-1234']);
   });
 });

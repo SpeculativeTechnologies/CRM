@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 
+import { EmailingDomainModule } from 'src/engine/core-modules/emailing-domain/emailing-domain.module';
 import { FileEmailAttachmentModule } from 'src/engine/core-modules/file/file-email-attachment/file-email-attachment.module';
 import { ToolModule } from 'src/engine/core-modules/tool/tool.module';
 import { ConnectedAccountMetadataModule } from 'src/engine/metadata-modules/connected-account/connected-account-metadata.module';
@@ -10,6 +11,7 @@ import { MessagingSendManagerModule } from 'src/modules/messaging/message-outbou
 
 @Module({
   imports: [
+    EmailingDomainModule,
     FileEmailAttachmentModule,
     ToolModule,
     MessagingSendManagerModule,

@@ -13,10 +13,12 @@ export class AttributeCampaignReplyJob {
 
   @Process(ATTRIBUTE_CAMPAIGN_REPLY_JOB)
   async handle(data: AttributeCampaignReplyJobData): Promise<void> {
-    await this.messageEngagementService.recordReply({
-      workspaceId: data.workspaceId,
-      replyHeaderMessageIds: data.replyHeaderMessageIds,
-      senderHandle: data.senderHandle,
-    });
+    for (const reply of data.replies) {
+      await this.messageEngagementService.recordReply({
+        workspaceId: data.workspaceId,
+        replyHeaderMessageIds: reply.replyHeaderMessageIds,
+        senderHandle: reply.senderHandle,
+      });
+    }
   }
 }

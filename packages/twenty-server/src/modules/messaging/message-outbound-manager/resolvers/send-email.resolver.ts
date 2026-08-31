@@ -11,6 +11,7 @@ import { PermissionFlagType } from 'twenty-shared/constants';
 
 import { MetadataResolver } from 'src/engine/api/graphql/graphql-config/decorators/metadata-resolver.decorator';
 import { AuthGraphqlApiExceptionFilter } from 'src/engine/core-modules/auth/filters/auth-graphql-api-exception.filter';
+import { EngagementTrackingContentService } from 'src/engine/core-modules/emailing-domain/services/engagement-tracking-content.service';
 import { FileEmailAttachmentService } from 'src/engine/core-modules/file/file-email-attachment/services/file-email-attachment.service';
 import { ResolverValidationPipe } from 'src/engine/core-modules/graphql/pipes/resolver-validation.pipe';
 import { WorkspaceEntity } from 'src/engine/core-modules/workspace/workspace.entity';
@@ -53,6 +54,7 @@ export class SendEmailResolver {
     private readonly fileEmailAttachmentService: FileEmailAttachmentService,
     private readonly sendEmailService: SendEmailService,
     private readonly messageCampaignService: MessageCampaignService,
+    private readonly engagementTrackingContentService: EngagementTrackingContentService,
   ) {}
 
   @Mutation(() => SaveMessageCampaignDraftOutputDTO)
@@ -108,6 +110,15 @@ export class SendEmailResolver {
       fromAddress: connectedAccount.handle,
     });
 
+    // Resolved once for the whole batch, and null when the workspace has no
+    // verified emailing domain with an active unsubscribe hostname to serve the
+    // tracking endpoints from. The send then goes out untracked.
+    const trackingBaseUrl =
+      await this.messageCampaignService.resolveCampaignTrackingBaseUrl({
+        workspaceId: workspace.id,
+        fromAddress: connectedAccount.handle,
+      });
+
     const outcomes: MassEmailCampaignSendOutcome[] = [];
     // Each outcome is recorded as soon as its email leaves, so an interrupted
     // batch still shows per-recipient tracking on the campaign.
@@ -144,13 +155,28 @@ export class SendEmailResolver {
           continue;
         }
 
-        const sendResult = await this.sendEmailService.sendComposedEmail(
-          composed.data,
-        );
-        const persistedMessage = composed.data.shouldPersistMessage
+        // The message row is written after the send on this path, so the token
+        // names the recipient and the tracking hit resolves the message from
+        // the campaign participant.
+        const composedWithTracking = {
+          ...composed.data,
+          sanitizedHtmlBody: this.engagementTrackingContentService.addToHtml({
+            html: composed.data.sanitizedHtmlBody,
+            workspaceId: workspace.id,
+            tracking: {
+              campaignId: input.campaignId,
+              personId: email.personId,
+            },
+            trackingBaseUrl,
+          }),
+        };
+
+        const sendResult =
+          await this.sendEmailService.sendComposedEmail(composedWithTracking);
+        const persistedMessage = composedWithTracking.shouldPersistMessage
           ? await this.sendEmailService.persistSentMessage(
               sendResult,
-              composed.data,
+              composedWithTracking,
               workspace.id,
             )
           : undefined;
