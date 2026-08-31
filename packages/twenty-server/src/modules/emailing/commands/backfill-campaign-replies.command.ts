@@ -3,7 +3,7 @@ import { Command } from 'nest-commander';
 import chunk from 'lodash.chunk';
 import { MessageParticipantRole } from 'twenty-shared/types';
 import { isDefined } from 'twenty-shared/utils';
-import { In, IsNull, Not } from 'typeorm';
+import { In, IsNull, MoreThan, Not } from 'typeorm';
 
 import { ProvisionedWorkspaceCommandRunner } from 'src/database/commands/command-runners/provisioned-workspace.command-runner';
 import { WorkspaceIteratorService } from 'src/database/commands/command-runners/workspace-iterator.service';
@@ -14,7 +14,15 @@ import { MessageCampaignStatisticsService } from 'src/modules/emailing/services/
 import { MessageParticipantWorkspaceEntity } from 'src/modules/messaging/common/standard-objects/message-participant.workspace-entity';
 import { MessageWorkspaceEntity } from 'src/modules/messaging/common/standard-objects/message.workspace-entity';
 
+const CAMPAIGN_MESSAGE_BATCH_SIZE = 500;
 const QUERY_CHUNK_SIZE = 500;
+
+type CampaignMessage = {
+  id: string;
+  messageCampaignId: string | null;
+  messageThreadId: string | null;
+  receivedAt: Date | null;
+};
 
 const normalizeHandle = (handle: string | null): string | null =>
   isDefined(handle) && handle.trim() !== ''
@@ -65,9 +73,9 @@ export class BackfillCampaignRepliesCommand extends ProvisionedWorkspaceCommandR
     }
   }
 
-  // Imported messages do not keep their headers, so a reply is identified the
-  // only way the stored rows allow: a later message in the campaign message's
-  // thread, sent by one of the people that message was addressed to.
+  // Batched on an ascending id cursor rather than read in one go, so a workspace
+  // with a long campaign history does not have to fit in memory. Stamping only
+  // removes rows from the filter, so the cursor never has to revisit a batch.
   private async backfillWorkspace(
     workspaceId: string,
     isDryRun: boolean,
@@ -78,17 +86,68 @@ export class BackfillCampaignRepliesCommand extends ProvisionedWorkspaceCommandR
         MessageWorkspaceEntity,
         { shouldBypassPermissionChecks: true },
       );
-    const campaignMessages = await messageRepository.find({
-      where: {
-        messageCampaignId: Not(IsNull()),
-        repliedAt: IsNull(),
-        messageThreadId: Not(IsNull()),
-      },
-    });
 
-    if (campaignMessages.length === 0) {
-      return new Set();
+    const stampedCampaignIds = new Set<string>();
+    let cursor: string | null = null;
+
+    for (;;) {
+      const campaignMessages: CampaignMessage[] = await messageRepository.find({
+        where: {
+          messageCampaignId: Not(IsNull()),
+          repliedAt: IsNull(),
+          messageThreadId: Not(IsNull()),
+          ...(cursor === null ? {} : { id: MoreThan(cursor) }),
+        },
+        select: {
+          id: true,
+          messageCampaignId: true,
+          messageThreadId: true,
+          receivedAt: true,
+        },
+        order: { id: 'ASC' },
+        take: CAMPAIGN_MESSAGE_BATCH_SIZE,
+      });
+
+      if (campaignMessages.length === 0) {
+        return stampedCampaignIds;
+      }
+
+      cursor = campaignMessages[campaignMessages.length - 1].id;
+
+      const batchCampaignIds = await this.backfillBatch({
+        workspaceId,
+        campaignMessages,
+        isDryRun,
+      });
+
+      for (const campaignId of batchCampaignIds) {
+        stampedCampaignIds.add(campaignId);
+      }
     }
+  }
+
+  // Imported messages do not keep their headers, so a reply is identified the
+  // only way the stored rows allow: a later message in the campaign message
+  // thread, sent by one of the people that message was addressed to. Without
+  // headers an out-of-office is indistinguishable from a written answer, so
+  // unlike the live attribution path this does count auto-replies.
+  private async backfillBatch({
+    workspaceId,
+    campaignMessages,
+    isDryRun,
+  }: {
+    workspaceId: string;
+    campaignMessages: CampaignMessage[];
+    isDryRun: boolean;
+  }): Promise<Set<string>> {
+    const messageRepository =
+      await this.globalWorkspaceOrmManager.getRepository(
+        workspaceId,
+        MessageWorkspaceEntity,
+        { shouldBypassPermissionChecks: true },
+      );
+
+    const stampedCampaignIds = new Set<string>();
 
     const recipientHandlesByMessageId = await this.loadHandlesByMessageId({
       workspaceId,
@@ -110,13 +169,14 @@ export class BackfillCampaignRepliesCommand extends ProvisionedWorkspaceCommandR
               messageThreadId: In(threadIdChunk),
               messageCampaignId: IsNull(),
             },
+            select: { id: true, messageThreadId: true, receivedAt: true },
           }),
         ),
       )
     ).flat();
 
     if (threadMessages.length === 0) {
-      return new Set();
+      return stampedCampaignIds;
     }
 
     const senderHandlesByMessageId = await this.loadHandlesByMessageId({
@@ -125,15 +185,18 @@ export class BackfillCampaignRepliesCommand extends ProvisionedWorkspaceCommandR
       role: MessageParticipantRole.FROM,
     });
 
-    const stampedCampaignIds = new Set<string>();
-
     for (const campaignMessage of campaignMessages) {
       const recipientHandles = recipientHandlesByMessageId.get(
         campaignMessage.id,
       );
       const sentAt = campaignMessage.receivedAt;
+      const campaignId = campaignMessage.messageCampaignId;
 
-      if (!isDefined(recipientHandles) || !isDefined(sentAt)) {
+      if (
+        !isDefined(recipientHandles) ||
+        !isDefined(sentAt) ||
+        !isDefined(campaignId)
+      ) {
         continue;
       }
 
@@ -151,18 +214,15 @@ export class BackfillCampaignRepliesCommand extends ProvisionedWorkspaceCommandR
         .filter(isDefined)
         .sort((first, second) => first.getTime() - second.getTime())[0];
 
-      if (
-        !isDefined(repliedAt) ||
-        !isDefined(campaignMessage.messageCampaignId)
-      ) {
+      if (!isDefined(repliedAt)) {
         continue;
       }
 
       this.logger.log(
-        `${isDryRun ? 'Would stamp' : 'Stamping'} reply on message ${campaignMessage.id} of campaign ${campaignMessage.messageCampaignId}`,
+        `${isDryRun ? 'Would stamp' : 'Stamping'} reply on message ${campaignMessage.id} of campaign ${campaignId}`,
       );
 
-      stampedCampaignIds.add(campaignMessage.messageCampaignId);
+      stampedCampaignIds.add(campaignId);
 
       if (!isDryRun) {
         await messageRepository.update(
@@ -196,6 +256,7 @@ export class BackfillCampaignRepliesCommand extends ProvisionedWorkspaceCommandR
         chunk(messageIds, QUERY_CHUNK_SIZE).map((messageIdChunk) =>
           participantRepository.find({
             where: { messageId: In(messageIdChunk), role },
+            select: { messageId: true, handle: true },
           }),
         ),
       )
