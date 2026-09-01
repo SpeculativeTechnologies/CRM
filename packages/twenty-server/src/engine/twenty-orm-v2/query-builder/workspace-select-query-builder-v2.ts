@@ -71,6 +71,11 @@ export type QueryBuilderV2Context = {
   formatResult: <T>(records: unknown) => T;
 };
 
+type RelationFilterFactory = (
+  queryBuilder: WorkspaceSelectQueryBuilderV2,
+  targetAlias: string,
+) => void;
+
 export class WorkspaceSelectQueryBuilderV2 implements WhereExpressionLike {
   readonly alias: string;
   readonly tableShape: WorkspaceTableShape;
@@ -192,6 +197,34 @@ export class WorkspaceSelectQueryBuilderV2 implements WhereExpressionLike {
     parameters?: Record<string, unknown>,
   ): this {
     return this.appendWhere('or', condition, parameters);
+  }
+
+  addRelationFilter(
+    relationFieldName: string,
+    applyFilter: RelationFilterFactory,
+    isFirst: boolean,
+  ): this {
+    const relationShape =
+      this.tableShape.relationShapeByFieldName[relationFieldName];
+
+    if (!isDefined(relationShape)) {
+      throw new TwentyOrmV2Exception(
+        `Relation "${relationFieldName}" does not exist on "${this.tableShape.nameSingular}"`,
+        TwentyOrmV2ExceptionCode.UNKNOWN_RELATION,
+      );
+    }
+
+    const parameters: Record<string, unknown> = {};
+    const condition = this.buildRelationExistsCondition({
+      relationFieldName,
+      relationShape,
+      applyFilter,
+      parameters,
+    });
+
+    return isFirst
+      ? this.where(condition, parameters)
+      : this.andWhere(condition, parameters);
   }
 
   setParameters(parameters: Record<string, unknown>): this {
@@ -865,7 +898,7 @@ export class WorkspaceSelectQueryBuilderV2 implements WhereExpressionLike {
           this.buildRelationExistsCondition({
             relationFieldName: columnName,
             relationShape,
-            where: value,
+            applyFilter: (queryBuilder) => queryBuilder.where(value),
             parameters,
           }),
         );
@@ -925,12 +958,12 @@ export class WorkspaceSelectQueryBuilderV2 implements WhereExpressionLike {
   private buildRelationExistsCondition({
     relationFieldName,
     relationShape,
-    where,
+    applyFilter,
     parameters,
   }: {
     relationFieldName: string;
     relationShape: WorkspaceTableShape['relationShapeByFieldName'][string];
-    where: ObjectWhereLike;
+    applyFilter: RelationFilterFactory;
     parameters: Record<string, unknown>;
   }): string {
     const targetTableShape = this.context.tableShapeByObjectMetadataId(
@@ -960,7 +993,7 @@ export class WorkspaceSelectQueryBuilderV2 implements WhereExpressionLike {
       tableShape: targetTableShape,
     });
 
-    nestedBuilder.where(where);
+    applyFilter(nestedBuilder, alias);
 
     Object.assign(parameters, nestedBuilder.parameters);
 

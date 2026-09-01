@@ -61,6 +61,23 @@ const isExistsCapableQueryBuilder = (
   );
 };
 
+type RelationFilterCapableWhereExpression = WhereExpressionBuilder & {
+  addRelationFilter(
+    relationFieldName: string,
+    applyFilter: (
+      queryBuilder: RecordQueryBuilder,
+      targetAlias: string,
+    ) => void,
+    isFirst: boolean,
+  ): unknown;
+};
+
+const isRelationFilterCapableWhereExpression = (
+  queryBuilder: WhereExpressionBuilder,
+): queryBuilder is RelationFilterCapableWhereExpression =>
+  typeof (queryBuilder as Partial<RelationFilterCapableWhereExpression>)
+    .addRelationFilter === 'function';
+
 export class GraphqlQueryFilterFieldParser {
   private flatObjectMetadata: FlatObjectMetadata;
   private flatFieldMetadataMaps: FlatEntityMaps<FlatFieldMetadata>;
@@ -277,18 +294,6 @@ export class GraphqlQueryFilterFieldParser {
     filterValue: Partial<ObjectRecordFilter>,
     isFirst: boolean,
   ): void {
-    // The EXISTS subquery needs the full TypeORM builder (subQuery, alias
-    // metadata, permission context); the ORM v2 read builder only implements
-    // the structural RecordQueryBuilder slice, so fail loudly instead of
-    // emitting a wrong query if it ever reaches this filter.
-    if (!isExistsCapableQueryBuilder(outerQueryBuilder)) {
-      throw new GraphqlQueryRunnerException(
-        `One-to-many relation filter on "${fieldMetadata.name}" is not supported on this query path`,
-        GraphqlQueryRunnerExceptionCode.INVALID_QUERY_INPUT,
-        { userFriendlyMessage: msg`Relation filter is not supported here` },
-      );
-    }
-
     if (!isDefined(fieldMetadata.relationTargetFieldMetadataId)) {
       throw new GraphqlQueryRunnerException(
         `Relation filter on "${fieldMetadata.name}" is missing a target field`,
@@ -319,6 +324,37 @@ export class GraphqlQueryFilterFieldParser {
       );
     }
 
+    const childConditionParser = new GraphqlQueryFilterConditionParser(
+      targetObjectMetadata,
+      this.flatFieldMetadataMaps,
+      this.flatObjectMetadataMaps,
+      this.depth + 1,
+    );
+
+    if (isRelationFilterCapableWhereExpression(queryBuilder)) {
+      queryBuilder.addRelationFilter(
+        fieldMetadata.name,
+        (relatedQueryBuilder, targetAlias) => {
+          childConditionParser.parse(
+            relatedQueryBuilder,
+            targetAlias,
+            filterValue,
+          );
+        },
+        isFirst,
+      );
+
+      return;
+    }
+
+    if (!isExistsCapableQueryBuilder(outerQueryBuilder)) {
+      throw new GraphqlQueryRunnerException(
+        `One-to-many relation filter on "${fieldMetadata.name}" is not supported on this query path`,
+        GraphqlQueryRunnerExceptionCode.INVALID_QUERY_INPUT,
+        { userFriendlyMessage: msg`Relation filter is not supported here` },
+      );
+    }
+
     const parentEntityMetadata =
       outerQueryBuilder.expressionMap.findAliasByName(parentAlias).metadata;
     const typeormRelationMetadata =
@@ -340,13 +376,6 @@ export class GraphqlQueryFilterFieldParser {
       .subQuery()
       .select('1')
       .from(typeormRelationMetadata.inverseEntityMetadata.target, targetAlias);
-
-    const childConditionParser = new GraphqlQueryFilterConditionParser(
-      targetObjectMetadata,
-      this.flatFieldMetadataMaps,
-      this.flatObjectMetadataMaps,
-      this.depth + 1,
-    );
 
     childConditionParser.applyFilterEntriesToWhereBrackets(
       subQuery,
