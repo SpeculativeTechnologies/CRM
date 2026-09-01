@@ -1,6 +1,5 @@
 import { isNonEmptyString } from '@sniptt/guards';
 import { MessageParticipantRole } from 'twenty-shared/types';
-import { isDefined } from 'twenty-shared/utils';
 
 import { type CampaignReplyAttribution } from 'src/engine/core-modules/emailing-domain/types/attribute-campaign-reply-job-data.type';
 import { MessageDirection } from 'src/modules/messaging/common/enums/message-direction.enum';
@@ -47,7 +46,7 @@ export const buildCampaignReplyAttributions = (
         replyHeaderMessageIds,
         senderHandle,
         ...(isNonEmptyString(messageThreadId) ? { messageThreadId } : {}),
-        ...(isDefined(message.receivedAt)
+        ...(message.receivedAt instanceof Date
           ? { receivedAt: message.receivedAt.toISOString() }
           : {}),
       },
