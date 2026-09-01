@@ -16223,6 +16223,7 @@ msgstr "해제하고 이 서버로 이전"
 #. js-lingui-id: HpK/8d
 #: src/modules/error-handler/components/AppRootErrorFallback.tsx
 #: src/modules/error-handler/components/internal/AppErrorDisplay.tsx
+#: src/modules/information-banner/components/session-expired/InformationBannerSessionExpired.tsx
 #: src/modules/settings/domains/components/SettingPublicDomain.tsx
 #: src/modules/settings/domains/components/SettingsCustomDomain.tsx
 msgid "Reload"
@@ -18151,6 +18152,11 @@ msgstr "사이드바 항목"
 #: src/modules/auth/sign-in-up/components/internal/SignInUpWithCredentials.tsx
 msgid "Sign in"
 msgstr "로그인"
+
+#. js-lingui-id: pa0Bbi
+#: src/modules/information-banner/components/session-expired/InformationBannerSessionExpired.tsx
+msgid "Sign in again"
+msgstr ""
 
 #. js-lingui-id: Vt3mQ2
 #: src/utils/title-utils.ts
@@ -22752,6 +22758,11 @@ msgstr "플랜이 즉시 Pro로 전환되며 체험판은 계속됩니다. 체�
 #: src/pages/settings/admin-panel/SettingsAdminNewAiProvider.tsx
 msgid "Your provider API key for authentication"
 msgstr "인증을 위한 공급자 API 키"
+
+#. js-lingui-id: gIWV6H
+#: src/modules/information-banner/components/session-expired/InformationBannerSessionExpired.tsx
+msgid "Your session expired. Sign in again in a new tab to keep this page and any unsaved changes."
+msgstr ""
 
 #. js-lingui-id: 319YPG
 #: src/pages/settings/enterprise/SettingsEnterprise.tsx

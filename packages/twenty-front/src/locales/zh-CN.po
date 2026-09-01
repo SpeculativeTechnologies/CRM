@@ -16200,6 +16200,7 @@ msgstr "释放并转移到此服务器"
 #. js-lingui-id: HpK/8d
 #: src/modules/error-handler/components/AppRootErrorFallback.tsx
 #: src/modules/error-handler/components/internal/AppErrorDisplay.tsx
+#: src/modules/information-banner/components/session-expired/InformationBannerSessionExpired.tsx
 #: src/modules/settings/domains/components/SettingPublicDomain.tsx
 #: src/modules/settings/domains/components/SettingsCustomDomain.tsx
 msgid "Reload"
@@ -18128,6 +18129,11 @@ msgstr "侧边栏项"
 #: src/modules/auth/sign-in-up/components/internal/SignInUpWithCredentials.tsx
 msgid "Sign in"
 msgstr "登录"
+
+#. js-lingui-id: pa0Bbi
+#: src/modules/information-banner/components/session-expired/InformationBannerSessionExpired.tsx
+msgid "Sign in again"
+msgstr ""
 
 #. js-lingui-id: Vt3mQ2
 #: src/utils/title-utils.ts
@@ -22699,6 +22705,11 @@ msgstr "您的方案将立即切换为 Pro，试用将继续。试用结束后�
 #: src/pages/settings/admin-panel/SettingsAdminNewAiProvider.tsx
 msgid "Your provider API key for authentication"
 msgstr "用于身份验证的提供商 API 密钥"
+
+#. js-lingui-id: gIWV6H
+#: src/modules/information-banner/components/session-expired/InformationBannerSessionExpired.tsx
+msgid "Your session expired. Sign in again in a new tab to keep this page and any unsaved changes."
+msgstr ""
 
 #. js-lingui-id: 319YPG
 #: src/pages/settings/enterprise/SettingsEnterprise.tsx

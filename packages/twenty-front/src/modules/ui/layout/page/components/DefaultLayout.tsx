@@ -4,6 +4,7 @@ import { AppPageErrorFallback } from '@/error-handler/components/AppPageErrorFal
 import { FileUploadProvider } from '@/file-upload/components/FileUploadProvider';
 import { InformationBannerEnvironment } from '@/information-banner/components/environment/InformationBannerEnvironment';
 import { InformationBannerIsImpersonating } from '@/information-banner/components/impersonate/InformationBannerIsImpersonating';
+import { InformationBannerSessionExpired } from '@/information-banner/components/session-expired/InformationBannerSessionExpired';
 import { KeyboardShortcutMenu } from '@/keyboard-shortcut-menu/components/KeyboardShortcutMenu';
 import { LayoutCustomizationBar } from '@/layout-customization/components/LayoutCustomizationBar';
 import { AppNavigationDrawer } from '@/navigation/components/AppNavigationDrawer';
@@ -84,6 +85,7 @@ export const DefaultLayout = () => {
           <AppErrorBoundary FallbackComponent={AppFullScreenErrorFallback}>
             <InformationBannerEnvironment />
             <InformationBannerIsImpersonating />
+            <InformationBannerSessionExpired />
             <LayoutCustomizationBar />
             <StyledPageContainer>
               <PageDragDropProvider>

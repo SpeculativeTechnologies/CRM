@@ -3,6 +3,7 @@ import { useMemo, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import { ApolloFactory, type Options } from '@/apollo/services/apollo.factory';
+import { isAuthProxySessionExpiredState } from '@/apollo/states/isAuthProxySessionExpiredState';
 import { reloadOnceForAuthProxyRedirect } from '@/apollo/utils/reloadOnceForAuthProxyRedirect';
 import { ONGOING_USER_CREATION_PATHS } from '@/auth/constants/OngoingUserCreationPaths';
 import { currentUserState } from '@/auth/states/currentUserState';
@@ -38,8 +39,15 @@ export const useApolloFactory = (options: Partial<Options> = {}) => {
   const [currentWorkspaceMember, setCurrentWorkspaceMember] = useAtomState(
     currentWorkspaceMemberState,
   );
-  const setCurrentUser = useSetAtomState(currentUserState);
+  const [currentUser, setCurrentUser] = useAtomState(currentUserState);
   const setCurrentUserWorkspace = useSetAtomState(currentUserWorkspaceState);
+  const setIsAuthProxySessionExpired = useSetAtomState(
+    isAuthProxySessionExpiredState,
+  );
+
+  // oxlint-disable-next-line twenty/no-state-useref
+  const currentUserRef = useRef(currentUser);
+  currentUserRef.current = currentUser;
 
   const setReturnToPath = useSetAtomState(returnToPathState);
   const location = useLocation();
@@ -108,7 +116,18 @@ export const useApolloFactory = (options: Partial<Options> = {}) => {
           },
         });
       },
-      onAuthProxyRedirect: reloadOnceForAuthProxyRedirect,
+      // Reloading is right only before the user has anything to lose. Once they
+      // are signed in and working, the reload discards the open view, the scroll
+      // position and every unsaved edit, so the banner takes over and lets them
+      // re-authenticate in another tab instead.
+      onAuthProxyRedirect: () => {
+        if (isDefined(currentUserRef.current)) {
+          setIsAuthProxySessionExpired(true);
+          return;
+        }
+
+        reloadOnceForAuthProxyRedirect();
+      },
       extraLinks: [],
       isDebugMode: process.env.IS_DEBUG_MODE === 'true',
       ...options,
@@ -123,6 +142,7 @@ export const useApolloFactory = (options: Partial<Options> = {}) => {
     setCurrentWorkspace,
     setReturnToPath,
     enqueueErrorSnackBar,
+    setIsAuthProxySessionExpired,
   ]);
 
   useUpdateEffect(() => {

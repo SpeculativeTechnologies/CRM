@@ -38,6 +38,9 @@ export const InformationBanner = ({
   buttonIcon,
   buttonOnClick,
   isButtonDisabled = false,
+  secondaryButtonTitle,
+  secondaryButtonIcon,
+  secondaryButtonOnClick,
   onClose,
   componentInstanceId,
 }: {
@@ -48,6 +51,9 @@ export const InformationBanner = ({
   buttonIcon?: IconComponent;
   buttonOnClick?: () => void;
   isButtonDisabled?: boolean;
+  secondaryButtonTitle?: string;
+  secondaryButtonIcon?: IconComponent;
+  secondaryButtonOnClick?: () => void;
   onClose?: () => void;
   componentInstanceId: string;
 }) => {
@@ -79,6 +85,17 @@ export const InformationBanner = ({
                 inverted={isPrimary}
                 onClick={buttonOnClick}
                 disabled={isButtonDisabled}
+              />
+            )}
+            {secondaryButtonTitle && secondaryButtonOnClick && (
+              <Button
+                variant="secondary"
+                accent={buttonAccent}
+                title={secondaryButtonTitle}
+                Icon={secondaryButtonIcon}
+                size="small"
+                inverted={isPrimary}
+                onClick={secondaryButtonOnClick}
               />
             )}
           </StyledContent>
