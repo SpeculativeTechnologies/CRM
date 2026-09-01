@@ -62,18 +62,67 @@ Every PR should state:
 - The rollback method.
 - Screenshots for visible UI changes.
 
-Review is mandatory by protocol even if GitHub has not yet been configured to
-enforce an approval count. Changes in these areas require the production
-owner's review:
-
-- `deploy/**`
-- `packages/twenty-server/src/database/**`
-- authentication, authorization, roles, permissions, and secrets
-- email/calendar integrations and background jobs
+Which pull requests need the production owner's review is decided by
+[CODEOWNERS](../.github/CODEOWNERS) and described in *What needs the production
+owner* below. Everything outside those paths may be reviewed by any developer
+with write access, or merged on the author's own judgement.
 
 Entity changes must include their generated instance command. Do not edit the
 `up` or `down` of an already-merged command. Regenerate frontend GraphQL types
 in the same PR as a GraphQL schema change.
+
+## What needs the production owner
+
+Promotion is delegated. Any developer with write access can merge to `main`,
+deploy to staging, and approve and run a production deploy. That is safe for
+most changes because of one property, and the exceptions are the changes that
+lack it:
+
+> **Does redeploying the previous SHA undo this?**
+
+Deploys are pinned to a full commit SHA, the commit must already be on `main`,
+and staging must have exercised it. Rollback is another deploy of a known-good
+SHA. So a change whose worst case is *the application misbehaves until someone
+redeploys* needs no special gate. Frontend work, styling, copy, views, and most
+server logic are in this category. Ship them.
+
+The changes that outlive a rollback are these, and they carry `@bzreinhardt` in
+CODEOWNERS so that GitHub requests the review without anyone remembering to:
+
+| Area | Why a rollback does not fix it |
+|---|---|
+| `packages/twenty-server/src/database/**` | A migration that has run stays run. `down` restores schema, not deleted rows. |
+| `engine/core-modules/upgrade/**` | Changes which commands run, and in what order, on every box. |
+| auth, permissions, guards | Bad state persists in issued sessions and tokens after the code is gone. |
+| messaging, calendar | Reaches real mailboxes and calendars. Sent mail cannot be unsent. |
+| `deploy/**`, `twenty-config/**`, promotion workflows | Configuration lives outside the pinned image, so rolling the image back leaves it in place. |
+| Anything paired with a `crm-ops` change | Same reason: the other half of the change is not in this repository. |
+
+`.github/workflows/ci-fork-release-risk.yaml` labels each pull request against
+this table and fails when an irreversible change arrives undocumented. It
+enforces two things a reviewer would otherwise have to catch by eye:
+
+- A command whose `up` path drops schema or writes data must have a `##
+  Rollback` section in the pull-request description. "Redeploy the previous
+  SHA" is not a rollback for a migration, so say what actually restores the
+  data: a backup restore, a compensating command, or an accepted loss.
+- A command registered under a `TWENTY_NEXT_VERSIONS` version ships **inert**.
+  The upgrade sequence only runs the previous and current versions, so a
+  command decorated `2.36.0` while the app is on `2.35.0` is skipped by every
+  deploy and has to be run by name on each box afterwards. It works in the
+  author's local testing because they invoke it directly. This shipped
+  unnoticed three times on 2026-08-12. The description must state the manual
+  run, including its `--dry-run` step.
+
+The check reports on every pull request, so a green run on an ordinary change
+means the classifier looked and found nothing, not that it failed to run. An
+upstream sync is classified and labelled but not blocked: those migrations are
+Twenty's own and arrive with their version bump.
+
+None of this constrains what someone with an interactive shell on the box can
+do. The gate is on the promotion workflow, not on the machine. Server access is
+a separate grant, and the controls there are the nightly backups, the audit
+trail, and the runbooks in `crm-ops`.
 
 ## Promotion protocol
 
@@ -113,12 +162,14 @@ must be handled.
 4. Exercise the changed behavior and the normal CRM smoke-test paths at
    `https://crm-staging.spec.tech`. Record an affirmative pass or fail; the
    absence of alerts alone is not a successful smoke test.
-5. If staging passes and the production owner is available to monitor the
-   release, run **Deploy to production** for the exact SHA staging ran. The
-   workflow verifies that the commit is on `main` and passed through staging,
-   then waits for the production approval gate before deploying. If the
-   release window ends before validation is complete, promote it during the
-   next supported window instead.
+5. If staging passes, run **Deploy to production** for the exact SHA staging
+   ran. The workflow verifies that the commit is on `main` and passed through
+   staging, then waits for the production approval gate. Anyone on the
+   `production` environment's reviewer list can approve it, including their own
+   run; the gate is a deliberate pause and an audit record, not a second
+   opinion. Whoever approves it watches the release. If the release window ends
+   before validation is complete, promote it during the next supported window
+   instead.
 6. If staging fails, do not deploy to production. Revert or fix the problem in
    another reviewed PR, then deploy and test the new `main` SHA on staging.
 7. Follow the private

@@ -7,3 +7,39 @@
 /.claude/              @charlesBochet @FelixMalfait @Weiko @prastoin @bosiraphael @etiennejouan @ijreilly @martmull @thomtrp
 /.mcp.json             @charlesBochet @FelixMalfait @Weiko @prastoin @bosiraphael @etiennejouan @ijreilly @martmull @thomtrp
 /CLAUDE.md             @charlesBochet @FelixMalfait @Weiko @prastoin @bosiraphael @etiennejouan @ijreilly @martmull @thomtrp
+
+# ---------------------------------------------------------------------------
+# Fork ownership. Keep this block last: CODEOWNERS resolves by last match, and
+# the entries above name upstream Twenty maintainers who are not collaborators
+# here. Append to it rather than editing it in place, so an upstream sync
+# conflicts at the end of the file or not at all.
+#
+# These are the paths a rollback does not undo. Everything else deploys and
+# reverts on its own, so it does not need the production owner in the loop.
+# See deploy/TEAM-WORKFLOW.md, "What needs the production owner".
+# ---------------------------------------------------------------------------
+
+# Migrations and upgrade commands: once one has run against production, the
+# previous image does not un-run it.
+/packages/twenty-server/src/database/                             @bzreinhardt
+/packages/twenty-server/src/engine/core-modules/upgrade/          @bzreinhardt
+
+# Access control: bad state outlives the rollback in sessions and tokens.
+/packages/twenty-server/src/engine/core-modules/auth/             @bzreinhardt
+/packages/twenty-server/src/engine/metadata-modules/permissions/  @bzreinhardt
+/packages/twenty-server/src/engine/guards/                        @bzreinhardt
+
+# Reaches the outside world. Mail that has been sent cannot be unsent.
+/packages/twenty-server/src/modules/messaging/                    @bzreinhardt
+/packages/twenty-server/src/modules/calendar/                     @bzreinhardt
+
+# Configuration and promotion machinery, which live outside the pinned image.
+/deploy/                                                          @bzreinhardt
+/packages/twenty-server/src/engine/core-modules/twenty-config/    @bzreinhardt
+/.github/CODEOWNERS                                               @bzreinhardt
+/.github/scripts/release-risk.mjs                                 @bzreinhardt
+/.github/workflows/ci-fork-release-risk.yaml                      @bzreinhardt
+/.github/workflows/deploy-production.yml                          @bzreinhardt
+/.github/workflows/deploy-staging.yml                             @bzreinhardt
+/.github/workflows/cd-deploy-cloud.yaml                           @bzreinhardt
+/.github/actions/deploy-cloud-box/                                @bzreinhardt
