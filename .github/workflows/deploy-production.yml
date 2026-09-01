@@ -146,3 +146,28 @@ jobs:
             -f state=success \
             -f description="deployed and verified on cloud production" >/dev/null
           echo "Deployment ${id} recorded for ${SHA}"
+
+      # So that promotion can be delegated without the production owner having
+      # to be the approval gate to hear about it. Silently does nothing until
+      # SLACK_DEPLOY_WEBHOOK is set, and never fails the deploy: a release that
+      # worked must not be reported as broken because a webhook was down.
+      - name: Announce the release
+        if: always()
+        continue-on-error: true
+        env:
+          WEBHOOK: ${{ secrets.SLACK_DEPLOY_WEBHOOK }}
+          REPO: ${{ github.repository }}
+          SHA: ${{ steps.resolve.outputs.sha }}
+          ACTOR: ${{ github.actor }}
+          OUTCOME: ${{ job.status }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          if [ -z "${WEBHOOK:-}" ]; then
+            echo "SLACK_DEPLOY_WEBHOOK is not set; skipping the announcement."
+            exit 0
+          fi
+          text="$(printf 'Production deploy %s: %s at %s, run by %s\n%s' \
+            "$OUTCOME" "$REPO" "${SHA:0:7}" "$ACTOR" "$RUN_URL")"
+          jq -nc --arg text "$text" '{text: $text}' \
+            | curl -sS -X POST -H 'Content-Type: application/json' --data @- "$WEBHOOK"

@@ -1,0 +1,57 @@
+name: CI Fork Release Risk
+
+# Sorts a pull request by whether a rollback would undo it, so that review
+# effort lands on the changes where it matters. Runs on every pull request
+# rather than on a path filter, because a required status check that never
+# reports blocks the merge.
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, edited]
+    branches:
+      - main
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: ci-fork-release-risk-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  release-risk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          fetch-depth: 0
+
+      - name: Classify the change
+        id: classify
+        env:
+          PR_BODY: ${{ github.event.pull_request.body }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          ADVISORY_ONLY: ${{ startsWith(github.head_ref, 'sync/upstream-') || contains(github.event.pull_request.labels.*.name, 'upstream-sync') }}
+        run: node .github/scripts/release-risk.mjs "$BASE_SHA" "$HEAD_SHA"
+
+      # Labels are how this shows up in the pull-request list, so they are
+      # applied whether or not the classification step failed.
+      - name: Label the pull request
+        if: always() && steps.classify.outputs.labels != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          NUMBER: ${{ github.event.pull_request.number }}
+          LABELS: ${{ steps.classify.outputs.labels }}
+        run: |
+          set -euo pipefail
+          IFS=',' read -ra names <<<"$LABELS"
+          for name in "${names[@]}"; do
+            gh label create "$name" --repo "$REPO" --color B60205 \
+              --description "Applied by CI Fork Release Risk" 2>/dev/null || true
+          done
+          gh pr edit "$NUMBER" --repo "$REPO" --add-label "$LABELS"
