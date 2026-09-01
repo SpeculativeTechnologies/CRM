@@ -4,6 +4,7 @@ import { type DateAggregateOperations } from '@/object-record/record-table/const
 import { RecordTableColumnAggregateFooterDropdownSubmenuContent } from '@/object-record/record-table/record-table-footer/components/RecordTableColumnAggregateDropdownSubmenuContent';
 import { RecordTableColumnAggregateFooterDropdownContext } from '@/object-record/record-table/record-table-footer/components/RecordTableColumnAggregateFooterDropdownContext';
 import { RecordTableColumnAggregateFooterMenuContent } from '@/object-record/record-table/record-table-footer/components/RecordTableColumnAggregateFooterMenuContent';
+import { RecordTableColumnAggregateFooterSelectValueMenuContent } from '@/object-record/record-table/record-table-footer/components/RecordTableColumnAggregateFooterSelectValueMenuContent';
 import { COUNT_AGGREGATE_OPERATION_OPTIONS } from '@/object-record/record-table/record-table-footer/constants/countAggregateOperationOptions';
 import { DATE_AGGREGATE_OPERATION_OPTIONS } from '@/object-record/record-table/record-table-footer/constants/dateAggregateOperationOptions';
 import { PERCENT_AGGREGATE_OPERATION_OPTIONS } from '@/object-record/record-table/record-table-footer/constants/percentAggregateOperationOptions';
@@ -11,6 +12,9 @@ import { STANDARD_AGGREGATE_OPERATION_OPTIONS } from '@/object-record/record-tab
 import { getAvailableAggregateOperationsForFieldMetadataType } from '@/object-record/record-table/record-table-footer/utils/getAvailableAggregateOperationsForFieldMetadataType';
 
 import { useLingui } from '@lingui/react/macro';
+import { useContext } from 'react';
+import { MenuItem } from 'twenty-ui/navigation';
+import { FieldMetadataType } from '~/generated-metadata/graphql';
 
 export const RecordTableColumnAggregateFooterDropdownContent = () => {
   const { t } = useLingui();
@@ -18,6 +22,13 @@ export const RecordTableColumnAggregateFooterDropdownContent = () => {
     useDropdownContextStateManagement({
       context: RecordTableColumnAggregateFooterDropdownContext,
     });
+  const { onContentChange } = useContext(
+    RecordTableColumnAggregateFooterDropdownContext,
+  );
+
+  const canCountByValue =
+    fieldMetadataType === FieldMetadataType.SELECT ||
+    fieldMetadataType === FieldMetadataType.MULTI_SELECT;
 
   const availableAggregateOperations =
     getAvailableAggregateOperationsForFieldMetadataType({
@@ -51,9 +62,19 @@ export const RecordTableColumnAggregateFooterDropdownContent = () => {
         <RecordTableColumnAggregateFooterDropdownSubmenuContent
           aggregateOperations={aggregateOperations}
           title={t`Count`}
-        />
+        >
+          {canCountByValue ? (
+            <MenuItem
+              onClick={() => onContentChange('countByValueOptions')}
+              text={t`By value`}
+              hasSubMenu
+            />
+          ) : null}
+        </RecordTableColumnAggregateFooterDropdownSubmenuContent>
       );
     }
+    case 'countByValueOptions':
+      return <RecordTableColumnAggregateFooterSelectValueMenuContent />;
     case 'percentAggregateOperationsOptions': {
       const aggregateOperations = availableAggregateOperations.filter(
         (aggregateOperation) =>

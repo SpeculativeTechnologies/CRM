@@ -172,6 +172,7 @@ export const useCreateViewFromCurrentView = (viewBarComponentId?: string) => {
         isVisible: viewField.isVisible,
         size: viewField.size,
         aggregateOperation: viewField.aggregateOperation,
+        aggregateValue: viewField.aggregateValue,
         viewFieldGroupId: viewField.viewFieldGroupId,
         viewId: newViewId,
       }));

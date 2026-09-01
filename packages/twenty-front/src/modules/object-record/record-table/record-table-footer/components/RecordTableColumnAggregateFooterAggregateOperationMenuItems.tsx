@@ -21,6 +21,7 @@ export const RecordTableColumnAggregateFooterAggregateOperationMenuItems = ({
   const {
     updateViewFieldAggregateOperation,
     currentViewFieldAggregateOperation,
+    currentViewFieldAggregateValue,
   } = useViewFieldAggregateOperation();
 
   const { dropdownId, resetContent } = useContext(
@@ -30,22 +31,24 @@ export const RecordTableColumnAggregateFooterAggregateOperationMenuItems = ({
 
   return (
     <>
-      {aggregateOperations.map((operation) => (
-        <MenuItem
-          key={operation}
-          onClick={async () => {
-            await updateViewFieldAggregateOperation(operation);
-            closeDropdown(dropdownId);
-          }}
-          text={getAggregateOperationLabel(operation)}
-          RightIcon={
-            currentViewFieldAggregateOperation === operation
-              ? IconCheck
-              : undefined
-          }
-          aria-selected={currentViewFieldAggregateOperation === operation}
-        />
-      ))}
+      {aggregateOperations.map((operation) => {
+        const isSelected =
+          currentViewFieldAggregateOperation === operation &&
+          !isDefined(currentViewFieldAggregateValue);
+
+        return (
+          <MenuItem
+            key={operation}
+            onClick={async () => {
+              await updateViewFieldAggregateOperation(operation);
+              closeDropdown(dropdownId);
+            }}
+            text={getAggregateOperationLabel(operation)}
+            RightIcon={isSelected ? IconCheck : undefined}
+            aria-selected={isSelected}
+          />
+        );
+      })}
       {children}
       <MenuItem
         key="none"

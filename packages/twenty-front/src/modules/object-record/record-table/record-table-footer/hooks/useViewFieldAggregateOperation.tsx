@@ -1,5 +1,6 @@
 import { RecordTableColumnAggregateFooterDropdownContext } from '@/object-record/record-table/record-table-footer/components/RecordTableColumnAggregateFooterDropdownContext';
 import { viewFieldAggregateOperationState } from '@/object-record/record-table/record-table-footer/states/viewFieldAggregateOperationState';
+import { viewFieldAggregateValueState } from '@/object-record/record-table/record-table-footer/states/viewFieldAggregateValueState';
 import { type ExtendedAggregateOperations } from '@/object-record/record-table/types/ExtendedAggregateOperations';
 import { convertExtendedAggregateOperationToAggregateOperation } from '@/object-record/utils/convertExtendedAggregateOperationToAggregateOperation';
 import { MISSING_RECORD_TABLE_WIDGET_PAGE_LAYOUT_ID } from '@/object-record/record-table-widget/constants/MissingRecordTableWidgetPageLayoutId';
@@ -48,6 +49,7 @@ export const useViewFieldAggregateOperation = () => {
 
   const updateViewFieldAggregateOperation = async (
     aggregateOperation: ExtendedAggregateOperations | null,
+    aggregateValue: string | null = null,
   ) => {
     if (!currentViewField) {
       throw new Error('ViewField not found');
@@ -66,6 +68,7 @@ export const useViewFieldAggregateOperation = () => {
     ) {
       persistTarget.widgetContext.updateViewDraftField(currentViewField.id, {
         aggregateOperation: aggregateOperationForPersistence,
+        aggregateValue,
       });
       return;
     }
@@ -83,6 +86,7 @@ export const useViewFieldAggregateOperation = () => {
             position: currentViewField.position,
             size: currentViewField.size,
             aggregateOperation: aggregateOperationForPersistence,
+            aggregateValue,
           },
         },
       },
@@ -94,8 +98,14 @@ export const useViewFieldAggregateOperation = () => {
     { viewFieldId: currentViewField?.id ?? '' },
   );
 
+  const viewFieldAggregateValue = useAtomFamilyStateValue(
+    viewFieldAggregateValueState,
+    { viewFieldId: currentViewField?.id ?? '' },
+  );
+
   return {
     updateViewFieldAggregateOperation,
     currentViewFieldAggregateOperation: viewFieldAggregateOperation,
+    currentViewFieldAggregateValue: viewFieldAggregateValue,
   };
 };

@@ -487,13 +487,19 @@ export class ViewWidgetUpsertService {
           existingField.overrides?.aggregateOperation !== undefined
             ? existingField.overrides.aggregateOperation
             : existingField.aggregateOperation;
+        const resolvedAggregateValue =
+          existingField.overrides?.aggregateValue !== undefined
+            ? existingField.overrides.aggregateValue
+            : existingField.aggregateValue;
 
         const hasChanged =
           resolvedIsVisible !== inputField.isVisible ||
           resolvedPosition !== inputField.position ||
           (isDefined(inputField.size) && resolvedSize !== inputField.size) ||
           (inputField.aggregateOperation !== undefined &&
-            resolvedAggregateOperation !== inputField.aggregateOperation);
+            resolvedAggregateOperation !== inputField.aggregateOperation) ||
+          (inputField.aggregateValue !== undefined &&
+            resolvedAggregateValue !== inputField.aggregateValue);
 
         if (!hasChanged) {
           continue;
@@ -518,6 +524,9 @@ export class ViewWidgetUpsertService {
               ...(isDefined(inputField.size) ? { size: inputField.size } : {}),
               ...(inputField.aggregateOperation !== undefined
                 ? { aggregateOperation: inputField.aggregateOperation }
+                : {}),
+              ...(inputField.aggregateValue !== undefined
+                ? { aggregateValue: inputField.aggregateValue }
                 : {}),
             },
             shouldOverride,
@@ -586,6 +595,7 @@ export class ViewWidgetUpsertService {
         size: inputField.size ?? DEFAULT_VIEW_FIELD_SIZE,
         position: inputField.position,
         aggregateOperation: inputField.aggregateOperation ?? null,
+        aggregateValue: inputField.aggregateValue ?? null,
         overrides: null,
         universalOverrides: null,
         isActive: true,

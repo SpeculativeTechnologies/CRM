@@ -40,6 +40,9 @@ export class ViewFieldDTO {
   @Field(() => AggregateOperations, { nullable: true })
   aggregateOperation?: AggregateOperations | null;
 
+  @Field(() => String, { nullable: true })
+  aggregateValue?: string | null;
+
   @Field(() => UUIDScalarType, { nullable: false })
   viewId: string;
 

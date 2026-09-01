@@ -91,6 +91,7 @@ export const computeMissingLabelIdentifierViewFields = ({
         isVisible: true,
         size: LABEL_IDENTIFIER_VIEW_FIELD_SIZE,
         aggregateOperation: null,
+        aggregateValue: null,
         isActive: true,
         isSystemSideEffect: flatView.isSystemSideEffect,
         overrides: null,

@@ -26,6 +26,7 @@ import { recordIndexKanbanColumnWidthComponentState } from '@/object-record/reco
 import { recordIndexShouldHideEmptyRecordGroupsComponentState } from '@/object-record/record-index/states/recordIndexShouldHideEmptyRecordGroupsComponentState';
 import { recordIndexViewTypeState } from '@/object-record/record-index/states/recordIndexViewTypeState';
 import { viewFieldAggregateOperationState } from '@/object-record/record-table/record-table-footer/states/viewFieldAggregateOperationState';
+import { viewFieldAggregateValueState } from '@/object-record/record-table/record-table-footer/states/viewFieldAggregateValueState';
 import { type ColumnDefinition } from '@/object-record/record-table/types/ColumnDefinition';
 import { convertAggregateOperationToExtendedAggregateOperation } from '@/object-record/utils/convertAggregateOperationToExtendedAggregateOperation';
 import { filterAvailableTableColumns } from '@/object-record/utils/filterAvailableTableColumns';
@@ -206,6 +207,14 @@ export const useLoadRecordIndexStates = () => {
                 }),
                 convertedViewFieldAggregateOp,
               );
+            }
+
+            const aggregateValueAtom = viewFieldAggregateValueState.atomFamily({
+              viewFieldId: viewField.id,
+            });
+
+            if (get(aggregateValueAtom) !== viewField.aggregateValue) {
+              batchSet(aggregateValueAtom, viewField.aggregateValue);
             }
           }
 

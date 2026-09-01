@@ -14,6 +14,8 @@ import { AggregateOperations } from '@/object-record/record-table/constants/Aggr
 import { useRecordTableContextOrThrow } from '@/object-record/record-table/contexts/RecordTableContext';
 import { RecordTableColumnAggregateFooterCellContext } from '@/object-record/record-table/record-table-footer/components/RecordTableColumnAggregateFooterCellContext';
 import { viewFieldAggregateOperationState } from '@/object-record/record-table/record-table-footer/states/viewFieldAggregateOperationState';
+import { viewFieldAggregateValueState } from '@/object-record/record-table/record-table-footer/states/viewFieldAggregateValueState';
+import { buildSelectValueAggregateFilter } from '@/object-record/record-table/record-table-footer/utils/buildSelectValueAggregateFilter';
 import { type ExtendedAggregateOperations } from '@/object-record/record-table/types/ExtendedAggregateOperations';
 import { convertAggregateOperationToExtendedAggregateOperation } from '@/object-record/utils/convertAggregateOperationToExtendedAggregateOperation';
 import { useAtomComponentStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomComponentStateValue';
@@ -24,12 +26,14 @@ import { useContext } from 'react';
 import { FIELD_FOR_TOTAL_COUNT_AGGREGATE_OPERATION } from 'twenty-shared/constants';
 import {
   computeRecordGqlOperationFilter,
+  combineFilters,
   findById,
   isDefined,
   isFieldMetadataDateKind,
   turnAnyFieldFilterIntoRecordGqlFilter,
 } from 'twenty-shared/utils';
 import { dateLocaleState } from '~/localization/states/dateLocaleState';
+import { FieldMetadataType } from '~/generated-metadata/graphql';
 
 export const useAggregateRecordsForRecordTableColumnFooter = (
   aggregateFieldMetadataId: string,
@@ -78,6 +82,11 @@ export const useAggregateRecordsForRecordTableColumnFooter = (
     { viewFieldId },
   );
 
+  const viewFieldAggregateValue = useAtomFamilyStateValue(
+    viewFieldAggregateValueState,
+    { viewFieldId },
+  );
+
   const isAggregateOperationImpossibleForDateField =
     isDefined(fieldMetadataItem) &&
     isFieldMetadataDateKind(fieldMetadataItem.type) &&
@@ -114,14 +123,32 @@ export const useAggregateRecordsForRecordTableColumnFooter = (
       filterValue: anyFieldFilterValue,
     });
 
+  const shouldFilterAggregateBySelectValue =
+    aggregateOperationForViewField === AggregateOperations.COUNT &&
+    isDefined(viewFieldAggregateValue) &&
+    isDefined(fieldMetadataItem) &&
+    (fieldMetadataItem.type === FieldMetadataType.SELECT ||
+      fieldMetadataItem.type === FieldMetadataType.MULTI_SELECT);
+
+  const selectValueAggregateFilter = shouldFilterAggregateBySelectValue
+    ? buildSelectValueAggregateFilter({
+        fieldName: fieldMetadataItem.name,
+        fieldMetadataType: fieldMetadataItem.type,
+        aggregateValue: viewFieldAggregateValue,
+      })
+    : {};
+
   const { data, loading } = useAggregateRecords({
     objectNameSingular: objectMetadataItem.nameSingular,
     recordGqlFieldsAggregate,
-    filter: {
-      ...requestFilters,
-      ...recordGroupFilter,
-      ...anyFieldFilter,
-    },
+    filter: combineFilters([
+      {
+        ...requestFilters,
+        ...recordGroupFilter,
+        ...anyFieldFilter,
+      },
+      selectValueAggregateFilter,
+    ]),
     skip: !isDefined(aggregateOperationForViewField),
   });
 
@@ -174,10 +201,20 @@ export const useAggregateRecordsForRecordTableColumnFooter = (
     aggregateOperation: aggregateOperationForViewField,
   });
 
+  const selectedAggregateOptionLabel = shouldFilterAggregateBySelectValue
+    ? (aggregateFieldMetadataItem.options?.find(
+        (option) => option.value === viewFieldAggregateValue,
+      )?.label ?? viewFieldAggregateValue)
+    : undefined;
+
+  const aggregateLabelWithValue = isDefined(selectedAggregateOptionLabel)
+    ? `${getAggregateOperationLabel(AggregateOperations.COUNT)}: ${selectedAggregateOptionLabel}`
+    : aggregateLabel;
+
   return {
     aggregateValue: aggregateDisplayValue,
     aggregateLabel: isDefined(aggregateDisplayValue)
-      ? aggregateLabel
+      ? aggregateLabelWithValue
       : undefined,
     isLoading: loading,
   };

@@ -27,6 +27,7 @@ export type ViewFieldOverrides = {
   size?: number;
   position?: number;
   aggregateOperation?: AggregateOperations | null;
+  aggregateValue?: string | null;
   viewFieldGroupId?: SerializedRelation | null;
 };
 
@@ -75,6 +76,9 @@ export class ViewFieldEntity
     default: null,
   })
   aggregateOperation: AggregateOperations | null;
+
+  @Column({ nullable: true, type: 'text', default: null })
+  aggregateValue: string | null;
 
   @Column({ nullable: false, type: 'uuid' })
   viewId: string;

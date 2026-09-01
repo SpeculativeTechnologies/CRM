@@ -66,6 +66,7 @@ export const fromCreateViewFieldInputToFlatViewFieldToCreate = ({
     size: createViewFieldInput.size ?? DEFAULT_VIEW_FIELD_SIZE,
     position: createViewFieldInput.position ?? 0,
     aggregateOperation: createViewFieldInput.aggregateOperation ?? null,
+    aggregateValue: createViewFieldInput.aggregateValue ?? null,
     isActive: true,
     isSystemSideEffect: false,
     universalOverrides: null,
