@@ -16223,6 +16223,7 @@ msgstr "Frigi og overfør til denne serveren"
 #. js-lingui-id: HpK/8d
 #: src/modules/error-handler/components/AppRootErrorFallback.tsx
 #: src/modules/error-handler/components/internal/AppErrorDisplay.tsx
+#: src/modules/information-banner/components/session-expired/InformationBannerSessionExpired.tsx
 #: src/modules/settings/domains/components/SettingPublicDomain.tsx
 #: src/modules/settings/domains/components/SettingsCustomDomain.tsx
 msgid "Reload"
@@ -18151,6 +18152,11 @@ msgstr "Elementer i sidepanelet"
 #: src/modules/auth/sign-in-up/components/internal/SignInUpWithCredentials.tsx
 msgid "Sign in"
 msgstr "Logg inn"
+
+#. js-lingui-id: pa0Bbi
+#: src/modules/information-banner/components/session-expired/InformationBannerSessionExpired.tsx
+msgid "Sign in again"
+msgstr ""
 
 #. js-lingui-id: Vt3mQ2
 #: src/utils/title-utils.ts
@@ -22752,6 +22758,11 @@ msgstr "Planen din vil byttes til Pro med en gang, og prøveperioden vil fortset
 #: src/pages/settings/admin-panel/SettingsAdminNewAiProvider.tsx
 msgid "Your provider API key for authentication"
 msgstr "API-nøkkelen til tilbyderen din for autentisering"
+
+#. js-lingui-id: gIWV6H
+#: src/modules/information-banner/components/session-expired/InformationBannerSessionExpired.tsx
+msgid "Your session expired. Sign in again in a new tab to keep this page and any unsaved changes."
+msgstr ""
 
 #. js-lingui-id: 319YPG
 #: src/pages/settings/enterprise/SettingsEnterprise.tsx
