@@ -217,7 +217,11 @@ export class MessagingSaveMessagesAndEnqueueContactCreationService {
       ],
       workspaceId,
     });
-    await this.enqueueCampaignReplyAttribution(messagesToSave, workspaceId);
+    await this.enqueueCampaignReplyAttribution(
+      messagesToSave,
+      savedMessagesResult.messageExternalIdToMessageThreadIdMap,
+      workspaceId,
+    );
 
     return {
       messageExternalIdsAndIdsMap:
@@ -231,9 +235,13 @@ export class MessagingSaveMessagesAndEnqueueContactCreationService {
   // is unrelated to importing the message, and must not fail the import.
   private async enqueueCampaignReplyAttribution(
     messagesToSave: MessageWithParticipants[],
+    messageExternalIdToMessageThreadIdMap: Map<string, string>,
     workspaceId: string,
   ): Promise<void> {
-    const replies = buildCampaignReplyAttributions(messagesToSave);
+    const replies = buildCampaignReplyAttributions(
+      messagesToSave,
+      messageExternalIdToMessageThreadIdMap,
+    );
 
     if (replies.length === 0) {
       return;

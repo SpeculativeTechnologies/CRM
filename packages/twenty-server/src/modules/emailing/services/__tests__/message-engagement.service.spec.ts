@@ -267,5 +267,114 @@ describe('MessageEngagementService', () => {
       expect(updateMock).not.toHaveBeenCalled();
       expect(scheduleMock).not.toHaveBeenCalled();
     });
+
+    // A connected-account send stores the Message-ID the composer generated
+    // while the provider puts its own on the wire, so the reply's In-Reply-To
+    // names an id no campaign message carries.
+    describe('when no stored header matches the reply', () => {
+      const THREAD_ID = '20202020-0000-0000-0000-0000000000t1';
+      const SENT_AT = new Date('2026-09-01T13:15:00.000Z');
+      const REPLY_RECEIVED_AT = '2026-09-01T13:20:00.000Z';
+
+      const threadReplyArgs = {
+        ...replyArgs,
+        messageThreadId: THREAD_ID,
+        receivedAt: REPLY_RECEIVED_AT,
+      };
+
+      const inThread = (
+        ...campaignMessages: {
+          id: string;
+          receivedAt: Date;
+        }[]
+      ) =>
+        findMock.mockImplementation(async ({ where }) =>
+          'messageThreadId' in where
+            ? campaignMessages.map((campaignMessage) => ({
+                ...campaignMessage,
+                messageCampaignId: CAMPAIGN_ID,
+              }))
+            : [],
+        );
+
+      it('falls back to the thread the reply was imported into', async () => {
+        inThread({ id: MESSAGE_ID, receivedAt: SENT_AT });
+        addressTo(MESSAGE_ID);
+
+        await service.recordReply(threadReplyArgs);
+
+        expect(findMock).toHaveBeenCalledWith({
+          where: {
+            messageThreadId: THREAD_ID,
+            messageCampaignId: Not(IsNull()),
+            repliedAt: IsNull(),
+          },
+          order: { receivedAt: 'DESC' },
+        });
+        expect(updateMock).toHaveBeenCalledWith(
+          { id: MESSAGE_ID, repliedAt: IsNull() },
+          { repliedAt: new Date(REPLY_RECEIVED_AT) },
+        );
+        expect(scheduleMock).toHaveBeenCalledWith({
+          workspaceId: WORKSPACE_ID,
+          campaignId: CAMPAIGN_ID,
+        });
+      });
+
+      // The thread carries the campaign's Cc'd party too, and their answer is
+      // not the recipient replying.
+      it('ignores a campaign message in the thread that was not addressed to the sender', async () => {
+        inThread({ id: MESSAGE_ID, receivedAt: SENT_AT });
+        findParticipantsMock.mockResolvedValue([
+          {
+            messageId: MESSAGE_ID,
+            role: MessageParticipantRole.TO,
+            handle: 'someone-else@example.com',
+          },
+        ]);
+
+        await service.recordReply(threadReplyArgs);
+
+        expect(updateMock).not.toHaveBeenCalled();
+        expect(scheduleMock).not.toHaveBeenCalled();
+      });
+
+      it('ignores a campaign message sent after the reply arrived', async () => {
+        inThread({
+          id: MESSAGE_ID,
+          receivedAt: new Date('2026-09-01T13:25:00.000Z'),
+        });
+        addressTo(MESSAGE_ID);
+
+        await service.recordReply(threadReplyArgs);
+
+        expect(updateMock).not.toHaveBeenCalled();
+      });
+
+      it('answers the most recent campaign message in the thread', async () => {
+        inThread(
+          { id: MESSAGE_ID, receivedAt: SENT_AT },
+          {
+            id: ANCESTOR_MESSAGE_ID,
+            receivedAt: new Date('2026-08-01T10:00:00.000Z'),
+          },
+        );
+        addressTo(MESSAGE_ID, ANCESTOR_MESSAGE_ID);
+
+        await service.recordReply(threadReplyArgs);
+
+        expect(updateMock).toHaveBeenCalledWith(
+          { id: MESSAGE_ID, repliedAt: IsNull() },
+          { repliedAt: new Date(REPLY_RECEIVED_AT) },
+        );
+      });
+
+      it('does not reach for the thread when the reply carries none', async () => {
+        await service.recordReply(replyArgs);
+
+        expect(findMock).toHaveBeenCalledTimes(1);
+        expect(updateMock).not.toHaveBeenCalled();
+      });
+    });
   });
 });
