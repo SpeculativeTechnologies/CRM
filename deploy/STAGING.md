@@ -17,7 +17,9 @@ Staging runs on its own Google Cloud VM and is available to authorized users at
 6. Exercise the changed behavior and the normal CRM smoke-test paths at
    `https://crm-staging.spec.tech`. Record an affirmative pass or fail; the
    absence of alerts alone is not a successful smoke test.
-7. Promote only the exact SHA that passed. If staging fails, stop and fix or
+7. Run **Record a staging check** with that pass or fail and what you
+   exercised. It signs off whatever staging is currently running.
+8. Promote only the exact SHA that passed. If staging fails, stop and fix or
    revert the issue through another reviewed PR before trying a new `main` SHA.
 
 Pre-merge staging is reserved for unusually risky changes that need cloud
@@ -27,7 +29,9 @@ replace CI or review, and the normal release train still stages a selected SHA
 from `main` before production.
 
 The workflow in `.github/workflows/deploy-staging.yml` records the exact commit
-staging ran. Production uses that record as a promotion gate.
+staging ran, and `.github/workflows/staging-signoff.yml` records that a human
+exercised it. Production uses both as promotion gates: the first for everything,
+the second for anything reaching the database.
 
 ## Operational boundary
 

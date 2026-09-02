@@ -11,8 +11,10 @@ The workflow:
 1. resolves the requested ref to an exact commit SHA;
 2. refuses commits that are not on `main`;
 3. refuses commits that do not contain what staging last ran;
-4. waits for the production approval gate; and
-5. deploys the pinned cloud image and waits for the result.
+4. refuses database changes that are not inside a commit signed off through
+   **Record a staging check**;
+5. waits for the production approval gate; and
+6. deploys the pinned cloud image and waits for the result.
 
 Developers and coding agents must not push directly to `main`, bypass the
 workflow, operate the production VM, or improvise database repair.

@@ -11,6 +11,8 @@
 import { execFileSync } from 'node:child_process';
 import { appendFileSync } from 'node:fs';
 
+import { databaseAreaFor } from './database-changes.mjs';
+
 const COMMANDS_ROOT =
   'packages/twenty-server/src/database/commands/upgrade-version-command';
 const CURRENT_VERSION_FILE =
@@ -200,8 +202,15 @@ const main = () => {
   const irreversible = [];
   const dormant = [];
   const advisory = [];
+  const database = [];
 
   for (const file of files) {
+    const databaseArea = databaseAreaFor(file);
+
+    if (databaseArea !== null) {
+      database.push({ file, reason: databaseArea.reason });
+    }
+
     for (const area of ADVISORY_AREAS) {
       if (file.startsWith(area.prefix)) {
         advisory.push({ file, ...area });
@@ -246,11 +255,33 @@ const main = () => {
   const violations = [];
   const lines = ['## Release risk'];
 
-  if (irreversible.length === 0 && dormant.length === 0 && advisory.length === 0) {
+  if (
+    irreversible.length === 0 &&
+    dormant.length === 0 &&
+    advisory.length === 0 &&
+    database.length === 0
+  ) {
     lines.push(
       '',
       'Nothing here survives a rollback. Redeploying the previous SHA undoes this change.',
     );
+  }
+
+  if (database.length > 0) {
+    lines.push(
+      '',
+      '### Reaches the production database',
+      '',
+      'Any developer can merge this. Promoting it is what is gated: **Deploy to',
+      'production** refuses these files until *Record a staging check* has signed',
+      'off a staging deploy that contained them. Deploy the merged SHA to staging,',
+      'exercise it there, then record the check.',
+      '',
+    );
+
+    for (const { file, reason } of database) {
+      lines.push(`- \`${file}\` — ${reason}`);
+    }
   }
 
   if (irreversible.length > 0) {
@@ -338,6 +369,7 @@ const main = () => {
   const labels = [
     ...new Set([
       ...(irreversible.length > 0 ? ['risk:irreversible'] : []),
+      ...(database.length > 0 ? ['risk:database'] : []),
       ...advisory.map(({ label }) => label),
     ]),
   ];

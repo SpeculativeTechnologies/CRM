@@ -65,7 +65,9 @@ Every PR should state:
 Which pull requests need the production owner's review is decided by
 [CODEOWNERS](../.github/CODEOWNERS) and described in *What needs the production
 owner* below. Everything outside those paths may be reviewed by any developer
-with write access, or merged on the author's own judgement.
+with write access, or merged on the author's own judgement. Database changes
+are in that second group but carry a gate of their own on the way to
+production; see *Database changes* below.
 
 Entity changes must include their generated instance command. Do not edit the
 `up` or `down` of an already-merged command. Regenerate frontend GraphQL types
@@ -91,15 +93,13 @@ CODEOWNERS so that GitHub requests the review without anyone remembering to:
 
 | Area | Why a rollback does not fix it |
 |---|---|
-| `packages/twenty-server/src/database/**` | A migration that has run stays run. `down` restores schema, not deleted rows. |
-| `engine/core-modules/upgrade/**` | Changes which commands run, and in what order, on every box. |
 | auth, permissions, guards | Bad state persists in issued sessions and tokens after the code is gone. |
 | messaging, calendar | Reaches real mailboxes and calendars. Sent mail cannot be unsent. |
 | `deploy/**`, `twenty-config/**`, promotion workflows | Configuration lives outside the pinned image, so rolling the image back leaves it in place. |
 | Anything paired with a `crm-ops` change | Same reason: the other half of the change is not in this repository. |
 
 `.github/workflows/ci-fork-release-risk.yaml` labels each pull request against
-this table and fails when an irreversible change arrives undocumented. It
+these tables and fails when an irreversible change arrives undocumented. It
 enforces two things a reviewer would otherwise have to catch by eye:
 
 - A command whose `up` path drops schema or writes data must have a `##
@@ -118,6 +118,40 @@ The check reports on every pull request, so a green run on an ordinary change
 means the classifier looked and found nothing, not that it failed to run. An
 upstream sync is classified and labelled but not blocked: those migrations are
 Twenty's own and arrive with their version bump.
+
+## Database changes: gated at promotion, not at merge
+
+Database changes outlive a rollback for the same reason a migration that has
+run stays run, and `down` restores schema, not deleted rows. But a review of
+the diff is a poor guard against that. What actually catches a bad migration is
+running it against a copy of production data and looking at the result, so
+these are gated where that evidence exists rather than at merge:
+
+| Area | What reaches the database |
+|---|---|
+| `packages/twenty-server/src/database/**` | Migrations and upgrade commands. |
+| `engine/core-modules/upgrade/**` | Which commands run, and in what order, on every box. |
+| `**/*.entity.ts`, `**/*.workspace-entity.ts` | Table definitions, synced into the schema on upgrade. |
+
+Any developer can merge these. `ci-fork-release-risk` labels the pull request
+`risk:database` and says in its report what promoting it will require.
+Promotion is where the gate is:
+
+1. Merge, then run **Deploy to staging** for the merged SHA.
+2. Exercise the change on staging against the mirrored data, not just the
+   application's health check.
+3. Run **Record a staging check**, describing what you exercised. It signs off
+   whatever `staging-target` points at, which is only ever a commit staging
+   deployed successfully, and moves `staging-verified` to it.
+4. Run **Deploy to production**. It refuses the promotion unless every
+   database-touching file in it is already inside the signed-off commit.
+
+Step 4 is stricter than the general staging rule on purpose. Ordinary code only
+has to have an ancestor on staging, which is fine when a redeploy undoes it. A
+migration merged on top of a staged commit would otherwise ride to production
+having never run anywhere, so it is held to containment in the checked commit
+instead. The consequence worth knowing: merging another database change after
+the check invalidates the check, and staging has to run and be checked again.
 
 None of this constrains what someone with an interactive shell on the box can
 do. The gate is on the promotion workflow, not on the machine. Server access is
@@ -162,17 +196,23 @@ must be handled.
 4. Exercise the changed behavior and the normal CRM smoke-test paths at
    `https://crm-staging.spec.tech`. Record an affirmative pass or fail; the
    absence of alerts alone is not a successful smoke test.
-5. If staging passes, run **Deploy to production** for the exact SHA staging
-   ran. The workflow verifies that the commit is on `main` and passed through
-   staging, then waits for the production approval gate. Anyone on the
+5. Run **Record a staging check** with that pass or fail and what you
+   exercised. Required before a database change can be promoted, and worth
+   doing either way: it is the only durable record of what step 4 actually
+   covered.
+6. If staging passes, run **Deploy to production** for the exact SHA staging
+   ran. The workflow verifies that the commit is on `main`, that it passed
+   through staging, and that anything reaching the database is inside the
+   commit step 5 signed off, then waits for the production approval gate.
+   Anyone on the
    `production` environment's reviewer list can approve it, including their own
    run; the gate is a deliberate pause and an audit record, not a second
    opinion. Whoever approves it watches the release. If the release window ends
    before validation is complete, promote it during the next supported window
    instead.
-6. If staging fails, do not deploy to production. Revert or fix the problem in
+7. If staging fails, do not deploy to production. Revert or fix the problem in
    another reviewed PR, then deploy and test the new `main` SHA on staging.
-7. Follow the private
+8. Follow the private
    [`crm-ops` cloud runbook](https://github.com/SpeculativeTechnologies/crm-ops/blob/main/deploy/CLOUD-OPS.md)
    for operational checks, backups, incidents, and rollback.
 
