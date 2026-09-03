@@ -138,10 +138,12 @@ export class AdoptMessageCampaignIndexViewsCommand extends ProvisionedWorkspaceC
     standardFlatViewMaps: FlatEntityMaps<FlatView>;
     standardFlatViewFieldMaps: FlatEntityMaps<FlatViewField>;
   }): ViewAdoption[] {
-    const existingViews = Object.values(flatViewMaps.byId).filter(isDefined);
-    const existingViewFields = Object.values(flatViewFieldMaps.byId).filter(
-      isDefined,
-    );
+    const existingViews = Object.values(
+      flatViewMaps.byUniversalIdentifier,
+    ).filter(isDefined);
+    const existingViewFields = Object.values(
+      flatViewFieldMaps.byUniversalIdentifier,
+    ).filter(isDefined);
     const standardViews = Object.values(
       standardFlatViewMaps.byUniversalIdentifier,
     ).filter(isDefined);
@@ -213,9 +215,9 @@ export class AdoptMessageCampaignIndexViewsCommand extends ProvisionedWorkspaceC
         .flatMap((standardViewField) => {
           const existingViewField = viewFieldsOfExistingView.find(
             (viewField) =>
-              flatFieldMetadataMaps.byId[viewField.fieldMetadataId]
-                ?.universalIdentifier ===
-              standardViewField.fieldMetadataUniversalIdentifier,
+              flatFieldMetadataMaps.universalIdentifierById[
+                viewField.fieldMetadataId
+              ] === standardViewField.fieldMetadataUniversalIdentifier,
           );
 
           return isDefined(existingViewField)

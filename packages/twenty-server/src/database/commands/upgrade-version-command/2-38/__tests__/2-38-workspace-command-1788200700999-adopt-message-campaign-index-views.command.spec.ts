@@ -18,10 +18,10 @@ const buildMaps = <T extends { universalIdentifier: string; id?: string }>(
     byUniversalIdentifier: Object.fromEntries(
       entities.map((entity) => [entity.universalIdentifier, entity]),
     ),
-    byId: Object.fromEntries(
+    universalIdentifierById: Object.fromEntries(
       entities
         .filter((entity) => entity.id !== undefined)
-        .map((entity) => [entity.id as string, entity]),
+        .map((entity) => [entity.id as string, entity.universalIdentifier]),
     ),
     universalIdentifiersByApplicationId: {},
   }) as unknown as FlatEntityMaps<T>;
