@@ -1179,11 +1179,6 @@ msgstr "啟用"
 msgid "Active API keys created by you or your team."
 msgstr "由您或您的團隊創建的啟用 API 密鑰。"
 
-#. js-lingui-id: A7Ks+i
-#: src/pages/settings/applications/components/SettingsApplicationRegistrationInstallStats.tsx
-#~ msgid "Active installs"
-#~ msgstr "使用中的安裝"
-
 #. js-lingui-id: QHjErc
 #: src/modules/settings/admin-panel/health-status/components/SettingsAdminHealthAccountSyncCountersTable.tsx
 msgid "Active Sync"
@@ -2602,11 +2597,6 @@ msgstr "適用性"
 msgid "Application"
 msgstr "應用程式"
 
-#. js-lingui-id: N+cUnB
-#: src/modules/front-components/hooks/useFrontComponentExecutionContext.ts
-#~ msgid "Application copied \"{preview}\" to your clipboard"
-#~ msgstr "應用程式已將「{preview}」複製到剪貼簿"
-
 #. js-lingui-id: vdieHo
 #: src/pages/settings/applications/SettingsApplicationDetails.tsx
 msgid "Application details"
@@ -3981,11 +3971,6 @@ msgstr "通道"
 msgid "Chart"
 msgstr "圖表"
 
-#. js-lingui-id: AHZflp
-#: src/modules/navigation/components/MainNavigationDrawerTabsRow.tsx
-#~ msgid "Chat"
-#~ msgstr "聊天"
-
 #. js-lingui-id: rlwve5
 #: src/modules/ai/components/AiChatThreadItemMenu.tsx
 msgid "Chat actions"
@@ -4394,11 +4379,6 @@ msgstr "收合詳情"
 #: src/modules/settings/accounts/components/message-folders/SettingsMessageFoldersTreeItem.tsx
 msgid "Collapse folder"
 msgstr "收合資料夾"
-
-#. js-lingui-id: 4Ub5ma
-#: src/modules/ui/navigation/navigation-drawer/components/NavigationDrawerCollapseButton.tsx
-#~ msgid "Collapse navigation panel"
-#~ msgstr "摺疊導覽面板"
 
 #. js-lingui-id: mkMLq4
 #: src/modules/navigation/hooks/useNavigationDrawerTogglePresentation.ts
@@ -8600,11 +8580,6 @@ msgstr "展開詳情"
 msgid "Expand folder"
 msgstr "展開資料夾"
 
-#. js-lingui-id: 7OJt04
-#: src/modules/ui/navigation/navigation-drawer/components/NavigationDrawerCollapseButton.tsx
-#~ msgid "Expand navigation panel"
-#~ msgstr "展開導覽面板"
-
 #. js-lingui-id: CM8OoE
 #: src/modules/side-panel/pages/rich-text-page/hooks/useExpandRichTextSidePanelPage.ts
 #: src/modules/side-panel/routing/hooks/useExpandRecordSidePanelPage.ts
@@ -8620,11 +8595,6 @@ msgstr ""
 #: src/modules/workflow/workflow-steps/workflow-actions/code-action/components/WorkflowCodeEditor.tsx
 msgid "Expand to Full Screen"
 msgstr "展開至全螢幕"
-
-#. js-lingui-id: YcwQIp
-#: src/modules/side-panel/pages/records-page/hooks/useExpandRecordsSidePanelPage.ts
-#~ msgid "Expand view"
-#~ msgstr "展開視圖"
 
 #. js-lingui-id: iT7W4v
 #: src/modules/workflow/workflow-trigger/components/WorkflowEditTriggerWebhookForm.tsx
@@ -11411,16 +11381,6 @@ msgstr ""
 msgid "Keep everyone separate"
 msgstr ""
 
-#. js-lingui-id: ZlHUDM
-#: src/modules/activities/calendar/components/CalendarEventComposerFields.tsx
-#~ msgid "Keep the current record in the guest list and leave invitations on so the event remains visible on this record."
-#~ msgstr "將目前記錄保留在來賓清單中，並保持啟用邀請功能，以便活動持續顯示於此記錄上。"
-
-#. js-lingui-id: WOUOYg
-#: src/modules/activities/calendar/components/CalendarEventComposerFields.tsx
-#~ msgid "Keep this event related"
-#~ msgstr "保持此活動關聯"
-
 #. js-lingui-id: 4Hatax
 #: src/modules/person-duplicate-review/components/PersonDuplicateCard.tsx
 msgid "Keep this record"
@@ -13152,11 +13112,6 @@ msgstr "導覽選單項目"
 msgid "Navigation modes"
 msgstr ""
 
-#. js-lingui-id: s2HXiD
-#: src/modules/navigation/components/MainNavigationDrawerTabsRow.tsx
-#~ msgid "Navigation tabs"
-#~ msgstr "導航分頁"
-
 #. js-lingui-id: IbVc4A
 #: src/modules/page-layout/widgets/record-table/utils/getRecordTableWidgetLayoutPickerOptions.ts
 msgid "Needs a Date field"
@@ -13202,11 +13157,6 @@ msgstr "新"
 #: src/modules/side-panel/hooks/useOpenRecordInSidePanel.ts
 msgid "New {0}"
 msgstr ""
-
-#. js-lingui-id: LfvvW4
-#: src/modules/side-panel/hooks/useOpenRecordInSidePanel.ts
-#~ msgid "New {objectLabelSingular}"
-#~ msgstr "新{objectLabelSingular}"
 
 #. js-lingui-id: Kcr9Fr
 #: src/modules/settings/accounts/components/SettingsNewAccountSection.tsx
@@ -14153,16 +14103,6 @@ msgstr "未找到任何伺服器管理員。"
 msgid "No subject"
 msgstr "沒有主題"
 
-#. js-lingui-id: Y8HpZa
-#: src/modules/page-layout/widgets/call-recording-summary/components/CallRecordingSummaryBody.tsx
-#~ msgid "No Summary"
-#~ msgstr "無摘要"
-
-#. js-lingui-id: cU6bd5
-#: src/modules/page-layout/widgets/call-recording-summary/components/CallRecordingSummaryBody.tsx
-#~ msgid "No summary has been generated for this call recording yet."
-#~ msgstr "尚未為此通話錄音產生摘要。"
-
 #. js-lingui-id: RQ6tfU
 #: src/modules/navigation-menu-item/edit/side-panel/components/SidePanelSystemObjectPickerSubView.tsx
 msgid "No system objects available"
@@ -14203,11 +14143,6 @@ msgstr "無逐字稿"
 #: src/modules/page-layout/widgets/call-recording/utils/getCallRecordingStatusDisplayConfiguration.ts
 msgid "No transcript is available for this call recording yet."
 msgstr ""
-
-#. js-lingui-id: du4Icj
-#: src/modules/page-layout/widgets/call-recording-transcript/components/CallRecordingTranscriptContent.tsx
-#~ msgid "No transcript is available for this recording."
-#~ msgstr "此錄音目前無可用的逐字稿。"
 
 #. js-lingui-id: ZCTuAQ
 #: src/modules/settings/logic-functions/components/tabs/SettingsLogicFunctionTriggersTab.tsx
@@ -15569,12 +15504,6 @@ msgstr ""
 msgid "Pick a {0} record"
 msgstr ""
 
-#. js-lingui-id: vqKcU0
-#: src/modules/workflow/workflow-steps/components/WorkflowDropdownStepOutputItems.tsx
-#: src/modules/workflow/workflow-variables/components/WorkflowVariablesDropdownStepItems.tsx
-#~ msgid "Pick a {objectLabel} record"
-#~ msgstr "選擇一個{objectLabel}記錄"
-
 #. js-lingui-id: JqqNlC
 #: src/modules/side-panel/utils/getSidePanelSubPageTitle.ts
 msgid "Pick a view"
@@ -15946,11 +15875,6 @@ msgstr "專業方案"
 #: src/modules/activities/calendar/components/CalendarEventCallRecorderAvatar.tsx
 msgid "Processing"
 msgstr "處理中"
-
-#. js-lingui-id: HvAaN4
-#: src/modules/page-layout/widgets/call-recording-summary/components/CallRecordingSummaryBody.tsx
-#~ msgid "Processing Failed"
-#~ msgstr "處理失敗"
 
 #. js-lingui-id: 9YrAC6
 #: src/modules/page-layout/widgets/call-recording/utils/getCallRecordingStatusDisplayConfiguration.ts
@@ -18281,11 +18205,6 @@ msgstr "設定此工作區的預設角色"
 msgid "Set as default"
 msgstr "設為默認"
 
-#. js-lingui-id: 7f09hf
-#: src/modules/side-panel/pages/page-layout/components/RegularTabSettingsContent.tsx
-#~ msgid "Set as pinned tab"
-#~ msgstr "設為釘選分頁"
-
 #. js-lingui-id: ml98ku
 #: src/modules/object-record/record-field/ui/meta-types/input/components/MultiItemFieldMenuItem.tsx
 msgid "Set as Primary"
@@ -19736,11 +19655,6 @@ msgstr "無法處理此通話錄音。"
 msgid "The call recording is being processed…"
 msgstr ""
 
-#. js-lingui-id: +AFHx6
-#: src/modules/page-layout/widgets/call-recording-summary/components/CallRecordingSummaryBody.tsx
-#~ msgid "The call recording is still being processed…"
-#~ msgstr "此通話錄音仍在處理中…"
-
 #. js-lingui-id: /kfzmx
 #: src/pages/settings/legal/SettingsLegalDpa.tsx
 msgid "The Data Processing Agreement could not be loaded. Please try again."
@@ -19945,11 +19859,6 @@ msgstr "認領此應用程式註冊的工作區"
 #: src/modules/ui/navigation/navigation-drawer/components/MultiWorkspaceDropdown/internal/MultiWorkspaceDropdownThemesComponents.tsx
 msgid "Theme"
 msgstr "主題"
-
-#. js-lingui-id: 6tNbxl
-#: src/modules/ui/navigation/navigation-drawer/components/MultiWorkspaceDropdown/internal/MultiWorkspaceDropdownDefaultComponents.tsx
-#~ msgid "Theme "
-#~ msgstr "主題 "
 
 #. js-lingui-id: Wn862P
 #: src/modules/keyboard-shortcut-menu/components/KeyboardShortcutMenuItem.tsx
@@ -20687,11 +20596,6 @@ msgstr "逐字稿已複製到剪貼簿"
 #: src/modules/page-layout/widgets/call-recording/utils/getCallRecordingStatusDisplayConfiguration.ts
 msgid "Transcript Failed"
 msgstr "逐字稿產生失敗"
-
-#. js-lingui-id: zDTPYv
-#: src/modules/page-layout/widgets/call-recording-transcript/components/CallRecordingTranscriptContent.tsx
-#~ msgid "Transcript is being prepared…"
-#~ msgstr "正在準備逐字稿…"
 
 #. js-lingui-id: zPGNJm
 #: src/pages/settings/admin-panel/SettingsAdminApplicationRegistrationDangerZone.tsx
@@ -21704,11 +21608,6 @@ msgstr "使用情況"
 msgid "Usage across all non-deleted workspaces on this server"
 msgstr ""
 
-#. js-lingui-id: 8Jr4QC
-#: src/pages/settings/applications/components/SettingsApplicationRegistrationGeneralStats.tsx
-#~ msgid "Usage across all workspaces on this server"
-#~ msgstr "此伺服器上所有工作區的使用情況"
-
 #. js-lingui-id: 21hsGI
 #: src/modules/settings/usage/components/SettingsUsageAnalyticsSection.tsx
 #: src/modules/settings/usage/components/SettingsUsageAnalyticsSection.tsx
@@ -21905,12 +21804,6 @@ msgstr "使用默認應用值。通過環境變量配置。"
 #: src/modules/settings/admin-panel/config-variables/components/ConfigVariableHelpText.tsx
 msgid "Using default value. Set a custom value to override."
 msgstr "使用默認值。設置自定義值來覆蓋。"
-
-#. js-lingui-id: zzp4XX
-#: src/pages/settings/enterprise/SettingsEnterprise.tsx
-#: src/pages/settings/enterprise/SettingsEnterprise.tsx
-#~ msgid "Valid until"
-#~ msgstr "有效至"
 
 #. js-lingui-id: Clr4qp
 #: src/modules/spreadsheet-import/steps/components/SpreadsheetImportStepperContainer.tsx
@@ -22644,12 +22537,6 @@ msgstr "小工具"
 #: src/modules/side-panel/pages/page-layout/utils/getPageLayoutPageTitle.ts
 msgid "Widget Settings"
 msgstr "小工具設定"
-
-#. js-lingui-id: fANaAS
-#: src/modules/side-panel/pages/page-layout/components/SidePanelPageLayoutDashboardWidgetTypeSelect.tsx
-#: src/modules/side-panel/pages/page-layout/components/SidePanelPageLayoutRecordPageWidgetTypeSelect.tsx
-#~ msgid "Widget type"
-#~ msgstr "小部件類型"
 
 #. js-lingui-id: YR3K7M
 #: src/pages/settings/applications/SettingsAvailableApplicationDetails.tsx

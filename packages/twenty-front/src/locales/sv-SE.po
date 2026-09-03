@@ -1179,11 +1179,6 @@ msgstr "Aktiv"
 msgid "Active API keys created by you or your team."
 msgstr "Aktiva API-nycklar skapade av dig eller ditt team."
 
-#. js-lingui-id: A7Ks+i
-#: src/pages/settings/applications/components/SettingsApplicationRegistrationInstallStats.tsx
-#~ msgid "Active installs"
-#~ msgstr "Aktiva installationer"
-
 #. js-lingui-id: QHjErc
 #: src/modules/settings/admin-panel/health-status/components/SettingsAdminHealthAccountSyncCountersTable.tsx
 msgid "Active Sync"
@@ -2602,11 +2597,6 @@ msgstr "Tillämpbarhet"
 msgid "Application"
 msgstr "Applikation"
 
-#. js-lingui-id: N+cUnB
-#: src/modules/front-components/hooks/useFrontComponentExecutionContext.ts
-#~ msgid "Application copied \"{preview}\" to your clipboard"
-#~ msgstr "Appen kopierade \"{preview}\" till urklipp"
-
 #. js-lingui-id: vdieHo
 #: src/pages/settings/applications/SettingsApplicationDetails.tsx
 msgid "Application details"
@@ -3981,11 +3971,6 @@ msgstr "Kanaler"
 msgid "Chart"
 msgstr "Diagram"
 
-#. js-lingui-id: AHZflp
-#: src/modules/navigation/components/MainNavigationDrawerTabsRow.tsx
-#~ msgid "Chat"
-#~ msgstr "Chatt"
-
 #. js-lingui-id: rlwve5
 #: src/modules/ai/components/AiChatThreadItemMenu.tsx
 msgid "Chat actions"
@@ -4394,11 +4379,6 @@ msgstr "Dölj detaljer"
 #: src/modules/settings/accounts/components/message-folders/SettingsMessageFoldersTreeItem.tsx
 msgid "Collapse folder"
 msgstr "Fäll ihop mapp"
-
-#. js-lingui-id: 4Ub5ma
-#: src/modules/ui/navigation/navigation-drawer/components/NavigationDrawerCollapseButton.tsx
-#~ msgid "Collapse navigation panel"
-#~ msgstr "Fäll ihop navigationspanelen"
 
 #. js-lingui-id: mkMLq4
 #: src/modules/navigation/hooks/useNavigationDrawerTogglePresentation.ts
@@ -8600,11 +8580,6 @@ msgstr "Visa detaljer"
 msgid "Expand folder"
 msgstr "Fäll ut mapp"
 
-#. js-lingui-id: 7OJt04
-#: src/modules/ui/navigation/navigation-drawer/components/NavigationDrawerCollapseButton.tsx
-#~ msgid "Expand navigation panel"
-#~ msgstr "Fäll ut navigationspanelen"
-
 #. js-lingui-id: CM8OoE
 #: src/modules/side-panel/pages/rich-text-page/hooks/useExpandRichTextSidePanelPage.ts
 #: src/modules/side-panel/routing/hooks/useExpandRecordSidePanelPage.ts
@@ -8620,11 +8595,6 @@ msgstr ""
 #: src/modules/workflow/workflow-steps/workflow-actions/code-action/components/WorkflowCodeEditor.tsx
 msgid "Expand to Full Screen"
 msgstr "Expandera till helskärm"
-
-#. js-lingui-id: YcwQIp
-#: src/modules/side-panel/pages/records-page/hooks/useExpandRecordsSidePanelPage.ts
-#~ msgid "Expand view"
-#~ msgstr "Expandera vy"
 
 #. js-lingui-id: iT7W4v
 #: src/modules/workflow/workflow-trigger/components/WorkflowEditTriggerWebhookForm.tsx
@@ -11434,16 +11404,6 @@ msgstr ""
 msgid "Keep everyone separate"
 msgstr ""
 
-#. js-lingui-id: ZlHUDM
-#: src/modules/activities/calendar/components/CalendarEventComposerFields.tsx
-#~ msgid "Keep the current record in the guest list and leave invitations on so the event remains visible on this record."
-#~ msgstr "Behåll den aktuella posten i gästlistan och låt inbjudningar vara aktiverade så att händelsen förblir synlig i den här posten."
-
-#. js-lingui-id: WOUOYg
-#: src/modules/activities/calendar/components/CalendarEventComposerFields.tsx
-#~ msgid "Keep this event related"
-#~ msgstr "Behåll den här händelsen kopplad"
-
 #. js-lingui-id: 4Hatax
 #: src/modules/person-duplicate-review/components/PersonDuplicateCard.tsx
 msgid "Keep this record"
@@ -13177,11 +13137,6 @@ msgstr "Navigationsmenyalternativ"
 msgid "Navigation modes"
 msgstr ""
 
-#. js-lingui-id: s2HXiD
-#: src/modules/navigation/components/MainNavigationDrawerTabsRow.tsx
-#~ msgid "Navigation tabs"
-#~ msgstr "Navigeringsflikar"
-
 #. js-lingui-id: IbVc4A
 #: src/modules/page-layout/widgets/record-table/utils/getRecordTableWidgetLayoutPickerOptions.ts
 msgid "Needs a Date field"
@@ -13227,11 +13182,6 @@ msgstr "Ny"
 #: src/modules/side-panel/hooks/useOpenRecordInSidePanel.ts
 msgid "New {0}"
 msgstr ""
-
-#. js-lingui-id: LfvvW4
-#: src/modules/side-panel/hooks/useOpenRecordInSidePanel.ts
-#~ msgid "New {objectLabelSingular}"
-#~ msgstr "Ny {objectLabelSingular}"
 
 #. js-lingui-id: Kcr9Fr
 #: src/modules/settings/accounts/components/SettingsNewAccountSection.tsx
@@ -14178,16 +14128,6 @@ msgstr "Inga serveradministratörer hittades."
 msgid "No subject"
 msgstr "Inget ämne"
 
-#. js-lingui-id: Y8HpZa
-#: src/modules/page-layout/widgets/call-recording-summary/components/CallRecordingSummaryBody.tsx
-#~ msgid "No Summary"
-#~ msgstr "Ingen sammanfattning"
-
-#. js-lingui-id: cU6bd5
-#: src/modules/page-layout/widgets/call-recording-summary/components/CallRecordingSummaryBody.tsx
-#~ msgid "No summary has been generated for this call recording yet."
-#~ msgstr "Ingen sammanfattning har genererats för den här samtalsinspelningen ännu."
-
 #. js-lingui-id: RQ6tfU
 #: src/modules/navigation-menu-item/edit/side-panel/components/SidePanelSystemObjectPickerSubView.tsx
 msgid "No system objects available"
@@ -14228,11 +14168,6 @@ msgstr "Ingen transkription"
 #: src/modules/page-layout/widgets/call-recording/utils/getCallRecordingStatusDisplayConfiguration.ts
 msgid "No transcript is available for this call recording yet."
 msgstr ""
-
-#. js-lingui-id: du4Icj
-#: src/modules/page-layout/widgets/call-recording-transcript/components/CallRecordingTranscriptContent.tsx
-#~ msgid "No transcript is available for this recording."
-#~ msgstr "Ingen transkription finns tillgänglig för den här inspelningen."
 
 #. js-lingui-id: ZCTuAQ
 #: src/modules/settings/logic-functions/components/tabs/SettingsLogicFunctionTriggersTab.tsx
@@ -15594,12 +15529,6 @@ msgstr ""
 msgid "Pick a {0} record"
 msgstr ""
 
-#. js-lingui-id: vqKcU0
-#: src/modules/workflow/workflow-steps/components/WorkflowDropdownStepOutputItems.tsx
-#: src/modules/workflow/workflow-variables/components/WorkflowVariablesDropdownStepItems.tsx
-#~ msgid "Pick a {objectLabel} record"
-#~ msgstr "Välj en {objectLabel} post"
-
 #. js-lingui-id: JqqNlC
 #: src/modules/side-panel/utils/getSidePanelSubPageTitle.ts
 msgid "Pick a view"
@@ -15971,11 +15900,6 @@ msgstr "Pro-plan"
 #: src/modules/activities/calendar/components/CalendarEventCallRecorderAvatar.tsx
 msgid "Processing"
 msgstr "Bearbetar"
-
-#. js-lingui-id: HvAaN4
-#: src/modules/page-layout/widgets/call-recording-summary/components/CallRecordingSummaryBody.tsx
-#~ msgid "Processing Failed"
-#~ msgstr "Bearbetningen misslyckades"
 
 #. js-lingui-id: 9YrAC6
 #: src/modules/page-layout/widgets/call-recording/utils/getCallRecordingStatusDisplayConfiguration.ts
@@ -18308,11 +18232,6 @@ msgstr "Ange standard för det här arbetsutrymmet"
 msgid "Set as default"
 msgstr "Sätt som standard"
 
-#. js-lingui-id: 7f09hf
-#: src/modules/side-panel/pages/page-layout/components/RegularTabSettingsContent.tsx
-#~ msgid "Set as pinned tab"
-#~ msgstr "Ange som fäst flik"
-
 #. js-lingui-id: ml98ku
 #: src/modules/object-record/record-field/ui/meta-types/input/components/MultiItemFieldMenuItem.tsx
 msgid "Set as Primary"
@@ -19795,11 +19714,6 @@ msgstr "Samtalsinspelningen kunde inte bearbetas."
 msgid "The call recording is being processed…"
 msgstr ""
 
-#. js-lingui-id: +AFHx6
-#: src/modules/page-layout/widgets/call-recording-summary/components/CallRecordingSummaryBody.tsx
-#~ msgid "The call recording is still being processed…"
-#~ msgstr "Samtalsinspelningen bearbetas fortfarande…"
-
 #. js-lingui-id: /kfzmx
 #: src/pages/settings/legal/SettingsLegalDpa.tsx
 msgid "The Data Processing Agreement could not be loaded. Please try again."
@@ -20004,11 +19918,6 @@ msgstr "Arbetsytan som tog ägarskap över den här appregistreringen"
 #: src/modules/ui/navigation/navigation-drawer/components/MultiWorkspaceDropdown/internal/MultiWorkspaceDropdownThemesComponents.tsx
 msgid "Theme"
 msgstr "Tema"
-
-#. js-lingui-id: 6tNbxl
-#: src/modules/ui/navigation/navigation-drawer/components/MultiWorkspaceDropdown/internal/MultiWorkspaceDropdownDefaultComponents.tsx
-#~ msgid "Theme "
-#~ msgstr "Tema "
 
 #. js-lingui-id: Wn862P
 #: src/modules/keyboard-shortcut-menu/components/KeyboardShortcutMenuItem.tsx
@@ -20748,11 +20657,6 @@ msgstr "Transkriptionen har kopierats till urklipp"
 #: src/modules/page-layout/widgets/call-recording/utils/getCallRecordingStatusDisplayConfiguration.ts
 msgid "Transcript Failed"
 msgstr "Transkriptionen misslyckades"
-
-#. js-lingui-id: zDTPYv
-#: src/modules/page-layout/widgets/call-recording-transcript/components/CallRecordingTranscriptContent.tsx
-#~ msgid "Transcript is being prepared…"
-#~ msgstr "Transkriptionen förbereds…"
 
 #. js-lingui-id: zPGNJm
 #: src/pages/settings/admin-panel/SettingsAdminApplicationRegistrationDangerZone.tsx
@@ -21765,11 +21669,6 @@ msgstr "Användning"
 msgid "Usage across all non-deleted workspaces on this server"
 msgstr ""
 
-#. js-lingui-id: 8Jr4QC
-#: src/pages/settings/applications/components/SettingsApplicationRegistrationGeneralStats.tsx
-#~ msgid "Usage across all workspaces on this server"
-#~ msgstr "Användning i alla arbetsytor på denna server"
-
 #. js-lingui-id: 21hsGI
 #: src/modules/settings/usage/components/SettingsUsageAnalyticsSection.tsx
 #: src/modules/settings/usage/components/SettingsUsageAnalyticsSection.tsx
@@ -21966,12 +21865,6 @@ msgstr "Använder standardapplikationsvärde. Konfigurera via miljövariabler."
 #: src/modules/settings/admin-panel/config-variables/components/ConfigVariableHelpText.tsx
 msgid "Using default value. Set a custom value to override."
 msgstr "Använder standardvärde. Ange ett anpassat värde för att åsidosätta."
-
-#. js-lingui-id: zzp4XX
-#: src/pages/settings/enterprise/SettingsEnterprise.tsx
-#: src/pages/settings/enterprise/SettingsEnterprise.tsx
-#~ msgid "Valid until"
-#~ msgstr "Giltig till"
 
 #. js-lingui-id: Clr4qp
 #: src/modules/spreadsheet-import/steps/components/SpreadsheetImportStepperContainer.tsx
@@ -22705,12 +22598,6 @@ msgstr "Widget"
 #: src/modules/side-panel/pages/page-layout/utils/getPageLayoutPageTitle.ts
 msgid "Widget Settings"
 msgstr "Widgetinställningar"
-
-#. js-lingui-id: fANaAS
-#: src/modules/side-panel/pages/page-layout/components/SidePanelPageLayoutDashboardWidgetTypeSelect.tsx
-#: src/modules/side-panel/pages/page-layout/components/SidePanelPageLayoutRecordPageWidgetTypeSelect.tsx
-#~ msgid "Widget type"
-#~ msgstr "Widgettyp"
 
 #. js-lingui-id: YR3K7M
 #: src/pages/settings/applications/SettingsAvailableApplicationDetails.tsx
