@@ -94,9 +94,23 @@ CODEOWNERS so that GitHub requests the review without anyone remembering to:
 | Area | Why a rollback does not fix it |
 |---|---|
 | auth, permissions, guards | Bad state persists in issued sessions and tokens after the code is gone. |
-| messaging, calendar | Reaches real mailboxes and calendars. Sent mail cannot be unsent. |
+| messaging, calendar | Reaches real mailboxes and calendars, and staging is sanitized so it cannot rehearse either. |
 | `deploy/**`, `twenty-config/**`, promotion workflows | Configuration lives outside the pinned image, so rolling the image back leaves it in place. |
 | Anything paired with a `crm-ops` change | Same reason: the other half of the change is not in this repository. |
+
+Messaging and calendar are worth spelling out, because the obvious next move is
+wrong. Staging cannot rehearse them at all: `deploy/staging-sanitize.sql`
+disables message and calendar sync and nulls every connected account's tokens
+on each restore, so the outbound path resolves no account and never runs. That
+is deliberate, and undoing it would be worse, because staging holds mirrored
+production contact data. A live mailbox connection there means a messaging bug
+mails real people.
+
+So a recorded staging check for a messaging change would certify a code path
+that never executed, which is worse than no gate because it looks like one.
+Database changes could move to a promotion gate because staging genuinely runs
+them. These cannot until there is somewhere to run them: a throwaway account,
+with the mirrored contact addresses scrubbed or redirected.
 
 `.github/workflows/ci-fork-release-risk.yaml` labels each pull request against
 these tables and fails when an irreversible change arrives undocumented. It
