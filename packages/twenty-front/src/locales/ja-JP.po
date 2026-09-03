@@ -46,6 +46,11 @@ msgstr "—"
 msgid ": Empty"
 msgstr ": 空"
 
+#. js-lingui-id: jmJy4X
+#: src/modules/object-record/object-filter-dropdown/utils/getOperandLabel.ts
+msgid ": Exactly"
+msgstr ""
+
 #. js-lingui-id: CE75IR
 #: src/modules/object-record/object-filter-dropdown/utils/getOperandLabel.ts
 msgid ": Future"
@@ -65,6 +70,11 @@ msgstr ": 適用しない"
 #: src/modules/object-record/object-filter-dropdown/utils/getOperandLabel.ts
 msgid ": NotEmpty"
 msgstr "空ではない"
+
+#. js-lingui-id: 0DaS2L
+#: src/modules/object-record/object-filter-dropdown/utils/getOperandLabel.ts
+msgid ": NotExactly"
+msgstr ""
 
 #. js-lingui-id: 11QpPG
 #: src/modules/object-record/object-filter-dropdown/utils/getOperandLabel.ts
@@ -95,6 +105,11 @@ msgstr "· {objectFilterDropdownSearchInput}"
 #: src/pages/onboarding/UpgradeFreeTrial.tsx
 msgid "· FREE"
 msgstr "· 無料"
+
+#. js-lingui-id: +ryuLa
+#: src/modules/object-record/record-field/ui/meta-types/utils/getNewSelectOptionErrorMessage.ts
+msgid "\"{optionName}\" cannot be used as an option name."
+msgstr ""
 
 #. js-lingui-id: TaLmrR
 #. placeholder {0}: formatNumber(currentCreditsByPeriod, { decimals: 2 })
@@ -219,6 +234,7 @@ msgstr "{0} 日"
 
 #. js-lingui-id: okrK9q
 #. placeholder {0}: preview.duplicateEmails
+#: src/modules/activities/emails/components/CampaignComposerFields.tsx
 #: src/modules/activities/emails/components/CampaignDetailsFields.tsx
 msgid "{0} duplicate"
 msgstr "{0} 件の重複"
@@ -240,6 +256,13 @@ msgstr "{0} は {loadBalancePoolObjectLabel} と関連付けられていませ�
 #: src/modules/activities/emails/components/CampaignDetailsFields.tsx
 msgid "{0} in this list"
 msgstr "このリスト内に {0} 件"
+
+#. js-lingui-id: MY0lRK
+#. placeholder {0}: preview.totalMembers
+#. placeholder {1}: preview.sendable
+#: src/modules/activities/emails/components/CampaignComposerFields.tsx
+msgid "{0} in this list — {1} sendable"
+msgstr ""
 
 #. js-lingui-id: /PXxEG
 #. placeholder {0}: preview.totalMembers
@@ -275,6 +298,7 @@ msgstr "{1} 件中 {0} 件"
 
 #. js-lingui-id: BzvoVr
 #. placeholder {0}: preview.topicUnsubscribed
+#: src/modules/activities/emails/components/CampaignComposerFields.tsx
 #: src/modules/activities/emails/components/CampaignDetailsFields.tsx
 msgid "{0} opted out of this topic"
 msgstr "{0} 件がこのトピックの受信をオプトアウト済み"
@@ -299,6 +323,7 @@ msgstr "{0} 件表示"
 
 #. js-lingui-id: nZUq+6
 #. placeholder {0}: preview.globallyUnsubscribed
+#: src/modules/activities/emails/components/CampaignComposerFields.tsx
 #: src/modules/activities/emails/components/CampaignDetailsFields.tsx
 msgid "{0} unsubscribed from everything"
 msgstr "{0} 件がすべての配信を停止済み"
@@ -323,6 +348,7 @@ msgstr "{0} 個のウィジェット"
 
 #. js-lingui-id: Aixgij
 #. placeholder {0}: preview.withoutEmail
+#: src/modules/activities/emails/components/CampaignComposerFields.tsx
 #: src/modules/activities/emails/components/CampaignDetailsFields.tsx
 msgid "{0} without email"
 msgstr "{0} 件にメールアドレスがありません"
@@ -553,6 +579,11 @@ msgstr "{permissionLabel} の権限を削除しました"
 msgid "{positionLabel} record holds priority"
 msgstr "{positionLabel} のレコードが優先されます"
 
+#. js-lingui-id: M71PWW
+#: src/modules/activities/emails/mass-email/components/MassEmailComposeCard.tsx
+msgid "{recipientCount} recipients"
+msgstr ""
+
 #. js-lingui-id: 5d0hY6
 #: src/modules/settings/admin-panel/health-status/hooks/useRetryJobs.ts
 #: src/modules/settings/admin-panel/health-status/hooks/useRetryJobs.ts
@@ -613,6 +644,11 @@ msgstr "{stepCount, plural, one {# ステップ} other {# ステップ}}"
 #: src/pages/settings/accounts/SettingsAccountsConfigurationStepCalendar.tsx
 msgid "{stepNumber}. Calendar"
 msgstr "{stepNumber}. カレンダー"
+
+#. js-lingui-id: NcsiO/
+#: src/modules/activities/emails/mass-email/hooks/useSendMassEmail.ts
+msgid "{successCount} emails sent"
+msgstr ""
 
 #. js-lingui-id: bI/mcH
 #: src/modules/settings/applications/hooks/useComputeApplicationContentForLayoutAndLogic.ts
@@ -894,10 +930,20 @@ msgstr "下書きはすでに存在します"
 msgid "A draft already exists for this workflow. Are you sure you want to erase it?"
 msgstr "この作業フローにはすでに下書きが存在します。それを削除してもよろしいですか？"
 
+#. js-lingui-id: oO3ZQX
+#: src/modules/page-layout/widgets/call-recording/utils/getCallRecordingStatusDisplayConfiguration.ts
+msgid "A recorder will join when the meeting starts."
+msgstr ""
+
 #. js-lingui-id: C6xZqR
 #: src/pages/settings/developers/api-keys/SettingsDevelopersApiKeyDetail.tsx
 msgid "A role must be selected for the API key"
 msgstr "APIキーのロールを選択する必要があります"
+
+#. js-lingui-id: 4tQSH0
+#: src/modules/page-layout/widgets/call-recording/utils/getCallRecordingStatusDisplayConfiguration.ts
+msgid "A summary is not available for this call recording yet."
+msgstr ""
 
 #. js-lingui-id: /cSHSG
 #: src/modules/auth/sign-in-up/components/EmailVerificationSent.tsx
@@ -1083,10 +1129,13 @@ msgstr "このオブジェクトにユーザーが行えるアクション"
 
 #. js-lingui-id: FQBaXG
 #: src/modules/settings/admin-panel/ai/components/SettingsAdminAI.tsx
+#: src/modules/settings/admin-panel/ai/components/SettingsAdminAI.tsx
 #: src/modules/settings/data-model/object-details/components/SettingsObjectFieldDisabledActionDropdown.tsx
 #: src/modules/settings/data-model/objects/components/SettingsObjectInactiveMenuDropDown.tsx
 #: src/modules/settings/security/components/SettingsSecuritySettings.tsx
 #: src/modules/settings/security/components/SSO/SettingsSecuritySSORowDropdownMenu.tsx
+#: src/pages/settings/admin-panel/SettingsAdminNewAiModel.tsx
+#: src/pages/settings/admin-panel/SettingsAdminNewAiProvider.tsx
 #: src/pages/settings/ai/components/SettingsAiUsageTab.tsx
 #: src/pages/settings/ai/components/SettingsSkillInactiveMenuDropDown.tsx
 #: src/pages/settings/ai/SettingsSkillForm.tsx
@@ -1112,6 +1161,7 @@ msgstr "有効化中..."
 
 #. js-lingui-id: F6pfE9
 #: src/modules/ai/constants/AgentChatThreadFilterStatusLabels.ts
+#: src/modules/object-core/workflows/constants/CoreWorkflowStatusFilterOptions.ts
 #: src/modules/settings/admin-panel/components/SettingsAdminWorkspaceCreditGrantsTable.tsx
 #: src/modules/settings/admin-panel/health-status/components/SettingsAdminQueueJobsTable.tsx
 #: src/modules/settings/admin-panel/signing-keys/components/SettingsAdminSigningKeysTable.tsx
@@ -1131,8 +1181,8 @@ msgstr "あなたまたはチームが作成したアクティブなAPIキー。
 
 #. js-lingui-id: A7Ks+i
 #: src/pages/settings/applications/components/SettingsApplicationRegistrationInstallStats.tsx
-msgid "Active installs"
-msgstr "アクティブインストール数"
+#~ msgid "Active installs"
+#~ msgstr "アクティブインストール数"
 
 #. js-lingui-id: QHjErc
 #: src/modules/settings/admin-panel/health-status/components/SettingsAdminHealthAccountSyncCountersTable.tsx
@@ -1155,6 +1205,7 @@ msgid "Add \"{trimmedName}\" to options"
 msgstr "「{trimmedName}」をオプションに追加"
 
 #. js-lingui-id: 9CHcSG
+#: src/modules/object-record/record-list/components/RecordListEmptyState.tsx
 #: src/modules/object-record/record-table/empty-state/components/RecordTableEmptyStateNoRecordFoundForFilter.tsx
 msgid "Add a {objectLabelSingular}"
 msgstr "{objectLabelSingular} を追加"
@@ -1181,6 +1232,16 @@ msgstr "会議リンクを追加"
 msgid "Add a new company we're in touch with (e.g. name, website, industry). Details: "
 msgstr "連絡を取っている新しい企業を追加（例：名称、ウェブサイト、業種）。詳細： "
 
+#. js-lingui-id: 5xxrhm
+#: src/modules/ai/components/suggested-prompts/contextual-suggested-prompts.ts
+msgid "Add a note"
+msgstr ""
+
+#. js-lingui-id: uza/B9
+#: src/modules/ai/components/suggested-prompts/contextual-suggested-prompts.ts
+msgid "Add a note to this record: "
+msgstr ""
+
 #. js-lingui-id: Ad+JsP
 #: src/modules/activities/calendar/hooks/useComposeCalendarEventRelatedRecordAction.ts
 msgid "Add a person with an email to this company first"
@@ -1191,10 +1252,26 @@ msgstr "この会社にメールアドレスを持つ人物を先に追加して
 msgid "Add a record"
 msgstr "レコードを追加"
 
+#. js-lingui-id: 4LAQbj
+#: src/modules/activities/calendar/components/CalendarEventComposerTargetsInput.tsx
+msgid "Add a related record"
+msgstr ""
+
 #. js-lingui-id: eMc2xs
+#: src/modules/ai/components/suggested-prompts/contextual-suggested-prompts.ts
 #: src/modules/workflow/workflow-diagram/components/WorkflowDiagramCreateStepElement.tsx
 msgid "Add a step"
 msgstr "ステップを追加"
+
+#. js-lingui-id: BKYXUk
+#: src/modules/ai/components/suggested-prompts/contextual-suggested-prompts.ts
+msgid "Add a step to this workflow that "
+msgstr ""
+
+#. js-lingui-id: Ope30e
+#: src/modules/activities/emails/components/EmailComposerFields.tsx
+msgid "Add a subject"
+msgstr ""
 
 #. js-lingui-id: KKfos4
 #: src/modules/workflow/workflow-diagram/workflow-nodes/components/WorkflowDiagramEmptyTriggerEditable.tsx
@@ -1402,6 +1479,16 @@ msgstr "前にメニュー項目を追加"
 msgid "Add Model"
 msgstr "モデルを追加"
 
+#. js-lingui-id: 4H+G/6
+#: src/modules/activities/emails/signature/components/EmailSignatureToggleRow.tsx
+msgid "Add my signature"
+msgstr ""
+
+#. js-lingui-id: 1jFlXn
+#: src/modules/settings/profile/components/SettingsProfileEmailSignature.tsx
+msgid "Add my signature to new emails by default"
+msgstr ""
+
 #. js-lingui-id: Hkobke
 #: src/modules/object-record/record-board/record-board-column/components/RecordBoardColumnHeader.tsx
 #: src/modules/object-record/record-list/components/RecordListAddNew.tsx
@@ -1450,6 +1537,11 @@ msgstr "ユーザーを追加または削除"
 msgid "Add Output Field"
 msgstr "出力フィールドを追加"
 
+#. js-lingui-id: +1O5zr
+#: src/modules/activities/emails/mass-email/components/MassEmailAddPeopleButton.tsx
+msgid "Add people"
+msgstr ""
+
 #. js-lingui-id: aYtHO6
 #: src/modules/workflow/workflow-steps/workflow-actions/ai-agent-action/components/WorkflowAiAgentPermissionsTab.tsx
 #: src/modules/workflow/workflow-steps/workflow-actions/ai-agent-action/components/WorkflowEditActionAiAgent.tsx
@@ -1468,6 +1560,8 @@ msgid "Add route"
 msgstr "ルートを追加"
 
 #. js-lingui-id: O8tK4v
+#: src/modules/object-core/workflows/components/CoreWorkflowFilterAddRuleButton.tsx
+#: src/modules/object-core/workflows/components/CoreWorkflowFilterAddRuleButton.tsx
 #: src/modules/object-record/advanced-filter/components/AdvancedFilterAddFilterRuleSelect.tsx
 #: src/modules/object-record/advanced-filter/components/AdvancedFilterAddFilterRuleSelect.tsx
 #: src/modules/object-record/advanced-filter/components/AdvancedFilterAddFilterRuleSelect.tsx
@@ -1499,6 +1593,11 @@ msgstr "並び替えを追加"
 #: src/modules/settings/security/components/SSO/SettingsSSOIdentitiesProvidersListCardWrapper.tsx
 msgid "Add SSO Identity Provider"
 msgstr "SSOアイデンティティプロバイダーを追加"
+
+#. js-lingui-id: ZAh4zP
+#: src/modules/views/view-stack/components/ViewStackTabList.tsx
+msgid "Add stack"
+msgstr ""
 
 #. js-lingui-id: 6Tl23V
 #: src/pages/settings/ai/components/SettingsAgentEvalsTab.tsx
@@ -1565,6 +1664,11 @@ msgstr "URI を追加"
 msgid "Add view"
 msgstr "ビューを追加"
 
+#. js-lingui-id: oU1lna
+#: src/modules/views/view-stack/components/ViewStackTabDropdownContent.tsx
+msgid "Add view to this stack"
+msgstr ""
+
 #. js-lingui-id: 8sZiWP
 #: src/modules/page-layout/widgets/components/DashboardWidgetPlaceholder.tsx
 #: src/modules/page-layout/widgets/components/RecordPageAddWidgetSection.tsx
@@ -1582,6 +1686,12 @@ msgstr "ウィジェットを追加"
 #: src/modules/side-panel/pages/page-layout/components/WidgetSettingsPlacementSection.tsx
 msgid "Add widget above"
 msgstr "上にウィジェットを追加"
+
+#. js-lingui-id: kMd29S
+#. placeholder {0}: widget.title
+#: src/modules/page-layout/widgets/components/RecordPageWidgetInsertionSeparator.tsx
+msgid "Add widget above {0}"
+msgstr ""
 
 #. js-lingui-id: yy7F6M
 #: src/modules/side-panel/pages/page-layout/components/WidgetSettingsPlacementSection.tsx
@@ -1606,7 +1716,6 @@ msgstr "最初の{objectLabel}を追加"
 
 #. js-lingui-id: vLO+NG
 #: src/modules/settings/hooks/useGetAddedRelativeDateDescription.ts
-#: src/modules/ui/layout/show-page/components/ShowPageSummaryCard.tsx
 msgid "Added {beautifiedCreatedAt}"
 msgstr "{beautifiedCreatedAt}に追加"
 
@@ -1614,6 +1723,11 @@ msgstr "{beautifiedCreatedAt}に追加"
 #: src/modules/settings/accounts/components/SettingsAccountsBlocklistTable.tsx
 msgid "Added to blocklist"
 msgstr "ブロックリストに追加済み"
+
+#. js-lingui-id: BrJ98E
+#: src/modules/settings/data-model/fields/forms/select/components/AddSelectOptionMenuItem.tsx
+msgid "Adding \"{trimmedName}\"..."
+msgstr ""
 
 #. js-lingui-id: hW/fMg
 #: src/modules/object-metadata/hooks/useSortSubFieldChoicesForField.ts
@@ -1791,6 +1905,7 @@ msgid "Aggregate Chart"
 msgstr "集計チャート"
 
 #. js-lingui-id: jsQZMk
+#: src/modules/navigation/components/MainNavigationDrawerModeSwitcher.tsx
 #: src/modules/settings/admin-panel/hooks/useSettingsAdminTabs.ts
 #: src/modules/settings/hooks/useSettingsNavigationItems.tsx
 #: src/modules/settings/roles/role-permissions/object-level-permissions/object-form/components/SettingsRolePermissionsObjectLevelObjectForm.tsx
@@ -2112,6 +2227,12 @@ msgstr "カスタムオブジェクトをすべて"
 msgid "Allow downloading files and attachments"
 msgstr "ファイルと添付ファイルのダウンロードを許可する"
 
+#. js-lingui-id: VwwcyO
+#: src/modules/side-panel/pages/page-layout/components/dashboard/SidePanelDashboardRecordTableSettings.tsx
+#: src/modules/side-panel/pages/page-layout/components/record-page/SidePanelRecordPageFieldSettings.tsx
+msgid "Allow editing"
+msgstr ""
+
 #. js-lingui-id: 6BV/aG
 #: src/modules/settings/security/components/SettingsSecurityAuthBypassOptionsList.tsx
 msgid "Allow email & password login for SSO bypass users."
@@ -2284,6 +2405,11 @@ msgstr "変更を検証中に内部エラーが発生しました。サポート
 msgid "An object with this name already exists"
 msgstr "この名前のオブジェクトはすでに存在します。"
 
+#. js-lingui-id: oMJTL2
+#: src/modules/object-record/record-field/ui/meta-types/utils/getNewSelectOptionErrorMessage.ts
+msgid "An option matching \"{optionName}\" already exists."
+msgstr ""
+
 #. js-lingui-id: HZFm5R
 #: src/modules/auth/sign-in-up/components/FooterNote.tsx
 #: src/modules/settings/roles/role-settings/components/SettingsRoleSettingsDeleteRoleConfirmationModalSubtitle.tsx
@@ -2425,7 +2551,6 @@ msgid "Apostrophe and dot"
 msgstr "アポストロフィとドット"
 
 #. js-lingui-id: LMUw1U
-#: src/modules/object-core/workflows/constants/WorkflowCoreTableColumns.tsx
 #: src/modules/settings/data-model/object-details/components/SettingsObjectRelationsTable.tsx
 #: src/pages/settings/ai/components/SettingsAgentToolsTable.tsx
 #: src/pages/settings/data-model/constants/SettingsObjectTableMetadata.ts
@@ -2479,8 +2604,8 @@ msgstr "アプリケーション"
 
 #. js-lingui-id: N+cUnB
 #: src/modules/front-components/hooks/useFrontComponentExecutionContext.ts
-msgid "Application copied \"{preview}\" to your clipboard"
-msgstr "アプリケーションは \"{preview}\" をクリップボードにコピーしました"
+#~ msgid "Application copied \"{preview}\" to your clipboard"
+#~ msgstr "アプリケーションは \"{preview}\" をクリップボードにコピーしました"
 
 #. js-lingui-id: vdieHo
 #: src/pages/settings/applications/SettingsApplicationDetails.tsx
@@ -3005,6 +3130,11 @@ msgstr "利用可能"
 msgid "Available"
 msgstr "利用可能"
 
+#. js-lingui-id: HsAhgd
+#: src/modules/settings/data-model/objects/forms/components/SettingsDataModelObjectLabelFormulaForm.tsx
+msgid "Available fields:"
+msgstr ""
+
 #. js-lingui-id: STA+22
 #: src/pages/settings/ai/components/SettingsAiModelsTab.tsx
 msgid "Available models"
@@ -3213,6 +3343,7 @@ msgid "Blocks"
 msgstr "ブロック"
 
 #. js-lingui-id: Zn5crm
+#: src/modules/advanced-text-editor/constants/TextColorLabels.ts
 #: src/modules/settings/data-model/fields/forms/select/components/SettingsDataModelFieldSelectFormOptionRow.tsx
 msgid "Blue"
 msgstr "青"
@@ -3288,6 +3419,7 @@ msgid "Bronze"
 msgstr "ブロンズ"
 
 #. js-lingui-id: JLxwQS
+#: src/modules/advanced-text-editor/constants/TextColorLabels.ts
 #: src/modules/settings/data-model/fields/forms/select/components/SettingsDataModelFieldSelectFormOptionRow.tsx
 msgid "Brown"
 msgstr "茶色"
@@ -3592,6 +3724,7 @@ msgstr "スキャンできませんか？ コピーしてください"
 #: src/modules/spreadsheet-import/steps/components/ValidationStep/ValidationStep.tsx
 #: src/modules/ui/feedback/snack-bar-manager/components/SnackBar.tsx
 #: src/modules/ui/layout/modal/components/ConfirmationModal.tsx
+#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
 #: src/pages/settings/admin-panel/SettingsAdminApplicationRegistrationDangerZone.tsx
 #: src/pages/settings/applications/components/SettingsApplicationConnectScopePickerModal.tsx
 msgid "Cancel"
@@ -3737,6 +3870,10 @@ msgstr "カテゴリ"
 #. js-lingui-id: RpYfjZ
 #: src/modules/activities/emails/components/EmailComposerFields.tsx
 #: src/modules/activities/emails/components/EmailComposerFields.tsx
+#: src/modules/activities/emails/mass-email/components/MassEmailComposeCard.tsx
+#: src/modules/activities/emails/mass-email/components/MassEmailComposeCard.tsx
+#: src/modules/activities/emails/mass-email/components/MassEmailComposeCard.tsx
+#: src/modules/activities/emails/mass-email/components/MassEmailComposeCard.tsx
 #: src/modules/workflow/workflow-steps/workflow-actions/components/WorkflowRunStepLogsEmailDetail.tsx
 msgid "Cc"
 msgstr "Cc"
@@ -3788,6 +3925,21 @@ msgstr "パスワードを変更"
 msgid "Change subdomain?"
 msgstr "サブドメインを変更しますか？"
 
+#. js-lingui-id: xYxauD
+#: src/modules/command-menu-item/display/hooks/useCommandMenuAppActions.ts
+msgid "Change theme to dark"
+msgstr ""
+
+#. js-lingui-id: L5kTLG
+#: src/modules/command-menu-item/display/hooks/useCommandMenuAppActions.ts
+msgid "Change theme to light"
+msgstr ""
+
+#. js-lingui-id: WAvMry
+#: src/modules/command-menu-item/display/hooks/useCommandMenuAppActions.ts
+msgid "Change theme to system"
+msgstr ""
+
 #. js-lingui-id: 9m7pJA
 #: src/modules/settings/billing/components/internal/SettingsBillingSubscriptionInfoModals.tsx
 msgid "Change to Monthly?"
@@ -3831,8 +3983,8 @@ msgstr "チャート"
 
 #. js-lingui-id: AHZflp
 #: src/modules/navigation/components/MainNavigationDrawerTabsRow.tsx
-msgid "Chat"
-msgstr "チャット"
+#~ msgid "Chat"
+#~ msgstr "チャット"
 
 #. js-lingui-id: rlwve5
 #: src/modules/ai/components/AiChatThreadItemMenu.tsx
@@ -3872,10 +4024,20 @@ msgstr "ChatGPT"
 msgid "Chats"
 msgstr "チャット"
 
+#. js-lingui-id: oa2dNe
+#: src/modules/ai/components/suggested-prompts/contextual-suggested-prompts.ts
+msgid "Check recent runs"
+msgstr ""
+
 #. js-lingui-id: JslvtK
 #: src/modules/activities/calendar/components/CalendarEventComposerFields.tsx
 msgid "Check the event dates"
 msgstr "イベントの日付を確認"
+
+#. js-lingui-id: PaKTa7
+#: src/modules/ai/components/suggested-prompts/contextual-suggested-prompts.ts
+msgid "Check this workflow's recent runs and tell me whether any failed and why."
+msgstr ""
 
 #. js-lingui-id: h5C4B4
 #: src/modules/settings/emailing-domains/components/SettingsEmailingDomainVerifyButton.tsx
@@ -4235,8 +4397,13 @@ msgstr "フォルダーを折りたたむ"
 
 #. js-lingui-id: 4Ub5ma
 #: src/modules/ui/navigation/navigation-drawer/components/NavigationDrawerCollapseButton.tsx
-msgid "Collapse navigation panel"
-msgstr "ナビゲーションパネルを折りたたむ"
+#~ msgid "Collapse navigation panel"
+#~ msgstr "ナビゲーションパネルを折りたたむ"
+
+#. js-lingui-id: mkMLq4
+#: src/modules/navigation/hooks/useNavigationDrawerTogglePresentation.ts
+msgid "Collapse sidebar"
+msgstr ""
 
 #. js-lingui-id: OQTRMK
 #: src/modules/ai/components/AiChatCollapseButton.tsx
@@ -4401,6 +4568,11 @@ msgstr "会社"
 msgid "Compare plans"
 msgstr "プランを比較"
 
+#. js-lingui-id: +vJdAa
+#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
+msgid "Compare the source records and decide. Twenty never merges or separates people without your choice."
+msgstr ""
+
 #. js-lingui-id: amPBVF
 #: src/modules/settings/admin-panel/constants/CreditGrantTypeLabels.ts
 msgid "Compensation"
@@ -4457,6 +4629,7 @@ msgid "Conditional availability"
 msgstr "条件付き可用性"
 
 #. js-lingui-id: 0CuAor
+#: src/modules/object-core/workflows/components/CoreWorkflowFiltersBuilder.tsx
 #: src/modules/side-panel/pages/page-layout/components/ChartFiltersSettings.tsx
 #: src/modules/side-panel/pages/page-layout/components/record-table-settings/RecordTableSettingsFilters.tsx
 #: src/modules/workflow/workflow-steps/filters/components/WorkflowStepFilterBuilder.tsx
@@ -4645,6 +4818,16 @@ msgstr "{roleName}のロールを削除しますか？この操作は元に戻�
 msgid "Confirm downgrade"
 msgstr "ダウングレードを確認"
 
+#. js-lingui-id: EfxM6i
+#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
+msgid "Confirm merge"
+msgstr ""
+
+#. js-lingui-id: x/wPTT
+#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
+msgid "Confirm merge: the chosen survivor keeps its ID and the reviewed contact details. The other selected records move to Trash with their email fields cleared; restoring them later will not move relationships back."
+msgstr ""
+
 #. js-lingui-id: 28b8wO
 #: src/modules/settings/members/components/MemberPermissionsTab.tsx
 msgid "Confirm role update"
@@ -4685,6 +4868,11 @@ msgstr "カレンダーアカウントを接続"
 msgid "Connect a new account to your workspace"
 msgstr "新しいアカウントをワークスペースに接続"
 
+#. js-lingui-id: 2OzvqP
+#: src/pages/mass-email/MassEmailPage.tsx
+msgid "Connect account"
+msgstr ""
+
 #. js-lingui-id: CMrq4R
 #: src/modules/settings/mcp-and-apis/utils/buildMcpSetupCategories.tsx
 msgid "Connect additional MCP clients using install links or client docs."
@@ -4694,6 +4882,11 @@ msgstr "インストールリンクまたはクライアントのドキュメン
 #: src/pages/settings/ai/components/SettingsAiOverviewTab.tsx
 msgid "Connect AI assistants like Claude or Cursor to your workspace via the Model Context Protocol"
 msgstr "Model Context Protocol を通じて、Claude や Cursor などの AI アシスタントをワークスペースに接続します"
+
+#. js-lingui-id: CcYWYM
+#: src/pages/mass-email/MassEmailPage.tsx
+msgid "Connect an email account to send emails."
+msgstr ""
 
 #. js-lingui-id: TA7R1S
 #: src/modules/activities/calendar/components/CalendarEventComposerFields.tsx
@@ -4962,6 +5155,11 @@ msgstr "キーIDをコピー"
 msgid "Copy link"
 msgstr "リンクをコピー"
 
+#. js-lingui-id: RlESoV
+#: src/modules/command-menu-item/display/hooks/useCommandMenuAppActions.ts
+msgid "Copy link to page"
+msgstr ""
+
 #. js-lingui-id: eZ5HO9
 #: src/modules/object-record/object-options-dropdown/components/ObjectOptionsDropdownDefaultView.tsx
 msgid "Copy link to view"
@@ -4986,6 +5184,11 @@ msgstr "セットアップキーをコピー"
 #: src/pages/settings/applications/components/SettingsApplicationRegistrationShareLinkButtons.tsx
 msgid "Copy sharing link"
 msgstr "共有リンクをコピー"
+
+#. js-lingui-id: a08Y3L
+#: src/modules/page-layout/widgets/call-recording-summary/components/WidgetActionCallRecordingSummary.tsx
+msgid "Copy summary"
+msgstr ""
 
 #. js-lingui-id: Ej5euX
 #: src/pages/settings/developers/api-keys/SettingsDevelopersApiKeyDetail.tsx
@@ -5158,6 +5361,11 @@ msgstr "利用可能かどうかを確認できませんでした。もう一度
 msgid "Couldn't copy to clipboard"
 msgstr "クリップボードにコピーできませんでした"
 
+#. js-lingui-id: TU+LOV
+#: src/pages/settings/applications/components/SettingsApplicationRegistrationInstalledWorkspaces.tsx
+msgid "Couldn't load installed workspaces"
+msgstr ""
+
 #. js-lingui-id: kjbTwZ
 #: src/modules/navigation-menu-item/edit/hooks/useNavigationMenuItemEditController.ts
 msgid "Couldn't remove favorite"
@@ -5235,7 +5443,13 @@ msgstr "作成"
 msgid "Create a new contact and link them to a company. Details: "
 msgstr "新しい連絡先を作成し、会社に関連付けます。詳細： "
 
+#. js-lingui-id: j85EUk
+#: src/modules/ai/components/suggested-prompts/contextual-suggested-prompts.ts
+msgid "Create a new record in this view. Details: "
+msgstr ""
+
 #. js-lingui-id: n1Nbbe
+#: src/modules/ai/components/suggested-prompts/contextual-suggested-prompts.ts
 #: src/modules/ai/components/suggested-prompts/default-suggested-prompts.ts
 msgid "Create a record"
 msgstr "レコードを作成"
@@ -5244,6 +5458,22 @@ msgstr "レコードを作成"
 #: src/pages/settings/ai/components/SettingsAgentRoleTab.tsx
 msgid "Create a role to define permissions for this agent."
 msgstr "ロールを作成して、このエージェントの権限を設定します。"
+
+#. js-lingui-id: OW4ZDC
+#: src/modules/ai/components/suggested-prompts/contextual-suggested-prompts.ts
+#: src/modules/ai/components/suggested-prompts/contextual-suggested-prompts.ts
+msgid "Create a task"
+msgstr ""
+
+#. js-lingui-id: Jk5UrD
+#: src/modules/ai/components/suggested-prompts/contextual-suggested-prompts.ts
+msgid "Create a task for this company: "
+msgstr ""
+
+#. js-lingui-id: T9fLSG
+#: src/modules/ai/components/suggested-prompts/contextual-suggested-prompts.ts
+msgid "Create a task for this record: "
+msgstr ""
 
 #. js-lingui-id: Xn2Nlq
 #: src/modules/ai/components/suggested-prompts/default-suggested-prompts.ts
@@ -5406,6 +5636,7 @@ msgid "Create, edit, and delete workspace views"
 msgstr "ワークスペースビューの作成、編集、削除"
 
 #. js-lingui-id: d+F6q9
+#: src/modules/person-duplicate-review/components/PersonDuplicateCard.tsx
 #: src/modules/settings/admin-panel/chats/components/SettingsAdminChatsTable.tsx
 #: src/modules/settings/admin-panel/components/SettingsAdminWorkspaceContent.tsx
 #: src/modules/settings/components/SettingsDatabaseEventsForm.tsx
@@ -5417,8 +5648,7 @@ msgid "Created"
 msgstr "作成済み"
 
 #. js-lingui-id: 4fBuqE
-#: src/modules/side-panel/components/SidePanelRecordInfo.tsx
-#: src/modules/side-panel/pages/search/components/SidePanelSearchRecordPreviewCard.tsx
+#: src/modules/object-record/record-show/components/RecordIdentifierBarCreatedAt.tsx
 msgid "Created {beautifiedCreatedAt}"
 msgstr "作成日時 {beautifiedCreatedAt}"
 
@@ -5766,6 +5996,26 @@ msgstr "カスタムプロバイダー"
 msgid "Custom Providers"
 msgstr "カスタムプロバイダー"
 
+#. js-lingui-id: 79QPp0
+#. placeholder {0}: access.seatThreshold
+#: src/modules/settings/admin-panel/ai/hooks/useCustomAiProviderAccess.ts
+msgid "Custom providers are complimentary for organizations of up to {0} seats. Above that, an Organization plan is required."
+msgstr ""
+
+#. js-lingui-id: dDp+uz
+#. placeholder {0}: access.seatThreshold
+#. placeholder {1}: access.seatCount
+#: src/modules/settings/admin-panel/ai/hooks/useCustomAiProviderAccess.ts
+msgid "Custom providers are complimentary for organizations of up to {0} seats. This instance has {1} seats, so an Organization plan is required."
+msgstr ""
+
+#. js-lingui-id: FjmF6O
+#. placeholder {0}: access.seatThreshold
+#. placeholder {1}: access.seatCount
+#: src/modules/settings/admin-panel/ai/hooks/useCustomAiProviderAccess.ts
+msgid "Custom providers are complimentary up to {0} seats. This instance has {1}. Upgrade to add more."
+msgstr ""
+
 #. js-lingui-id: BjGDEB
 #: src/modules/object-record/object-options-dropdown/components/ObjectOptionsDropdownCustomView.tsx
 msgid "Custom View"
@@ -5850,6 +6100,11 @@ msgstr "このユーザーが閲覧・操作できる内容をカスタマイズ
 #: src/modules/settings/security/components/SettingsSecuritySettings.tsx
 msgid "Customize your workspace security"
 msgstr "ワークスペースのセキュリティをカスタマイズ"
+
+#. js-lingui-id: xMd3+1
+#: src/modules/activities/emails/mass-email/components/MassEmailComposeCard.tsx
+msgid "Customized for this recipient"
+msgstr ""
 
 #. js-lingui-id: fFwMZv
 #: src/modules/settings/data-model/fields/forms/select/components/SettingsDataModelFieldSelectFormOptionRow.tsx
@@ -6123,6 +6378,7 @@ msgid "Deactivate this field"
 msgstr "このフィールドを無効化"
 
 #. js-lingui-id: yAT3be
+#: src/modules/object-core/workflows/constants/CoreWorkflowStatusFilterOptions.ts
 #: src/modules/settings/data-model/fields/forms/components/text/constants/TextDataModelSelectOptions.ts
 #: src/modules/settings/data-model/object-details/components/SettingsObjectFieldItemTableRow.tsx
 #: src/modules/settings/data-model/object-details/components/SettingsObjectItemTableRow.tsx
@@ -6149,6 +6405,7 @@ msgid "default"
 msgstr "デフォルト"
 
 #. js-lingui-id: ovBPCi
+#: src/modules/advanced-text-editor/components/TextColorDropdown.tsx
 #: src/modules/settings/data-model/fields/forms/address/components/MultiSelectAddressFields.tsx
 #: src/modules/settings/data-model/fields/forms/date/utils/getDisplayFormatLabel.ts
 #: src/modules/settings/experience/components/UiScalePicker.tsx
@@ -6370,6 +6627,11 @@ msgstr "アプリを削除"
 #: src/modules/ai/components/AiChatThreadDeleteConfirmationModal.tsx
 msgid "Delete chat"
 msgstr "チャットを削除"
+
+#. js-lingui-id: Wkx6Ld
+#: src/modules/workflow/workflow-diagram/workflow-edges/components/WorkflowDiagramDefaultEdgeEditable.tsx
+msgid "Delete connection"
+msgstr ""
 
 #. js-lingui-id: 4xlcyV
 #: src/pages/settings/communications/SettingsWorkspaceCommunicationGroupChannelDetail.tsx
@@ -6676,6 +6938,21 @@ msgstr "デバイス"
 msgid "Devices with an active session on your account"
 msgstr "あなたのアカウントでアクティブなセッションがあるデバイス"
 
+#. js-lingui-id: PFS3WB
+#: src/modules/ai/dictation/utils/getDictationFailureMessage.ts
+msgid "Dictation did not respond in this browser. Try Safari, or type instead."
+msgstr ""
+
+#. js-lingui-id: qXiOAF
+#: src/modules/ai/dictation/utils/getDictationFailureMessage.ts
+msgid "Dictation failed. Try again."
+msgstr ""
+
+#. js-lingui-id: MDy8Vw
+#: src/modules/ai/dictation/utils/getDictationFailureMessage.ts
+msgid "Dictation is not supported in this browser."
+msgstr ""
+
 #. js-lingui-id: MRB7nI
 #: src/pages/settings/layout/SettingsLayoutViewDetail.tsx
 msgid "Direction"
@@ -6825,6 +7102,7 @@ msgid "Doesn't contain"
 msgstr "含まない"
 
 #. js-lingui-id: EoKe5U
+#: src/modules/settings/data-model/fields/forms/components/SettingsDataModelFieldLinksVariantForm.tsx
 #: src/modules/settings/workspace/components/SettingsWorkspaceEmailGroupSection.tsx
 #: src/pages/settings/security/SettingsSecurityApprovedAccessDomain.tsx
 msgid "Domain"
@@ -6834,6 +7112,11 @@ msgstr "ドメイン"
 #: src/modules/settings/domains/hooks/useSettingsCustomDomain.ts
 msgid "Domain already taken"
 msgstr "ドメインは既に使用されています"
+
+#. js-lingui-id: eNcdvk
+#: src/modules/settings/data-model/fields/forms/components/SettingsDataModelFieldLinksVariantForm.tsx
+msgid "Domain links are stored as a bare domain name, so twenty.com and https://www.twenty.com are the same value"
+msgstr ""
 
 #. js-lingui-id: XoBD/+
 #: src/modules/settings/domains/components/SettingsDomainRecords.tsx
@@ -6916,8 +7199,24 @@ msgstr "サンプルファイルをダウンロード"
 
 #. js-lingui-id: eneWvv
 #: src/modules/activities/emails/components/EmailThreadPreview.tsx
+#: src/modules/object-core/workflows/constants/CoreWorkflowStatusFilterOptions.ts
 msgid "Draft"
 msgstr "下書き"
+
+#. js-lingui-id: 1qZ7C3
+#: src/modules/ai/components/suggested-prompts/contextual-suggested-prompts.ts
+msgid "Draft an email"
+msgstr ""
+
+#. js-lingui-id: /b72oP
+#: src/modules/ai/components/suggested-prompts/contextual-suggested-prompts.ts
+msgid "Draft an email to this company about "
+msgstr ""
+
+#. js-lingui-id: 1dpSPf
+#: src/modules/activities/emails/hooks/useMessageCampaignDraft.ts
+msgid "Draft deleted"
+msgstr ""
 
 #. js-lingui-id: DbAw4C
 #: src/modules/workflow/workflow-steps/workflow-actions/components/WorkflowRunStepLogsEmailDetail.tsx
@@ -6976,6 +7275,10 @@ msgstr "ウィジェットを複製"
 
 #. js-lingui-id: cheWPw
 #: src/modules/object-record/record-field-list/record-detail-section/duplicate/components/RecordDetailDuplicatesSection.tsx
+#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
+#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
+#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
+#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
 msgid "Duplicates"
 msgstr "重複"
 
@@ -7143,6 +7446,11 @@ msgstr "データ構造とフィールドを編集する"
 msgid "Edit each side"
 msgstr "各辺を個別に編集"
 
+#. js-lingui-id: QjNcml
+#: src/modules/object-record/record-table/record-table-header/components/RecordTableColumnHeadDropdownMenu.tsx
+msgid "Edit field"
+msgstr ""
+
 #. js-lingui-id: 9QCQIc
 #: src/modules/object-record/object-options-dropdown/components/ObjectOptionsDropdownHiddenRecordGroupsContent.tsx
 msgid "Edit field values"
@@ -7196,6 +7504,12 @@ msgstr "ページを編集"
 msgid "Edit payment method, see your invoices and more"
 msgstr "支払い方法の編集、請求書の確認など"
 
+#. js-lingui-id: bQBJjz
+#. placeholder {0}: pinnedTab.title
+#: src/modules/page-layout/components/PageLayoutRecordIdentifierBar.tsx
+msgid "Edit pinned tab: {0}"
+msgstr ""
+
 #. js-lingui-id: QJQd1J
 #: src/modules/settings/roles/role-permissions/permission-flags/hooks/useActionRolePermissionFlagConfig.ts
 msgid "Edit Profile"
@@ -7215,6 +7529,12 @@ msgstr "全オブジェクトでレコードを編集する"
 #: src/modules/page-layout/widgets/field/components/FieldWidgetRelationEditAction.tsx
 msgid "Edit relation"
 msgstr "リレーションを編集"
+
+#. js-lingui-id: CvRD+4
+#. placeholder {0}: composerState.includedRecipients.length
+#: src/modules/activities/emails/mass-email/components/MassEmailRecipientList.tsx
+msgid "Edit template · {0} recipients"
+msgstr ""
 
 #. js-lingui-id: /VLYQj
 #: src/modules/settings/translations/components/SettingsTranslationsButton.tsx
@@ -7351,6 +7671,11 @@ msgstr "メールが正常に送信されました。"
 msgid "Email sharing"
 msgstr "メール共有"
 
+#. js-lingui-id: iSMIhW
+#: src/pages/settings/profile/SettingsProfile.tsx
+msgid "Email signature"
+msgstr ""
+
 #. js-lingui-id: jvneza
 #: src/modules/settings/applications/components/SettingsApplicationAboutSidebar.tsx
 msgid "Email support"
@@ -7392,6 +7717,8 @@ msgid "Email/Domain"
 msgstr "メール/ドメイン"
 
 #. js-lingui-id: BXEcos
+#: src/modules/person-duplicate-review/components/PersonDuplicateCard.tsx
+#: src/modules/person-duplicate-review/components/PersonDuplicateMergePreview.tsx
 #: src/modules/settings/accounts/components/SettingsAccountsSettingsSection.tsx
 #: src/modules/settings/hooks/useSettingsNavigationItems.tsx
 #: src/pages/settings/accounts/SettingsAccountsEmails.tsx
@@ -7792,6 +8119,7 @@ msgid "Enter the workspace subdomain to transfer this app to. You will lose acce
 msgstr "このアプリを譲渡するワークスペースのサブドメインを入力してください。管理権限を失います。"
 
 #. js-lingui-id: pubQie
+#: src/modules/object-core/workflows/components/CoreWorkflowFilterValueInput.tsx
 #: src/modules/object-record/advanced-filter/components/AdvancedFilterDropdownNumberInput.tsx
 #: src/modules/object-record/advanced-filter/components/AdvancedFilterDropdownTextInput.tsx
 #: src/modules/object-record/record-field/ui/meta-types/input/components/ArrayFieldInput.tsx
@@ -7878,6 +8206,11 @@ msgstr "環境変数のオプション"
 #: src/modules/settings/admin-panel/config-variables/utils/useSourceContent.ts
 msgid "Environment variable"
 msgstr "環境変数"
+
+#. js-lingui-id: fa53BW
+#: src/modules/information-banner/components/environment/InformationBannerEnvironment.tsx
+msgid "Environment: {REACT_APP_ENVIRONMENT_LABEL}"
+msgstr ""
 
 #. js-lingui-id: 3dQ6zJ
 #: src/modules/settings/billing/constants/SettingsBillingPlanComparisonRows.ts
@@ -8172,6 +8505,10 @@ msgid "every minute"
 msgstr "毎分"
 
 #. js-lingui-id: PsQmAw
+#: src/modules/activities/emails/mass-email/components/MassEmailComposeCard.tsx
+#: src/modules/activities/emails/mass-email/components/MassEmailComposeCard.tsx
+#: src/modules/activities/emails/mass-email/components/MassEmailRecipientList.tsx
+#: src/modules/activities/emails/mass-email/components/MassEmailRecipientList.tsx
 #: src/modules/object-record/object-options-dropdown/components/ObjectOptionsDropdownVisibilityContent.tsx
 msgid "Everyone"
 msgstr "全員"
@@ -8265,14 +8602,19 @@ msgstr "フォルダーを展開"
 
 #. js-lingui-id: 7OJt04
 #: src/modules/ui/navigation/navigation-drawer/components/NavigationDrawerCollapseButton.tsx
-msgid "Expand navigation panel"
-msgstr "ナビゲーションパネルを展開する"
+#~ msgid "Expand navigation panel"
+#~ msgstr "ナビゲーションパネルを展開する"
 
 #. js-lingui-id: CM8OoE
-#: src/modules/side-panel/pages/record-page/hooks/useExpandRecordSidePanelPage.ts
 #: src/modules/side-panel/pages/rich-text-page/hooks/useExpandRichTextSidePanelPage.ts
+#: src/modules/side-panel/routing/hooks/useExpandRecordSidePanelPage.ts
 msgid "Expand record"
 msgstr "レコードを展開する"
+
+#. js-lingui-id: tugdy6
+#: src/modules/navigation/hooks/useNavigationDrawerTogglePresentation.ts
+msgid "Expand sidebar"
+msgstr ""
 
 #. js-lingui-id: Y7w75u
 #: src/modules/workflow/workflow-steps/workflow-actions/code-action/components/WorkflowCodeEditor.tsx
@@ -8281,8 +8623,8 @@ msgstr "フルスクリーンに拡大"
 
 #. js-lingui-id: YcwQIp
 #: src/modules/side-panel/pages/records-page/hooks/useExpandRecordsSidePanelPage.ts
-msgid "Expand view"
-msgstr "ビューを展開する"
+#~ msgid "Expand view"
+#~ msgstr "ビューを展開する"
 
 #. js-lingui-id: iT7W4v
 #: src/modules/workflow/workflow-trigger/components/WorkflowEditTriggerWebhookForm.tsx
@@ -8344,6 +8686,16 @@ msgstr "有効期限"
 #: src/modules/settings/developers/utils/formatExpiration.ts
 msgid "Expires in {dateDiff}"
 msgstr "{dateDiff} で期限が切れます"
+
+#. js-lingui-id: VJKLVq
+#: src/modules/ai/components/suggested-prompts/contextual-suggested-prompts.ts
+msgid "Explain this workflow"
+msgstr ""
+
+#. js-lingui-id: p8KUPY
+#: src/modules/ai/components/suggested-prompts/contextual-suggested-prompts.ts
+msgid "Explain what this workflow does, step by step."
+msgstr ""
 
 #. js-lingui-id: GS+Mus
 #: src/modules/object-record/record-index/export/hooks/useRecordIndexExportRecords.ts
@@ -8456,6 +8808,11 @@ msgstr "レコードの作成に失敗しました"
 msgid "Failed to create unsubscribe topic."
 msgstr "配信停止トピックの作成に失敗しました。"
 
+#. js-lingui-id: dQhrqB
+#: src/modules/activities/emails/hooks/useMessageCampaignDraft.ts
+msgid "Failed to delete draft"
+msgstr ""
+
 #. js-lingui-id: AXveCw
 #: src/pages/settings/communications/SettingsWorkspaceCommunicationGroupChannelDetail.tsx
 msgid "Failed to delete email channel."
@@ -8510,6 +8867,11 @@ msgstr "応答の取得に失敗しました"
 #: src/modules/marketplace/hooks/useInstallMarketplaceApp.ts
 msgid "Failed to install the application."
 msgstr "アプリケーションのインストールに失敗しました。"
+
+#. js-lingui-id: 8YghIJ
+#: src/modules/activities/calendar/hooks/useCalendarEventComposer.ts
+msgid "Failed to link the related records to this event"
+msgstr ""
 
 #. js-lingui-id: LGNhPn
 #: src/modules/settings/billing/components/SettingsBillingPageLayout.tsx
@@ -8614,6 +8976,12 @@ msgstr "ジョブの再試行に失敗しました。後でもう一度お試し
 msgid "Failed to revoke signing key. Please try again later."
 msgstr "署名キーの失効に失敗しました。後でもう一度お試しください。"
 
+#. js-lingui-id: TQfiMk
+#: src/modules/activities/emails/hooks/useMessageCampaignDraft.ts
+#: src/modules/activities/emails/mass-email/hooks/useMassEmailCampaignDraft.ts
+msgid "Failed to save draft"
+msgstr ""
+
 #. js-lingui-id: farFvy
 #: src/modules/layout-customization/hooks/useSaveLayoutCustomization.ts
 msgid "Failed to save layout customization"
@@ -8645,6 +9013,11 @@ msgstr "キャンペーンの送信に失敗しました"
 #: src/modules/activities/emails/hooks/useSendEmail.ts
 msgid "Failed to send email"
 msgstr "メールを送信できませんでした。"
+
+#. js-lingui-id: B6aF8Q
+#: src/modules/activities/emails/mass-email/hooks/useSendMassEmail.ts
+msgid "Failed to send emails"
+msgstr ""
 
 #. js-lingui-id: aH/q8K
 #: src/modules/activities/emails/hooks/useSendMessageCampaignTest.ts
@@ -8790,6 +9163,7 @@ msgstr "フォールバック"
 #. js-lingui-id: ocUvR+
 #: src/modules/object-record/object-filter-dropdown/components/ObjectFilterDropdownBooleanSelect.tsx
 #: src/modules/object-record/record-board/record-board-column/utils/getAggregateOperationShortLabel.ts
+#: src/modules/object-record/record-field/ui/utils/getFieldDisplayLabelText.ts
 #: src/modules/settings/data-model/fields/forms/boolean/constants/BooleanDataModelSelectOptions.ts
 #: src/modules/side-panel/pages/page-layout/components/dropdown-content/ChartRatioOptionValueSelectionDropdownContent.tsx
 #: src/modules/side-panel/pages/page-layout/hooks/useChartSettingsValues.ts
@@ -8897,7 +9271,6 @@ msgstr "フィールド"
 #: src/modules/settings/roles/role-permissions/object-level-permissions/record-level-permissions/components/SettingsRolePermissionsObjectLevelRecordLevelPermissionFieldSelectFieldMenu.tsx
 #: src/modules/side-panel/pages/page-layout/components/dashboard/SidePanelDashboardRecordTableSettings.tsx
 #: src/modules/side-panel/pages/page-layout/components/record-page/SidePanelRecordPageFieldSettings.tsx
-#: src/modules/side-panel/pages/page-layout/components/SidePanelPageLayoutRecordPageWidgetTypeSelect.tsx
 #: src/modules/side-panel/utils/getSidePanelSubPageTitle.ts
 #: src/pages/settings/data-model/constants/SettingsObjectTableMetadata.ts
 #: src/pages/settings/data-model/new-index/SettingsObjectNewIndex.tsx
@@ -8929,6 +9302,7 @@ msgstr "フィールド数"
 
 #. js-lingui-id: EI7W0X
 #: src/modules/page-layout/widgets/components/RecordPageAddWidgetSection.tsx
+#: src/modules/side-panel/pages/page-layout/components/SidePanelPageLayoutRecordPageWidgetTypeSelect.tsx
 msgid "Fields group"
 msgstr "フィールドグループ"
 
@@ -9001,6 +9375,8 @@ msgid "Fill with sample input from"
 msgstr "次からサンプル入力を挿入"
 
 #. js-lingui-id: o7J4JM
+#: src/modules/object-core/workflows/components/CoreWorkflowsFilterBar.tsx
+#: src/modules/object-core/workflows/hooks/useOpenCoreWorkflowFiltersSidePanel.ts
 #: src/modules/object-record/record-table/record-table-header/components/RecordTableColumnHeadDropdownMenu.tsx
 #: src/modules/settings/data-model/object-details/components/SettingsObjectRelationsTable.tsx
 #: src/modules/settings/roles/components/SettingsRolesList.tsx
@@ -9037,6 +9413,16 @@ msgstr "チャットを絞り込む"
 msgid "Filter group rule options"
 msgstr "フィルターグループのルールオプション"
 
+#. js-lingui-id: FG3LyE
+#: src/modules/ai/components/suggested-prompts/contextual-suggested-prompts.ts
+msgid "Filter this view"
+msgstr ""
+
+#. js-lingui-id: xitJ93
+#: src/modules/ai/components/suggested-prompts/contextual-suggested-prompts.ts
+msgid "Filter this view to only show "
+msgstr ""
+
 #. js-lingui-id: 0i36a3
 #: src/modules/page-layout/widgets/timeline/components/WidgetActionTimelineFilter.tsx
 msgid "Filter timeline"
@@ -9046,6 +9432,11 @@ msgstr "タイムラインを絞り込む"
 #: src/modules/settings/unsubscribers/components/filter-dropdown/SettingsUnsubscribersFilterDropdown.tsx
 msgid "Filter unsubscribers"
 msgstr "配信停止者を絞り込む"
+
+#. js-lingui-id: iTs6Ck
+#: src/modules/object-core/commands/hooks/useCoreObjectsCommands.ts
+msgid "Filter workflows"
+msgstr ""
 
 #. js-lingui-id: YrBWVK
 #: src/modules/object-record/record-index/utils/getNonReadableViewFieldSubTitle.ts
@@ -9263,9 +9654,11 @@ msgid "French"
 msgstr "フランス語"
 
 #. js-lingui-id: ejVYRQ
+#: src/modules/activities/emails/components/CampaignComposerFields.tsx
 #: src/modules/activities/emails/components/CampaignDetailsFields.tsx
 #: src/modules/activities/emails/components/CampaignSentEnvelope.tsx
 #: src/modules/activities/emails/components/EmailComposerFields.tsx
+#: src/modules/activities/emails/mass-email/components/MassEmailComposeCard.tsx
 #: src/modules/workflow/workflow-steps/workflow-actions/components/WorkflowEditActionEmailBase.tsx
 #: src/modules/workflow/workflow-steps/workflow-actions/components/WorkflowRunStepLogsEmailDetail.tsx
 msgid "From"
@@ -9325,6 +9718,7 @@ msgstr "氏名"
 #. js-lingui-id: i9zh9T
 #: src/modules/settings/data-model/object-details/components/tabs/ObjectOpenRecordInPicker.tsx
 #: src/modules/settings/experience/components/OpenRecordInPreferencePicker.tsx
+#: src/modules/ui/navigation/navigation-drawer/constants/OpenRecordInOptions.ts
 msgid "Full page"
 msgstr "専用ページ"
 
@@ -9491,7 +9885,13 @@ msgstr "請求ポータルに移動"
 msgid "Go to Draft"
 msgstr "ドラフトに移動"
 
+#. js-lingui-id: MrE/Qb
+#: src/pages/mass-email/MassEmailPage.tsx
+msgid "Go to People"
+msgstr ""
+
 #. js-lingui-id: mT57+Q
+#: src/modules/object-record/record-list/components/RecordListEmptyState.tsx
 #: src/modules/object-record/record-table/empty-state/components/RecordTableEmptyStateRemote.tsx
 #: src/modules/views/view-picker/components/ViewPickerCreateButton.tsx
 #: src/modules/views/view-picker/components/ViewPickerCreateButton.tsx
@@ -9603,6 +10003,7 @@ msgid "Grass"
 msgstr "グラス"
 
 #. js-lingui-id: qS5//Q
+#: src/modules/advanced-text-editor/constants/TextColorLabels.ts
 #: src/modules/settings/data-model/fields/forms/select/components/SettingsDataModelFieldSelectFormOptionRow.tsx
 msgid "Gray"
 msgstr "グレー"
@@ -9618,6 +10019,7 @@ msgid "Greek"
 msgstr "ギリシャ語"
 
 #. js-lingui-id: VmkjGB
+#: src/modules/advanced-text-editor/constants/TextColorLabels.ts
 #: src/modules/settings/data-model/fields/forms/select/components/SettingsDataModelFieldSelectFormOptionRow.tsx
 msgid "Green"
 msgstr "緑"
@@ -9861,7 +10263,7 @@ msgid "Hire a partner to help you implement and customize Twenty."
 msgstr "パートナーに依頼して、Twenty の導入とカスタマイズを支援してもらいましょう。"
 
 #. js-lingui-id: i0qMbr
-#: src/modules/navigation/components/MainNavigationDrawerTabsRow.tsx
+#: src/modules/navigation/components/MainNavigationDrawerModeSwitcher.tsx
 #: src/modules/navigation/hooks/useMobileNavigationBarItems.ts
 msgid "Home"
 msgstr "ホーム"
@@ -10108,6 +10510,7 @@ msgid "If this email is registered, a password reset link has been sent"
 msgstr "このメールアドレスが登録されている場合は、パスワード再設定用リンクを送信しました"
 
 #. js-lingui-id: ZfP/Ap
+#: src/modules/object-record/record-list/components/RecordListEmptyState.tsx
 #: src/modules/object-record/record-table/empty-state/components/RecordTableEmptyStateRemote.tsx
 msgid "If this is unexpected, please verify your settings."
 msgstr "予期しない場合は、設定を確認してください。"
@@ -10220,7 +10623,7 @@ msgstr "なりすまし"
 #. js-lingui-id: gFoGWm
 #: src/modules/settings/admin-panel/components/SettingsAdminServerAdminAccess.tsx
 #: src/modules/settings/admin-panel/components/SettingsAdminServerAdmins.tsx
-#: src/modules/settings/profile/devices/components/SettingsProfileDevicesSection.tsx
+#: src/modules/settings/profile/devices/components/SettingsDeviceSessionRowRightComponent.tsx
 msgid "Impersonation"
 msgstr "なりすまし"
 
@@ -10311,6 +10714,11 @@ msgstr "非アクティブなオブジェクトのオプション"
 #: src/pages/settings/ai/components/SettingsSkillInactiveMenuDropDown.tsx
 msgid "Inactive Skill Options"
 msgstr "非アクティブなスキルのオプション"
+
+#. js-lingui-id: KiXg6J
+#: src/modules/person-duplicate-review/components/PersonDuplicateCard.tsx
+msgid "Include {displayName} in merge"
+msgstr ""
 
 #. js-lingui-id: j8Bj7e
 #: src/modules/settings/security/components/SettingsSecuritySettings.tsx
@@ -10436,6 +10844,11 @@ msgstr "入力トークン"
 msgid "Insert a JSON input, then press \"Run Function\"."
 msgstr "JSON 入力を挿入し、「関数を実行」を押します。"
 
+#. js-lingui-id: UsX21s
+#: src/modules/workflow/workflow-diagram/workflow-edges/components/WorkflowDiagramDefaultEdgeEditable.tsx
+msgid "Insert action"
+msgstr ""
+
 #. js-lingui-id: mia08l
 #: src/modules/advanced-text-editor/components/AdvancedTextEditorInsertRail.tsx
 msgid "Insert image"
@@ -10523,8 +10936,14 @@ msgstr "インストール済みのアプリ"
 #. js-lingui-id: wJJ+Wy
 #: src/pages/settings/applications/components/SettingsApplicationRegistrationShareLinkButtons.tsx
 #: src/pages/settings/applications/tabs/SettingsApplicationDetailAboutTab.tsx
+#: src/pages/settings/applications/tabs/SettingsApplicationDetailAboutTab.tsx
 msgid "Installing..."
 msgstr "インストール中..."
+
+#. js-lingui-id: kc9VIS
+#: src/pages/settings/applications/components/SettingsApplicationRegistrationInstallStats.tsx
+msgid "Installs"
+msgstr ""
 
 #. js-lingui-id: x8uKc7
 #: src/modules/settings/admin-panel/health-status/components/SettingsAdminUpgradeStatusListCard.tsx
@@ -10762,6 +11181,11 @@ msgstr "前である"
 msgid "Is empty"
 msgstr "空である"
 
+#. js-lingui-id: tJ3FGI
+#: src/modules/object-record/object-filter-dropdown/utils/getOperandLabel.ts
+msgid "Is exactly"
+msgstr ""
+
 #. js-lingui-id: glSyvW
 #: src/modules/object-record/object-filter-dropdown/utils/getOperandLabel.ts
 msgid "Is in future"
@@ -10831,6 +11255,11 @@ msgstr "有効なUUIDではありません"
 #: src/modules/object-record/object-filter-dropdown/utils/getOperandLabel.ts
 msgid "Is not empty"
 msgstr "空でない"
+
+#. js-lingui-id: UmjIni
+#: src/modules/object-record/object-filter-dropdown/utils/getOperandLabel.ts
+msgid "Is not exactly"
+msgstr ""
 
 #. js-lingui-id: HQFVAU
 #: src/modules/object-record/object-filter-dropdown/utils/getOperandLabel.ts
@@ -10984,15 +11413,41 @@ msgstr "かんばん"
 msgid "Kanban widget"
 msgstr "カンバン ウィジェット"
 
+#. js-lingui-id: ok27CW
+#. placeholder {0}: link.url
+#: src/modules/person-duplicate-review/components/PersonDuplicateMergePreview.tsx
+msgid "Keep {0}"
+msgstr ""
+
+#. js-lingui-id: tXq9mG
+#: src/modules/person-duplicate-review/components/PersonDuplicateMergePreview.tsx
+msgid "Keep {displayValue}"
+msgstr ""
+
+#. js-lingui-id: w7Wygd
+#: src/modules/person-duplicate-review/components/PersonDuplicateMergePreview.tsx
+msgid "Keep {email}"
+msgstr ""
+
+#. js-lingui-id: IwceEs
+#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
+msgid "Keep everyone separate"
+msgstr ""
+
 #. js-lingui-id: ZlHUDM
 #: src/modules/activities/calendar/components/CalendarEventComposerFields.tsx
-msgid "Keep the current record in the guest list and leave invitations on so the event remains visible on this record."
-msgstr "このレコードにイベントが表示されたままになるよう、現在のレコードをゲストリストに残し、招待をオンのままにしてください。"
+#~ msgid "Keep the current record in the guest list and leave invitations on so the event remains visible on this record."
+#~ msgstr "このレコードにイベントが表示されたままになるよう、現在のレコードをゲストリストに残し、招待をオンのままにしてください。"
 
 #. js-lingui-id: WOUOYg
 #: src/modules/activities/calendar/components/CalendarEventComposerFields.tsx
-msgid "Keep this event related"
-msgstr "このイベントを関連付けたままにする"
+#~ msgid "Keep this event related"
+#~ msgstr "このイベントを関連付けたままにする"
+
+#. js-lingui-id: 4Hatax
+#: src/modules/person-duplicate-review/components/PersonDuplicateCard.tsx
+msgid "Keep this record"
+msgstr ""
 
 #. js-lingui-id: 7sMeHQ
 #: src/modules/workflow/workflow-steps/workflow-actions/http-request-action/components/KeyValuePairInput.tsx
@@ -11260,11 +11715,13 @@ msgid "Last signed in"
 msgstr "最終サインイン"
 
 #. js-lingui-id: o1zvNS
+#: src/modules/object-core/workflows/constants/CoreWorkflowFilterFields.ts
 #: src/modules/object-core/workflows/constants/WorkflowCoreTableColumns.tsx
 msgid "Last update"
 msgstr "最終更新"
 
 #. js-lingui-id: C3yOz3
+#: src/modules/person-duplicate-review/components/PersonDuplicateCard.tsx
 #: src/modules/settings/admin-panel/components/SettingsAdminWorkspaceContent.tsx
 #: src/pages/settings/admin-panel/SettingsAdminInstanceStatus.tsx
 msgid "Last updated"
@@ -11527,7 +11984,13 @@ msgstr "リンク"
 msgid "Link"
 msgstr "リンク"
 
+#. js-lingui-id: FJPUOB
+#: src/modules/settings/data-model/fields/forms/components/SettingsDataModelFieldLinksVariantForm.tsx
+msgid "Link content"
+msgstr ""
+
 #. js-lingui-id: pQjjYo
+#: src/modules/command-menu-item/display/hooks/useCommandMenuAppActions.ts
 #: src/modules/object-record/object-options-dropdown/components/ObjectOptionsDropdownDefaultView.tsx
 #: src/modules/object-record/object-options-dropdown/components/ObjectOptionsDropdownDefaultView.tsx
 #: src/modules/object-record/object-options-dropdown/components/ObjectOptionsDropdownVisibilityContent.tsx
@@ -11558,6 +12021,12 @@ msgstr "リンク URL"
 #: src/modules/activities/timeline-activities/rows/generic/components/EventRowGenericLinked.tsx
 msgid "linked a {objectLabel}"
 msgstr "{objectLabel} をリンクしました"
+
+#. js-lingui-id: gggTBm
+#: src/modules/person-duplicate-review/components/PersonDuplicateCard.tsx
+#: src/modules/person-duplicate-review/components/PersonDuplicateMergePreview.tsx
+msgid "LinkedIn"
+msgstr ""
 
 #. js-lingui-id: 82kQhK
 #: src/modules/advanced-text-editor/extensions/slash-command/DefaultSlashCommands.ts
@@ -11819,6 +12288,11 @@ msgstr "経度"
 msgid "Look up"
 msgstr "検索"
 
+#. js-lingui-id: 9NNx2W
+#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
+msgid "Looking for exact duplicate signals…"
+msgstr ""
+
 #. js-lingui-id: tL2lBI
 #: src/modules/workflow/workflow-diagram/utils/generateNodesAndEdgesForIteratorNode.ts
 msgid "loop"
@@ -11839,6 +12313,22 @@ msgstr "メンテナンス"
 msgid "Maintenance mode"
 msgstr "メンテナンスモード"
 
+#. js-lingui-id: 6nweKM
+#. placeholder {0}: link.url
+#: src/modules/person-duplicate-review/components/PersonDuplicateMergePreview.tsx
+msgid "Make {0} primary"
+msgstr ""
+
+#. js-lingui-id: HpCWO5
+#: src/modules/person-duplicate-review/components/PersonDuplicateMergePreview.tsx
+msgid "Make {displayValue} primary"
+msgstr ""
+
+#. js-lingui-id: VSfvRD
+#: src/modules/person-duplicate-review/components/PersonDuplicateMergePreview.tsx
+msgid "Make {email} primary"
+msgstr ""
+
 #. js-lingui-id: MOLprz
 #: src/modules/settings/roles/role-permissions/permission-flags/hooks/useActionRolePermissionFlagConfig.ts
 msgid "Make HTTP requests to external APIs"
@@ -11851,6 +12341,7 @@ msgstr "非公開にする"
 
 #. js-lingui-id: wckWOP
 #: src/modules/settings/billing/components/internal/ResourceCreditPriceSelector.tsx
+#: src/modules/side-panel/pages/page-layout/components/RegularTabSettingsContent.tsx
 #: src/modules/side-panel/pages/page-layout/components/SingleWidgetTabSettingsContent.tsx
 #: src/modules/side-panel/pages/page-layout/components/WidgetSettingsManageSection.tsx
 msgid "Manage"
@@ -11990,6 +12481,11 @@ msgstr "マーケットプレイス"
 #: src/modules/settings/admin-panel/apps/components/SettingsAdminApps.tsx
 msgid "Marketplace catalog synchronization started."
 msgstr "マーケットプレイスカタログの同期を開始しました。"
+
+#. js-lingui-id: EvNy5N
+#: src/pages/mass-email/MassEmailPage.tsx
+msgid "Mass email"
+msgstr ""
 
 #. js-lingui-id: 8r6vNs
 #. placeholder {0}: fieldLabel ?? ''
@@ -12172,10 +12668,20 @@ msgstr "マージプレビュー"
 msgid "Merge records"
 msgstr "レコードをマージ"
 
+#. js-lingui-id: nLKgG0
+#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
+msgid "Merge selected"
+msgstr ""
+
 #. js-lingui-id: LuriZ0
 #: src/modules/object-record/record-merge/components/MergeRecordsFooter.tsx
 msgid "Merging..."
 msgstr "マージ中..."
+
+#. js-lingui-id: MJKChL
+#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
+msgid "Merging…"
+msgstr ""
 
 #. js-lingui-id: xDAtGP
 #: src/modules/settings/event-logs/utils/getColumnsForEventLogTable.tsx
@@ -12226,6 +12732,11 @@ msgstr "メタデータファイルの生成に失敗しました"
 msgid "Method"
 msgstr "メソッド"
 
+#. js-lingui-id: P9IeiA
+#: src/modules/ai/dictation/utils/getDictationFailureMessage.ts
+msgid "Microphone access is blocked. Allow it in your browser settings to dictate."
+msgstr ""
+
 #. js-lingui-id: 6cH65H
 #: src/modules/settings/security/components/SettingsSecurityAuthBypassOptionsList.tsx
 #: src/modules/settings/security/components/SettingsSecurityAuthProvidersOptionsList.tsx
@@ -12268,6 +12779,11 @@ msgstr "トリガー間の分"
 #: src/modules/workflow/workflow-steps/workflow-actions/components/WorkflowEditActionCreateCalendarEvent.tsx
 msgid "Missing calendar permission."
 msgstr "カレンダー権限がありません。"
+
+#. js-lingui-id: kVXdHR
+#: src/modules/activities/emails/mass-email/components/MassEmailComposeCard.tsx
+msgid "Missing data for:"
+msgstr ""
 
 #. js-lingui-id: URVUmK
 #: src/modules/workflow/workflow-steps/workflow-actions/components/WorkflowEditActionEmailBase.tsx
@@ -12450,16 +12966,14 @@ msgstr "下へ移動"
 #. js-lingui-id: iSLA/r
 #: src/modules/object-record/record-group/hooks/useRecordGroupActions.ts
 #: src/modules/object-record/record-table/record-table-header/components/RecordTableColumnHeadDropdownMenu.tsx
-#: src/modules/side-panel/pages/page-layout/components/RegularTabSettingsContent.tsx
-#: src/modules/side-panel/pages/page-layout/components/SingleWidgetTabSettingsContent.tsx
+#: src/modules/side-panel/pages/page-layout/utils/getTabSettingsPlacementItems.ts
 msgid "Move left"
 msgstr "左に移動"
 
 #. js-lingui-id: Ubl2by
 #: src/modules/object-record/record-group/hooks/useRecordGroupActions.ts
 #: src/modules/object-record/record-table/record-table-header/components/RecordTableColumnHeadDropdownMenu.tsx
-#: src/modules/side-panel/pages/page-layout/components/RegularTabSettingsContent.tsx
-#: src/modules/side-panel/pages/page-layout/components/SingleWidgetTabSettingsContent.tsx
+#: src/modules/side-panel/pages/page-layout/utils/getTabSettingsPlacementItems.ts
 msgid "Move right"
 msgstr "右に移動"
 
@@ -12549,7 +13063,9 @@ msgstr "該当なし"
 
 #. js-lingui-id: 6YtxFj
 #: src/modules/auth/sign-in-up/components/internal/SignInUpWorkspaceCreationForm.tsx
+#: src/modules/object-core/workflows/constants/CoreWorkflowFilterFields.ts
 #: src/modules/object-core/workflows/constants/WorkflowCoreTableColumns.tsx
+#: src/modules/person-duplicate-review/components/PersonDuplicateMergePreview.tsx
 #: src/modules/settings/accounts/components/SettingsAccountsConnectionForm.tsx
 #: src/modules/settings/admin-panel/apps/components/SettingsAdminApps.tsx
 #: src/modules/settings/admin-panel/components/SettingsAdminGeneral.tsx
@@ -12654,10 +13170,15 @@ msgstr "ナビゲーションメニュー項目"
 msgid "Navigation menu items"
 msgstr "ナビゲーションメニュー項目"
 
+#. js-lingui-id: aTTshK
+#: src/modules/navigation/components/MainNavigationDrawerModeSwitcher.tsx
+msgid "Navigation modes"
+msgstr ""
+
 #. js-lingui-id: s2HXiD
 #: src/modules/navigation/components/MainNavigationDrawerTabsRow.tsx
-msgid "Navigation tabs"
-msgstr "ナビゲーションタブ"
+#~ msgid "Navigation tabs"
+#~ msgstr "ナビゲーションタブ"
 
 #. js-lingui-id: IbVc4A
 #: src/modules/page-layout/widgets/record-table/utils/getRecordTableWidgetLayoutPickerOptions.ts
@@ -12699,10 +13220,16 @@ msgstr "サインイン時には表示されません。メンバーはワーク
 msgid "New"
 msgstr "新規"
 
+#. js-lingui-id: 6WSYbN
+#. placeholder {0}: objectMetadataItem.labelSingular
+#: src/modules/side-panel/hooks/useOpenRecordInSidePanel.ts
+msgid "New {0}"
+msgstr ""
+
 #. js-lingui-id: LfvvW4
 #: src/modules/side-panel/hooks/useOpenRecordInSidePanel.ts
-msgid "New {objectLabelSingular}"
-msgstr "新しい{objectLabelSingular}"
+#~ msgid "New {objectLabelSingular}"
+#~ msgstr "新しい{objectLabelSingular}"
 
 #. js-lingui-id: Kcr9Fr
 #: src/modules/settings/accounts/components/SettingsNewAccountSection.tsx
@@ -12746,8 +13273,6 @@ msgstr "新しいカレンダーイベント"
 
 #. js-lingui-id: hIQkLb
 #: src/modules/ai/components/NavigationDrawerAiChatThreadItem.tsx
-#: src/modules/navigation/components/MainNavigationDrawerTabsRow.tsx
-#: src/modules/navigation/components/MainNavigationDrawerTabsRow.tsx
 msgid "New chat"
 msgstr "新しいチャット"
 
@@ -12777,6 +13302,11 @@ msgstr "新規メール"
 #: src/modules/settings/accounts/components/SettingsAccountsNewEmailGroupChannel.tsx
 msgid "New Email Channel"
 msgstr "新しいメールチャネル"
+
+#. js-lingui-id: 8ETZA5
+#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
+msgid "New exact matches on full name, email, phone, or LinkedIn will appear here. No records are merged automatically."
+msgstr ""
 
 #. js-lingui-id: k6B3QD
 #: src/modules/navigation-menu-item/display/sections/favorites/components/FavoritesSection.tsx
@@ -12881,6 +13411,11 @@ msgstr "新しいSSO構成"
 msgid "New SSO provider"
 msgstr "新しいSSOプロバイダー"
 
+#. js-lingui-id: l3pyXo
+#: src/modules/views/view-picker/components/ViewPickerStackSelect.tsx
+msgid "New stack"
+msgstr ""
+
 #. js-lingui-id: 3YvS+c
 #: src/modules/page-layout/components/PageLayoutTabListNewTabDropdownContent.tsx
 msgid "New tab"
@@ -12931,6 +13466,7 @@ msgstr "ニュースレター"
 #: src/modules/settings/admin-panel/health-status/components/SettingsAdminQueueJobsTable.tsx
 #: src/modules/settings/billing/components/internal/SubscriptionInfoRowContainer.tsx
 #: src/modules/settings/components/SettingsPaginationControls.tsx
+#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
 #: src/pages/settings/accounts/SettingsAccountsConfigurationStepEmail.tsx
 msgid "Next"
 msgstr "次へ"
@@ -12989,6 +13525,7 @@ msgid "No {label}"
 msgstr "{label}がありません"
 
 #. js-lingui-id: 9CpMvJ
+#: src/modules/object-record/record-list/components/RecordListEmptyState.tsx
 #: src/modules/object-record/record-table/empty-state/components/RecordTableEmptyStateNoRecordFoundForFilter.tsx
 msgid "No {objectLabelSingular} found"
 msgstr "{objectLabelSingular} が見つかりません"
@@ -13208,6 +13745,7 @@ msgid "No Data"
 msgstr "データなし"
 
 #. js-lingui-id: 7tCnBa
+#: src/modules/object-record/record-list/components/RecordListEmptyState.tsx
 #: src/modules/object-record/record-table/empty-state/components/RecordTableEmptyStateRemote.tsx
 msgid "No Data Available for Remote Table"
 msgstr "リモートテーブルの利用可能なデータがありません。"
@@ -13244,11 +13782,13 @@ msgid "No default configuration available for this widget"
 msgstr "このウィジェットには既定の設定はありません"
 
 #. js-lingui-id: P4KXUa
+#: src/modules/object-record/record-list/components/RecordListEmptyState.tsx
 #: src/modules/object-record/record-table/empty-state/components/RecordTableEmptyStateSoftDelete.tsx
 msgid "No Deleted {objectLabelSingular} found"
 msgstr "削除された{objectLabelSingular}が見つかりません"
 
 #. js-lingui-id: s7QKq9
+#: src/modules/object-record/record-list/components/RecordListEmptyState.tsx
 #: src/modules/object-record/record-table/empty-state/components/RecordTableEmptyStateSoftDelete.tsx
 msgid "No deleted records matching the filter criteria were found."
 msgstr "フィルター基準に合致する削除されたレコードは見つかりませんでした。"
@@ -13257,6 +13797,12 @@ msgstr "フィルター基準に合致する削除されたレコードは見つ
 #: src/pages/settings/applications/tabs/SettingsApplicationDetailAboutTab.tsx
 msgid "No description available for this application"
 msgstr "このアプリケーションの説明はありません"
+
+#. js-lingui-id: E0HtSP
+#. placeholder {0}: formatSkippedLabels( composerState.skippedWithoutEmail.map( (skipped) => skipped.displayName, ), )
+#: src/modules/activities/emails/mass-email/components/MassEmailRecipientList.tsx
+msgid "No email address, skipped: {0}"
+msgstr ""
 
 #. js-lingui-id: mINrlz
 #: src/modules/activities/emails/components/EmptyInboxPlaceholder.tsx
@@ -13371,6 +13917,13 @@ msgstr "最新バージョンが見つかりません"
 msgid "No limit"
 msgstr "上限なし"
 
+#. js-lingui-id: ANScpa
+#. placeholder {0}: massEmailRelatedSource.relationFieldLabel
+#. placeholder {1}: formatSkippedLabels( massEmailRelatedSource.sourceRecordLabelsWithoutRelatedPerson, )
+#: src/modules/activities/emails/mass-email/components/MassEmailRecipientList.tsx
+msgid "No linked {0}, skipped: {1}"
+msgstr ""
+
 #. js-lingui-id: nivaRq
 #: src/modules/activities/emails/components/CampaignSentEnvelope.tsx
 msgid "No list"
@@ -13420,6 +13973,11 @@ msgstr "メッセージが見つかりません。"
 #: src/modules/settings/admin-panel/health-status/components/SettingsAdminWorkerMetricsGraph.tsx
 msgid "No metrics data available"
 msgstr "利用可能なメトリックスデータがありません"
+
+#. js-lingui-id: RUBcco
+#: src/modules/ai/dictation/utils/getDictationFailureMessage.ts
+msgid "No microphone is available. Connect one and try again."
+msgstr ""
 
 #. js-lingui-id: UWZZdQ
 #: src/pages/settings/ai/components/SettingsAgentSettingsTab.tsx
@@ -13485,6 +14043,16 @@ msgstr "個々のオブジェクトに対して権限が設定されていませ
 msgid "No provenance attestation was found for this package. Publish it from GitHub Actions with npm trusted publishing, then try claiming again."
 msgstr "このパッケージのプロベナンスのアテステーションが見つかりませんでした。GitHub Actions から npm Trusted Publishing を使用して公開してから、もう一度所有権の取得を行ってください。"
 
+#. js-lingui-id: O9dD65
+#: src/modules/activities/emails/mass-email/components/MassEmailRecipientList.tsx
+msgid "No recipients match your search."
+msgstr ""
+
+#. js-lingui-id: JPmCmL
+#: src/pages/mass-email/MassEmailPage.tsx
+msgid "No recipients selected."
+msgstr ""
+
 #. js-lingui-id: 5sv+ia
 #: src/modules/activities/emails/hooks/useSendMessageCampaign.ts
 msgid "No recipients to send to ({skippedCount} skipped)"
@@ -13509,12 +14077,14 @@ msgid "No record selected"
 msgstr "レコードが選択されていません"
 
 #. js-lingui-id: EqGTpW
+#: src/modules/object-record/record-list/components/RecordListEmptyState.tsx
 #: src/modules/object-record/record-picker/components/RecordPickerNoRecordFoundMenuItem.tsx
 #: src/modules/object-record/record-table/empty-state/components/RecordTableEmptyStateReadOnly.tsx
 msgid "No records found"
 msgstr "レコードが見つかりません"
 
 #. js-lingui-id: FwUgy3
+#: src/modules/object-record/record-list/components/RecordListEmptyState.tsx
 #: src/modules/object-record/record-table/empty-state/components/RecordTableEmptyStateNoRecordFoundForFilter.tsx
 msgid "No records matching the filter criteria were found."
 msgstr "フィルター条件に一致するレコードは見つかりませんでした。"
@@ -13608,13 +14178,13 @@ msgstr "件名なし"
 
 #. js-lingui-id: Y8HpZa
 #: src/modules/page-layout/widgets/call-recording-summary/components/CallRecordingSummaryBody.tsx
-msgid "No Summary"
-msgstr "要約なし"
+#~ msgid "No Summary"
+#~ msgstr "要約なし"
 
 #. js-lingui-id: cU6bd5
 #: src/modules/page-layout/widgets/call-recording-summary/components/CallRecordingSummaryBody.tsx
-msgid "No summary has been generated for this call recording yet."
-msgstr "この通話録音の要約は、まだ生成されていません。"
+#~ msgid "No summary has been generated for this call recording yet."
+#~ msgstr "この通話録音の要約は、まだ生成されていません。"
 
 #. js-lingui-id: RQ6tfU
 #: src/modules/navigation-menu-item/edit/side-panel/components/SidePanelSystemObjectPickerSubView.tsx
@@ -13631,25 +14201,36 @@ msgstr "ビューのあるシステムオブジェクトが見つかりません
 msgid "No targets available"
 msgstr "利用可能なターゲットはありません"
 
+#. js-lingui-id: LPYdVr
+#: src/modules/person-duplicate-review/components/PersonDuplicateCard.tsx
+msgid "No title or company"
+msgstr ""
+
 #. js-lingui-id: t0t36i
 #: src/modules/workflow/workflow-steps/workflow-actions/ai-agent-action/components/WorkflowRunStepLogsAiAgentDetail.tsx
 msgid "No tools were called"
 msgstr "ツールは呼び出されませんでした"
 
 #. js-lingui-id: vK0RL8
+#: src/modules/activities/emails/components/CampaignComposerFields.tsx
 #: src/modules/activities/emails/components/CampaignDetailsFields.tsx
 msgid "No topic"
 msgstr "トピックなし"
 
 #. js-lingui-id: 3Y/oDZ
-#: src/modules/page-layout/widgets/call-recording-transcript/components/CallRecordingTranscriptContent.tsx
+#: src/modules/page-layout/widgets/call-recording/utils/getCallRecordingStatusDisplayConfiguration.ts
 msgid "No Transcript"
 msgstr "文字起こしなし"
 
+#. js-lingui-id: g+1H2/
+#: src/modules/page-layout/widgets/call-recording/utils/getCallRecordingStatusDisplayConfiguration.ts
+msgid "No transcript is available for this call recording yet."
+msgstr ""
+
 #. js-lingui-id: du4Icj
 #: src/modules/page-layout/widgets/call-recording-transcript/components/CallRecordingTranscriptContent.tsx
-msgid "No transcript is available for this recording."
-msgstr "この録音には書き起こしがありません。"
+#~ msgid "No transcript is available for this recording."
+#~ msgstr "この録音には書き起こしがありません。"
 
 #. js-lingui-id: ZCTuAQ
 #: src/modules/settings/logic-functions/components/tabs/SettingsLogicFunctionTriggersTab.tsx
@@ -13660,6 +14241,11 @@ msgstr "この関数にはトリガーが設定されていません。"
 #: src/modules/settings/logic-functions/components/tabs/SettingsLogicFunctionTriggersTab.tsx
 msgid "No trigger is enabled. Toggle one of the options above to choose how this function gets invoked."
 msgstr "有効なトリガーがありません。上のいずれかのオプションを切り替えて、この関数の呼び出し方法を選択してください。"
+
+#. js-lingui-id: Bvyu3u
+#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
+msgid "No unresolved duplicate groups"
+msgstr ""
 
 #. js-lingui-id: OLsGjz
 #: src/modules/settings/unsubscribers/components/SettingsUnsubscribersList.tsx
@@ -13767,6 +14353,11 @@ msgstr "ワークスペースが見つかりません"
 msgid "No workspaces found matching your search criteria."
 msgstr "検索条件に一致するワークスペースが見つかりません。"
 
+#. js-lingui-id: lYc235
+#: src/pages/settings/applications/components/SettingsApplicationRegistrationInstalledWorkspaces.tsx
+msgid "No workspaces match this search"
+msgstr ""
+
 #. js-lingui-id: Ah7JCB
 #: src/modules/side-panel/pages/workflow/step/view-run/components/SidePanelWorkflowRunViewStepContent.tsx
 msgid "Node"
@@ -13785,6 +14376,7 @@ msgstr "ノードオプション"
 #: src/modules/settings/accounts/components/SettingsAccountsMessageAutoCreationCard.tsx
 #: src/modules/settings/admin-panel/components/SettingsAdminWorkspaceContent.tsx
 #: src/modules/settings/data-model/objects/forms/components/SettingsDataModelObjectIdentifiersForm.tsx
+#: src/modules/settings/data-model/objects/forms/components/SettingsDataModelObjectLabelFormulaForm.tsx
 #: src/modules/side-panel/pages/page-layout/components/dashboard/SidePanelDashboardRecordTableSettings.tsx
 #: src/modules/side-panel/pages/page-layout/components/dashboard/SidePanelDashboardRecordTableSettings.tsx
 #: src/modules/side-panel/pages/page-layout/components/dashboard/SidePanelDashboardRecordTableSettings.tsx
@@ -13802,6 +14394,13 @@ msgstr "ノードオプション"
 #: src/pages/settings/admin-panel/SettingsAdminNewAiProvider.tsx
 msgid "None"
 msgstr "なし"
+
+#. js-lingui-id: cMbQFQ
+#. placeholder {0}: objectMetadataItem.labelPlural
+#. placeholder {1}: relatedPersonFieldMetadataItem.label
+#: src/modules/activities/emails/related-people/hooks/useComposeEmailToRelatedPeople.ts
+msgid "None of the selected {0} have a linked {1}."
+msgstr ""
 
 #. js-lingui-id: 1IipHp
 #: src/localization/hooks/useLocaleOptions.ts
@@ -13856,6 +14455,11 @@ msgstr "リストにありません"
 msgid "Not recorded"
 msgstr "録音なし"
 
+#. js-lingui-id: jUNf38
+#: src/modules/page-layout/widgets/call-recording/utils/getCallRecordingStatusDisplayConfiguration.ts
+msgid "Not Recorded"
+msgstr ""
+
 #. js-lingui-id: MTqQMG
 #: src/pages/settings/applications/tabs/SettingsApplicationCommandMenuItemSettingsTab.tsx
 #: src/pages/settings/applications/tabs/SettingsApplicationCommandMenuItemSettingsTab.tsx
@@ -13886,6 +14490,15 @@ msgstr "{notSharedByFullName}によって共有されていません"
 #: src/modules/settings/accounts/components/SettingsAccountsConnectedAccountsRowRightContainer.tsx
 msgid "Not synced"
 msgstr "同期されていません"
+
+#. js-lingui-id: KiJn9B
+#: src/modules/page-layout/hooks/useCreateRecordPageNoteWidget.ts
+#: src/modules/page-layout/hooks/useCreateRecordPageNoteWidget.ts
+#: src/modules/page-layout/widgets/components/RecordPageAddWidgetSection.tsx
+#: src/modules/side-panel/hooks/useOpenWidgetSettingsInSidePanel.ts
+#: src/modules/side-panel/pages/page-layout/components/SidePanelPageLayoutRecordPageWidgetTypeSelect.tsx
+msgid "Note"
+msgstr ""
 
 #. js-lingui-id: VngD1z
 #: src/pages/settings/applications/SettingsApplicationDetails.tsx
@@ -14093,6 +14706,11 @@ msgstr "オブジェクトとフィールドの権限設定"
 msgid "of"
 msgstr "の"
 
+#. js-lingui-id: EZxOWJ
+#: src/modules/settings/profile/components/SettingsProfileEmailSignature.tsx
+msgid "Off by default. You can still switch the signature on or off for each email you write."
+msgstr ""
+
 #. js-lingui-id: KNz3EF
 #: src/pages/not-found/NotFound.tsx
 msgid "Off the beaten path"
@@ -14132,6 +14750,11 @@ msgstr "ゼロ値を省略する"
 #: src/modules/settings/applications/hooks/useComputeObjectAndFieldsContentForApplication.ts
 msgid "on {0}"
 msgstr "{0} 用"
+
+#. js-lingui-id: gzokj+
+#: src/pages/settings/applications/components/SettingsApplicationRegistrationInstallStats.tsx
+msgid "On suspended workspaces"
+msgstr ""
 
 #. js-lingui-id: jcwJgk
 #: src/modules/workflow/workflow-trigger/utils/cron-to-human/descriptors/getDayOfMonthDescription.ts
@@ -14275,6 +14898,12 @@ msgstr "{firstDay} と {secondDay} のみ"
 msgid "only on {remainingDays} and {0}"
 msgstr "{remainingDays} と {0} のみ"
 
+#. js-lingui-id: asP63i
+#. placeholder {0}: massEmailRelatedSource.sourceObjectLabelPlural
+#: src/modules/activities/emails/mass-email/components/MassEmailRecipientList.tsx
+msgid "Only the first {MAX_EMAIL_RECIPIENTS} selected {0} were read."
+msgstr ""
+
 #. js-lingui-id: saaSLd
 #: src/modules/activities/emails/components/EmailThreadNotShared.tsx
 msgid "Only the subject is shared"
@@ -14327,10 +14956,20 @@ msgstr "Twenty リモートサーバーの設定が事前入力された Cursor 
 msgid "Open Gmail"
 msgstr "Gmailで開く"
 
+#. js-lingui-id: C39K59
+#: src/modules/ui/navigation/navigation-drawer/components/MultiWorkspaceDropdown/internal/MultiWorkspaceDropdownDefaultComponents.tsx
+msgid "Open in"
+msgstr ""
+
 #. js-lingui-id: noLjKT
 #: src/modules/settings/data-model/fields/forms/components/SettingsDataModelFieldOnClickActionForm.tsx
 msgid "Open in app"
 msgstr "アプリで開く"
+
+#. js-lingui-id: D/Ckos
+#: src/modules/side-panel/routing/hooks/useExpandRoutedSidePanelPage.ts
+msgid "Open in full page"
+msgstr ""
 
 #. js-lingui-id: DP5C7w
 #: src/modules/settings/members/components/MemberPermissionsTab.tsx
@@ -14352,6 +14991,11 @@ msgstr "レコードを開く"
 #: src/modules/settings/experience/components/OpenRecordInPreferencePicker.tsx
 msgid "Open records alongside the current page"
 msgstr "現在のページの横にレコードを開く"
+
+#. js-lingui-id: p9J4lB
+#: src/modules/ui/navigation/navigation-drawer/components/MultiWorkspaceDropdown/internal/MultiWorkspaceDropdownOpenRecordInComponents.tsx
+msgid "Open records in"
+msgstr ""
 
 #. js-lingui-id: F7UdSk
 #: src/modules/settings/data-model/object-details/components/tabs/ObjectOpenRecordInPicker.tsx
@@ -14389,6 +15033,16 @@ msgstr "稼働中"
 msgid "Option 1"
 msgstr "オプション 1"
 
+#. js-lingui-id: WYGNk6
+#: src/modules/object-record/record-field/ui/meta-types/utils/getNewSelectOptionErrorMessage.ts
+msgid "Option names are limited to {OPTION_VALUE_MAXIMUM_LENGTH} characters."
+msgstr ""
+
+#. js-lingui-id: TUkT4u
+#: src/modules/object-record/record-field/ui/meta-types/utils/getNewSelectOptionErrorMessage.ts
+msgid "Option names cannot contain a comma."
+msgstr ""
+
 #. js-lingui-id: gUeG+X
 #: src/pages/settings/admin-panel/SettingsAdminNewAiProvider.tsx
 #: src/pages/settings/admin-panel/SettingsAdminNewAiProvider.tsx
@@ -14424,6 +15078,7 @@ msgid "Or"
 msgstr "または"
 
 #. js-lingui-id: 4OE5Sf
+#: src/modules/advanced-text-editor/constants/TextColorLabels.ts
 #: src/modules/settings/data-model/fields/forms/select/components/SettingsDataModelFieldSelectFormOptionRow.tsx
 msgid "Orange"
 msgstr "オレンジ"
@@ -14452,6 +15107,11 @@ msgstr "番号付きリスト"
 #: src/pages/settings/enterprise/components/OrganizationAdornment.tsx
 msgid "Organization"
 msgstr "組織"
+
+#. js-lingui-id: 0Ogq/s
+#: src/modules/settings/admin-panel/ai/components/SettingsAdminAI.tsx
+msgid "Organization feature"
+msgstr ""
 
 #. js-lingui-id: cyDPQQ
 #: src/modules/settings/billing/components/SettingsBillingSubscriptionInfo.tsx
@@ -14578,6 +15238,11 @@ msgstr "概要"
 #: src/pages/settings/applications/SettingsApplicationRegistrationDetails.tsx
 msgid "Owner"
 msgstr "所有者"
+
+#. js-lingui-id: aiXStf
+#: src/modules/person-duplicate-review/components/PersonDuplicateCard.tsx
+msgid "Owner / creator"
+msgstr ""
 
 #. js-lingui-id: oDAEQq
 #: src/pages/settings/admin-panel/SettingsAdminApplicationRegistrationClaims.tsx
@@ -14798,6 +15463,11 @@ msgstr "送信したメールおよび受信したメールの相手。"
 msgid "People I’ve sent emails to."
 msgstr "送信したメールの相手。"
 
+#. js-lingui-id: ly1vF8
+#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
+msgid "People merged. Absorbed records are available in Trash."
+msgstr ""
+
 #. js-lingui-id: qMTN0w
 #: src/pages/settings/ai/SettingsAiUsageUserDetail.tsx
 msgid "Per-day AI consumption."
@@ -14887,6 +15557,11 @@ msgstr "人物を作成しました"
 msgid "Person ID"
 msgstr "人物 ID"
 
+#. js-lingui-id: FaMom6
+#: src/modules/activities/emails/mass-email/components/MassEmailComposeCard.tsx
+msgid "Personalize for each recipient with placeholders:"
+msgstr ""
+
 #. js-lingui-id: zmwvG2
 #: src/modules/object-record/record-field/ui/meta-types/input/components/PhonesFieldInput.tsx
 msgid "Phone"
@@ -14903,11 +15578,25 @@ msgstr "電話番号"
 msgid "Phone number copied to clipboard"
 msgstr "電話番号がクリップボードにコピーされました"
 
+#. js-lingui-id: m2ivgq
+#: src/modules/person-duplicate-review/components/PersonDuplicateCard.tsx
+#: src/modules/person-duplicate-review/components/PersonDuplicateMergePreview.tsx
+msgid "Phones"
+msgstr ""
+
+#. js-lingui-id: DLlQEh
+#. placeholder {0}: displayedSubStepObjectDisplay?.label
+#. placeholder {0}: subStepObjectDisplay?.label
+#: src/modules/workflow/workflow-steps/components/WorkflowDropdownStepOutputItems.tsx
+#: src/modules/workflow/workflow-variables/components/WorkflowVariablesDropdownStepItems.tsx
+msgid "Pick a {0} record"
+msgstr ""
+
 #. js-lingui-id: vqKcU0
 #: src/modules/workflow/workflow-steps/components/WorkflowDropdownStepOutputItems.tsx
 #: src/modules/workflow/workflow-variables/components/WorkflowVariablesDropdownStepItems.tsx
-msgid "Pick a {objectLabel} record"
-msgstr "{objectLabel}レコードを選択する"
+#~ msgid "Pick a {objectLabel} record"
+#~ msgstr "{objectLabel}レコードを選択する"
 
 #. js-lingui-id: JqqNlC
 #: src/modules/side-panel/utils/getSidePanelSubPageTitle.ts
@@ -14954,11 +15643,12 @@ msgid "Pie Chart"
 msgstr "パイチャート"
 
 #. js-lingui-id: 3pU8e+
-#: src/modules/side-panel/pages/page-layout/components/SingleWidgetTabSettingsContent.tsx
+#: src/modules/side-panel/pages/page-layout/utils/getTabSettingsPlacementItems.ts
 msgid "Pin tab"
 msgstr "タブをピン留め"
 
 #. js-lingui-id: 2FIjLb
+#: src/modules/advanced-text-editor/constants/TextColorLabels.ts
 #: src/modules/settings/data-model/fields/forms/select/components/SettingsDataModelFieldSelectFormOptionRow.tsx
 msgid "Pink"
 msgstr "ピンク"
@@ -14970,6 +15660,11 @@ msgstr "ピンク"
 msgid "Pinned"
 msgstr "ピン留め"
 
+#. js-lingui-id: OFY07S
+#: src/modules/page-layout/components/PageLayoutRecordIdentifierBar.tsx
+msgid "Pinned tab, always shown on the left"
+msgstr ""
+
 #. js-lingui-id: hx1ePY
 #: src/modules/workflow/workflow-steps/workflow-actions/form-action/components/WorkflowFormFieldSettingsNumber.tsx
 #: src/modules/workflow/workflow-steps/workflow-actions/form-action/components/WorkflowFormFieldSettingsText.tsx
@@ -14977,7 +15672,7 @@ msgid "Placeholder"
 msgstr "プレースホルダー"
 
 #. js-lingui-id: MFTZK8
-#: src/modules/side-panel/pages/page-layout/components/SingleWidgetTabSettingsContent.tsx
+#: src/modules/side-panel/pages/page-layout/components/TabSettingsPlacementSection.tsx
 #: src/modules/side-panel/pages/page-layout/components/WidgetSettingsPlacementSection.tsx
 msgid "Placement"
 msgstr "配置"
@@ -15151,7 +15846,7 @@ msgid "Prefix"
 msgstr "接頭辞"
 
 #. js-lingui-id: dVCM1s
-#: src/modules/page-layout/widgets/call-recording-transcript/components/CallRecordingTranscriptContent.tsx
+#: src/modules/page-layout/widgets/call-recording/utils/getCallRecordingStatusDisplayConfiguration.ts
 msgid "Preparing Transcript"
 msgstr "文字起こしを準備中"
 
@@ -15186,6 +15881,7 @@ msgstr "受信者が配信を停止する際に表示されるページのプレ
 #. js-lingui-id: DHhJ7s
 #: src/modules/settings/admin-panel/health-status/components/SettingsAdminQueueJobsTable.tsx
 #: src/modules/settings/components/SettingsPaginationControls.tsx
+#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
 msgid "Previous"
 msgstr "前へ"
 
@@ -15276,11 +15972,11 @@ msgstr "処理中"
 
 #. js-lingui-id: HvAaN4
 #: src/modules/page-layout/widgets/call-recording-summary/components/CallRecordingSummaryBody.tsx
-msgid "Processing Failed"
-msgstr "処理に失敗しました"
+#~ msgid "Processing Failed"
+#~ msgstr "処理に失敗しました"
 
 #. js-lingui-id: 9YrAC6
-#: src/modules/page-layout/widgets/call-recording-summary/components/CallRecordingSummaryBody.tsx
+#: src/modules/page-layout/widgets/call-recording/utils/getCallRecordingStatusDisplayConfiguration.ts
 msgid "Processing Recording"
 msgstr "録音を処理中"
 
@@ -15339,6 +16035,11 @@ msgstr "プロパティ名"
 msgid "Property value"
 msgstr "プロパティ値"
 
+#. js-lingui-id: k5ePVH
+#: src/modules/person-duplicate-review/components/PersonDuplicateMergePreview.tsx
+msgid "Proposed merged person"
+msgstr ""
+
 #. js-lingui-id: GVxbU6
 #: src/modules/settings/security/components/SSO/SettingsSSOOIDCForm.tsx
 msgid "Provide your OIDC provider details"
@@ -15392,6 +16093,7 @@ msgid "Publish your app to the marketplace so others can install it"
 msgstr "アプリをマーケットプレイスに公開して、他のユーザーがインストールできるようにする"
 
 #. js-lingui-id: mF9LxA
+#: src/modules/advanced-text-editor/constants/TextColorLabels.ts
 #: src/modules/settings/data-model/fields/forms/select/components/SettingsDataModelFieldSelectFormOptionRow.tsx
 msgid "Purple"
 msgstr "パープル"
@@ -15691,6 +16393,11 @@ msgstr "レコード画像"
 msgid "Record label"
 msgstr "レコードラベル"
 
+#. js-lingui-id: Pp7MBT
+#: src/modules/settings/data-model/objects/forms/components/SettingsDataModelObjectLabelFormulaForm.tsx
+msgid "Record label formula"
+msgstr ""
+
 #. js-lingui-id: XueM/X
 #: src/modules/settings/data-model/object-details/components/tabs/ObjectLayout.tsx
 msgid "Record page"
@@ -15723,10 +16430,26 @@ msgstr "レコードレベル"
 msgid "Record(s) selected"
 msgstr "選択されたレコード"
 
+#. js-lingui-id: 3esxl/
+#: src/modules/page-layout/widgets/call-recording/utils/getCallRecordingStatusDisplayConfiguration.ts
+msgid "Recorder Joining"
+msgstr ""
+
 #. js-lingui-id: XmKjfh
 #: src/modules/activities/calendar/components/CalendarEventCallRecorderAvatar.tsx
+#: src/modules/page-layout/widgets/call-recording/utils/getCallRecordingStatusDisplayConfiguration.ts
 msgid "Recording"
 msgstr "録音中"
+
+#. js-lingui-id: nHfxK5
+#: src/modules/page-layout/widgets/call-recording/utils/getCallRecordingStatusDisplayConfiguration.ts
+msgid "Recording Failed"
+msgstr ""
+
+#. js-lingui-id: h9TBi+
+#: src/modules/page-layout/widgets/call-recording/utils/getCallRecordingStatusDisplayConfiguration.ts
+msgid "Recording Scheduled"
+msgstr ""
 
 #. js-lingui-id: PWlTvh
 #: src/modules/navigation-menu-item/edit/side-panel/components/SidePanelNewSidebarItemSearchResults.tsx
@@ -15737,6 +16460,7 @@ msgid "Records"
 msgstr "レコード"
 
 #. js-lingui-id: wRTiSD
+#: src/modules/advanced-text-editor/constants/TextColorLabels.ts
 #: src/modules/settings/data-model/fields/forms/select/components/SettingsDataModelFieldSelectFormOptionRow.tsx
 msgid "Red"
 msgstr "赤"
@@ -15826,6 +16550,7 @@ msgid "Relation type"
 msgstr "関係タイプ"
 
 #. js-lingui-id: g87L9j
+#: src/modules/activities/calendar/components/CalendarEventComposerFields.tsx
 #: src/modules/settings/data-model/object-details/components/tabs/ObjectFields.tsx
 msgid "Relations"
 msgstr "関連"
@@ -15927,6 +16652,7 @@ msgid "Remove block"
 msgstr "ブロックを削除"
 
 #. js-lingui-id: 2HpFUd
+#: src/modules/object-record/record-list/components/RecordListEmptyState.tsx
 #: src/modules/object-record/record-table/empty-state/components/RecordTableEmptyStateSoftDelete.tsx
 msgid "Remove Deleted filter"
 msgstr "削除フィルターを削除"
@@ -16048,6 +16774,11 @@ msgstr "すべての言語で名前を変更"
 msgid "Renewal date"
 msgstr "更新日"
 
+#. js-lingui-id: bha0Vl
+#: src/pages/settings/enterprise/SettingsEnterprise.tsx
+msgid "Renews on"
+msgstr ""
+
 #. js-lingui-id: Ee8JBW
 #: src/modules/workflow/workflow-steps/workflow-actions/form-action/components/WorkflowEditActionFormBuilder.tsx
 msgid "Reorder field"
@@ -16110,6 +16841,11 @@ msgstr "レポート"
 msgid "Request"
 msgstr "リクエスト"
 
+#. js-lingui-id: nTlQ1w
+#: src/modules/navigation/components/MainNavigationDrawerFeatureRequestItem.tsx
+msgid "Request a feature"
+msgstr ""
+
 #. js-lingui-id: /laZGZ
 #: src/modules/workflow/workflow-steps/workflow-actions/http-request-action/components/HttpRequestExecutionResult.tsx
 msgid "Request Failed"
@@ -16124,6 +16860,16 @@ msgstr "認証を必須にする"
 #: src/pages/settings/ai/components/SettingsToolParameterTable.tsx
 msgid "Required"
 msgstr "必須"
+
+#. js-lingui-id: Vae65A
+#: src/modules/ai/components/suggested-prompts/contextual-suggested-prompts.ts
+msgid "Research this company"
+msgstr ""
+
+#. js-lingui-id: ycHL5x
+#: src/modules/ai/components/suggested-prompts/contextual-suggested-prompts.ts
+msgid "Research this company and summarize what they do, how big they are and any recent news."
+msgstr ""
 
 #. js-lingui-id: G42SNI
 #: src/modules/auth/sign-in-up/components/EmailVerificationSent.tsx
@@ -16298,6 +17044,11 @@ msgstr "戻り値"
 #: src/modules/side-panel/pages/page-layout/utils/getSortLabelSuffixForFieldType.ts
 msgid "reverse alphabetical"
 msgstr "アルファベット逆順"
+
+#. js-lingui-id: wvtGe+
+#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
+msgid "Review possible duplicate people"
+msgstr ""
 
 #. js-lingui-id: GXsAby
 #: src/modules/settings/admin-panel/components/SettingsAdminWorkspaceCreditGrantRowDropdownMenu.tsx
@@ -16532,6 +17283,26 @@ msgstr "ロシア語"
 msgid "Sales"
 msgstr "セールス"
 
+#. js-lingui-id: Ift2Jz
+#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
+msgid "Same email"
+msgstr ""
+
+#. js-lingui-id: asi7+Q
+#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
+msgid "Same full name"
+msgstr ""
+
+#. js-lingui-id: aWrH6A
+#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
+msgid "Same LinkedIn"
+msgstr ""
+
+#. js-lingui-id: Brfp+M
+#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
+msgid "Same phone"
+msgstr ""
+
 #. js-lingui-id: QeF0zb
 #: src/modules/side-panel/pages/email-block-settings/components/EmailBoxSidesInput.tsx
 msgid "Same value on every side"
@@ -16568,6 +17339,11 @@ msgstr "新しいビューとして保存"
 #: src/modules/layout-customization/hooks/useEnterLayoutCustomizationMode.ts
 msgid "Save or cancel dashboard changes before editing the layout."
 msgstr "レイアウトを編集する前に、ダッシュボードの変更を保存するか取り消してください。"
+
+#. js-lingui-id: K/F6pa
+#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
+msgid "Saving…"
+msgstr ""
 
 #. js-lingui-id: bifv6N
 #: src/modules/settings/experience/components/UiScalePicker.tsx
@@ -16632,12 +17408,18 @@ msgstr "スコープ"
 msgid "Score"
 msgstr "スコア"
 
+#. js-lingui-id: oOi11l
+#: src/modules/ai/components/AiChatScrollToBottomButton.tsx
+msgid "Scroll to bottom"
+msgstr ""
+
 #. js-lingui-id: hJjXGo
 #: src/pages/settings/admin-panel/SettingsAdminAiProviderDetail.tsx
 msgid "SDK"
 msgstr "SDK"
 
 #. js-lingui-id: A1taO8
+#: src/modules/activities/emails/mass-email/components/MassEmailRecipientList.tsx
 #: src/modules/command-menu-item/engine-command/constants/EngineComponentKeyHeadlessComponentMap.tsx
 #: src/modules/command-menu-item/engine-command/constants/EngineComponentKeyHeadlessComponentMap.tsx
 #: src/modules/navigation/hooks/useMobileNavigationBarItems.ts
@@ -16894,6 +17676,11 @@ msgstr "レコードを検索..."
 msgid "Search registrations..."
 msgstr "登録を検索..."
 
+#. js-lingui-id: Yv+rTs
+#: src/modules/workflow/workflow-variables/components/WorkflowVariablesDropdownSteps.tsx
+msgid "Search steps and fields"
+msgstr ""
+
 #. js-lingui-id: YIix5Y
 #: src/modules/settings/developers/components/WebhookEntitySelect.tsx
 #: src/pages/settings/applications/tabs/SettingsApplicationDetailContentTab.tsx
@@ -17046,7 +17833,7 @@ msgid "See all {relationLabelPlural} linked to this record"
 msgstr "このレコードにリンクされている{relationLabelPlural}をすべて表示"
 
 #. js-lingui-id: OhVSE4
-#: src/modules/page-layout/widgets/call-recording-transcript/components/WidgetActionCallRecordingTranscript.tsx
+#: src/modules/page-layout/widgets/call-recording/components/WidgetActionCallRecordingSeeAll.tsx
 msgid "See all call recordings linked to this calendar event"
 msgstr "このカレンダーイベントにリンクされているすべての通話録音を表示"
 
@@ -17085,6 +17872,11 @@ msgstr "レコードを表示"
 #: src/modules/settings/roles/role-permissions/objects-permissions/components/SettingsRolePermissionsObjectsSection.tsx
 msgid "See Records on All Objects"
 msgstr "全オブジェクトでレコードを表示する"
+
+#. js-lingui-id: boSDrg
+#: src/modules/ai/components/suggested-prompts/default-suggested-prompts.ts
+msgid "See what I can do"
+msgstr ""
 
 #. js-lingui-id: eQ3co2
 #: src/pages/settings/data-model/SettingsObjects.tsx
@@ -17137,6 +17929,7 @@ msgid "Select a date and time"
 msgstr "日付と時刻を選択します"
 
 #. js-lingui-id: 1YV5aa
+#: src/modules/object-core/workflows/components/CoreWorkflowFilterFieldSelect.tsx
 #: src/modules/settings/data-model/indexes/forms/components/SettingsObjectIndexFieldsForm.tsx
 #: src/modules/workflow/workflow-steps/filters/components/WorkflowStepFilterFieldSelect.tsx
 msgid "Select a field"
@@ -17167,15 +17960,26 @@ msgstr "既知のプロバイダーを選択するか、カスタムプロバイ
 msgid "Select a navigation item to edit"
 msgstr "編集するナビゲーション項目を選択"
 
+#. js-lingui-id: p4N5TB
+#: src/modules/object-record/record-picker/multiple-record-picker/components/MultipleRecordPickerCreateTargetSelect.tsx
+msgid "Select a record type"
+msgstr ""
+
 #. js-lingui-id: dE5jOH
 #: src/modules/side-panel/pages/email-block-settings/components/EmailPageStyleSection.tsx
 msgid "Select a section, columns, button or divider in the email body to edit its settings."
 msgstr "メール本文内のセクション、列、ボタン、または区切り線を選択して設定を編集します。"
 
 #. js-lingui-id: YkYui1
+#: src/modules/activities/emails/components/CampaignComposerFields.tsx
 #: src/modules/activities/emails/components/CampaignDetailsFields.tsx
 msgid "Select a sender"
 msgstr "送信者を選択"
+
+#. js-lingui-id: uOFdLq
+#: src/modules/settings/data-model/fields/forms/morph-relation/components/SettingsDataModelFieldRelationJunctionForm.tsx
+msgid "Select a valid target"
+msgstr ""
 
 #. js-lingui-id: jL3gox
 #: src/modules/object-record/record-field/ui/form-types/components/FormBooleanFieldInput.tsx
@@ -17211,6 +18015,11 @@ msgstr "すべての行を選択"
 #: src/modules/workflow/workflow-trigger/components/WorkflowEditTriggerDatabaseEventForm.tsx
 msgid "Select an option"
 msgstr "オプションを選択"
+
+#. js-lingui-id: lqGidJ
+#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
+msgid "Select at least two people to merge."
+msgstr ""
 
 #. js-lingui-id: 21YIUv
 #: src/modules/spreadsheet-import/steps/components/MatchColumnsStep/components/TemplateColumn.tsx
@@ -17345,6 +18154,11 @@ msgstr "言語を選択し、インターフェースのサイズを調整しま
 msgid "Send"
 msgstr "送信"
 
+#. js-lingui-id: zKE0So
+#: src/modules/activities/emails/mass-email/components/MassEmailComposeCard.tsx
+msgid "Send {recipientCount} emails"
+msgstr ""
+
 #. js-lingui-id: mjK8F3
 #: src/pages/settings/members/tabs/SettingsWorkspaceMembersInviteTab.tsx
 msgid "Send an invite email to your team"
@@ -17357,7 +18171,9 @@ msgstr "メールを送信"
 
 #. js-lingui-id: i/TzEU
 #: src/modules/activities/emails/components/EmptyInboxPlaceholder.tsx
+#: src/modules/command-menu-item/components/RecordIndexCommandMenuDropdown.tsx
 #: src/modules/settings/roles/role-permissions/permission-flags/hooks/useActionRolePermissionFlagConfig.ts
+#: src/modules/side-panel/hooks/useOpenComposeEmailToRelatedPeoplePickerInSidePanel.ts
 msgid "Send Email"
 msgstr "メールを送信"
 
@@ -17388,6 +18204,12 @@ msgstr "テストメールを送信"
 msgid "Sender name"
 msgstr "送信者名"
 
+#. js-lingui-id: 34Qpoa
+#. placeholder {0}: composerState.sentCount
+#: src/modules/activities/emails/mass-email/components/MassEmailComposeCard.tsx
+msgid "Sending {0}/{recipientCount}…"
+msgstr ""
+
 #. js-lingui-id: ULtHaJ
 #: src/pages/settings/communications/SettingsWorkspaceCommunicationGroupChannelDetail.tsx
 msgid "Sending domain"
@@ -17414,6 +18236,13 @@ msgstr "送信中..."
 #: src/modules/workflow/workflow-steps/workflow-actions/components/WorkflowRunStepLogsEmailDetail.tsx
 msgid "Sent"
 msgstr "送信済み"
+
+#. js-lingui-id: 7/XV81
+#. placeholder {0}: emails.length
+#. placeholder {1}: failedRecipients.join(', ')
+#: src/modules/activities/emails/mass-email/hooks/useSendMassEmail.ts
+msgid "Sent {successCount} of {0} emails. Failed: {1}"
+msgstr ""
 
 #. js-lingui-id: hdVMzO
 #: src/modules/settings/accounts/components/SettingsAccountsMessageAutoCreationCard.tsx
@@ -17477,8 +18306,8 @@ msgstr "デフォルトとして設定"
 
 #. js-lingui-id: 7f09hf
 #: src/modules/side-panel/pages/page-layout/components/RegularTabSettingsContent.tsx
-msgid "Set as pinned tab"
-msgstr "タブをピン留めする"
+#~ msgid "Set as pinned tab"
+#~ msgstr "タブをピン留めする"
 
 #. js-lingui-id: ml98ku
 #: src/modules/object-record/record-field/ui/meta-types/input/components/MultiItemFieldMenuItem.tsx
@@ -17548,9 +18377,8 @@ msgid "Setting up your <0>database</0>..."
 msgstr "<0>データベース</0>をセットアップしています..."
 
 #. js-lingui-id: Tz0i8g
+#: src/modules/navigation/components/MainNavigationDrawerModeSwitcher.tsx
 #: src/modules/navigation/components/NavigationDrawerOtherSection.tsx
-#: src/modules/navigation/components/SettingsNavigationDrawer.tsx
-#: src/modules/navigation/components/SettingsNavigationDrawer.tsx
 #: src/modules/object-record/record-merge/hooks/useMergeRecordsContainerTabs.ts
 #: src/modules/settings/accounts/components/SettingsAccountsSettingsSection.tsx
 #: src/modules/settings/mcp-and-apis/utils/buildMcpSetupCategories.tsx
@@ -17560,8 +18388,6 @@ msgstr "<0>データベース</0>をセットアップしています..."
 #: src/modules/settings/roles/role-permissions/permission-flags/components/SettingsRolePermissionsSettingsSection.tsx
 #: src/modules/settings/roles/role/components/SettingsRole.tsx
 #: src/modules/side-panel/pages/page-layout/components/dashboard/SidePanelDashboardRecordTableSettings.tsx
-#: src/modules/side-panel/pages/page-layout/components/RegularTabSettingsContent.tsx
-#: src/modules/ui/navigation/navigation-drawer/components/MultiWorkspaceDropdown/internal/MultiWorkspaceDropdownDefaultComponents.tsx
 #: src/pages/settings/ai/SettingsAgentForm.tsx
 #: src/pages/settings/applications/SettingsApplicationDetails.tsx
 #: src/pages/settings/applications/SettingsApplicationFrontComponentDetail.tsx
@@ -17718,6 +18544,7 @@ msgstr "中央に値を表示"
 #. js-lingui-id: P7rcbf
 #: src/modules/settings/data-model/object-details/components/tabs/ObjectOpenRecordInPicker.tsx
 #: src/modules/settings/experience/components/OpenRecordInPreferencePicker.tsx
+#: src/modules/ui/navigation/navigation-drawer/constants/OpenRecordInOptions.ts
 msgid "Side panel"
 msgstr "サイドパネル"
 
@@ -17755,6 +18582,11 @@ msgstr "メンテナンス中はサインアップを一時的に利用できま
 #: src/pages/settings/legal/SettingsLegalDpaNew.tsx
 msgid "Signatory title"
 msgstr "署名権限者の役職"
+
+#. js-lingui-id: 0rl8O6
+#: src/pages/settings/profile/SettingsProfile.tsx
+msgid "Signature you can add to the emails you write from Twenty"
+msgstr ""
 
 #. js-lingui-id: Lz4j8Q
 #: src/modules/settings/legal/components/SettingsDpaAgreementRow.tsx
@@ -17883,7 +18715,15 @@ msgstr "ジャンクションオブジェクト（多対多リレーションに
 msgid "Skipped"
 msgstr "スキップ済み"
 
+#. js-lingui-id: L253KY
+#. placeholder {0}: relatedPersonFieldMetadataItem.label
+#. placeholder {1}: sourceRecordLabelsWithoutRelatedPerson.join(', ')
+#: src/modules/activities/emails/related-people/hooks/useComposeEmailToRelatedPeople.ts
+msgid "Skipped without a linked {0}: {1}"
+msgstr ""
+
 #. js-lingui-id: BIZl8w
+#: src/modules/advanced-text-editor/constants/TextColorLabels.ts
 #: src/modules/settings/data-model/fields/forms/select/components/SettingsDataModelFieldSelectFormOptionRow.tsx
 msgid "Sky"
 msgstr "スカイ"
@@ -17987,6 +18827,11 @@ msgstr "ワークスペースの作成中に問題が発生しました。もう
 msgid "Something went wrong while loading logs. Please try again."
 msgstr "ログの読み込み中に問題が発生しました。もう一度お試しください。"
 
+#. js-lingui-id: YaUOHN
+#: src/modules/side-panel/routing/components/SidePanelRoutedPage.tsx
+msgid "Something went wrong while loading this page."
+msgstr ""
+
 #. js-lingui-id: yHwG3y
 #: src/modules/object-record/object-options-dropdown/components/ObjectOptionsDropdownCalendarViewContent.tsx
 #: src/modules/settings/components/SettingsCard.tsx
@@ -18071,6 +18916,11 @@ msgstr "スペースとカンマ"
 msgid "Spanish"
 msgstr "スペイン語"
 
+#. js-lingui-id: NWZxCM
+#: src/modules/ai/dictation/utils/getDictationFailureMessage.ts
+msgid "Speech recognition could not be reached. Check your connection."
+msgstr ""
+
 #. js-lingui-id: pyfee5
 #: src/modules/settings/data-model/object-details/components/tabs/ObjectSettings.tsx
 msgid "Speed up reads on the fields you filter or sort by most. Each index also slows down writes and uses disk space, so add them with intent."
@@ -18101,6 +18951,11 @@ msgstr "SSO（SAML / OIDC）"
 msgid "SSO Bypass"
 msgstr "SSO バイパス"
 
+#. js-lingui-id: P9fBwv
+#: src/modules/views/view-picker/components/ViewPickerStackSelect.tsx
+msgid "Stack"
+msgstr ""
+
 #. js-lingui-id: uavm+q
 #: src/modules/settings/admin-panel/health-status/components/SettingsAdminJobDetailsExpandable.tsx
 msgid "Stack Trace"
@@ -18128,6 +18983,12 @@ msgstr "ステージ"
 msgid "Standard"
 msgstr "標準"
 
+#. js-lingui-id: 9oJdah
+#: src/modules/side-panel/pages/page-layout/components/SidePanelPageLayoutDashboardWidgetTypeSelect.tsx
+#: src/modules/side-panel/pages/page-layout/components/SidePanelPageLayoutRecordPageWidgetTypeSelect.tsx
+msgid "Standard widgets"
+msgstr ""
+
 #. js-lingui-id: ASqWQi
 #: src/pages/settings/enterprise/SettingsEnterprise.tsx
 msgid "Start a new enterprise subscription to re-enable enterprise features."
@@ -18143,6 +19004,11 @@ msgstr "新しい Enterprise サブスクリプションを開始してくださ
 #: src/modules/settings/event-logs/components/EventLogFilters.tsx
 msgid "Start date"
 msgstr "開始日"
+
+#. js-lingui-id: HUKGLi
+#: src/modules/ai/dictation/components/AiChatDictationButton.tsx
+msgid "Start dictation"
+msgstr ""
 
 #. js-lingui-id: s+K73L
 #: src/modules/settings/billing/components/internal/SettingsBillingSubscriptionInfoModals.tsx
@@ -18181,10 +19047,15 @@ msgstr "開始時刻"
 msgid "State"
 msgstr "状態"
 
+#. js-lingui-id: EPFwS4
+#: src/modules/page-layout/widgets/components/RecordPageAddWidgetSection.tsx
+#: src/modules/side-panel/pages/page-layout/components/SidePanelPageLayoutRecordPageWidgetTypeSelect.tsx
+msgid "Static text shared across all record pages"
+msgstr ""
+
 #. js-lingui-id: uAQUqI
 #: src/modules/ai/components/AiChatThreadFilterDropdownRootMenu.tsx
 #: src/modules/ai/components/AiChatThreadFilterDropdownStatusMenu.tsx
-#: src/modules/object-core/workflows/constants/WorkflowCoreTableColumns.tsx
 #: src/modules/settings/accounts/components/SettingsConnectedAccountsTableHeader.tsx
 #: src/modules/settings/admin-panel/components/SettingsAdminWorkspaceBillingContent.tsx
 #: src/modules/settings/admin-panel/components/SettingsAdminWorkspaceContent.tsx
@@ -18206,6 +19077,12 @@ msgstr "状態"
 msgid "Status"
 msgstr "ステータス"
 
+#. js-lingui-id: Db4W3/
+#: src/modules/object-core/workflows/constants/CoreWorkflowFilterFields.ts
+#: src/modules/object-core/workflows/constants/WorkflowCoreTableColumns.tsx
+msgid "Statuses"
+msgstr ""
+
 #. js-lingui-id: oCQwvS
 #: src/pages/settings/community/SettingsCommunity.tsx
 msgid "Stay up to date with product news and community updates."
@@ -18220,6 +19097,11 @@ msgstr "ステップのフィルターグループオプション"
 #: src/modules/workflow/workflow-steps/filters/components/WorkflowStepFilterOptionsDropdown.tsx
 msgid "Step filter options"
 msgstr "ステップのフィルターオプション"
+
+#. js-lingui-id: 9QwrMz
+#: src/modules/ai/dictation/components/AiChatDictationButton.tsx
+msgid "Stop dictation"
+msgstr ""
 
 #. js-lingui-id: I8EmDx
 #: src/modules/information-banner/components/impersonate/InformationBannerIsImpersonating.tsx
@@ -18326,11 +19208,13 @@ msgid "subheading"
 msgstr "subheading"
 
 #. js-lingui-id: UJmAAK
+#: src/modules/activities/emails/components/CampaignComposerFields.tsx
+#: src/modules/activities/emails/components/CampaignComposerFields.tsx
 #: src/modules/activities/emails/components/CampaignDetailsFields.tsx
 #: src/modules/activities/emails/components/CampaignDetailsFields.tsx
 #: src/modules/activities/emails/components/CampaignSentEnvelope.tsx
 #: src/modules/activities/emails/components/EmailComposerFields.tsx
-#: src/modules/activities/emails/components/EmailComposerFields.tsx
+#: src/modules/activities/emails/mass-email/components/MassEmailComposeCard.tsx
 #: src/modules/workflow/workflow-steps/workflow-actions/components/WorkflowEditActionEmailBase.tsx
 msgid "Subject"
 msgstr "件名"
@@ -18458,6 +19342,36 @@ msgstr "提案"
 msgid "Sum"
 msgstr "合計"
 
+#. js-lingui-id: UjjqZc
+#: src/modules/ai/components/suggested-prompts/contextual-suggested-prompts.ts
+msgid "Summarize the records in this view and point out anything that needs attention."
+msgstr ""
+
+#. js-lingui-id: UcEfIM
+#: src/modules/ai/components/suggested-prompts/contextual-suggested-prompts.ts
+msgid "Summarize this record"
+msgstr ""
+
+#. js-lingui-id: jhr7if
+#: src/modules/ai/components/suggested-prompts/contextual-suggested-prompts.ts
+msgid "Summarize this record and its recent activity."
+msgstr ""
+
+#. js-lingui-id: uN7gsS
+#: src/modules/ai/components/suggested-prompts/contextual-suggested-prompts.ts
+msgid "Summarize this view"
+msgstr ""
+
+#. js-lingui-id: gKAccC
+#: src/modules/page-layout/widgets/call-recording-summary/components/WidgetActionCallRecordingSummary.tsx
+msgid "Summary copied to clipboard"
+msgstr ""
+
+#. js-lingui-id: yROOOg
+#: src/modules/page-layout/widgets/call-recording/utils/getCallRecordingStatusDisplayConfiguration.ts
+msgid "Summary Not Available"
+msgstr ""
+
 #. js-lingui-id: DBC3t5
 #: src/pages/settings/profile/appearance/components/DateTimeSettingsCalendarStartDaySelect.tsx
 #: src/pages/settings/profile/appearance/components/DateTimeSettingsCalendarStartDaySelect.tsx
@@ -18486,6 +19400,11 @@ msgstr "サポートされている入力タイプ"
 #: src/pages/settings/admin-panel/SettingsAdminNewAiModel.tsx
 msgid "Supports reasoning"
 msgstr "推論をサポート"
+
+#. js-lingui-id: 1T4saU
+#: src/modules/person-duplicate-review/components/PersonDuplicateCard.tsx
+msgid "Survivor"
+msgstr ""
 
 #. js-lingui-id: UaISq3
 #: src/localization/hooks/useLocaleOptions.ts
@@ -18569,6 +19488,8 @@ msgid "Synchronize Objects Labels and API Names"
 msgstr "オブジェクトのラベルとAPI名を同時に同期させる"
 
 #. js-lingui-id: D+NlUC
+#: src/modules/navigation-menu-item/display/folder/components/NavigationMenuItemFolderSubItem.tsx
+#: src/modules/navigation-menu-item/display/object/components/NavigationDrawerItemForObjectMetadataItem.tsx
 #: src/modules/ui/navigation/navigation-drawer/components/MultiWorkspaceDropdown/internal/MultiWorkspaceDropdownThemesComponents.tsx
 #: src/pages/settings/ai/SettingsAgentTurnDetail.tsx
 msgid "System"
@@ -18859,14 +19780,19 @@ msgstr ""
 "詳しい手順は[はじめにガイド](https://twenty.com/developers/extend/apps/getting-started)を、`defineApplication` / `defineEntity` API については[アプリの構築](https://twenty.com/developers/extend/apps/building)をご覧ください。"
 
 #. js-lingui-id: VsxjzF
-#: src/modules/page-layout/widgets/call-recording-summary/components/CallRecordingSummaryBody.tsx
+#: src/modules/page-layout/widgets/call-recording/utils/getCallRecordingStatusDisplayConfiguration.ts
 msgid "The call recording could not be processed."
 msgstr "通話録音を処理できませんでした。"
 
+#. js-lingui-id: oji+JF
+#: src/modules/page-layout/widgets/call-recording/utils/getCallRecordingStatusDisplayConfiguration.ts
+msgid "The call recording is being processed…"
+msgstr ""
+
 #. js-lingui-id: +AFHx6
 #: src/modules/page-layout/widgets/call-recording-summary/components/CallRecordingSummaryBody.tsx
-msgid "The call recording is still being processed…"
-msgstr "通話録音はまだ処理中です…"
+#~ msgid "The call recording is still being processed…"
+#~ msgstr "通話録音はまだ処理中です…"
 
 #. js-lingui-id: /kfzmx
 #: src/pages/settings/legal/SettingsLegalDpa.tsx
@@ -18892,6 +19818,11 @@ msgstr "新しい住所のデフォルトの国"
 #: src/pages/settings/data-model/SettingsObjectFieldEdit.tsx
 msgid "The description of this field"
 msgstr "このフィールドの説明"
+
+#. js-lingui-id: JeOanZ
+#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
+msgid "The duplicate queue could not be loaded."
+msgstr ""
 
 #. js-lingui-id: xJSPh6
 #: src/modules/settings/members/components/MemberInfosTab.tsx
@@ -18922,6 +19853,17 @@ msgstr "お客様のデプロイメント向けに項目が反映された完全
 #: src/modules/workflow/workflow-trigger/components/WorkflowEditTriggerManual.tsx
 msgid "The icon your workflow trigger will display in the command menu"
 msgstr "ワークフロートリガーでコマンドメニューに表示するアイコン"
+
+#. js-lingui-id: u7SthV
+#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
+msgid "The keep-separate decision could not be saved."
+msgstr ""
+
+#. js-lingui-id: 4YoVrr
+#. placeholder {0}: relatedPersonFieldMetadataItem.label
+#: src/modules/activities/emails/related-people/hooks/useComposeEmailToRelatedPeople.ts
+msgid "The linked {0} has no email address."
+msgstr ""
 
 #. js-lingui-id: HiI1Lo
 #: src/pages/settings/admin-panel/SettingsAdminNewAiModel.tsx
@@ -18970,10 +19912,25 @@ msgstr "お探しのページは存在しないか、削除されました。元
 msgid "The PDF is pre-signed by Twenty and executed with your legal entity and authorized signatory."
 msgstr "PDF は Twenty によって事前に署名され、お客様の法人および権限のある署名者との間で締結されます。"
 
+#. js-lingui-id: JD8guD
+#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
+msgid "The people could not be merged."
+msgstr ""
+
+#. js-lingui-id: Ir4tSJ
+#: src/modules/page-layout/widgets/call-recording/utils/getCallRecordingStatusDisplayConfiguration.ts
+msgid "The recorder is joining the call…"
+msgstr ""
+
 #. js-lingui-id: 8vRPIJ
 #: src/modules/page-layout/widgets/call-recording-transcript/components/CallRecordingVideoPlayer.tsx
 msgid "The recording could not be loaded."
 msgstr "録音を読み込めませんでした。"
+
+#. js-lingui-id: RhRop7
+#: src/modules/object-record/record-field/ui/hooks/useCreateJunctionRecordWithNestedTarget.ts
+msgid "The relation configuration could not be resolved."
+msgstr ""
 
 #. js-lingui-id: wxyrqd
 #: src/modules/workflow/workflow-steps/workflow-actions/pick-record-action/components/WorkflowEditActionPickRecord.tsx
@@ -18995,12 +19952,23 @@ msgstr "選択したレコード(最大 {maxRecordsFormatted} 件)がワーク�
 msgid "The shared email you want to use."
 msgstr "使用したい共有メールアドレスです。"
 
+#. js-lingui-id: 8XEPsC
+#: src/modules/person-duplicate-review/components/PersonDuplicateMergePreview.tsx
+msgid "The survivor keeps its ID. Checked contact details are preserved; the star marks the primary value."
+msgstr ""
+
 #. js-lingui-id: 9q0gnf
-#: src/modules/page-layout/widgets/call-recording-transcript/components/CallRecordingTranscriptContent.tsx
+#: src/modules/page-layout/widgets/call-recording/utils/getCallRecordingStatusDisplayConfiguration.ts
 msgid "The transcript could not be generated."
 msgstr "書き起こしを生成できませんでした。"
 
+#. js-lingui-id: Qdm4D5
+#: src/modules/page-layout/widgets/call-recording/utils/getCallRecordingStatusDisplayConfiguration.ts
+msgid "The transcript is being prepared…"
+msgstr ""
+
 #. js-lingui-id: qrhV2s
+#: src/modules/activities/emails/components/CampaignComposerFields.tsx
 #: src/modules/activities/emails/components/CampaignDetailsFields.tsx
 msgid "The unsubscribe topic this email belongs to. Recipients who opted out of it are skipped, and the unsubscribe link is scoped to it."
 msgstr "このメールが属する配信停止トピックです。これをオプトアウトした受信者はスキップされ、配信停止リンクはこのトピックに限定されます。"
@@ -19026,14 +19994,15 @@ msgid "The workspace that claimed this app registration"
 msgstr "このアプリ登録の所有権を取得したワークスペース"
 
 #. js-lingui-id: FEr96N
+#: src/modules/ui/navigation/navigation-drawer/components/MultiWorkspaceDropdown/internal/MultiWorkspaceDropdownDefaultComponents.tsx
 #: src/modules/ui/navigation/navigation-drawer/components/MultiWorkspaceDropdown/internal/MultiWorkspaceDropdownThemesComponents.tsx
 msgid "Theme"
 msgstr "テーマ"
 
 #. js-lingui-id: 6tNbxl
 #: src/modules/ui/navigation/navigation-drawer/components/MultiWorkspaceDropdown/internal/MultiWorkspaceDropdownDefaultComponents.tsx
-msgid "Theme "
-msgstr "テーマ "
+#~ msgid "Theme "
+#~ msgstr "テーマ "
 
 #. js-lingui-id: Wn862P
 #: src/modules/keyboard-shortcut-menu/components/KeyboardShortcutMenuItem.tsx
@@ -19074,6 +20043,11 @@ msgstr "このレコードに関連付けられたアクティビティはあり
 #: src/pages/auth/PasswordReset.tsx
 msgid "There was an error while updating password."
 msgstr "パスワードの更新中にエラーが発生しました"
+
+#. js-lingui-id: RuO91P
+#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
+msgid "These people will remain separate unless their identity details change."
+msgstr ""
 
 #. js-lingui-id: 5Ml5Nr
 #: src/modules/advanced-text-editor/constants/AdvancedTextEditorBlockCatalog.ts
@@ -19199,6 +20173,11 @@ msgstr "このアプリケーションはすでに所有権が取得されてい
 msgid "This application's registration is claimed by your workspace"
 msgstr "このアプリケーションの登録は、あなたのワークスペースが所有権を取得しています。"
 
+#. js-lingui-id: XkzBBX
+#: src/modules/page-layout/widgets/call-recording/utils/getCallRecordingStatusDisplayConfiguration.ts
+msgid "This call is being recorded…"
+msgstr ""
+
 #. js-lingui-id: WCa/7U
 #: src/pages/settings/applications/tabs/SettingsApplicationFrontComponentPreviewTab.tsx
 msgid "This component runs without a UI and renders nothing here."
@@ -19215,7 +20194,7 @@ msgid "This database value overrides environment settings. "
 msgstr "このデータベース値は環境設定を上書きします。"
 
 #. js-lingui-id: pmDHTY
-#: src/modules/settings/profile/devices/components/SettingsProfileDevicesSection.tsx
+#: src/modules/settings/profile/devices/components/SettingsDeviceSessionRowRightComponent.tsx
 msgid "This device"
 msgstr "このデバイス"
 
@@ -19254,6 +20233,11 @@ msgstr "このフォームはワークフローの実行時に表示されます
 msgid "This function has no trigger configured, so it can only be invoked from the Test tab or by other functions."
 msgstr "この関数にはトリガーが設定されていないため、テストタブから、または他の関数からのみ呼び出せます。"
 
+#. js-lingui-id: 6IcJ94
+#: src/modules/settings/admin-panel/ai/hooks/useCustomAiProviderAccess.ts
+msgid "This instance's plan could not be verified. Reload the page to try again."
+msgstr ""
+
 #. js-lingui-id: MGWsz+
 #: src/modules/information-banner/components/enterprise/InformationBannerNonProductionInstance.tsx
 msgid "This is a non-production instance."
@@ -19279,6 +20263,11 @@ msgstr "これは現在の署名キーです。これを失効させると、こ
 msgid "This key should be set through body input"
 msgstr "このキーはボディ入力で設定する必要があります"
 
+#. js-lingui-id: V6FP3d
+#: src/modules/page-layout/widgets/call-recording/utils/getCallRecordingStatusDisplayConfiguration.ts
+msgid "This meeting was not recorded."
+msgstr ""
+
 #. js-lingui-id: Wuvfgw
 #: src/pages/settings/admin-panel/SettingsAdminAiProviderDetail.tsx
 msgid "This model will be removed from the provider. You can re-add it later."
@@ -19288,6 +20277,11 @@ msgstr "このモデルはプロバイダーから削除されます。後で再
 #: src/modules/page-layout/widgets/components/StandaloneWidgetPlaceholder.tsx
 msgid "This page has no content"
 msgstr "このページにはコンテンツがありません"
+
+#. js-lingui-id: 45fXTY
+#: src/modules/app/routing/components/WorkspaceRouteUnavailable.tsx
+msgid "This page isn't available."
+msgstr ""
 
 #. js-lingui-id: R/PuIn
 #: src/pages/settings/admin-panel/SettingsAdminNewAiProvider.tsx
@@ -19540,11 +20534,18 @@ msgstr "タイトル"
 msgid "Title"
 msgstr "タイトル"
 
+#. js-lingui-id: 6OdanD
+#: src/modules/person-duplicate-review/components/PersonDuplicateMergePreview.tsx
+msgid "Title and current company"
+msgstr ""
+
 #. js-lingui-id: /jQctM
+#: src/modules/activities/emails/components/CampaignComposerFields.tsx
 #: src/modules/activities/emails/components/CampaignDetailsFields.tsx
 #: src/modules/activities/emails/components/CampaignSentEnvelope.tsx
 #: src/modules/activities/emails/components/EmailComposerFields.tsx
 #: src/modules/activities/emails/components/EmailComposerFields.tsx
+#: src/modules/activities/emails/mass-email/components/MassEmailComposeCard.tsx
 #: src/modules/workflow/workflow-steps/workflow-actions/components/WorkflowEditActionEmailBase.tsx
 #: src/modules/workflow/workflow-steps/workflow-actions/components/WorkflowRunStepLogsEmailDetail.tsx
 msgid "To"
@@ -19616,9 +20617,11 @@ msgid "Too many guests"
 msgstr "ゲストが多すぎます"
 
 #. js-lingui-id: x+3/CM
+#. placeholder {0}: composerState.largestRecipientCount
 #. placeholder {0}: composerState.recipientCount
 #. placeholder {1}: composerState.maxRecipients
 #: src/modules/activities/emails/components/EmailComposerFields.tsx
+#: src/modules/activities/emails/mass-email/components/MassEmailComposeCard.tsx
 msgid "Too many recipients ({0}/{1})."
 msgstr "受信者が多すぎます ({0}/{1})。"
 
@@ -19734,14 +20737,14 @@ msgid "Transcript copied to clipboard"
 msgstr "文字起こしがクリップボードにコピーされました"
 
 #. js-lingui-id: U2CSqa
-#: src/modules/page-layout/widgets/call-recording-transcript/components/CallRecordingTranscriptContent.tsx
+#: src/modules/page-layout/widgets/call-recording/utils/getCallRecordingStatusDisplayConfiguration.ts
 msgid "Transcript Failed"
 msgstr "文字起こしに失敗しました"
 
 #. js-lingui-id: zDTPYv
 #: src/modules/page-layout/widgets/call-recording-transcript/components/CallRecordingTranscriptContent.tsx
-msgid "Transcript is being prepared…"
-msgstr "書き起こしを準備しています…"
+#~ msgid "Transcript is being prepared…"
+#~ msgstr "書き起こしを準備しています…"
 
 #. js-lingui-id: zPGNJm
 #: src/pages/settings/admin-panel/SettingsAdminApplicationRegistrationDangerZone.tsx
@@ -19867,6 +20870,7 @@ msgstr "HTTP リクエストで関数をトリガーします"
 #. js-lingui-id: c+xCSz
 #: src/modules/object-record/object-filter-dropdown/components/ObjectFilterDropdownBooleanSelect.tsx
 #: src/modules/object-record/record-board/record-board-column/utils/getAggregateOperationShortLabel.ts
+#: src/modules/object-record/record-field/ui/utils/getFieldDisplayLabelText.ts
 #: src/modules/settings/data-model/fields/forms/boolean/constants/BooleanDataModelSelectOptions.ts
 #: src/modules/side-panel/pages/page-layout/components/dropdown-content/ChartRatioOptionValueSelectionDropdownContent.tsx
 #: src/modules/side-panel/pages/page-layout/hooks/useChartSettingsValues.ts
@@ -19934,6 +20938,7 @@ msgid "Turn Not Found"
 msgstr "ターンが見つかりません"
 
 #. js-lingui-id: EdHWDU
+#: src/modules/advanced-text-editor/constants/TextColorLabels.ts
 #: src/modules/settings/data-model/fields/forms/select/components/SettingsDataModelFieldSelectFormOptionRow.tsx
 msgid "Turquoise"
 msgstr "ターコイズ"
@@ -19942,6 +20947,11 @@ msgstr "ターコイズ"
 #: src/modules/spreadsheet-import/steps/components/MatchColumnsStep/components/ColumnGrid.tsx
 msgid "Twenty fields"
 msgstr "Twenty のフィールド"
+
+#. js-lingui-id: 7uWmv3
+#: src/modules/person-duplicate-review/components/PersonDuplicateMergePreview.tsx
+msgid "Twenty supports one current company per person, so this comes from the chosen survivor."
+msgstr ""
 
 #. js-lingui-id: YIjS4q
 #: src/modules/ai/components/SettingsAgentModelCapabilities.tsx
@@ -20020,6 +21030,7 @@ msgstr "何でも入力..."
 
 #. js-lingui-id: LaEX5I
 #: src/modules/activities/emails/components/CampaignBodyField.tsx
+#: src/modules/activities/emails/components/CampaignComposerFields.tsx
 #: src/modules/activities/emails/components/EmailComposerFields.tsx
 msgid "Type something or press \"/\" to see commands"
 msgstr "何か入力するか、\"/\" を押すとコマンドが表示されます"
@@ -20129,6 +21140,7 @@ msgid "Uninstall this app from all workspaces before deleting it"
 msgstr "削除する前に、このアプリをすべてのワークスペースからアンインストールしてください"
 
 #. js-lingui-id: ItfvBz
+#: src/pages/settings/applications/tabs/SettingsApplicationDetailAboutTab.tsx
 #: src/pages/settings/applications/tabs/SettingsApplicationDetailAboutTab.tsx
 msgid "Uninstalling..."
 msgstr "アンインストール中..."
@@ -20293,6 +21305,11 @@ msgstr "黒丸付きの箇条書きリスト"
 msgid "Unpaid"
 msgstr "未払い"
 
+#. js-lingui-id: SYfHmN
+#: src/modules/side-panel/pages/page-layout/utils/getTabSettingsPlacementItems.ts
+msgid "Unpin tab"
+msgstr ""
+
 #. js-lingui-id: SMaFdc
 #: src/modules/settings/unsubscribers/components/SettingsUnsubscribePreview.tsx
 #: src/pages/settings/communications/SettingsWorkspaceCommunications.tsx
@@ -20315,6 +21332,7 @@ msgid "Unsubscribe page"
 msgstr "配信停止ページ"
 
 #. js-lingui-id: BEZcuL
+#: src/modules/activities/emails/components/CampaignComposerFields.tsx
 #: src/modules/activities/emails/components/CampaignDetailsFields.tsx
 #: src/modules/activities/emails/components/CampaignSentEnvelope.tsx
 msgid "Unsubscribe topic"
@@ -20385,6 +21403,7 @@ msgid "Untitled iFrame"
 msgstr "無題の iFrame"
 
 #. js-lingui-id: PMPun8
+#: src/modules/activities/emails/components/CampaignComposerFields.tsx
 #: src/modules/activities/emails/components/CampaignDetailsFields.tsx
 msgid "Untitled list"
 msgstr "無題のリスト"
@@ -20395,6 +21414,7 @@ msgid "Untitled role"
 msgstr "無題の役割"
 
 #. js-lingui-id: jxRjAG
+#: src/modules/activities/emails/components/CampaignComposerFields.tsx
 #: src/modules/activities/emails/components/CampaignDetailsFields.tsx
 #: src/modules/activities/emails/components/CampaignSentEnvelope.tsx
 #: src/modules/settings/unsubscribe-topics/components/SettingsWorkspaceUnsubscribeTopicSection.tsx
@@ -20615,6 +21635,7 @@ msgstr "サブスクリプションをアップグレード中..."
 #. js-lingui-id: +Gi3x1
 #: src/pages/settings/applications/components/SettingsApplicationVersionContainer.tsx
 #: src/pages/settings/applications/tabs/SettingsApplicationDetailAboutTab.tsx
+#: src/pages/settings/applications/tabs/SettingsApplicationDetailAboutTab.tsx
 msgid "Upgrading..."
 msgstr "アップグレード中..."
 
@@ -20699,6 +21720,7 @@ msgstr "この URI はすでにリダイレクト URI の一覧に含まれて�
 
 #. js-lingui-id: IagCbF
 #: src/modules/settings/admin-panel/components/SettingsAdminWorkspaceContent.tsx
+#: src/modules/settings/data-model/fields/forms/components/SettingsDataModelFieldLinksVariantForm.tsx
 #: src/modules/workflow/workflow-steps/workflow-actions/http-request-action/components/WorkflowEditActionHttpRequest.tsx
 msgid "URL"
 msgstr "URL"
@@ -20730,10 +21752,15 @@ msgstr "us-east-1"
 msgid "Usage"
 msgstr "使用状況"
 
+#. js-lingui-id: iaIm91
+#: src/pages/settings/applications/components/SettingsApplicationRegistrationGeneralStats.tsx
+msgid "Usage across all non-deleted workspaces on this server"
+msgstr ""
+
 #. js-lingui-id: 8Jr4QC
 #: src/pages/settings/applications/components/SettingsApplicationRegistrationGeneralStats.tsx
-msgid "Usage across all workspaces on this server"
-msgstr "このサーバー上のすべてのワークスペースでの利用状況"
+#~ msgid "Usage across all workspaces on this server"
+#~ msgstr "このサーバー上のすべてのワークスペースでの利用状況"
 
 #. js-lingui-id: 21hsGI
 #: src/modules/settings/usage/components/SettingsUsageAnalyticsSection.tsx
@@ -20781,6 +21808,11 @@ msgstr "1Password、Authy、Microsoft Authenticatorなどの認証アプリや�
 #: src/pages/settings/ai/components/SettingsAiModelsTab.tsx
 msgid "Use best models only"
 msgstr "最良のモデルのみを使用する"
+
+#. js-lingui-id: kp9jLK
+#: src/modules/settings/data-model/objects/forms/components/SettingsDataModelObjectLabelFormulaForm.tsx
+msgid "Use field API names in braces. Use ?? for a fallback. Clear the formula to enter labels manually."
+msgstr ""
 
 #. js-lingui-id: 5ZehS/
 #: src/pages/settings/ai/components/SettingsAgentSkillsTab.tsx
@@ -20930,8 +21962,8 @@ msgstr "デフォルト値を使用しています。カスタム値を設定し
 #. js-lingui-id: zzp4XX
 #: src/pages/settings/enterprise/SettingsEnterprise.tsx
 #: src/pages/settings/enterprise/SettingsEnterprise.tsx
-msgid "Valid until"
-msgstr "有効期限"
+#~ msgid "Valid until"
+#~ msgstr "有効期限"
 
 #. js-lingui-id: Clr4qp
 #: src/modules/spreadsheet-import/steps/components/SpreadsheetImportStepperContainer.tsx
@@ -21160,6 +22192,11 @@ msgstr "ビューフィルタ"
 #: src/modules/metadata-error-handler/hooks/useMetadataErrorHandler.ts
 msgid "view filter group"
 msgstr "ビューフィルタグループ"
+
+#. js-lingui-id: cKqT2J
+#: src/modules/person-duplicate-review/components/PersonDuplicateCard.tsx
+msgid "View full record"
+msgstr ""
 
 #. js-lingui-id: n7a9IR
 #: src/modules/metadata-error-handler/hooks/useMetadataErrorHandler.ts
@@ -21556,6 +22593,11 @@ msgstr "ようこそ、{workspaceName}。"
 msgid "What can I help you with?"
 msgstr "何をお手伝いできますか？"
 
+#. js-lingui-id: ivJ1Xk
+#: src/modules/ai/components/suggested-prompts/default-suggested-prompts.ts
+msgid "What can you do?"
+msgstr ""
+
 #. js-lingui-id: /SZI25
 #: src/pages/settings/data-model/SettingsObjectFieldEdit.tsx
 msgid "What each language displays for this field's labels"
@@ -21635,6 +22677,11 @@ msgstr "このモデルが Chain-of-Thought（思考の連鎖）による推論�
 msgid "Whole list"
 msgstr "リスト全体"
 
+#. js-lingui-id: 6rbnkB
+#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
+msgid "Why this was surfaced:"
+msgstr ""
+
 #. js-lingui-id: dmoPOu
 #: src/pages/settings/applications/SettingsAvailableApplicationDetails.tsx
 msgid "widget"
@@ -21654,8 +22701,8 @@ msgstr "ウィジェット設定"
 #. js-lingui-id: fANaAS
 #: src/modules/side-panel/pages/page-layout/components/SidePanelPageLayoutDashboardWidgetTypeSelect.tsx
 #: src/modules/side-panel/pages/page-layout/components/SidePanelPageLayoutRecordPageWidgetTypeSelect.tsx
-msgid "Widget type"
-msgstr "ウィジェットタイプ"
+#~ msgid "Widget type"
+#~ msgstr "ウィジェットタイプ"
 
 #. js-lingui-id: YR3K7M
 #: src/pages/settings/applications/SettingsAvailableApplicationDetails.tsx
@@ -21915,6 +22962,11 @@ msgstr "説明を記入"
 msgid "Write a description for this agent"
 msgstr "このエージェントの説明を書く"
 
+#. js-lingui-id: gnkeuQ
+#: src/modules/activities/emails/mass-email/components/MassEmailComposeCard.tsx
+msgid "Write your email…"
+msgstr ""
+
 #. js-lingui-id: zeCIJi
 #: src/modules/settings/logic-functions/components/tabs/SettingsLogicFunctionCodeEditorTab.tsx
 msgid "Write your function (in typescript) below"
@@ -21972,6 +23024,7 @@ msgid "years"
 msgstr "年"
 
 #. js-lingui-id: QyCqHT
+#: src/modules/advanced-text-editor/constants/TextColorLabels.ts
 #: src/modules/settings/data-model/fields/forms/select/components/SettingsDataModelFieldSelectFormOptionRow.tsx
 msgid "Yellow"
 msgstr "黄色"
@@ -22023,6 +23076,7 @@ msgid "You are editing the {currentLanguageLabel} translation. Renaming instead 
 msgstr "{currentLanguageLabel}の翻訳を編集中です。代わりに名前を変更すると、すべての言語のソースラベルが変更されます。"
 
 #. js-lingui-id: MFDARJ
+#: src/modules/object-record/record-list/components/RecordListEmptyState.tsx
 #: src/modules/object-record/record-table/empty-state/components/RecordTableEmptyStateReadOnly.tsx
 msgid "You are not allowed to create records for this object"
 msgstr "このオブジェクトでレコードを作成することは許可されていません"
@@ -22032,10 +23086,20 @@ msgstr "このオブジェクトでレコードを作成することは許可さ
 msgid "You can either create a private app or share it to others"
 msgstr "プライベートアプリを作成することも、他のユーザーと共有することもできます。"
 
+#. js-lingui-id: lcoYde
+#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
+msgid "You can review this queue, but People edit and delete permissions are required to merge or keep records separate."
+msgstr ""
+
 #. js-lingui-id: CNAoaw
 #: src/modules/workflow/workflow-steps/workflow-actions/logic-function-action/components/WorkflowEditActionLogicFunction.tsx
 msgid "You can see the function logic in your application settings."
 msgstr "アプリケーション設定で関数のロジックを確認できます。"
+
+#. js-lingui-id: jedKjC
+#: src/modules/activities/emails/mass-email/components/MassEmailAddPeopleButton.tsx
+msgid "You can select at most {MAX_EMAIL_RECIPIENTS} people."
+msgstr ""
 
 #. js-lingui-id: VlX5Sq
 #: src/modules/object-record/record-field/ui/form-types/components/FormMultiRecordPicker.tsx
@@ -22072,6 +23136,11 @@ msgstr "このウィジェットを表示する権限がありません。"
 #: src/modules/object-record/record-index/components/RecordIndexEmptyStateNotShared.tsx
 msgid "You don't have access to this object."
 msgstr "このオブジェクトにアクセスする権限がありません。"
+
+#. js-lingui-id: Dg2c0z
+#: src/modules/settings/components/SettingsProtectedRouteWrapper.tsx
+msgid "You don't have access to this settings page."
+msgstr ""
 
 #. js-lingui-id: /K45m9
 #: src/pages/settings/enterprise/SettingsEnterprise.tsx
@@ -22223,6 +23292,11 @@ msgstr "ハンドラーはこのオブジェクトを受け取ります。GET �
 #: src/pages/settings/profile/SettingsProfile.tsx
 msgid "Your name as it will be displayed"
 msgstr "表示名"
+
+#. js-lingui-id: ZV7dVk
+#: src/modules/settings/profile/components/SettingsProfileEmailSignature.tsx
+msgid "Your name, role, and anything else you want at the end of your emails"
+msgstr ""
 
 #. js-lingui-id: 8mfOAZ
 #: src/modules/settings/billing/components/AddPaymentMethodForm.tsx

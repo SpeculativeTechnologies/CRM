@@ -304,6 +304,7 @@ export type Mutation = {
   duplicateWorkflow: WorkflowVersionDto;
   duplicateWorkflowVersionStep: WorkflowVersionStepChanges;
   generateSignedDpa: GenerateSignedDpaResult;
+  keepPersonDuplicateRecordsSeparate: Scalars['Boolean']['output'];
   retryWorkflowRun: WorkflowRun;
   runWorkflowVersion: RunWorkflowVersion;
   stopWorkflowRun: WorkflowRun;
@@ -376,6 +377,11 @@ export type MutationGenerateSignedDpaArgs = {
 };
 
 
+export type MutationKeepPersonDuplicateRecordsSeparateArgs = {
+  pairs: Array<PersonDuplicatePairInput>;
+};
+
+
 export type MutationRetryWorkflowRunArgs = {
   workflowRunId: Scalars['UUID']['input'];
 };
@@ -430,6 +436,61 @@ export type ObjectRecordFilterInput = {
   updatedAt?: InputMaybe<DateTimeFilter>;
 };
 
+export type PersonDuplicateCompany = {
+  __typename?: 'PersonDuplicateCompany';
+  id: Scalars['UUID']['output'];
+  name: Scalars['String']['output'];
+};
+
+export type PersonDuplicateGroup = {
+  __typename?: 'PersonDuplicateGroup';
+  detectedAt: Scalars['DateTime']['output'];
+  id: Scalars['String']['output'];
+  people: Array<PersonDuplicatePerson>;
+  reasons: Array<Scalars['String']['output']>;
+};
+
+export type PersonDuplicateGroups = {
+  __typename?: 'PersonDuplicateGroups';
+  canResolve: Scalars['Boolean']['output'];
+  groups: Array<PersonDuplicateGroup>;
+  totalCount: Scalars['Float']['output'];
+};
+
+export type PersonDuplicateLink = {
+  __typename?: 'PersonDuplicateLink';
+  label: Scalars['String']['output'];
+  url: Scalars['String']['output'];
+};
+
+export type PersonDuplicatePairInput = {
+  leftPersonId: Scalars['UUID']['input'];
+  rightPersonId: Scalars['UUID']['input'];
+};
+
+export type PersonDuplicatePerson = {
+  __typename?: 'PersonDuplicatePerson';
+  avatarUrl: Scalars['String']['output'];
+  company?: Maybe<PersonDuplicateCompany>;
+  createdAt: Scalars['DateTime']['output'];
+  createdByName: Scalars['String']['output'];
+  emails: Array<Scalars['String']['output']>;
+  firstName: Scalars['String']['output'];
+  id: Scalars['UUID']['output'];
+  jobTitle: Scalars['String']['output'];
+  lastName: Scalars['String']['output'];
+  linkedinLinks: Array<PersonDuplicateLink>;
+  phones: Array<PersonDuplicatePhone>;
+  updatedAt: Scalars['DateTime']['output'];
+};
+
+export type PersonDuplicatePhone = {
+  __typename?: 'PersonDuplicatePhone';
+  callingCode: Scalars['String']['output'];
+  countryCode: Scalars['String']['output'];
+  number: Scalars['String']['output'];
+};
+
 export type Query = {
   __typename?: 'Query';
   coreWorkflows: CoreWorkflowConnection;
@@ -450,6 +511,8 @@ export type Query = {
   /** @deprecated Use getTimelineThreadsFromObjectRecord instead */
   getTimelineThreadsFromPersonId: TimelineThreadsWithTotal;
   isMaintenanceModeBannerDismissed: Scalars['Boolean']['output'];
+  personDuplicateGroups: PersonDuplicateGroups;
+  personDuplicateGroupsTotalCount: Scalars['Int']['output'];
   search: SearchResultConnection;
   workflowStepConnectedAccountHandle?: Maybe<ConnectedAccountHandleDto>;
   workflowVersionContent: WorkflowVersionContent;
