@@ -33,8 +33,8 @@ import { SendEmailService } from 'src/modules/messaging/message-outbound-manager
 import { SaveMessageCampaignDraftOutputDTO } from 'src/engine/core-modules/emailing-domain/dtos/save-message-campaign-draft-output.dto';
 import {
   type MassEmailCampaignSendOutcome,
-  MessageCampaignService,
-} from 'src/modules/emailing/services/message-campaign.service';
+  MessageCampaignAuthoringService,
+} from 'src/modules/emailing/services/message-campaign-authoring.service';
 import { isDefined } from 'twenty-shared/utils';
 import { isNonEmptyString } from '@sniptt/guards';
 
@@ -53,7 +53,7 @@ export class SendEmailResolver {
     private readonly emailComposerService: EmailComposerService,
     private readonly fileEmailAttachmentService: FileEmailAttachmentService,
     private readonly sendEmailService: SendEmailService,
-    private readonly messageCampaignService: MessageCampaignService,
+    private readonly messageCampaignAuthoringService: MessageCampaignAuthoringService,
     private readonly engagementTrackingContentService: EngagementTrackingContentService,
   ) {}
 
@@ -71,7 +71,7 @@ export class SendEmailResolver {
         workspaceId: workspace.id,
       });
 
-    return this.messageCampaignService.saveMassEmailDraft({
+    return this.messageCampaignAuthoringService.saveMassEmailDraft({
       workspaceId: workspace.id,
       userWorkspaceId,
       workspaceMemberId,
@@ -98,26 +98,30 @@ export class SendEmailResolver {
         workspaceId: workspace.id,
       });
 
-    await this.messageCampaignService.prepareMassEmailCampaignForSending({
-      workspaceId: workspace.id,
-      userWorkspaceId,
-      workspaceMemberId,
-      campaignId: input.campaignId,
-      recipients: input.emails.map(({ personId, to }) => ({
-        personId,
-        email: to,
-      })),
-      fromAddress: connectedAccount.handle,
-    });
+    await this.messageCampaignAuthoringService.prepareMassEmailCampaignForSending(
+      {
+        workspaceId: workspace.id,
+        userWorkspaceId,
+        workspaceMemberId,
+        campaignId: input.campaignId,
+        recipients: input.emails.map(({ personId, to }) => ({
+          personId,
+          email: to,
+        })),
+        fromAddress: connectedAccount.handle,
+      },
+    );
 
     // Resolved once for the whole batch, and null when the workspace has no
     // verified emailing domain with an active unsubscribe hostname to serve the
     // tracking endpoints from. The send then goes out untracked.
     const trackingBaseUrl =
-      await this.messageCampaignService.resolveCampaignTrackingBaseUrl({
-        workspaceId: workspace.id,
-        fromAddress: connectedAccount.handle,
-      });
+      await this.messageCampaignAuthoringService.resolveCampaignTrackingBaseUrl(
+        {
+          workspaceId: workspace.id,
+          fromAddress: connectedAccount.handle,
+        },
+      );
 
     const outcomes: MassEmailCampaignSendOutcome[] = [];
     // Each outcome is recorded as soon as its email leaves, so an interrupted
@@ -125,12 +129,14 @@ export class SendEmailResolver {
     const recordOutcome = async (outcome: MassEmailCampaignSendOutcome) => {
       outcomes.push(outcome);
 
-      await this.messageCampaignService.recordMassEmailCampaignSendOutcome({
-        workspaceId: workspace.id,
-        campaignId: input.campaignId,
-        fromAddress: connectedAccount.handle,
-        outcome,
-      });
+      await this.messageCampaignAuthoringService.recordMassEmailCampaignSendOutcome(
+        {
+          workspaceId: workspace.id,
+          campaignId: input.campaignId,
+          fromAddress: connectedAccount.handle,
+          outcome,
+        },
+      );
     };
 
     for (const email of input.emails) {
@@ -195,7 +201,7 @@ export class SendEmailResolver {
       }
     }
 
-    await this.messageCampaignService.finalizeMassEmailCampaign({
+    await this.messageCampaignAuthoringService.finalizeMassEmailCampaign({
       workspaceId: workspace.id,
       campaignId: input.campaignId,
       workspaceMemberId,

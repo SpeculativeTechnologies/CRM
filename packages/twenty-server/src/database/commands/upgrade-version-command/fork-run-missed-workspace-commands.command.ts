@@ -39,10 +39,9 @@ type MissedWorkspaceStep = {
 // TWENTY_CROSS_UPGRADE_SUPPORTED_VERSIONS — safe because upgrade commands
 // must be idempotent (they already re-run at every version bump).
 //
-// Missed INSTANCE commands are only reported, never run: replaying them would
-// record a fresh attempt and regress the global cursor, making the next
-// `upgrade` re-execute every later instance step. Run those by hand
-// (see the twenty-gated-upgrade-command runbook) if this ever fires.
+// Missed INSTANCE commands are only reported here: `upgrade` runs them itself
+// right before resuming, and its start-cursor resolution ignores the
+// backdated record they leave behind.
 @Command({
   name: 'upgrade:run-missed-commands',
   description:
@@ -89,15 +88,15 @@ export class ForkRunMissedWorkspaceCommandsCommand extends CommandRunner {
       await this.findMissedSteps(passedSteps, workspaceIds);
 
     if (missedInstanceSteps.length > 0) {
-      // Failing here fails the deploy before `upgrade` runs into whatever
-      // depended on the missing instance command — same contract as a
-      // migration failure, and the box rolls back cleanly.
-      throw new Error(
+      // `upgrade` runs these itself before resuming (see
+      // UpgradeSequenceRunnerService.runInstanceStepsSkippedBehindCursor), so
+      // this only matters when a missed workspace command below depends on
+      // one of them. That has not happened yet; surface it loudly if it does.
+      this.logger.warn(
         `${missedInstanceSteps.length} instance command(s) were added to an ` +
-          'already-passed version segment and never ran: ' +
+          'already-passed version segment and have not run yet: ' +
           missedInstanceSteps.map((step) => step.name).join(', ') +
-          '. Run them by hand on this box (see the ' +
-          'twenty-gated-upgrade-command runbook), then rerun the deploy.',
+          '. `upgrade` runs them before resuming.',
       );
     }
 

@@ -26,10 +26,8 @@ export class MessageCampaignResolver {
 
   @Query(() => [MessageCampaignSummaryDTO])
   @RequireFeatureFlag(FeatureFlagKey.IS_EMAIL_GROUP_ENABLED)
-  async messageCampaigns(
-    @AuthWorkspace() currentWorkspace: WorkspaceEntity,
-  ): Promise<MessageCampaignSummaryDTO[]> {
-    return this.messageCampaignQueryService.findAll(currentWorkspace.id);
+  async messageCampaigns(): Promise<MessageCampaignSummaryDTO[]> {
+    return this.messageCampaignQueryService.findAll();
   }
 
   @Query(() => MessageCampaignDetailsDTO)

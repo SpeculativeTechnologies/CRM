@@ -11,20 +11,20 @@ import { type FlatEntityMaps } from 'src/engine/metadata-modules/flat-entity/typ
 import { findFlatEntityByIdInFlatEntityMaps } from 'src/engine/metadata-modules/flat-entity/utils/find-flat-entity-by-id-in-flat-entity-maps.util';
 import { findFlatEntityByUniversalIdentifier } from 'src/engine/metadata-modules/flat-entity/utils/find-flat-entity-by-universal-identifier.util';
 import { computeMorphOrRelationFieldJoinColumnName } from 'src/engine/metadata-modules/field-metadata/utils/compute-morph-or-relation-field-join-column-name.util';
-import { type FlatFieldMetadata } from 'src/engine/metadata-modules/flat-field-metadata/types/flat-field-metadata.type';
+import { type OrmFlatFieldMetadata } from 'src/engine/metadata-modules/flat-field-metadata/types/orm-flat-field-metadata.type';
 import { isFlatFieldMetadataOfType } from 'src/engine/metadata-modules/flat-field-metadata/utils/is-flat-field-metadata-of-type.util';
 import { type FlatObjectMetadata } from 'src/engine/metadata-modules/flat-object-metadata/types/flat-object-metadata.type';
 
 export type RecordLabelFormulaDefinition = {
   formula: LabelIdentifierFormula;
-  labelIdentifierFieldMetadata: FlatFieldMetadata<FieldMetadataType.TEXT>;
+  labelIdentifierFieldMetadata: OrmFlatFieldMetadata<FieldMetadataType.TEXT>;
 };
 
 export const getRecordLabelFormulaDefinition = ({
   flatFieldMetadataMaps,
   flatObjectMetadata,
 }: {
-  flatFieldMetadataMaps: FlatEntityMaps<FlatFieldMetadata>;
+  flatFieldMetadataMaps: FlatEntityMaps<OrmFlatFieldMetadata>;
   flatObjectMetadata: FlatObjectMetadata;
 }): RecordLabelFormulaDefinition | undefined => {
   const labelIdentifierFieldMetadata = findFlatEntityByIdInFlatEntityMaps({
@@ -56,9 +56,9 @@ export const getRecordLabelFormulaReferencedFieldMetadatas = ({
   flatFieldMetadataMaps,
   formula,
 }: {
-  flatFieldMetadataMaps: FlatEntityMaps<FlatFieldMetadata>;
+  flatFieldMetadataMaps: FlatEntityMaps<OrmFlatFieldMetadata>;
   formula: LabelIdentifierFormula;
-}): FlatFieldMetadata[] =>
+}): OrmFlatFieldMetadata[] =>
   [
     ...new Set(
       formula.fieldReferences.flatMap(
@@ -81,7 +81,7 @@ export const evaluateRecordLabelFormula = ({
   record,
   relationRecordLabels,
 }: {
-  flatFieldMetadataMaps: FlatEntityMaps<FlatFieldMetadata>;
+  flatFieldMetadataMaps: FlatEntityMaps<OrmFlatFieldMetadata>;
   formula: LabelIdentifierFormula;
   record: ObjectRecord;
   relationRecordLabels: Map<string, string>;
@@ -109,7 +109,7 @@ const formatRecordLabelFormulaFieldValue = ({
   record,
   relationRecordLabels,
 }: {
-  fieldMetadata: FlatFieldMetadata;
+  fieldMetadata: OrmFlatFieldMetadata;
   record: ObjectRecord;
   relationRecordLabels: Map<string, string>;
 }): string => {

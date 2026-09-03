@@ -12,6 +12,8 @@ const STANDARD_APPLICATION = {
   universalIdentifier: '20202020-0000-0000-0000-0000000000bb',
 };
 const MESSAGE = STANDARD_OBJECTS.message;
+const DELIVERY_STATUS_FIELD_UNIVERSAL_IDENTIFIER =
+  '209254fa-2b89-429d-a72a-c401c4bd5a78';
 
 const buildByUniversalIdentifierMap = (
   universalIdentifiers: string[] = [],
@@ -68,36 +70,20 @@ describe('AddMessageDeliveryStatusFieldCommand', () => {
       total: 1,
     });
 
-  it('creates Message.deliveryStatus when an existing workspace is missing it', async () => {
+  // The 2-38 command removed deliveryStatus from the standard application, so
+  // this command can no longer build the field and must leave the workspace as
+  // it found it instead of throwing.
+  it('skips a workspace missing the field now that the standard application no longer defines it', async () => {
     await runOnWorkspace();
 
-    expect(validateBuildAndRunWorkspaceMigrationMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        isSystemBuild: true,
-        applicationUniversalIdentifier:
-          STANDARD_APPLICATION.universalIdentifier,
-        workspaceId: WORKSPACE_ID,
-        allFlatEntityOperationByMetadataName: {
-          fieldMetadata: {
-            flatEntityToCreate: [
-              expect.objectContaining({
-                universalIdentifier:
-                  MESSAGE.fields.deliveryStatus.universalIdentifier,
-                name: 'deliveryStatus',
-              }),
-            ],
-            flatEntityToDelete: [],
-            flatEntityToUpdate: [],
-          },
-        },
-      }),
-    );
+    expect(applicationServiceMock).toHaveBeenCalled();
+    expect(validateBuildAndRunWorkspaceMigrationMock).not.toHaveBeenCalled();
   });
 
   it('skips an already-correct workspace without building a migration', async () => {
     getOrRecomputeMock.mockResolvedValue({
       flatFieldMetadataMaps: buildByUniversalIdentifierMap([
-        MESSAGE.fields.deliveryStatus.universalIdentifier,
+        DELIVERY_STATUS_FIELD_UNIVERSAL_IDENTIFIER,
       ]),
       flatObjectMetadataMaps: buildByUniversalIdentifierMap([
         MESSAGE.universalIdentifier,

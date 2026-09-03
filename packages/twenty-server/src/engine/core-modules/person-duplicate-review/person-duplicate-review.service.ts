@@ -26,7 +26,7 @@ import {
   getSortedPersonPair,
 } from 'src/engine/core-modules/person-duplicate-review/utils/person-duplicate-review.util';
 import { type WorkspaceAuthContext } from 'src/engine/core-modules/auth/types/workspace-auth-context.type';
-import { GlobalWorkspaceOrmManager } from 'src/engine/twenty-orm/global-workspace-datasource/global-workspace-orm.manager';
+import { WorkspaceOrmManager } from 'src/engine/twenty-orm/workspace-orm.manager';
 import { getWorkspaceContext } from 'src/engine/twenty-orm/storage/orm-workspace-context.storage';
 import { getObjectsPermissionsFromRolePermissionConfig } from 'src/engine/twenty-orm/utils/get-objects-permissions-from-role-permission-config.util';
 import { resolveRolePermissionConfig } from 'src/engine/twenty-orm/utils/resolve-role-permission-config.util';
@@ -48,7 +48,7 @@ type CachedPersonDuplicateGroups = {
 @Injectable()
 export class PersonDuplicateReviewService {
   constructor(
-    private readonly globalWorkspaceOrmManager: GlobalWorkspaceOrmManager,
+    private readonly globalWorkspaceOrmManager: WorkspaceOrmManager,
     @InjectWorkspaceScopedRepository(PersonDuplicatePairDecisionEntity)
     private readonly personDuplicatePairDecisionRepository: WorkspaceScopedRepository<PersonDuplicatePairDecisionEntity>,
     @InjectCacheStorage(CacheStorageNamespace.EngineWorkspace)
@@ -297,7 +297,6 @@ export class PersonDuplicateReviewService {
     const personPermissions = objectsPermissions[personObjectMetadataId];
     const personRepository =
       await this.globalWorkspaceOrmManager.getRepository<PersonWorkspaceEntity>(
-        authContext.workspace.id,
         'person',
         rolePermissionConfig,
       );

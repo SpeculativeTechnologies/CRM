@@ -1,9 +1,8 @@
 import ReactDOM from 'react-dom/client';
 
 import { App } from '@/app/components/App';
-import { preloadWorkspacePageChunkForPath } from '@/app/hooks/useCreateWorkspaceAppRouter';
+import { preloadWorkspacePageChunkForPath } from '@/app/routing/utils/createWorkspaceRouteObjects';
 import '@/app/utils/setupMonacoEnvironment';
-import { migrateTokenPairCookieToLocalStorage } from '@/auth/utils/migrateTokenPairCookieToLocalStorage';
 import { hydrateMetadataStore } from '@/metadata-store/storage/metadataStoreStorage';
 import '@fontsource/dm-mono/400.css';
 import '@fontsource/dm-mono/500.css';
@@ -16,10 +15,6 @@ import 'twenty-ui/style.css';
 import 'twenty-ui/theme-light.css';
 import 'twenty-ui/theme-dark.css';
 import './index.css';
-
-// TODO: REMOVE this after 2026-12-12 — temporary migration of tokenPair from the
-// legacy cookie to localStorage (legacy cookie has a 180-day expiry).
-migrateTokenPairCookieToLocalStorage();
 
 preloadWorkspacePageChunkForPath(window.location.pathname);
 

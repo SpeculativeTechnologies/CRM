@@ -1,5 +1,5 @@
 import { recordStoreFamilyState } from '@/object-record/record-store/states/recordStoreFamilyState';
-import { useLayoutRenderingContext } from '@/ui/layout/contexts/LayoutRenderingContext';
+import { useLayoutRenderingContextOrUndefined } from '@/ui/layout/contexts/LayoutRenderingContext';
 import { useAtomFamilyStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomFamilyStateValue';
 import { CoreObjectNameSingular } from 'twenty-shared/types';
 import { PageLayoutType } from '~/generated-metadata/graphql';
@@ -7,7 +7,11 @@ import { PageLayoutType } from '~/generated-metadata/graphql';
 // Read straight off the record rather than counting tasks client side, so the
 // tab can never disagree with the Open tasks filter on the People index.
 export const useRecordPageOpenTaskCount = (): number | undefined => {
-  const { targetRecordIdentifier, layoutType } = useLayoutRenderingContext();
+  // Tab lists also render outside a layout (upstream's tests, standalone pages),
+  // where there is no record to read from.
+  const layoutRenderingContext = useLayoutRenderingContextOrUndefined();
+  const targetRecordIdentifier = layoutRenderingContext?.targetRecordIdentifier;
+  const layoutType = layoutRenderingContext?.layoutType;
 
   const recordStore = useAtomFamilyStateValue(
     recordStoreFamilyState,

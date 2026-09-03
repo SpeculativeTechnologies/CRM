@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 
 import { FieldMetadataType, type ObjectRecord } from 'twenty-shared/types';
 import { isDefined } from 'twenty-shared/utils';
-import { In } from 'typeorm';
+import { In, MoreThan } from 'typeorm';
 
 import { RecordLabelFormulaRelationService } from 'src/engine/core-modules/record-label-formula/services/record-label-formula-relation.service';
 import {
@@ -11,28 +11,26 @@ import {
   getRecordLabelFormulaReferencedFieldMetadatas,
 } from 'src/engine/core-modules/record-label-formula/utils/record-label-formula-metadata.util';
 import { type FlatEntityMaps } from 'src/engine/metadata-modules/flat-entity/types/flat-entity-maps.type';
-import { type FlatFieldMetadata } from 'src/engine/metadata-modules/flat-field-metadata/types/flat-field-metadata.type';
+import { type OrmFlatFieldMetadata } from 'src/engine/metadata-modules/flat-field-metadata/types/orm-flat-field-metadata.type';
 import { computeMorphOrRelationFieldJoinColumnName } from 'src/engine/metadata-modules/field-metadata/utils/compute-morph-or-relation-field-join-column-name.util';
 import { type FlatObjectMetadata } from 'src/engine/metadata-modules/flat-object-metadata/types/flat-object-metadata.type';
-import { GlobalWorkspaceDataSource } from 'src/engine/twenty-orm/global-workspace-datasource/global-workspace-datasource';
-import { GlobalWorkspaceOrmManager } from 'src/engine/twenty-orm/global-workspace-datasource/global-workspace-orm.manager';
 import { buildSystemAuthContext } from 'src/engine/twenty-orm/utils/build-system-auth-context.util';
+import { WorkspaceOrmManager } from 'src/engine/twenty-orm/workspace-orm.manager';
 import { WorkspaceCacheService } from 'src/engine/workspace-cache/services/workspace-cache.service';
 
 const RECORD_BACKFILL_BATCH_SIZE = 500;
 
 type RecordLabelFormulaRecomputeArgs = {
-  flatFieldMetadataMaps: FlatEntityMaps<FlatFieldMetadata>;
+  flatFieldMetadataMaps: FlatEntityMaps<OrmFlatFieldMetadata>;
   flatObjectMetadata: FlatObjectMetadata;
   flatObjectMetadataMaps: FlatEntityMaps<FlatObjectMetadata>;
   recordIds: string[];
-  workspaceDataSource: GlobalWorkspaceDataSource;
 };
 
 @Injectable()
 export class RecordLabelFormulaService {
   constructor(
-    private readonly globalWorkspaceOrmManager: GlobalWorkspaceOrmManager,
+    private readonly workspaceOrmManager: WorkspaceOrmManager,
     private readonly workspaceCacheService: WorkspaceCacheService,
     private readonly recordLabelFormulaRelationService: RecordLabelFormulaRelationService,
   ) {}
@@ -42,7 +40,6 @@ export class RecordLabelFormulaService {
     flatObjectMetadata,
     flatObjectMetadataMaps,
     recordIds,
-    workspaceDataSource,
   }: RecordLabelFormulaRecomputeArgs): Promise<Map<string, string>> {
     if (recordIds.length === 0) {
       return new Map();
@@ -91,7 +88,6 @@ export class RecordLabelFormulaService {
         flatObjectMetadata: next.flatObjectMetadata,
         flatObjectMetadataMaps,
         recordIds: unvisitedRecordIds,
-        workspaceDataSource,
       });
 
       if (next.isStartingObject) {
@@ -105,7 +101,6 @@ export class RecordLabelFormulaService {
         changedRecordIds: unvisitedRecordIds,
         flatFieldMetadataMaps,
         flatObjectMetadataMaps,
-        workspaceDataSource,
       });
 
       queue.push(
@@ -165,17 +160,13 @@ export class RecordLabelFormulaService {
       return;
     }
 
-    await this.globalWorkspaceOrmManager.executeInWorkspaceContext(
+    await this.workspaceOrmManager.executeInWorkspaceContext(
       async () => {
-        const workspaceDataSource =
-          await this.globalWorkspaceOrmManager.getGlobalWorkspaceDataSource();
-
         for (const affectedObjectMetadata of affectedObjectMetadatas) {
           await this.recomputeAllObjectRecordLabels({
             flatFieldMetadataMaps,
             flatObjectMetadata: affectedObjectMetadata,
             flatObjectMetadataMaps,
-            workspaceDataSource,
           });
         }
       },
@@ -205,16 +196,12 @@ export class RecordLabelFormulaService {
       return;
     }
 
-    await this.globalWorkspaceOrmManager.executeInWorkspaceContext(
+    await this.workspaceOrmManager.executeInWorkspaceContext(
       async () => {
-        const workspaceDataSource =
-          await this.globalWorkspaceOrmManager.getGlobalWorkspaceDataSource();
-
         await this.recomputeAllObjectRecordLabels({
           flatFieldMetadataMaps,
           flatObjectMetadata,
           flatObjectMetadataMaps,
-          workspaceDataSource,
         });
       },
       buildSystemAuthContext(workspaceId),
@@ -226,31 +213,20 @@ export class RecordLabelFormulaService {
     flatFieldMetadataMaps,
     flatObjectMetadata,
     flatObjectMetadataMaps,
-    workspaceDataSource,
   }: Omit<RecordLabelFormulaRecomputeArgs, 'recordIds'>): Promise<void> {
-    const repository = workspaceDataSource.getRepository(
+    const repository = this.workspaceOrmManager.getRepository(
       flatObjectMetadata.nameSingular,
       { shouldBypassPermissionChecks: true },
     );
     let lastRecordId: string | undefined;
 
     while (true) {
-      const queryBuilder = repository
-        .createQueryBuilder(flatObjectMetadata.nameSingular)
-        .select(`${flatObjectMetadata.nameSingular}.id`, 'id')
-        .orderBy(`${flatObjectMetadata.nameSingular}.id`, 'ASC')
-        .take(RECORD_BACKFILL_BATCH_SIZE);
-
-      if (isDefined(lastRecordId)) {
-        queryBuilder.andWhere(
-          `${flatObjectMetadata.nameSingular}.id > :lastRecordId`,
-          { lastRecordId },
-        );
-      }
-
-      const records = (await queryBuilder.getRawMany()) as Array<{
-        id: string;
-      }>;
+      const records = (await repository.find({
+        select: ['id'],
+        where: isDefined(lastRecordId) ? { id: MoreThan(lastRecordId) } : {},
+        order: { id: 'ASC' },
+        take: RECORD_BACKFILL_BATCH_SIZE,
+      })) as Array<{ id: string }>;
 
       if (records.length === 0) {
         break;
@@ -263,7 +239,6 @@ export class RecordLabelFormulaService {
         flatObjectMetadata,
         flatObjectMetadataMaps,
         recordIds,
-        workspaceDataSource,
       });
 
       lastRecordId = recordIds[recordIds.length - 1];
@@ -275,7 +250,6 @@ export class RecordLabelFormulaService {
     flatObjectMetadata,
     flatObjectMetadataMaps,
     recordIds,
-    workspaceDataSource,
   }: RecordLabelFormulaRecomputeArgs): Promise<Map<string, string>> {
     const formulaDefinition = getRecordLabelFormulaDefinition({
       flatFieldMetadataMaps,
@@ -301,7 +275,7 @@ export class RecordLabelFormulaService {
           })
         : fieldMetadata.name,
     );
-    const repository = workspaceDataSource.getRepository(
+    const repository = this.workspaceOrmManager.getRepository(
       flatObjectMetadata.nameSingular,
       { shouldBypassPermissionChecks: true },
     );
@@ -315,7 +289,6 @@ export class RecordLabelFormulaService {
         flatObjectMetadataMaps,
         records,
         relationFieldMetadatas,
-        workspaceDataSource,
       });
     const updates: Array<{
       criteria: string;
@@ -352,13 +325,11 @@ export class RecordLabelFormulaService {
     changedRecordIds,
     flatFieldMetadataMaps,
     flatObjectMetadataMaps,
-    workspaceDataSource,
   }: {
     changedObjectMetadata: FlatObjectMetadata;
     changedRecordIds: string[];
-    flatFieldMetadataMaps: FlatEntityMaps<FlatFieldMetadata>;
+    flatFieldMetadataMaps: FlatEntityMaps<OrmFlatFieldMetadata>;
     flatObjectMetadataMaps: FlatEntityMaps<FlatObjectMetadata>;
-    workspaceDataSource: GlobalWorkspaceDataSource;
   }): Promise<
     Array<{ flatObjectMetadata: FlatObjectMetadata; recordIds: string[] }>
   > {
@@ -394,7 +365,7 @@ export class RecordLabelFormulaService {
         continue;
       }
 
-      const repository = workspaceDataSource.getRepository(
+      const repository = this.workspaceOrmManager.getRepository(
         candidateObjectMetadata.nameSingular,
         { shouldBypassPermissionChecks: true },
       );

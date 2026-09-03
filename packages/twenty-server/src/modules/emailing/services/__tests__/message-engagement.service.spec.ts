@@ -3,8 +3,8 @@ import { In, IsNull, Not } from 'typeorm';
 
 import { MessageParticipantWorkspaceEntity } from 'src/modules/messaging/common/standard-objects/message-participant.workspace-entity';
 
-import { type GlobalWorkspaceOrmManager } from 'src/engine/twenty-orm/global-workspace-datasource/global-workspace-orm.manager';
-import { type CampaignStatsRefreshSchedulerService } from 'src/modules/emailing/services/campaign-stats-refresh-scheduler.service';
+import { type WorkspaceOrmManager } from 'src/engine/twenty-orm/workspace-orm.manager';
+import { type MessageCampaignStatisticsService } from 'src/modules/emailing/services/message-campaign-statistics.service';
 import { MessageEngagementService } from 'src/modules/emailing/services/message-engagement.service';
 
 const WORKSPACE_ID = '20202020-0000-0000-0000-000000000001';
@@ -32,9 +32,9 @@ describe('MessageEngagementService', () => {
     updateMock = jest.fn().mockResolvedValue(undefined);
     scheduleMock = jest.fn().mockResolvedValue(undefined);
 
-    const globalWorkspaceOrmManager = {
+    const workspaceOrmManager = {
       executeInWorkspaceContext: (work: () => Promise<void>) => work(),
-      getRepository: async (_workspaceId: string, entity: unknown) =>
+      getRepository: (entity: unknown) =>
         entity === MessageParticipantWorkspaceEntity
           ? { find: findParticipantsMock, findOne: findOneParticipantMock }
           : {
@@ -42,11 +42,11 @@ describe('MessageEngagementService', () => {
               find: findMock,
               update: updateMock,
             },
-    } as unknown as GlobalWorkspaceOrmManager;
+    } as unknown as WorkspaceOrmManager;
 
-    service = new MessageEngagementService(globalWorkspaceOrmManager, {
-      schedule: scheduleMock,
-    } as unknown as CampaignStatsRefreshSchedulerService);
+    service = new MessageEngagementService(workspaceOrmManager, {
+      scheduleRefresh: scheduleMock,
+    } as unknown as MessageCampaignStatisticsService);
   });
 
   const args = {

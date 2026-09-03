@@ -7,7 +7,6 @@ import {
   ensureLocalFirstTable,
   type LocalFirstColumn,
 } from '@/local-first/services/getLocalFirstDatabase';
-import { getLocalFirstAuthHeaders } from '@/local-first/utils/getLocalFirstAuthHeaders';
 import { REACT_APP_SERVER_BASE_URL } from '~/config';
 
 export type LocalFirstMirror = {
@@ -46,7 +45,6 @@ const fetchTableColumns = async (
     `${REACT_APP_SERVER_BASE_URL}/${ApiPath.LocalFirst}/schema/${tableName}`,
     {
       credentials: 'include',
-      headers: getLocalFirstAuthHeaders(),
     },
   );
 

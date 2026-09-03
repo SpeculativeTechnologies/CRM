@@ -19,7 +19,9 @@ import { type PageLayout } from '@/page-layout/types/PageLayout';
 import { type PageLayoutWidget } from '@/page-layout/types/PageLayoutWidget';
 import { FieldWidget } from '@/page-layout/widgets/field/components/FieldWidget';
 import { WidgetComponentInstanceContext } from '@/page-layout/widgets/states/contexts/WidgetComponentInstanceContext';
+import { MAIN_CONTEXT_STORE_INSTANCE_ID } from '@/context-store/constants/MainContextStoreInstanceId';
 import { LayoutRenderingProvider } from '@/ui/layout/contexts/LayoutRenderingContext';
+import { WorkspaceSurfaceContext } from '@/ui/layout/contexts/WorkspaceSurfaceContext';
 import { jotaiStore } from '@/ui/utilities/state/jotai/jotaiStore';
 import { CoreObjectNameSingular } from 'twenty-shared/types';
 import { ComponentDecorator } from 'twenty-ui/testing';
@@ -287,6 +289,7 @@ const createPageLayoutWithWidget = (
   id: PAGE_LAYOUT_TEST_INSTANCE_ID,
   name: 'Mock Page Layout',
   type: PageLayoutType.RECORD_PAGE,
+  isFirstTabPinned: true,
   isSystemSideEffect: true,
   objectMetadataId,
   universalIdentifier: '20202020-0000-0000-0000-000000000001',
@@ -337,8 +340,9 @@ const buildFieldWidget = ({
   type: WidgetType.FIELD,
   title,
   objectMetadataId,
-  gridPosition: {
-    __typename: 'GridPosition',
+  position: {
+    layoutMode: PageLayoutTabLayoutMode.GRID,
+    __typename: 'PageLayoutWidgetGridPosition',
     row: 0,
     column: 0,
     rowSpan: 1,
@@ -395,30 +399,45 @@ const renderFieldWidgetStory = ({
       <JestMetadataAndApolloMocksWrapper>
         <CoreClientProviderWrapper>
           <PageLayoutTestWrapper store={jotaiStore}>
-            <LayoutRenderingProvider
-              value={{
-                isInSidePanel,
-                layoutType: PageLayoutType.RECORD_PAGE,
-                targetRecordIdentifier: {
-                  id: targetRecord.id,
-                  targetObjectNameSingular: targetRecord.nameSingular,
-                },
-              }}
+            <WorkspaceSurfaceContext.Provider
+              value={
+                isInSidePanel
+                  ? {
+                      type: 'side-panel',
+                      instanceId: 'side-panel-page',
+                      ownsRouteLocation: false,
+                    }
+                  : {
+                      type: 'main',
+                      instanceId: MAIN_CONTEXT_STORE_INSTANCE_ID,
+                      ownsRouteLocation: true,
+                    }
+              }
             >
-              <PageLayoutContentProvider
+              <LayoutRenderingProvider
                 value={{
-                  layoutMode: PageLayoutTabLayoutMode.VERTICAL_LIST,
-                  presentation: 'stack',
-                  tabId: 'fields',
+                  layoutType: PageLayoutType.RECORD_PAGE,
+                  targetRecordIdentifier: {
+                    id: targetRecord.id,
+                    targetObjectNameSingular: targetRecord.nameSingular,
+                  },
                 }}
               >
-                <WidgetComponentInstanceContext.Provider
-                  value={{ instanceId: widget.id }}
+                <PageLayoutContentProvider
+                  value={{
+                    layoutMode: PageLayoutTabLayoutMode.VERTICAL_LIST,
+                    presentation: 'stack',
+                    tabId: 'fields',
+                  }}
                 >
-                  <FieldWidget widget={widget} />
-                </WidgetComponentInstanceContext.Provider>
-              </PageLayoutContentProvider>
-            </LayoutRenderingProvider>
+                  <WidgetComponentInstanceContext.Provider
+                    value={{ instanceId: widget.id }}
+                  >
+                    <FieldWidget widget={widget} />
+                  </WidgetComponentInstanceContext.Provider>
+                </PageLayoutContentProvider>
+              </LayoutRenderingProvider>
+            </WorkspaceSurfaceContext.Provider>
           </PageLayoutTestWrapper>
         </CoreClientProviderWrapper>
       </JestMetadataAndApolloMocksWrapper>

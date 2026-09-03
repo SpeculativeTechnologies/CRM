@@ -15,7 +15,23 @@ const defaultOperands = [
   ViewFilterOperand.IS_NOT_EMPTY,
 ] as const;
 
-export const getStepFilterOperands = ({
+// The fork's exact-match operands exist for record views; workflow step
+// filters (and the core workflow rules built from them) have no evaluation
+// for them, so they are not offered here.
+const VIEW_ONLY_OPERANDS: ReadonlySet<ViewFilterOperand> = new Set([
+  ViewFilterOperand.IS_EXACTLY,
+  ViewFilterOperand.IS_NOT_EXACTLY,
+]);
+
+export const getStepFilterOperands = (args: {
+  filterType: string | undefined;
+  subFieldName: string | undefined;
+}): readonly ViewFilterOperand[] =>
+  getStepFilterOperandsForFilterType(args).filter(
+    (operand) => !VIEW_ONLY_OPERANDS.has(operand),
+  );
+
+const getStepFilterOperandsForFilterType = ({
   filterType,
   subFieldName,
 }: {

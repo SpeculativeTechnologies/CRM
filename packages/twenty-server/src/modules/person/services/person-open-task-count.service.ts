@@ -3,11 +3,12 @@ import { Injectable } from '@nestjs/common';
 import { In } from 'typeorm';
 import { isDefined } from 'twenty-shared/utils';
 
-import { GlobalWorkspaceOrmManager } from 'src/engine/twenty-orm/global-workspace-datasource/global-workspace-orm.manager';
+import { WorkspaceOrmManager } from 'src/engine/twenty-orm/workspace-orm.manager';
 import { type RolePermissionConfig } from 'src/engine/twenty-orm/types/role-permission-config';
 import { type PersonWorkspaceEntity } from 'src/modules/person/standard-objects/person.workspace-entity';
 import { computeOpenTaskCountByPersonId } from 'src/modules/person/utils/compute-open-task-count-by-person-id.util';
 import { type TaskTargetWorkspaceEntity } from 'src/modules/task/standard-objects/task-target.workspace-entity';
+import { type TaskWorkspaceEntity } from 'src/modules/task/standard-objects/task.workspace-entity';
 
 // openTaskCount is derived and written by the system, never by the actor whose
 // task edit triggered the recount, so their own role must not gate it.
@@ -18,11 +19,10 @@ const SYSTEM_MAINTAINED_FIELD_PERMISSIONS: RolePermissionConfig = {
 @Injectable()
 export class PersonOpenTaskCountService {
   constructor(
-    private readonly globalWorkspaceOrmManager: GlobalWorkspaceOrmManager,
+    private readonly globalWorkspaceOrmManager: WorkspaceOrmManager,
   ) {}
 
   async findPersonIdsTargetedByTasks({
-    workspaceId,
     taskIds,
   }: {
     workspaceId: string;
@@ -34,7 +34,6 @@ export class PersonOpenTaskCountService {
 
     const taskTargetRepository =
       await this.globalWorkspaceOrmManager.getRepository<TaskTargetWorkspaceEntity>(
-        workspaceId,
         'taskTarget',
         SYSTEM_MAINTAINED_FIELD_PERMISSIONS,
       );
@@ -57,7 +56,6 @@ export class PersonOpenTaskCountService {
   }
 
   async recomputeForPersonIds({
-    workspaceId,
     personIds,
   }: {
     workspaceId: string;
@@ -71,19 +69,24 @@ export class PersonOpenTaskCountService {
 
     const taskTargetRepository =
       await this.globalWorkspaceOrmManager.getRepository<TaskTargetWorkspaceEntity>(
-        workspaceId,
         'taskTarget',
+        SYSTEM_MAINTAINED_FIELD_PERMISSIONS,
+      );
+
+    const taskRepository =
+      this.globalWorkspaceOrmManager.getRepository<TaskWorkspaceEntity>(
+        'task',
         SYSTEM_MAINTAINED_FIELD_PERMISSIONS,
       );
 
     const openTaskCountByPersonId = await computeOpenTaskCountByPersonId({
       taskTargetRepository,
+      taskRepository,
       personIds: uniquePersonIds,
     });
 
     const personRepository =
       await this.globalWorkspaceOrmManager.getRepository<PersonWorkspaceEntity>(
-        workspaceId,
         'person',
         SYSTEM_MAINTAINED_FIELD_PERMISSIONS,
       );

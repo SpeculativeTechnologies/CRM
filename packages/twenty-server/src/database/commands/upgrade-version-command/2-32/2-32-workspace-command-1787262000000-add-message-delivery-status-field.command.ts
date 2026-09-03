@@ -14,8 +14,10 @@ import { computeTwentyStandardApplicationAllFlatEntityMaps } from 'src/engine/wo
 import { WorkspaceMigrationValidateBuildAndRunService } from 'src/engine/workspace-manager/workspace-migration/services/workspace-migration-validate-build-and-run-service';
 
 const MESSAGE = STANDARD_OBJECTS.message;
+// Literal because upstream dropped this field from STANDARD_OBJECT_FIELDS when
+// per-recipient state moved to core.campaignDelivery (see the 2-38 command).
 const DELIVERY_STATUS_FIELD_UNIVERSAL_IDENTIFIER =
-  MESSAGE.fields.deliveryStatus.universalIdentifier;
+  '209254fa-2b89-429d-a72a-c401c4bd5a78';
 
 @RegisteredWorkspaceCommand('2.32.0', 1787262000000)
 @Command({
@@ -83,6 +85,20 @@ export class AddMessageDeliveryStatusFieldCommand extends ProvisionedWorkspaceCo
         workspaceId,
         twentyStandardApplicationId: twentyStandardFlatApplication.id,
       });
+
+    if (
+      !isDefined(
+        standardAllFlatEntityMaps.flatFieldMetadataMaps.byUniversalIdentifier[
+          DELIVERY_STATUS_FIELD_UNIVERSAL_IDENTIFIER
+        ],
+      )
+    ) {
+      this.logger.log(
+        `Message.deliveryStatus is no longer part of the standard application, skipping workspace ${workspaceId}`,
+      );
+
+      return;
+    }
 
     const [deliveryStatusField] =
       getStandardFlatEntitiesToCreateOrThrow<FlatFieldMetadata>({

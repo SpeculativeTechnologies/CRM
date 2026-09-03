@@ -5,8 +5,9 @@ import { SkeletonLoader } from '@/activities/components/SkeletonLoader';
 import { EventList } from '@/activities/timeline-activities/components/EventList';
 import { useTimelineActivities } from '@/activities/timeline-activities/hooks/useTimelineActivities';
 import { RecordListUpsertRecordsInStoreEffect } from '@/object-record/record-list/components/RecordListUpsertRecordsInStoreEffect';
-import { useLayoutRenderingContext } from '@/ui/layout/contexts/LayoutRenderingContext';
+import { StyledWidgetScrollContainer } from '@/ui/layout/components/WidgetContentContainer';
 import { useTargetRecord } from '@/ui/layout/contexts/useTargetRecord';
+import { useWorkspaceSurface } from '@/ui/layout/hooks/useWorkspaceSurface';
 import { t } from '@lingui/core/macro';
 import {
   AnimatedPlaceholder,
@@ -17,24 +18,14 @@ import {
 } from 'twenty-ui/feedback';
 import { MOBILE_VIEWPORT, themeCssVariables } from 'twenty-ui/theme-constants';
 
-const StyledMainContainer = styled.div`
+const StyledMainContainer = styled(StyledWidgetScrollContainer)`
   align-items: flex-start;
   align-self: stretch;
   border-top: none;
-  display: flex;
-  flex-direction: column;
   gap: ${themeCssVariables.spacing[4]};
-
-  justify-content: center;
-  overflow: auto;
-  padding-left: ${themeCssVariables.spacing[6]};
-  padding-right: ${themeCssVariables.spacing[6]};
-  padding-top: ${themeCssVariables.spacing[6]};
 
   @media (max-width: ${MOBILE_VIEWPORT}px) {
     border-top: 1px solid ${themeCssVariables.border.color.medium};
-    padding-right: ${themeCssVariables.spacing[1]};
-    padding-left: ${themeCssVariables.spacing[1]};
   }
 `;
 
@@ -47,7 +38,7 @@ const StyledSidePanelPlaceholderWrapper = styled.div`
 
 export const TimelineCard = () => {
   const targetRecord = useTargetRecord();
-  const { isInSidePanel } = useLayoutRenderingContext();
+  const isInSidePanel = useWorkspaceSurface().type === 'side-panel';
   const {
     timelineActivities,
     firstQueryLoading,

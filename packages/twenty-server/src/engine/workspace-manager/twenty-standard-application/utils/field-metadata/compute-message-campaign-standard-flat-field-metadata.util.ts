@@ -375,6 +375,15 @@ export const buildMessageCampaignStandardFlatFieldMetadatas = ({
             position: 4,
             color: 'orange',
           },
+          {
+            id: '3f0d9c41-6a52-4e88-9b74-5c2ad83f1e60',
+            value: 'CANCELED',
+            label: i18nLabel(
+              msg({ message: `Canceled`, context: 'fieldMetadata.label' }),
+            ),
+            position: 5,
+            color: 'red',
+          },
         ],
       },
     }),
@@ -413,6 +422,26 @@ export const buildMessageCampaignStandardFlatFieldMetadatas = ({
           }),
         ),
         icon: 'IconMailFast',
+        isNullable: false,
+        isUIEditable: false,
+        defaultValue: 0,
+      },
+    }),
+    deliveredCount: createStandardFieldFlatMetadata({
+      ...base,
+      context: {
+        fieldName: 'deliveredCount',
+        type: FieldMetadataType.NUMBER,
+        label: i18nLabel(
+          msg({ message: `Delivered count`, context: 'fieldMetadata.label' }),
+        ),
+        description: i18nLabel(
+          msg({
+            message: `Number of emails confirmed delivered`,
+            context: 'fieldMetadata.description',
+          }),
+        ),
+        icon: 'IconMailCheck',
         isNullable: false,
         isUIEditable: false,
         defaultValue: 0,
@@ -533,6 +562,26 @@ export const buildMessageCampaignStandardFlatFieldMetadatas = ({
           }),
         ),
         icon: 'IconMailForward',
+        isNullable: false,
+        isUIEditable: false,
+        defaultValue: 0,
+      },
+    }),
+    skippedCount: createStandardFieldFlatMetadata({
+      ...base,
+      context: {
+        fieldName: 'skippedCount',
+        type: FieldMetadataType.NUMBER,
+        label: i18nLabel(
+          msg({ message: `Skipped count`, context: 'fieldMetadata.label' }),
+        ),
+        description: i18nLabel(
+          msg({
+            message: `Number of recipients skipped without being emailed`,
+            context: 'fieldMetadata.description',
+          }),
+        ),
+        icon: 'IconMailOff',
         isNullable: false,
         isUIEditable: false,
         defaultValue: 0,

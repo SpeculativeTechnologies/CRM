@@ -16,7 +16,7 @@ import { isJunctionRelationForbidden } from '@/object-record/record-field/ui/uti
 import { RecordInlineCellAnchoredPortalContext } from '@/object-record/record-inline-cell/components/RecordInlineCellAnchoredPortalContext';
 import { RecordInlineCellCloseOnSidePanelOpeningEffect } from '@/object-record/record-inline-cell/components/RecordInlineCellCloseOnSidePanelOpeningEffect';
 import { getRecordFieldInputInstanceId } from '@/object-record/utils/getRecordFieldInputId';
-import { useLayoutRenderingContextOrUndefined } from '@/ui/layout/contexts/LayoutRenderingContext';
+import { useWorkspaceSurface } from '@/ui/layout/hooks/useWorkspaceSurface';
 import { createPortal } from 'react-dom';
 import { isDefined } from 'twenty-shared/utils';
 
@@ -48,10 +48,7 @@ export const RecordInlineCellAnchoredPortal = ({
   children,
   onCloseEditMode,
 }: RecordInlineCellAnchoredPortalProps) => {
-  // Board and calendar cards anchor inline cells straight from an index page,
-  // which renders no page layout and therefore no side panel.
-  const layoutRenderingContext = useLayoutRenderingContextOrUndefined();
-  const isInSidePanel = layoutRenderingContext?.isInSidePanel === true;
+  const isInSidePanel = useWorkspaceSurface().type === 'side-panel';
 
   const fieldInstanceId = getRecordFieldInputInstanceId({
     recordId,

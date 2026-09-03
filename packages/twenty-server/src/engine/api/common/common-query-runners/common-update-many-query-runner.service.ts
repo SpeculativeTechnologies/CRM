@@ -24,8 +24,8 @@ import { assertIsValidUuid } from 'src/engine/api/graphql/workspace-query-runner
 import { WorkspaceAuthContext } from 'src/engine/core-modules/auth/types/workspace-auth-context.type';
 import { RecordLabelFormulaService } from 'src/engine/core-modules/record-label-formula/services/record-label-formula.service';
 import { FlatEntityMaps } from 'src/engine/metadata-modules/flat-entity/types/flat-entity-maps.type';
-import { FlatFieldMetadata } from 'src/engine/metadata-modules/flat-field-metadata/types/flat-field-metadata.type';
 import { findFlatEntityByIdInFlatEntityMaps } from 'src/engine/metadata-modules/flat-entity/utils/find-flat-entity-by-id-in-flat-entity-maps.util';
+import { type OrmFlatFieldMetadata } from 'src/engine/metadata-modules/flat-field-metadata/types/orm-flat-field-metadata.type';
 import { FlatObjectMetadata } from 'src/engine/metadata-modules/flat-object-metadata/types/flat-object-metadata.type';
 import { assertMutationNotOnRemoteObject } from 'src/engine/metadata-modules/object-metadata/utils/assert-mutation-not-on-remote-object.util';
 
@@ -49,7 +49,6 @@ export class CommonUpdateManyQueryRunnerService extends CommonBaseQueryRunnerSer
     const {
       authContext,
       rolePermissionConfig,
-      workspaceDataSource,
       flatObjectMetadataMaps,
       flatFieldMetadataMaps,
       flatObjectMetadata,
@@ -77,7 +76,6 @@ export class CommonUpdateManyQueryRunnerService extends CommonBaseQueryRunnerSer
         flatObjectMetadata,
         flatObjectMetadataMaps,
         recordIds: updatedRecords.map((record) => record.id),
-        workspaceDataSource,
       });
     const labelIdentifierFieldMetadataId =
       flatObjectMetadata.labelIdentifierFieldMetadataId;
@@ -176,7 +174,7 @@ export class CommonUpdateManyQueryRunnerService extends CommonBaseQueryRunnerSer
     queryResult: ObjectRecord[],
     flatObjectMetadata: FlatObjectMetadata,
     flatObjectMetadataMaps: FlatEntityMaps<FlatObjectMetadata>,
-    flatFieldMetadataMaps: FlatEntityMaps<FlatFieldMetadata>,
+    flatFieldMetadataMaps: FlatEntityMaps<OrmFlatFieldMetadata>,
     authContext: WorkspaceAuthContext,
   ): Promise<ObjectRecord[]> {
     return await this.commonResultGettersService.processRecordArray(

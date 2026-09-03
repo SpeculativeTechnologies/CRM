@@ -1,14 +1,8 @@
-import { CoreObjectNamePlural } from '@/object-metadata/types/CoreObjectNamePlural';
 import { type EnrichedObjectMetadataItem } from '@/object-metadata/types/EnrichedObjectMetadataItem';
 import { type FieldMetadataItem } from '@/object-metadata/types/FieldMetadataItem';
-import { generateActivityTargetGqlFields } from '@/object-record/graphql/record-gql-fields/utils/generateActivityTargetGqlFields';
 import { generateDepthRecordGqlFieldsFromFields } from '@/object-record/graphql/record-gql-fields/utils/generateDepthRecordGqlFieldsFromFields';
 import { type RecordGqlOperationSignatureFactory } from '@/object-record/graphql/types/RecordGqlOperationSignatureFactory';
-import {
-  CoreObjectNameSingular,
-  FieldMetadataType,
-  RelationType,
-} from 'twenty-shared/types';
+import { FieldMetadataType, RelationType } from 'twenty-shared/types';
 import { isDefined } from 'twenty-shared/utils';
 
 type FindOneRecordForShowPageOperationSignatureFactory = {
@@ -44,43 +38,16 @@ export const buildFindOneRecordForShowPageOperationSignature: RecordGqlOperation
       )
     : objectMetadataItem.fields;
 
-  const shouldFetchActivityTargets = (
-    activityTargetsFieldName:
-      | CoreObjectNamePlural.NoteTarget
-      | CoreObjectNamePlural.TaskTarget,
-  ) =>
-    fieldsToFetch.some(
-      (fieldMetadataItem) =>
-        fieldMetadataItem.name === activityTargetsFieldName,
-    );
-
   return {
     objectNameSingular: objectMetadataItem.nameSingular,
     variables: {},
     fields: {
       ...generateDepthRecordGqlFieldsFromFields({
         objectMetadataItems,
+        sourceObjectMetadataItem: objectMetadataItem,
         fields: fieldsToFetch,
         depth: 1,
       }),
-      ...(shouldFetchActivityTargets(CoreObjectNamePlural.NoteTarget)
-        ? {
-            noteTargets: generateActivityTargetGqlFields({
-              activityObjectNameSingular: CoreObjectNameSingular.Note,
-              loadRelations: 'both',
-              objectMetadataItems,
-            }),
-          }
-        : {}),
-      ...(shouldFetchActivityTargets(CoreObjectNamePlural.TaskTarget)
-        ? {
-            taskTargets: generateActivityTargetGqlFields({
-              activityObjectNameSingular: CoreObjectNameSingular.Task,
-              loadRelations: 'both',
-              objectMetadataItems,
-            }),
-          }
-        : {}),
     },
   };
 };

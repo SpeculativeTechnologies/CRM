@@ -5,7 +5,7 @@ import { type FullNameMetadata } from 'twenty-shared/types';
 import { isDefined } from 'twenty-shared/utils';
 import { v4 } from 'uuid';
 
-import { GlobalWorkspaceOrmManager } from 'src/engine/twenty-orm/global-workspace-datasource/global-workspace-orm.manager';
+import { WorkspaceOrmManager } from 'src/engine/twenty-orm/workspace-orm.manager';
 import { type RolePermissionConfig } from 'src/engine/twenty-orm/types/role-permission-config';
 import { composeConnectionName } from 'src/modules/connection/utils/compose-connection-name.util';
 import { type PersonWorkspaceEntity } from 'src/modules/person/standard-objects/person.workspace-entity';
@@ -29,12 +29,11 @@ type ConnectionRecord = {
 @Injectable()
 export class ConnectionReciprocalService {
   constructor(
-    private readonly globalWorkspaceOrmManager: GlobalWorkspaceOrmManager,
+    private readonly globalWorkspaceOrmManager: WorkspaceOrmManager,
   ) {}
 
-  private async getConnectionRepository(workspaceId: string) {
+  private async getConnectionRepository() {
     return await this.globalWorkspaceOrmManager.getRepository<ConnectionRecord>(
-      workspaceId,
       'connection',
       SYSTEM_MAINTAINED_FIELD_PERMISSIONS,
     );
@@ -48,8 +47,7 @@ export class ConnectionReciprocalService {
     // Omit to sweep every connection, as the one-off backfill does
     connectionIds?: string[];
   }): Promise<number> {
-    const connectionRepository =
-      await this.getConnectionRepository(workspaceId);
+    const connectionRepository = await this.getConnectionRepository();
 
     if (isDefined(connectionIds) && connectionIds.length === 0) {
       return 0;
@@ -123,14 +121,12 @@ export class ConnectionReciprocalService {
   }
 
   async deleteReciprocalsOf({
-    workspaceId,
     connections,
   }: {
     workspaceId: string;
     connections: Pick<ConnectionRecord, 'personId' | 'connectedToId'>[];
   }): Promise<void> {
-    const connectionRepository =
-      await this.getConnectionRepository(workspaceId);
+    const connectionRepository = await this.getConnectionRepository();
 
     for (const connection of connections) {
       if (
@@ -158,7 +154,6 @@ export class ConnectionReciprocalService {
   }
 
   private async getPersonNameById({
-    workspaceId,
     personIds,
   }: {
     workspaceId: string;
@@ -172,7 +167,6 @@ export class ConnectionReciprocalService {
 
     const personRepository =
       await this.globalWorkspaceOrmManager.getRepository<PersonWorkspaceEntity>(
-        workspaceId,
         'person',
         SYSTEM_MAINTAINED_FIELD_PERMISSIONS,
       );

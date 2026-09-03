@@ -9,6 +9,7 @@ const buildEmail = (
 ): EmailingDomainSendEmailInput => ({
   workspaceId: 'workspace-1',
   domain: 'example.com',
+  sendKind: 'MARKETING',
   from: 'sender@example.com',
   to: ['recipient@example.org'],
   subject: 'Hello',

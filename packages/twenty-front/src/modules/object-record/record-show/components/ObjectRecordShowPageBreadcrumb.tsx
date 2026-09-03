@@ -85,7 +85,7 @@ export const ObjectRecordShowPageBreadcrumb = ({
 }) => {
   const isMobile = useIsMobile();
 
-  // The show page findOne (RecordShowEffect) writes the record into the
+  // The show page findOne (RecordShowPageResourceEffect) writes the record into the
   // record store; rendering waits on that instead of issuing a second query
   // for the label identifier. Coming from a table the store is already
   // primed, so the breadcrumb paints immediately.

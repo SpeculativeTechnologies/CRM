@@ -5,7 +5,7 @@ import { In } from 'typeorm';
 import { type FullNameMetadata } from 'twenty-shared/types';
 import { isDefined } from 'twenty-shared/utils';
 
-import { GlobalWorkspaceOrmManager } from 'src/engine/twenty-orm/global-workspace-datasource/global-workspace-orm.manager';
+import { WorkspaceOrmManager } from 'src/engine/twenty-orm/workspace-orm.manager';
 import { type RolePermissionConfig } from 'src/engine/twenty-orm/types/role-permission-config';
 import { composeConnectionName } from 'src/modules/connection/utils/compose-connection-name.util';
 import { type PersonWorkspaceEntity } from 'src/modules/person/standard-objects/person.workspace-entity';
@@ -27,11 +27,10 @@ type ConnectionRecord = {
 @Injectable()
 export class ConnectionNameService {
   constructor(
-    private readonly globalWorkspaceOrmManager: GlobalWorkspaceOrmManager,
+    private readonly globalWorkspaceOrmManager: WorkspaceOrmManager,
   ) {}
 
   async fillMissingNamesForConnectionIds({
-    workspaceId,
     connectionIds,
   }: {
     workspaceId: string;
@@ -45,7 +44,6 @@ export class ConnectionNameService {
 
     const connectionRepository =
       await this.globalWorkspaceOrmManager.getRepository<ConnectionRecord>(
-        workspaceId,
         'connection',
         SYSTEM_MAINTAINED_FIELD_PERMISSIONS,
       );
@@ -79,7 +77,6 @@ export class ConnectionNameService {
 
     const personRepository =
       await this.globalWorkspaceOrmManager.getRepository<PersonWorkspaceEntity>(
-        workspaceId,
         'person',
         SYSTEM_MAINTAINED_FIELD_PERMISSIONS,
       );

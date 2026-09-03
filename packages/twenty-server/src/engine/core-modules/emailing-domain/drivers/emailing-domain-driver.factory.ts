@@ -9,6 +9,7 @@ import {
 import { type EmailingDomainDriverInterface } from 'src/engine/core-modules/emailing-domain/drivers/interfaces/emailing-domain-driver.interface';
 
 import { AwsSesClientProvider } from 'src/engine/core-modules/emailing-domain/drivers/aws-ses/providers/aws-ses-client.provider';
+import { AwsSesAccountService } from 'src/engine/core-modules/emailing-domain/drivers/aws-ses/services/aws-ses-account.service';
 import { AwsSesRegisterDomainService } from 'src/engine/core-modules/emailing-domain/drivers/aws-ses/services/aws-ses-register-domain.service';
 import { AwsSesDriver } from 'src/engine/core-modules/emailing-domain/drivers/aws-ses/services/aws-ses-driver.service';
 import { AwsSesHandleErrorService } from 'src/engine/core-modules/emailing-domain/drivers/aws-ses/services/aws-ses-handle-error.service';
@@ -31,6 +32,7 @@ export class EmailingDomainDriverFactory extends DriverFactoryBase<EmailingDomai
     twentyConfigService: TwentyConfigService,
     configGroupHashService: ConfigGroupHashService,
     private readonly awsSesClientProvider: AwsSesClientProvider,
+    private readonly awsSesAccountService: AwsSesAccountService,
     private readonly awsSesHandleErrorService: AwsSesHandleErrorService,
     private readonly awsSesRegisterDomainService: AwsSesRegisterDomainService,
     private readonly awsSesSendEmailService: AwsSesSendEmailService,
@@ -103,6 +105,7 @@ export class EmailingDomainDriverFactory extends DriverFactoryBase<EmailingDomai
         return new AwsSesDriver(
           awsConfig,
           this.awsSesClientProvider,
+          this.awsSesAccountService,
           this.awsSesHandleErrorService,
           this.awsSesRegisterDomainService,
           this.awsSesSendEmailService,
