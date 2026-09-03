@@ -2,7 +2,6 @@ import { useCallback } from 'react';
 
 import { useCloseDropdown } from '@/ui/layout/dropdown/hooks/useCloseDropdown';
 import { useSetAtomComponentState } from '@/ui/utilities/state/jotai/hooks/useSetAtomComponentState';
-import { VIEW_PICKER_CALENDAR_END_FIELD_DROPDOWN_ID } from '@/views/view-picker/constants/ViewPickerCalendarEndFieldDropdownId';
 import { VIEW_PICKER_CALENDAR_FIELD_DROPDOWN_ID } from '@/views/view-picker/constants/ViewPickerCalendarFieldDropdownId';
 import { VIEW_PICKER_DROPDOWN_ID } from '@/views/view-picker/constants/ViewPickerDropdownId';
 import { VIEW_PICKER_KANBAN_FIELD_DROPDOWN_ID } from '@/views/view-picker/constants/ViewPickerKanbanFieldDropdownId';
@@ -30,7 +29,6 @@ export const useCloseAndResetViewPicker = () => {
     setViewPickerIsPersisting(false);
     setViewPickerMode('list');
     setViewPickerParentViewId('');
-    closeDropdown(VIEW_PICKER_CALENDAR_END_FIELD_DROPDOWN_ID);
     closeDropdown(VIEW_PICKER_CALENDAR_FIELD_DROPDOWN_ID);
     closeDropdown(VIEW_PICKER_KANBAN_FIELD_DROPDOWN_ID);
     closeDropdown(VIEW_PICKER_VIEW_TYPE_DROPDOWN_ID);

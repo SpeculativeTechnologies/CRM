@@ -1,6 +1,4 @@
 import { useIsLogged } from '@/auth/hooks/useIsLogged';
-import { isCookieAuthActiveState } from '@/auth/states/isCookieAuthActiveState';
-import { tokenPairState } from '@/auth/states/tokenPairState';
 import { useListenToBrowserEvent } from '@/browser-event/hooks/useListenToBrowserEvent';
 import { dispatchBrowserEvent } from '@/browser-event/utils/dispatchBrowserEvent';
 import { useResyncMetadataStore } from '@/metadata-store/hooks/useResyncMetadataStore';
@@ -9,9 +7,7 @@ import { SSE_RESYNC_DEBOUNCE_TIME_IN_MS } from '@/sse-db-event/constants/SseResy
 import { useHandleSseClientConnectionRetry } from '@/sse-db-event/hooks/useHandleSseClientConnectionRetry';
 import { activeQueryListenersState } from '@/sse-db-event/states/activeQueryListenersState';
 import { sseClientState } from '@/sse-db-event/states/sseClientState';
-import { getSseClientAuthHeaders } from '@/sse-db-event/utils/getSseClientAuthHeaders';
 import { useAtomState } from '@/ui/utilities/state/jotai/hooks/useAtomState';
-import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
 import { isNonEmptyArray } from '@sniptt/guards';
 import { createClient } from 'graphql-sse';
 import { useCallback, useEffect } from 'react';
@@ -24,7 +20,6 @@ export const SSEClientEffect = () => {
   const store = useStore();
   const isLogged = useIsLogged();
   const [sseClient, setSseClient] = useAtomState(sseClientState);
-  const tokenPair = useAtomStateValue(tokenPairState);
   const { resyncMetadataStore } = useResyncMetadataStore();
 
   const debouncedResyncMetadataStore = useDebouncedCallback(
@@ -63,11 +58,6 @@ export const SSEClientEffect = () => {
       const newSseClient = createClient({
         url: `${REACT_APP_SERVER_BASE_URL}/metadata`,
         credentials: 'include',
-        headers: () =>
-          getSseClientAuthHeaders({
-            isCookieAuthActive: store.get(isCookieAuthActiveState.atom),
-            tokenPair: store.get(tokenPairState.atom),
-          }),
         on: {
           connected: handleSSEClientConnected,
         },
@@ -84,7 +74,6 @@ export const SSEClientEffect = () => {
     setSseClient,
     sseClient,
     store,
-    tokenPair,
     handleSseClientConnectionRetry,
   ]);
 

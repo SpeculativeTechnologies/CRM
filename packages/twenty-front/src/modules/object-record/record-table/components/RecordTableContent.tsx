@@ -77,8 +77,6 @@ export const RecordTableContent = ({
 
   const store = useStore();
 
-  const recordTableScrollWrapperId = `record-table-scroll-${recordTableId}`;
-
   const { visibleRecordFields } = useRecordTableContextOrThrow();
 
   const recordTableHoverPositionCallbackState =
@@ -185,7 +183,6 @@ export const RecordTableContent = ({
         onDragSelectionStart={handleDragStart}
         onDragSelectionBoxChange={updateRecordTableCellRangeFromSelectionBox}
         onDragSelectionEnd={handleDragEnd}
-        scrollWrapperComponentInstanceId={recordTableScrollWrapperId}
         selectionBoundaryClass={RECORD_INDEX_DRAG_SELECT_BOUNDARY_CLASS}
       />
     </StyledTableContainer>

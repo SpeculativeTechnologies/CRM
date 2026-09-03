@@ -4,9 +4,9 @@ import { MessageParticipantRole } from 'twenty-shared/types';
 import { isDefined } from 'twenty-shared/utils';
 import { In, IsNull, Not } from 'typeorm';
 
-import { GlobalWorkspaceOrmManager } from 'src/engine/twenty-orm/global-workspace-datasource/global-workspace-orm.manager';
 import { buildSystemAuthContext } from 'src/engine/twenty-orm/utils/build-system-auth-context.util';
-import { CampaignStatsRefreshSchedulerService } from 'src/modules/emailing/services/campaign-stats-refresh-scheduler.service';
+import { WorkspaceOrmManager } from 'src/engine/twenty-orm/workspace-orm.manager';
+import { MessageCampaignStatisticsService } from 'src/modules/emailing/services/message-campaign-statistics.service';
 import { MessageParticipantWorkspaceEntity } from 'src/modules/messaging/common/standard-objects/message-participant.workspace-entity';
 import { MessageWorkspaceEntity } from 'src/modules/messaging/common/standard-objects/message.workspace-entity';
 
@@ -28,8 +28,8 @@ export class MessageEngagementService {
   private readonly logger = new Logger(MessageEngagementService.name);
 
   constructor(
-    private readonly globalWorkspaceOrmManager: GlobalWorkspaceOrmManager,
-    private readonly campaignStatsRefreshSchedulerService: CampaignStatsRefreshSchedulerService,
+    private readonly workspaceOrmManager: WorkspaceOrmManager,
+    private readonly messageCampaignStatisticsService: MessageCampaignStatisticsService,
   ) {}
 
   async recordOpen(args: RecordEngagementArgs): Promise<void> {
@@ -54,13 +54,11 @@ export class MessageEngagementService {
       return;
     }
 
-    await this.globalWorkspaceOrmManager.executeInWorkspaceContext(async () => {
-      const messageRepository =
-        await this.globalWorkspaceOrmManager.getRepository(
-          workspaceId,
-          MessageWorkspaceEntity,
-          { shouldBypassPermissionChecks: true },
-        );
+    await this.workspaceOrmManager.executeInWorkspaceContext(async () => {
+      const messageRepository = this.workspaceOrmManager.getRepository(
+        MessageWorkspaceEntity,
+        { shouldBypassPermissionChecks: true },
+      );
 
       const candidateMessages = await messageRepository.find({
         where: {
@@ -78,7 +76,6 @@ export class MessageEngagementService {
       // message of their own, so without this the Cc'd party answering any
       // recipient's email would be counted as that recipient replying.
       const recipientMessageIds = await this.findMessageIdsAddressedTo({
-        workspaceId,
         messageIds: candidateMessages.map(({ id }) => id),
         handle: normalizedSenderHandle,
       });
@@ -111,7 +108,7 @@ export class MessageEngagementService {
         `Recorded reply to campaign ${campaignId} on message ${message.id}`,
       );
 
-      await this.campaignStatsRefreshSchedulerService.schedule({
+      await this.messageCampaignStatisticsService.scheduleRefresh({
         workspaceId,
         campaignId,
       });
@@ -119,20 +116,16 @@ export class MessageEngagementService {
   }
 
   private async findMessageIdsAddressedTo({
-    workspaceId,
     messageIds,
     handle,
   }: {
-    workspaceId: string;
     messageIds: string[];
     handle: string;
   }): Promise<Set<string>> {
-    const participantRepository =
-      await this.globalWorkspaceOrmManager.getRepository(
-        workspaceId,
-        MessageParticipantWorkspaceEntity,
-        { shouldBypassPermissionChecks: true },
-      );
+    const participantRepository = this.workspaceOrmManager.getRepository(
+      MessageParticipantWorkspaceEntity,
+      { shouldBypassPermissionChecks: true },
+    );
 
     const participants = await participantRepository.find({
       where: {
@@ -155,7 +148,6 @@ export class MessageEngagementService {
   // time. A hit that lands before the row is written is dropped rather than
   // retried: the pixel and the redirect must answer regardless.
   private async resolveCampaignMessageId({
-    workspaceId,
     campaignId,
     messageId,
     personId,
@@ -168,12 +160,10 @@ export class MessageEngagementService {
       return null;
     }
 
-    const participantRepository =
-      await this.globalWorkspaceOrmManager.getRepository(
-        workspaceId,
-        MessageParticipantWorkspaceEntity,
-        { shouldBypassPermissionChecks: true },
-      );
+    const participantRepository = this.workspaceOrmManager.getRepository(
+      MessageParticipantWorkspaceEntity,
+      { shouldBypassPermissionChecks: true },
+    );
 
     const participant = await participantRepository.findOne({
       where: {
@@ -193,13 +183,11 @@ export class MessageEngagementService {
   ): Promise<void> {
     const { workspaceId, campaignId } = args;
 
-    await this.globalWorkspaceOrmManager.executeInWorkspaceContext(async () => {
-      const messageRepository =
-        await this.globalWorkspaceOrmManager.getRepository(
-          workspaceId,
-          MessageWorkspaceEntity,
-          { shouldBypassPermissionChecks: true },
-        );
+    await this.workspaceOrmManager.executeInWorkspaceContext(async () => {
+      const messageRepository = this.workspaceOrmManager.getRepository(
+        MessageWorkspaceEntity,
+        { shouldBypassPermissionChecks: true },
+      );
 
       const messageId = await this.resolveCampaignMessageId(args);
 
@@ -250,7 +238,7 @@ export class MessageEngagementService {
         );
       }
 
-      await this.campaignStatsRefreshSchedulerService.schedule({
+      await this.messageCampaignStatisticsService.scheduleRefresh({
         workspaceId,
         campaignId,
       });

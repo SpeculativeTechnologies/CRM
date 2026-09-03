@@ -21,10 +21,10 @@ import { useAtomFamilySelectorValue } from '@/ui/utilities/state/jotai/hooks/use
 import {
   IconArrowLeft,
   IconArrowRight,
+  IconArrowsSort,
   IconEyeOff,
   IconFilter,
   IconSettings,
-  IconSortDescending,
 } from 'twenty-ui/icon';
 import { MenuItem } from 'twenty-ui/navigation';
 import { PermissionFlagType } from '~/generated-metadata/graphql';
@@ -162,7 +162,7 @@ export const RecordTableColumnHeadDropdownMenu = ({
           )}
           {isSortable && (
             <MenuItem
-              LeftIcon={IconSortDescending}
+              LeftIcon={IconArrowsSort}
               onClick={handleSortClick}
               text={t`Sort`}
             />

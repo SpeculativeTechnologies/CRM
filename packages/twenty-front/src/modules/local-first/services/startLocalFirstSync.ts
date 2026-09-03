@@ -6,7 +6,6 @@ import { IS_LOCAL_FIRST_ENABLED } from '@/local-first/constants/IS_LOCAL_FIRST_E
 import { type LocalFirstColumn } from '@/local-first/services/getLocalFirstDatabase';
 import { getLocalFirstMirror } from '@/local-first/services/getLocalFirstMirror';
 import { type LocalFirstSyncStatus } from '@/local-first/states/localFirstSyncStatusState';
-import { getLocalFirstAuthHeaders } from '@/local-first/utils/getLocalFirstAuthHeaders';
 import { coerceValueForLocalColumn } from '@/local-first/utils/coerceValueForLocalColumn';
 import { REACT_APP_SERVER_BASE_URL } from '~/config';
 
@@ -46,7 +45,6 @@ const fetchShapeBatch = async ({
     `${REACT_APP_SERVER_BASE_URL}/${ApiPath.LocalFirst}/shape/${tableName}?${params}`,
     {
       credentials: 'include',
-      headers: getLocalFirstAuthHeaders(),
     },
   );
 

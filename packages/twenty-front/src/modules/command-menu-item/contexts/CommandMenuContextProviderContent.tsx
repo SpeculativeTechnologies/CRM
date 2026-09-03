@@ -10,9 +10,12 @@ import { doesCommandMenuItemMatchPageType } from '@/command-menu-item/utils/does
 import { doesCommandMenuItemMatchRelatedPersonFields } from '@/command-menu-item/utils/doesCommandMenuItemMatchRelatedPersonFields';
 import { doesCommandMenuItemMatchSelectionState } from '@/command-menu-item/utils/doesCommandMenuItemMatchSelectionState';
 import { useObjectMetadataItems } from '@/object-metadata/hooks/useObjectMetadataItems';
-import { currentPageLayoutIdState } from '@/page-layout/states/currentPageLayoutIdState';
+import {
+  currentPageLayoutIdState,
+  PageLayoutIdContext,
+} from '@/page-layout/states/currentPageLayoutIdState';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
-import { useMemo } from 'react';
+import { useContext, useMemo } from 'react';
 import { type CommandMenuContextApi } from 'twenty-shared/types';
 import { evaluateConditionalAvailabilityExpression } from 'twenty-shared/utils';
 
@@ -35,6 +38,11 @@ export const CommandMenuContextProviderContent = ({
   const commandMenuItemsDraft = useAtomStateValue(commandMenuItemsDraftState);
   const currentPageLayoutId = useAtomStateValue(currentPageLayoutIdState);
   const { objectMetadataItems } = useObjectMetadataItems();
+  const pageLayoutIdFromContext = useContext(PageLayoutIdContext);
+  const effectivePageLayoutId =
+    pageLayoutIdFromContext === undefined
+      ? currentPageLayoutId
+      : pageLayoutIdFromContext;
 
   const filteredCommandMenuItems = useMemo(() => {
     const currentObjectMetadataItemId =
@@ -55,7 +63,7 @@ export const CommandMenuContextProviderContent = ({
       )
       .filter(doesCommandMenuItemMatchPageType(commandMenuContextApi.pageType))
       .filter(doesCommandMenuItemMatchSelectionState(hasSelectedRecords))
-      .filter(doesCommandMenuItemMatchPageLayoutId(currentPageLayoutId))
+      .filter(doesCommandMenuItemMatchPageLayoutId(effectivePageLayoutId))
       .filter(
         doesCommandMenuItemMatchRelatedPersonFields(currentObjectMetadataItem),
       )
@@ -72,7 +80,7 @@ export const CommandMenuContextProviderContent = ({
     commandMenuContextApi,
     commandMenuItems,
     commandMenuItemsDraft,
-    currentPageLayoutId,
+    effectivePageLayoutId,
     isInPreviewMode,
     objectMetadataItems,
   ]);

@@ -3,16 +3,16 @@ import { type EnrichedObjectMetadataItem } from '@/object-metadata/types/Enriche
 import { getImageIdentifierFieldMetadataItem } from '@/object-metadata/utils/getImageIdentifierFieldMetadataItem';
 import { getLabelIdentifierFieldMetadataItem } from '@/object-metadata/utils/getLabelIdentifierFieldMetadataItem';
 import { hasObjectMetadataItemPositionField } from '@/object-metadata/utils/hasObjectMetadataItemPositionField';
-import { generateActivityTargetGqlFields } from '@/object-record/graphql/record-gql-fields/utils/generateActivityTargetGqlFields';
-import { CoreObjectNameSingular } from 'twenty-shared/types';
-
 import { generateDepthRecordGqlFieldsFromFields } from '@/object-record/graphql/record-gql-fields/utils/generateDepthRecordGqlFieldsFromFields';
+import { getFieldRelations } from '@/object-record/record-field/ui/utils/junction/getFieldRelations';
+import { getJunctionObjectMetadataIds } from '@/object-record/record-field/ui/utils/junction/getJunctionObjectMetadataIds';
 import { visibleRecordFieldsComponentSelector } from '@/object-record/record-field/states/visibleRecordFieldsComponentSelector';
 import { currentRecordFiltersComponentState } from '@/object-record/record-filter/states/currentRecordFiltersComponentState';
 import { useRecordIndexContextOrThrow } from '@/object-record/record-index/contexts/RecordIndexContext';
 
 import { useAtomComponentSelectorValue } from '@/ui/utilities/state/jotai/hooks/useAtomComponentSelectorValue';
 import { useAtomComponentStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomComponentStateValue';
+import { CoreObjectNameSingular } from 'twenty-shared/types';
 import { filterDuplicatesById, isDefined } from 'twenty-shared/utils';
 
 type UseRecordsUsefulGqlFields = {
@@ -68,7 +68,44 @@ export const useRelevantRecordsGqlFields = ({
 
   const allDepthOneGqlFields = generateDepthRecordGqlFieldsFromFields({
     objectMetadataItems,
+    sourceObjectMetadataItem: objectMetadataItem,
     fields: fieldMetadataItemsToUse,
+    depth: 1,
+  });
+
+  // Junction records are the only way to reach what they link to, so they are always
+  // fetched, whether or not the field holding them is visible.
+  const junctionObjectMetadataIds =
+    getJunctionObjectMetadataIds(objectMetadataItems);
+
+  // Notes and tasks need their targets on every row: the Relations chips on
+  // their list views read them with the target records loaded. For every
+  // other object, fetching the activity targets unconditionally pulled up
+  // to 60 noteTargets plus 60 taskTargets per row for columns nothing
+  // displays; when a targets column is visible or filtered on, it is
+  // already covered by allDepthOneGqlFields above.
+  const isObjectAnActivity =
+    objectMetadataItem.nameSingular === CoreObjectNameSingular.Note ||
+    objectMetadataItem.nameSingular === CoreObjectNameSingular.Task;
+
+  const isActivityTargetRelation = (relation: {
+    targetObjectMetadata: { nameSingular: string };
+  }) =>
+    relation.targetObjectMetadata.nameSingular ===
+      CoreObjectNameSingular.NoteTarget ||
+    relation.targetObjectMetadata.nameSingular ===
+      CoreObjectNameSingular.TaskTarget;
+
+  const junctionRelationGqlFields = generateDepthRecordGqlFieldsFromFields({
+    objectMetadataItems,
+    sourceObjectMetadataItem: objectMetadataItem,
+    fields: objectMetadataItem.fields.filter((fieldMetadataItem) =>
+      getFieldRelations(fieldMetadataItem).some(
+        (relation) =>
+          junctionObjectMetadataIds.has(relation.targetObjectMetadata.id) &&
+          (isObjectAnActivity || !isActivityTargetRelation(relation)),
+      ),
+    ),
     depth: 1,
   });
 
@@ -78,10 +115,6 @@ export const useRelevantRecordsGqlFields = ({
     getImageIdentifierFieldMetadataItem(objectMetadataItem);
 
   const hasPosition = hasObjectMetadataItemPositionField(objectMetadataItem);
-
-  const isObjectAnActivity =
-    objectMetadataItem.nameSingular === CoreObjectNameSingular.Note ||
-    objectMetadataItem.nameSingular === CoreObjectNameSingular.Task;
 
   return {
     id: true,
@@ -93,28 +126,9 @@ export const useRelevantRecordsGqlFields = ({
       : {}),
     ...(hasPosition ? { position: true } : {}),
     ...allDepthOneGqlFields,
+    ...junctionRelationGqlFields,
     createdAt: true,
     updatedAt: true,
     deletedAt: true,
-    // Notes and tasks need their targets on every row: the Relations chips on
-    // their list views read them with the target records loaded. For every
-    // other object, fetching the activity targets unconditionally pulled up
-    // to 60 noteTargets plus 60 taskTargets per row for columns nothing
-    // displays; when a targets column is visible or filtered on, it is
-    // already covered by allDepthOneGqlFields above.
-    ...(isObjectAnActivity
-      ? {
-          noteTargets: generateActivityTargetGqlFields({
-            activityObjectNameSingular: CoreObjectNameSingular.Note,
-            objectMetadataItems,
-            loadRelations: 'relations',
-          }),
-          taskTargets: generateActivityTargetGqlFields({
-            activityObjectNameSingular: CoreObjectNameSingular.Task,
-            objectMetadataItems,
-            loadRelations: 'relations',
-          }),
-        }
-      : {}),
   };
 };

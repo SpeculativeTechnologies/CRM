@@ -1,19 +1,30 @@
 import { MessageCampaignStatus } from 'twenty-shared/types';
 
-export const resolveCompletedCampaignStatus = (
-  failedCount: number,
-): MessageCampaignStatus =>
-  failedCount > 0
-    ? MessageCampaignStatus.SENT_WITH_ERRORS
-    : MessageCampaignStatus.SENT;
+import { type CampaignCounts } from 'src/engine/core-modules/emailing-domain/types/campaign-counts.type';
 
-// A campaign stays in SENDING until none of its messages are waiting to go out.
-// Null means the campaign is still in flight and must keep its current status.
 export const computeCampaignTerminalStatus = ({
-  queuedCount,
+  totalCount,
+  inProgressCount,
   failedCount,
-}: {
-  queuedCount: number;
-  failedCount: number;
-}): MessageCampaignStatus | null =>
-  queuedCount > 0 ? null : resolveCompletedCampaignStatus(failedCount);
+  skippedCount,
+}: Pick<
+  CampaignCounts,
+  'totalCount' | 'inProgressCount' | 'failedCount' | 'skippedCount'
+>):
+  | MessageCampaignStatus.SENT
+  | MessageCampaignStatus.SENT_WITH_ERRORS
+  | undefined => {
+  if (inProgressCount > 0) {
+    return undefined;
+  }
+
+  if (totalCount === 0) {
+    return MessageCampaignStatus.SENT_WITH_ERRORS;
+  }
+
+  if (failedCount > 0 || skippedCount > 0) {
+    return MessageCampaignStatus.SENT_WITH_ERRORS;
+  }
+
+  return MessageCampaignStatus.SENT;
+};

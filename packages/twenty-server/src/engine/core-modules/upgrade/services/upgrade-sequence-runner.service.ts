@@ -87,6 +87,12 @@ export class UpgradeSequenceRunnerService {
       allProvisionedWorkspaceIds,
     });
 
+    await this.runInstanceStepsSkippedBehindCursor({
+      sequence,
+      startCursor,
+      skipDataMigration: allProvisionedWorkspaceIds.length === 0,
+    });
+
     let totalSuccesses = 0;
     let totalFailures = 0;
     let cursor = startCursor;
@@ -242,27 +248,141 @@ export class UpgradeSequenceRunnerService {
     switch (lastAttemptedStep.kind) {
       case 'fast-instance':
       case 'slow-instance': {
+        // This fork merges upstream weekly, so upstream regularly adds instance
+        // steps to a version segment the instance has already passed. Once
+        // such a step runs it is the newest record, but the workspaces are
+        // already further along; resume from where they are instead of
+        // walking the sequence again from the backdated step.
+        const furthestWorkspaceStep = await this.findWorkspaceStepAheadOfCursor(
+          {
+            sequence,
+            allProvisionedWorkspaceIds,
+            cursor: lastAttemptedCursor,
+          },
+        );
+
+        if (isDefined(furthestWorkspaceStep)) {
+          return this.resolveStartCursorFromWorkspaceStep({
+            sequence,
+            allProvisionedWorkspaceIds,
+            workspaceStep: furthestWorkspaceStep,
+          });
+        }
+
         return lastAttempted.status === 'completed'
           ? lastAttemptedCursor + 1
           : lastAttemptedCursor;
       }
       case 'workspace': {
-        const workspaceSliceBounds =
-          this.upgradeSequenceReaderService.getWorkspaceSegmentBounds({
-            sequence,
-            workspaceCommand: lastAttemptedStep,
-          });
-
-        await this.validateWorkspaceCursorsAreInWorkspaceSegment({
+        return this.resolveStartCursorFromWorkspaceStep({
           sequence,
           allProvisionedWorkspaceIds,
-          workspaceSliceBounds,
+          workspaceStep: lastAttemptedStep,
         });
-
-        return workspaceSliceBounds.startCursor;
       }
       default:
         assertUnreachable(lastAttemptedStep);
+    }
+  }
+
+  private async findWorkspaceStepAheadOfCursor({
+    sequence,
+    allProvisionedWorkspaceIds,
+    cursor,
+  }: {
+    sequence: UpgradeStep[];
+    allProvisionedWorkspaceIds: string[];
+    cursor: number;
+  }): Promise<WorkspaceUpgradeStep | undefined> {
+    const workspaceCursors = await this.fetchWorkspaceCursors(
+      allProvisionedWorkspaceIds,
+    );
+    let furthest: { position: number; step: WorkspaceUpgradeStep } | undefined;
+
+    for (const workspaceCursor of workspaceCursors.values()) {
+      const position =
+        this.upgradeSequenceReaderService.locateStepInSequenceOrThrow({
+          sequence,
+          stepName: workspaceCursor.name,
+        });
+      const step = sequence[position];
+
+      if (
+        position > cursor &&
+        step.kind === 'workspace' &&
+        (!isDefined(furthest) || position > furthest.position)
+      ) {
+        furthest = { position, step };
+      }
+    }
+
+    return furthest?.step;
+  }
+
+  private async resolveStartCursorFromWorkspaceStep({
+    sequence,
+    allProvisionedWorkspaceIds,
+    workspaceStep,
+  }: {
+    sequence: UpgradeStep[];
+    allProvisionedWorkspaceIds: string[];
+    workspaceStep: WorkspaceUpgradeStep;
+  }): Promise<number> {
+    const workspaceSliceBounds =
+      this.upgradeSequenceReaderService.getWorkspaceSegmentBounds({
+        sequence,
+        workspaceCommand: workspaceStep,
+      });
+
+    await this.validateWorkspaceCursorsAreInWorkspaceSegment({
+      sequence,
+      allProvisionedWorkspaceIds,
+      workspaceSliceBounds,
+    });
+
+    return workspaceSliceBounds.startCursor;
+  }
+
+  // Instance steps upstream inserted behind the cursor never ran here, and the
+  // workspace steps after them assume their schema changes. Run them before
+  // resuming; the workspace barrier check does not apply because every
+  // workspace is already past them.
+  private async runInstanceStepsSkippedBehindCursor({
+    sequence,
+    startCursor,
+    skipDataMigration,
+  }: {
+    sequence: UpgradeStep[];
+    startCursor: number;
+    skipDataMigration: boolean;
+  }): Promise<void> {
+    for (const step of sequence.slice(0, startCursor)) {
+      if (step.kind === 'workspace') {
+        continue;
+      }
+
+      const isCompleted =
+        await this.upgradeMigrationService.isLastAttemptCompleted({
+          name: step.name,
+          workspaceId: null,
+        });
+
+      if (isCompleted) {
+        continue;
+      }
+
+      this.logger.warn(
+        formatUpgradeLog({
+          humanMessage:
+            `Instance step "${step.name}" sits behind the cursor but never ran ` +
+            '(added to an already-passed version). Running it now.',
+          event: 'instance.catch-up',
+          logFields: { step: step.name },
+        }),
+      );
+
+      await this.runInstanceStep({ instanceStep: step, skipDataMigration });
+      await this.upgradeAwareEntityMetadataAdapter.refresh();
     }
   }
 

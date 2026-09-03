@@ -288,7 +288,6 @@ msgstr "A required field is missing."
 
 #. js-lingui-id: /ffPWJ
 #: src/engine/api/graphql/workspace-query-runner/constants/postgres-error-messages.constants.ts
-#: src/engine/twenty-orm/error-handling/__tests__/compute-twenty-orm-exception.spec.ts
 msgid "A required field is missing. Please provide all required values and try again."
 msgstr "A required field is missing. Please provide all required values and try again."
 
@@ -385,21 +384,6 @@ msgstr "A valid targetRecordId is required for RECORD type"
 #: src/engine/metadata-modules/flat-navigation-menu-item/validators/utils/validate-navigation-menu-item-type-required-properties.util.ts
 msgid "A valid viewUniversalIdentifier is required for VIEW type"
 msgstr "A valid viewUniversalIdentifier is required for VIEW type"
-
-#. js-lingui-id: LQD1eK
-#: src/engine/metadata-modules/view/utils/validate-view-parent-or-throw.util.ts
-msgid "A view can only be added to a stack on the same object."
-msgstr "A view can only be added to a stack on the same object."
-
-#. js-lingui-id: V2Nu5k
-#: src/engine/metadata-modules/view/utils/validate-view-parent-or-throw.util.ts
-msgid "A view cannot be its own parent"
-msgstr "A view cannot be its own parent"
-
-#. js-lingui-id: TloFnU
-#: src/engine/metadata-modules/view/utils/validate-view-parent-or-throw.util.ts
-msgid "A view cannot be its own parent."
-msgstr "A view cannot be its own parent."
 
 #. js-lingui-id: qqnpQ9
 #: src/engine/metadata-modules/view/exceptions/view.exception.ts
@@ -1612,12 +1596,6 @@ msgstr "Calendar view must have a calendar field"
 msgid "Calendar view must have a calendar layout"
 msgstr "Calendar view must have a calendar layout"
 
-#. js-lingui-id: D9pZ2l
-#: src/engine/workspace-manager/workspace-migration/workspace-migration-builder/validators/utils/validate-flat-view-calendar-fields.util.ts
-#: src/engine/workspace-manager/workspace-migration/workspace-migration-builder/validators/utils/validate-flat-view-calendar-fields.util.ts
-msgid "Calendar widget views only support the month layout"
-msgstr "Calendar widget views only support the month layout"
-
 #. js-lingui-id: 0U7DBn
 #: src/engine/workspace-manager/twenty-standard-application/constants/standard-command-menu-item.constant.ts
 msgctxt "commandMenuItem.shortLabel"
@@ -1946,12 +1924,6 @@ msgctxt "fieldMetadata.label"
 msgid "Cc"
 msgstr "Cc"
 
-#. js-lingui-id: rzA83L
-#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-message-campaign-standard-flat-field-metadata.util.ts
-msgctxt "fieldMetadata.label"
-msgid "Cc addresses"
-msgstr "Cc addresses"
-
 #. js-lingui-id: +4WR+J
 #: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-calendar-channel-event-association-standard-flat-field-metadata.util.ts
 msgctxt "fieldMetadata.description"
@@ -2026,18 +1998,6 @@ msgstr "Circular dependency detected in view filter group hierarchy"
 msgid "Claiming is not configured on this server. Ask an administrator to configure the GitHub OAuth app."
 msgstr "Claiming is not configured on this server. Ask an administrator to configure the GitHub OAuth app."
 
-#. js-lingui-id: hWeWDv
-#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-message-standard-flat-field-metadata.util.ts
-msgctxt "fieldMetadata.label"
-msgid "Click count"
-msgstr "Click count"
-
-#. js-lingui-id: fLO69b
-#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-message-campaign-standard-flat-field-metadata.util.ts
-msgctxt "fieldMetadata.label"
-msgid "Clicked count"
-msgstr "Clicked count"
-
 #. js-lingui-id: J7dFKa
 #: src/engine/core-modules/application/connection-provider/connection-provider.exception.ts
 msgid "Client credentials are not configured for this OAuth provider."
@@ -2064,12 +2024,6 @@ msgstr "Code step execution failed."
 msgctxt "fieldMetadata.label"
 msgid "Color Scheme"
 msgstr "Color Scheme"
-
-#. js-lingui-id: 5hBPJO
-#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-message-campaign-standard-flat-field-metadata.util.ts
-msgctxt "fieldMetadata.description"
-msgid "Comma separated addresses copied on every recipient's email"
-msgstr "Comma separated addresses copied on every recipient's email"
 
 #. js-lingui-id: 8nN8qg
 #: src/engine/metadata-modules/flat-page-layout-widget/validators/utils/validate-front-component-header-command-menu-items.util.ts
@@ -2432,12 +2386,14 @@ msgid "Contradicting field permissions have been detected on a relation field."
 msgstr "Contradicting field permissions have been detected on a relation field."
 
 #. js-lingui-id: X/ryFh
+#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-workflow-run-standard-flat-field-metadata.util.ts
 #: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-workflow-standard-flat-field-metadata.util.ts
 msgctxt "fieldMetadata.label"
 msgid "Core workflow id"
 msgstr "Core workflow id"
 
 #. js-lingui-id: WkctC4
+#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-workflow-run-standard-flat-field-metadata.util.ts
 #: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-workflow-version-standard-flat-field-metadata.util.ts
 msgctxt "fieldMetadata.label"
 msgid "Core workflow version id"
@@ -3382,12 +3338,6 @@ msgstr "Email is required. Please provide a valid email address."
 msgid "Email is unchanged."
 msgstr "Email is unchanged."
 
-#. js-lingui-id: tcEfxi
-#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-workspace-member-standard-flat-field-metadata.util.ts
-msgctxt "fieldMetadata.label"
-msgid "Email signature"
-msgstr "Email signature"
-
 #. js-lingui-id: su92Mw
 #: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-message-campaign-standard-flat-field-metadata.util.ts
 msgctxt "fieldMetadata.description"
@@ -3540,18 +3490,6 @@ msgstr "Event ID"
 msgctxt "fieldMetadata.label"
 msgid "Event ID"
 msgstr "Event ID"
-
-#. js-lingui-id: ygoA2u
-#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-timeline-activity-standard-flat-field-metadata.util.ts
-msgctxt "fieldMetadata.description"
-msgid "Event name"
-msgstr "Event name"
-
-#. js-lingui-id: AvDRPM
-#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-timeline-activity-standard-flat-field-metadata.util.ts
-msgctxt "fieldMetadata.label"
-msgid "Event name"
-msgstr "Event name"
 
 #. js-lingui-id: irEsRo
 #: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-calendar-event-standard-flat-field-metadata.util.ts
@@ -4145,6 +4083,7 @@ msgstr "File not found in SDK client archive."
 #: src/engine/core-modules/file/file-upload/services/file-upload.service.ts
 #: src/engine/core-modules/file/file-upload/services/file-upload.service.ts
 #: src/engine/core-modules/file/file.exception.ts
+#: src/engine/core-modules/file/files-field/services/files-field.service.ts
 #: src/engine/core-modules/tool/tools/email-tool/exceptions/email-tool.exception.ts
 msgid "File not found."
 msgstr "File not found."
@@ -4202,28 +4141,10 @@ msgstr "Filtering or ordering through this relation is not supported."
 msgid "Find"
 msgstr "Find"
 
-#. js-lingui-id: 2oBmWf
-#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-message-standard-flat-field-metadata.util.ts
-msgctxt "fieldMetadata.label"
-msgid "First clicked at"
-msgstr "First clicked at"
-
 #. js-lingui-id: 4GaFCQ
 #: src/engine/workspace-manager/workspace-migration/interceptors/utils/__tests__/build-metadata-validation-error-payload.util.spec.ts
 msgid "First friendly message"
 msgstr "First friendly message"
-
-#. js-lingui-id: 54OZDp
-#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-message-standard-flat-field-metadata.util.ts
-msgctxt "fieldMetadata.label"
-msgid "First opened at"
-msgstr "First opened at"
-
-#. js-lingui-id: Are5zn
-#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-message-standard-flat-field-metadata.util.ts
-msgctxt "fieldMetadata.label"
-msgid "First replied at"
-msgstr "First replied at"
 
 #. js-lingui-id: BUBVGN
 #: src/engine/metadata-modules/page-layout-tab/constants/standard-page-layout-tab-titles.ts
@@ -5076,11 +4997,6 @@ msgstr "Invalid filter: \"{operator}\" operator requires an array"
 #: src/engine/api/common/common-args-processors/filter-arg-processor/utils/validate-is-empty-array-operator-value-or-throw.util.ts
 msgid "Invalid filter: \"isEmptyArray\" operator requires a boolean"
 msgstr "Invalid filter: \"isEmptyArray\" operator requires a boolean"
-
-#. js-lingui-id: kymlZR
-#: src/engine/api/common/common-args-processors/filter-arg-processor/filter-arg-processor.service.ts
-msgid "Invalid filter: choose a field on a related record for \"{key}\""
-msgstr "Invalid filter: choose a field on a related record for \"{key}\""
 
 #. js-lingui-id: Np9Fvw
 #: src/engine/api/common/common-args-processors/filter-arg-processor/utils/validate-and-transform-operator-and-value.util.ts
@@ -6738,6 +6654,16 @@ msgstr "Navigation menu item not found."
 msgid "Navigation menu item type is required"
 msgstr "Navigation menu item type is required"
 
+#. js-lingui-id: sq8J4x
+#: src/engine/workspace-manager/workspace-migration/workspace-migration-builder/validators/services/flat-command-menu-item-validator.service.ts
+msgid "Navigation target object metadata not found"
+msgstr "Navigation target object metadata not found"
+
+#. js-lingui-id: 4/QAvg
+#: src/engine/workspace-manager/workspace-migration/workspace-migration-builder/validators/services/flat-command-menu-item-validator.service.ts
+msgid "Navigation target object not found"
+msgstr "Navigation target object not found"
+
 #. js-lingui-id: B/prgH
 #: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-calendar-event-participant-standard-flat-field-metadata.util.ts
 msgctxt "fieldMetadata.label"
@@ -7056,47 +6982,11 @@ msgctxt "fieldMetadata.description"
 msgid "Number of emails that failed to send"
 msgstr "Number of emails that failed to send"
 
-#. js-lingui-id: uQtsD5
-#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-message-standard-flat-field-metadata.util.ts
-msgctxt "fieldMetadata.description"
-msgid "Number of link clicks recorded for this campaign email"
-msgstr "Number of link clicks recorded for this campaign email"
-
-#. js-lingui-id: l08rF/
-#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-message-campaign-standard-flat-field-metadata.util.ts
-msgctxt "fieldMetadata.description"
-msgid "Number of recipients who clicked a link in this campaign"
-msgstr "Number of recipients who clicked a link in this campaign"
-
-#. js-lingui-id: bYfvni
-#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-message-campaign-standard-flat-field-metadata.util.ts
-msgctxt "fieldMetadata.description"
-msgid "Number of recipients who opened this campaign"
-msgstr "Number of recipients who opened this campaign"
-
-#. js-lingui-id: JIJQFU
-#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-message-campaign-standard-flat-field-metadata.util.ts
-msgctxt "fieldMetadata.description"
-msgid "Number of recipients who replied to this campaign"
-msgstr "Number of recipients who replied to this campaign"
-
 #. js-lingui-id: bgG8mY
 #: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-message-campaign-standard-flat-field-metadata.util.ts
 msgctxt "fieldMetadata.description"
 msgid "Number of spam complaints received"
 msgstr "Number of spam complaints received"
-
-#. js-lingui-id: b/z56M
-#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-person-standard-flat-field-metadata.util.ts
-msgctxt "fieldMetadata.description"
-msgid "Number of tasks tied to the contact that are not done"
-msgstr "Number of tasks tied to the contact that are not done"
-
-#. js-lingui-id: VCnORW
-#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-message-standard-flat-field-metadata.util.ts
-msgctxt "fieldMetadata.description"
-msgid "Number of times this campaign email was opened"
-msgstr "Number of times this campaign email was opened"
 
 #. js-lingui-id: MKdH/S
 #: src/engine/workspace-manager/workspace-migration/workspace-migration-builder/validators/services/flat-connection-provider-validator.service.ts
@@ -7319,29 +7209,11 @@ msgstr "Only error"
 msgid "Only field restrictions are allowed."
 msgstr "Only field restrictions are allowed."
 
-#. js-lingui-id: UsW4F7
-#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-message-standard-flat-field-metadata.util.ts
-msgctxt "fieldMetadata.label"
-msgid "Open count"
-msgstr "Open count"
-
 #. js-lingui-id: lWLaJ5
 #: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-workspace-member-standard-flat-field-metadata.util.ts
 msgctxt "fieldMetadata.label"
 msgid "Open Records In"
 msgstr "Open Records In"
-
-#. js-lingui-id: 7Nn1/7
-#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-person-standard-flat-field-metadata.util.ts
-msgctxt "fieldMetadata.label"
-msgid "Open tasks"
-msgstr "Open tasks"
-
-#. js-lingui-id: EN4rfX
-#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-message-campaign-standard-flat-field-metadata.util.ts
-msgctxt "fieldMetadata.label"
-msgid "Opened count"
-msgstr "Opened count"
 
 #. js-lingui-id: e/+ykp
 #. placeholder {0}: allowedOperands.join(', ')
@@ -7685,11 +7557,6 @@ msgstr "Parent navigation menu item not found"
 msgid "Parent row level permission predicate group not found"
 msgstr "Parent row level permission predicate group not found"
 
-#. js-lingui-id: iOZ/kO
-#: src/engine/metadata-modules/view/utils/validate-view-parent-or-throw.util.ts
-msgid "Parent view belongs to a different object"
-msgstr "Parent view belongs to a different object"
-
 #. js-lingui-id: 6OzP7Y
 #: src/engine/workspace-manager/workspace-migration/workspace-migration-builder/validators/services/flat-view-filter-group-validator.service.ts
 #: src/engine/workspace-manager/workspace-migration/workspace-migration-builder/validators/services/flat-view-filter-group-validator.service.ts
@@ -7697,16 +7564,6 @@ msgstr "Parent view belongs to a different object"
 #: src/engine/workspace-manager/workspace-migration/workspace-migration-builder/validators/services/flat-view-filter-group-validator.service.ts
 msgid "Parent view filter group not found"
 msgstr "Parent view filter group not found"
-
-#. js-lingui-id: b8/ezf
-#: src/engine/metadata-modules/view/utils/validate-view-parent-or-throw.util.ts
-msgid "Parent view is already inside a stack"
-msgstr "Parent view is already inside a stack"
-
-#. js-lingui-id: qfJecq
-#: src/engine/metadata-modules/view/utils/validate-view-parent-or-throw.util.ts
-msgid "Parent view not found"
-msgstr "Parent view not found"
 
 #. js-lingui-id: Yp8zt3
 #: src/engine/metadata-modules/page-layout-widget/constants/standard-page-layout-widget-titles.ts
@@ -8295,12 +8152,14 @@ msgid "Recurring Event ID"
 msgstr "Recurring Event ID"
 
 #. js-lingui-id: zEHtXk
+#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-workflow-run-standard-flat-field-metadata.util.ts
 #: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-workflow-standard-flat-field-metadata.util.ts
 msgctxt "fieldMetadata.description"
 msgid "Reference to the core workflow row"
 msgstr "Reference to the core workflow row"
 
 #. js-lingui-id: avBuTv
+#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-workflow-run-standard-flat-field-metadata.util.ts
 #: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-workflow-version-standard-flat-field-metadata.util.ts
 msgctxt "fieldMetadata.description"
 msgid "Reference to the core workflowVersion row"
@@ -8341,14 +8200,10 @@ msgstr "Relation field target metadata not found"
 #. js-lingui-id: HmNKeM
 #: src/engine/api/graphql/graphql-query-runner/graphql-query-parsers/graphql-query-filter/graphql-query-filter-field.parser.ts
 #: src/engine/api/graphql/graphql-query-runner/graphql-query-parsers/graphql-query-filter/graphql-query-filter-field.parser.ts
-#: src/engine/api/graphql/graphql-query-runner/graphql-query-parsers/graphql-query-filter/graphql-query-filter-field.parser.ts
-#: src/engine/api/graphql/graphql-query-runner/graphql-query-parsers/graphql-query-filter/graphql-query-filter-field.parser.ts
-#: src/engine/api/graphql/graphql-query-runner/graphql-query-parsers/graphql-query-filter/graphql-query-filter-field.parser.ts
 msgid "Relation filter is misconfigured"
 msgstr "Relation filter is misconfigured"
 
 #. js-lingui-id: 1RF4/e
-#: src/engine/api/graphql/graphql-query-runner/graphql-query-parsers/graphql-query-filter/graphql-query-filter-field.parser.ts
 #: src/engine/api/graphql/graphql-query-runner/graphql-query-parsers/graphql-query-filter/graphql-query-filter-field.parser.ts
 msgid "Relation filter is not supported here"
 msgstr "Relation filter is not supported here"
@@ -8411,12 +8266,6 @@ msgstr "Remove this permission from all roles before deleting it"
 msgctxt "timelineActivityType.label"
 msgid "removed an attachment"
 msgstr "removed an attachment"
-
-#. js-lingui-id: yYK27/
-#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-message-campaign-standard-flat-field-metadata.util.ts
-msgctxt "fieldMetadata.label"
-msgid "Replied count"
-msgstr "Replied count"
 
 #. js-lingui-id: U4APCE
 #: src/engine/workspace-manager/twenty-standard-application/constants/standard-command-menu-item.constant.ts
@@ -8841,6 +8690,12 @@ msgctxt "fieldMetadata.label"
 msgid "Scheduled"
 msgstr "Scheduled"
 
+#. js-lingui-id: V1y7Hg
+#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-blocklist-standard-flat-field-metadata.util.ts
+msgctxt "fieldMetadata.label"
+msgid "Scope"
+msgstr "Scope"
+
 #. js-lingui-id: SiXwZL
 #: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-opportunity-standard-flat-field-metadata.util.ts
 msgctxt "fieldMetadata.label"
@@ -9174,18 +9029,6 @@ msgstr "Settings"
 msgid "Sign up is disabled."
 msgstr "Sign up is disabled."
 
-#. js-lingui-id: tF3AqN
-#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-workspace-member-standard-flat-field-metadata.util.ts
-msgctxt "fieldMetadata.label"
-msgid "Signature on by default"
-msgstr "Signature on by default"
-
-#. js-lingui-id: muyTrw
-#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-workspace-member-standard-flat-field-metadata.util.ts
-msgctxt "fieldMetadata.description"
-msgid "Signature this member can add to the emails they compose"
-msgstr "Signature this member can add to the emails they compose"
-
 #. js-lingui-id: 4AomZC
 #: src/engine/core-modules/auth/auth.exception.ts
 msgid "Single sign-on authentication failed."
@@ -9311,11 +9154,6 @@ msgstr "SSO configuration error."
 #: src/engine/core-modules/sso/sso.exception.ts
 msgid "SSO is disabled."
 msgstr "SSO is disabled."
-
-#. js-lingui-id: T30Bn9
-#: src/engine/metadata-modules/view/utils/validate-view-parent-or-throw.util.ts
-msgid "Stacks cannot be nested inside other stacks."
-msgstr "Stacks cannot be nested inside other stacks."
 
 #. js-lingui-id: drcYgn
 #: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-opportunity-standard-flat-field-metadata.util.ts
@@ -10005,7 +9843,7 @@ msgid "The file extension doesn't match the file content. Please check that your
 msgstr "The file extension doesn't match the file content. Please check that your file is not corrupted and has the correct extension."
 
 #. js-lingui-id: H+ZNr6
-#: src/engine/core-modules/file/file-upload/services/file-upload.service.ts
+#: src/engine/core-modules/file/file-upload/services/file-upload-completion.service.ts
 msgid "The file has not been uploaded yet. Please upload it before confirming."
 msgstr "The file has not been uploaded yet. Please upload it before confirming."
 
@@ -10013,6 +9851,11 @@ msgstr "The file has not been uploaded yet. Please upload it before confirming."
 #: src/engine/core-modules/file/file-upload/services/file-upload.service.ts
 msgid "The file is empty or exceeds the maximum allowed size."
 msgstr "The file is empty or exceeds the maximum allowed size."
+
+#. js-lingui-id: 2hrpBa
+#: src/engine/core-modules/file/files-field/services/files-field.service.ts
+msgid "The file upload has not been completed. Please retry the upload."
+msgstr "The file upload has not been completed. Please retry the upload."
 
 #. js-lingui-id: 9TYO3w
 #: src/engine/workspace-manager/workspace-migration/workspace-migration-builder/validators/services/flat-timeline-activity-type-validator.service.ts
@@ -10141,11 +9984,6 @@ msgstr "The provider is temporarily unavailable. Please try again later."
 msgid "The received email content is no longer available."
 msgstr "The received email content is no longer available."
 
-#. js-lingui-id: wdaHel
-#: src/engine/metadata-modules/flat-field-metadata/validators/utils/validate-text-flat-field-metadata.util.ts
-msgid "The record label formula is invalid."
-msgstr "The record label formula is invalid."
-
 #. js-lingui-id: pv+BoZ
 #: src/engine/core-modules/graphql/hooks/use-validate-graphql-query-complexity.hook.ts
 msgid "The request is too complex to process. Please try reducing the amount of requested fields."
@@ -10194,11 +10032,6 @@ msgstr "The server's APP_VERSION is not a valid semver version. Self-hosted inst
 msgid "The singular and plural names cannot be the same for an object"
 msgstr "The singular and plural names cannot be the same for an object"
 
-#. js-lingui-id: kIEMl9
-#: src/engine/metadata-modules/view/utils/validate-view-parent-or-throw.util.ts
-msgid "The stack this view points to no longer exists."
-msgstr "The stack this view points to no longer exists."
-
 #. js-lingui-id: Dvwk3g
 #: src/modules/connected-account/webhook-subscription-manager/drivers/exceptions/webhook-subscription-driver.exception.ts
 msgid "The subscription is no longer available on the provider."
@@ -10226,7 +10059,7 @@ msgid "The unsubscribe topic this campaign was sent under"
 msgstr "The unsubscribe topic this campaign was sent under"
 
 #. js-lingui-id: uYP2Uw
-#: src/engine/core-modules/file/file-upload/services/file-upload.service.ts
+#: src/engine/core-modules/file/file-upload/services/file-upload-completion.service.ts
 #: src/engine/core-modules/file/file-upload/services/file-upload.service.ts
 msgid "The uploaded file does not match the declared size. Please retry the upload."
 msgstr "The uploaded file does not match the declared size. Please retry the upload."
@@ -10347,11 +10180,6 @@ msgstr "There is no previous onboarding step to go back to."
 #: src/engine/core-modules/workspace/services/workspace.service.ts
 msgid "These fields cannot be updated before the workspace is activated: {fieldsList}."
 msgstr "These fields cannot be updated before the workspace is activated: {fieldsList}."
-
-#. js-lingui-id: Iy9pZw
-#: src/engine/api/graphql/workspace-query-runner/utils/handle-duplicate-key-error.util.ts
-msgid "This {fieldLabel} value is already in use. Please check your data and try again."
-msgstr "This {fieldLabel} value is already in use. Please check your data and try again."
 
 #. js-lingui-id: bypqPt
 #: src/engine/core-modules/server-route-trigger/exceptions/server-route-trigger.exception.ts
@@ -10523,7 +10351,7 @@ msgid "This field references an object that could not be found"
 msgstr "This field references an object that could not be found"
 
 #. js-lingui-id: 5F02zD
-#: src/engine/core-modules/file/file-upload/services/file-upload.service.ts
+#: src/engine/core-modules/file/file-upload/services/file-upload-completion.service.ts
 msgid "This file format is not supported."
 msgstr "This file format is not supported."
 
@@ -10606,11 +10434,6 @@ msgstr "This object permission is already set for the role"
 msgid "This operation is not allowed."
 msgstr "This operation is not allowed."
 
-#. js-lingui-id: eitC3W
-#: src/engine/workspace-datasource/workspace-datasource.service.ts
-msgid "This operation is not allowed. Please try a different approach or contact support if you need assistance."
-msgstr "This operation is not allowed. Please try a different approach or contact support if you need assistance."
-
 #. js-lingui-id: bEhTPN
 #: src/engine/workspace-manager/workspace-migration/workspace-migration-runner/exceptions/workspace-migration-action-execution.exception.ts
 msgid "This operation is not supported."
@@ -10618,7 +10441,6 @@ msgstr "This operation is not supported."
 
 #. js-lingui-id: fxy039
 #: src/engine/api/graphql/workspace-query-runner/constants/postgres-error-messages.constants.ts
-#: src/engine/twenty-orm/error-handling/__tests__/compute-twenty-orm-exception.spec.ts
 msgid "This operation references a record that does not exist or cannot be modified due to existing relationships."
 msgstr "This operation references a record that does not exist or cannot be modified due to existing relationships."
 
@@ -10650,7 +10472,6 @@ msgstr "This record already exists. Please check your data and try again."
 
 #. js-lingui-id: BQ4MUY
 #: src/engine/api/graphql/workspace-query-runner/constants/postgres-error-messages.constants.ts
-#: src/engine/twenty-orm/error-handling/__tests__/compute-twenty-orm-exception.spec.ts
 msgid "This record cannot be deleted because it is still referenced by other records."
 msgstr "This record cannot be deleted because it is still referenced by other records."
 
@@ -10749,11 +10570,6 @@ msgstr "This version is not higher than the currently deployed version. Please b
 #: src/engine/core-modules/application/application.exception.ts
 msgid "This version of the application is already installed in this workspace."
 msgstr "This version of the application is already installed in this workspace."
-
-#. js-lingui-id: uJZkYy
-#: src/engine/metadata-modules/view/utils/validate-view-parent-or-throw.util.ts
-msgid "This view already holds a stack, so it cannot be moved into another one."
-msgstr "This view already holds a stack, so it cannot be moved into another one."
 
 #. js-lingui-id: o/Kt/Y
 #: src/engine/core-modules/billing/billing.exception.ts
@@ -11523,11 +11339,6 @@ msgstr "Video recording"
 msgid "View already exists"
 msgstr "View already exists"
 
-#. js-lingui-id: +GJhrv
-#: src/engine/metadata-modules/view/utils/validate-view-parent-or-throw.util.ts
-msgid "View already holds a stack"
-msgstr "View already holds a stack"
-
 #. js-lingui-id: pTvQqf
 #: src/engine/workspace-manager/workspace-migration/workspace-migration-builder/validators/services/flat-view-field-validator.service.ts
 msgid "View field already exists"
@@ -11979,29 +11790,11 @@ msgstr "Wednesday"
 msgid "Welcome to Twenty: Please Confirm Your Email"
 msgstr "Welcome to Twenty: Please Confirm Your Email"
 
-#. js-lingui-id: H5XCbW
-#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-message-standard-flat-field-metadata.util.ts
-msgctxt "fieldMetadata.description"
-msgid "When a link in this campaign email was first clicked by its recipient"
-msgstr "When a link in this campaign email was first clicked by its recipient"
-
 #. js-lingui-id: ofdfh5
 #: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-message-campaign-standard-flat-field-metadata.util.ts
 msgctxt "fieldMetadata.description"
 msgid "When the campaign finished sending"
 msgstr "When the campaign finished sending"
-
-#. js-lingui-id: /uWsJG
-#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-message-standard-flat-field-metadata.util.ts
-msgctxt "fieldMetadata.description"
-msgid "When this campaign email was first opened by its recipient"
-msgstr "When this campaign email was first opened by its recipient"
-
-#. js-lingui-id: 7+YQ4x
-#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-message-standard-flat-field-metadata.util.ts
-msgctxt "fieldMetadata.description"
-msgid "When this campaign email was first replied to by its recipient"
-msgstr "When this campaign email was first replied to by its recipient"
 
 #. js-lingui-id: Kx3ltI
 #: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-workspace-member-standard-flat-field-metadata.util.ts
@@ -12009,11 +11802,11 @@ msgctxt "fieldMetadata.description"
 msgid "Where records open for objects that follow the member's preference"
 msgstr "Where records open for objects that follow the member's preference"
 
-#. js-lingui-id: dACOxO
-#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-workspace-member-standard-flat-field-metadata.util.ts
+#. js-lingui-id: shMrkl
+#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-blocklist-standard-flat-field-metadata.util.ts
 msgctxt "fieldMetadata.description"
-msgid "Whether new emails this member composes start with their signature"
-msgstr "Whether new emails this member composes start with their signature"
+msgid "Whether the handle is blocked for a single workspace member or for the whole workspace"
+msgstr "Whether the handle is blocked for a single workspace member or for the whole workspace"
 
 #. js-lingui-id: zSq4aO
 #: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-message-standard-flat-field-metadata.util.ts
@@ -12385,6 +12178,12 @@ msgstr "workflowVersionId must not be set for engine component key {engineCompon
 msgid "workflowVersionId must not be set when engineComponentKey is FRONT_COMPONENT_RENDERER"
 msgstr "workflowVersionId must not be set when engineComponentKey is FRONT_COMPONENT_RENDERER"
 
+#. js-lingui-id: kRP73e
+#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-blocklist-standard-flat-field-metadata.util.ts
+msgctxt "fieldMetadata.label"
+msgid "Workspace"
+msgstr "Workspace"
+
 #. js-lingui-id: bK8AyJ
 #: src/engine/core-modules/billing-webhook/services/billing-webhook-subscription.service.ts
 #: src/engine/core-modules/billing-webhook/services/billing-webhook-subscription.service.ts
@@ -12431,6 +12230,12 @@ msgstr "Workspace limit reached. A valid enterprise key is required to create mo
 #. js-lingui-id: foYipq
 #: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-message-participant-standard-flat-field-metadata.util.ts
 msgctxt "fieldMetadata.description"
+msgid "Workspace member"
+msgstr "Workspace member"
+
+#. js-lingui-id: gfOHib
+#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-blocklist-standard-flat-field-metadata.util.ts
+msgctxt "fieldMetadata.label"
 msgid "Workspace member"
 msgstr "Workspace member"
 
@@ -12642,9 +12447,8 @@ msgid "You can only update one record with files field at once."
 msgstr "You can only update one record with files field at once."
 
 #. js-lingui-id: 4ysDL0
-#: src/engine/twenty-orm-v2/repository/workspace-repository-v2.ts
-#: src/engine/twenty-orm-v2/repository/workspace-repository-v2.ts
-#: src/engine/twenty-orm/repository/workspace-update-query-builder.ts
+#: src/engine/twenty-orm/repository/workspace-repository.ts
+#: src/engine/twenty-orm/repository/workspace-repository.ts
 msgid "You can only update up to {QUERY_MAX_RECORDS} records at once."
 msgstr "You can only update up to {QUERY_MAX_RECORDS} records at once."
 

@@ -8,7 +8,7 @@ import { In, IsNull, MoreThan, Not } from 'typeorm';
 import { ProvisionedWorkspaceCommandRunner } from 'src/database/commands/command-runners/provisioned-workspace.command-runner';
 import { WorkspaceIteratorService } from 'src/database/commands/command-runners/workspace-iterator.service';
 import { type RunOnWorkspaceArgs } from 'src/database/commands/command-runners/workspace.command-runner';
-import { GlobalWorkspaceOrmManager } from 'src/engine/twenty-orm/global-workspace-datasource/global-workspace-orm.manager';
+import { WorkspaceOrmManager } from 'src/engine/twenty-orm/workspace-orm.manager';
 import { buildSystemAuthContext } from 'src/engine/twenty-orm/utils/build-system-auth-context.util';
 import { MessageCampaignStatisticsService } from 'src/modules/emailing/services/message-campaign-statistics.service';
 import { MessageParticipantWorkspaceEntity } from 'src/modules/messaging/common/standard-objects/message-participant.workspace-entity';
@@ -37,7 +37,7 @@ const normalizeHandle = (handle: string | null): string | null =>
 export class BackfillCampaignRepliesCommand extends ProvisionedWorkspaceCommandRunner {
   constructor(
     protected readonly workspaceIteratorService: WorkspaceIteratorService,
-    private readonly globalWorkspaceOrmManager: GlobalWorkspaceOrmManager,
+    private readonly workspaceOrmManager: WorkspaceOrmManager,
     private readonly messageCampaignStatisticsService: MessageCampaignStatisticsService,
   ) {
     super(workspaceIteratorService);
@@ -50,7 +50,7 @@ export class BackfillCampaignRepliesCommand extends ProvisionedWorkspaceCommandR
     const isDryRun = options.dryRun ?? false;
 
     const stampedCampaignIds =
-      await this.globalWorkspaceOrmManager.executeInWorkspaceContext(
+      await this.workspaceOrmManager.executeInWorkspaceContext(
         async () => this.backfillWorkspace(workspaceId, isDryRun),
         buildSystemAuthContext(workspaceId),
       );
@@ -80,12 +80,10 @@ export class BackfillCampaignRepliesCommand extends ProvisionedWorkspaceCommandR
     workspaceId: string,
     isDryRun: boolean,
   ): Promise<Set<string>> {
-    const messageRepository =
-      await this.globalWorkspaceOrmManager.getRepository(
-        workspaceId,
-        MessageWorkspaceEntity,
-        { shouldBypassPermissionChecks: true },
-      );
+    const messageRepository = this.workspaceOrmManager.getRepository(
+      MessageWorkspaceEntity,
+      { shouldBypassPermissionChecks: true },
+    );
 
     const stampedCampaignIds = new Set<string>();
     let cursor: string | null = null;
@@ -132,7 +130,6 @@ export class BackfillCampaignRepliesCommand extends ProvisionedWorkspaceCommandR
   // headers an out-of-office is indistinguishable from a written answer, so
   // unlike the live attribution path this does count auto-replies.
   private async backfillBatch({
-    workspaceId,
     campaignMessages,
     isDryRun,
   }: {
@@ -140,17 +137,14 @@ export class BackfillCampaignRepliesCommand extends ProvisionedWorkspaceCommandR
     campaignMessages: CampaignMessage[];
     isDryRun: boolean;
   }): Promise<Set<string>> {
-    const messageRepository =
-      await this.globalWorkspaceOrmManager.getRepository(
-        workspaceId,
-        MessageWorkspaceEntity,
-        { shouldBypassPermissionChecks: true },
-      );
+    const messageRepository = this.workspaceOrmManager.getRepository(
+      MessageWorkspaceEntity,
+      { shouldBypassPermissionChecks: true },
+    );
 
     const stampedCampaignIds = new Set<string>();
 
     const recipientHandlesByMessageId = await this.loadHandlesByMessageId({
-      workspaceId,
       messageIds: campaignMessages.map(({ id }) => id),
       role: MessageParticipantRole.TO,
     });
@@ -180,7 +174,6 @@ export class BackfillCampaignRepliesCommand extends ProvisionedWorkspaceCommandR
     }
 
     const senderHandlesByMessageId = await this.loadHandlesByMessageId({
-      workspaceId,
       messageIds: threadMessages.map(({ id }) => id),
       role: MessageParticipantRole.FROM,
     });
@@ -236,20 +229,16 @@ export class BackfillCampaignRepliesCommand extends ProvisionedWorkspaceCommandR
   }
 
   private async loadHandlesByMessageId({
-    workspaceId,
     messageIds,
     role,
   }: {
-    workspaceId: string;
     messageIds: string[];
     role: MessageParticipantRole;
   }): Promise<Map<string, Set<string>>> {
-    const participantRepository =
-      await this.globalWorkspaceOrmManager.getRepository(
-        workspaceId,
-        MessageParticipantWorkspaceEntity,
-        { shouldBypassPermissionChecks: true },
-      );
+    const participantRepository = this.workspaceOrmManager.getRepository(
+      MessageParticipantWorkspaceEntity,
+      { shouldBypassPermissionChecks: true },
+    );
 
     const participants = (
       await Promise.all(

@@ -1,8 +1,8 @@
 import { type TextColorName } from '@/advanced-text-editor/constants/TextColorNames';
 import { TEXT_COLOR_MARK_NAME } from '@/advanced-text-editor/extensions/text-color/TextColorMark';
+import { useLiveEditorState } from '@/advanced-text-editor/hooks/useLiveEditorState';
 import { isTextColorName } from '@/advanced-text-editor/utils/isTextColorName';
 import { type Editor } from '@tiptap/core';
-import { useEditorState } from '@tiptap/react';
 
 // A selection spanning several colours reports whichever the mark at the caret
 // carries; an unrecognised stored name reads as no colour, matching what the
@@ -14,21 +14,18 @@ const readTextColor = (editor: Editor): TextColorName | undefined => {
 };
 
 export const useTextBubbleState = (editor: Editor) => {
-  const state = useEditorState({
-    editor,
-    selector: (ctx) => {
-      return {
-        isBold: ctx.editor.isActive('bold'),
-        isItalic: ctx.editor.isActive('italic'),
-        isStrike: ctx.editor.isActive('strike'),
-        isUnderline: ctx.editor.isActive('underline'),
-        isLink: ctx.editor.isActive('link'),
-        linkHref: ctx.editor.getAttributes('link').href || '',
-        isBulletList: ctx.editor.isActive('bulletList'),
-        isOrderedList: ctx.editor.isActive('orderedList'),
-        textColor: readTextColor(ctx.editor),
-      };
-    },
+  const state = useLiveEditorState(editor, (currentEditor) => {
+    return {
+      isBold: currentEditor.isActive('bold'),
+      isItalic: currentEditor.isActive('italic'),
+      isStrike: currentEditor.isActive('strike'),
+      isUnderline: currentEditor.isActive('underline'),
+      isLink: currentEditor.isActive('link'),
+      linkHref: currentEditor.getAttributes('link').href || '',
+      isBulletList: currentEditor.isActive('bulletList'),
+      isOrderedList: currentEditor.isActive('orderedList'),
+      textColor: readTextColor(currentEditor),
+    };
   });
 
   return state;

@@ -57,6 +57,15 @@ describe('LogEmailingDomainDriver engagement tracking', () => {
       .spyOn(driver['logger'], 'log')
       .mockImplementation(() => undefined);
 
+    // Upstream's log driver now sleeps and randomly throttles to mimic a real
+    // provider; neither belongs in a test of the rendered html.
+    jest
+      .spyOn(
+        driver as unknown as { simulateProviderCall: () => Promise<void> },
+        'simulateProviderCall',
+      )
+      .mockResolvedValue(undefined);
+
     await driver.sendEmail(buildRequest());
 
     loggedHtml = logSpy.mock.calls.map(([message]) => String(message)).join('');

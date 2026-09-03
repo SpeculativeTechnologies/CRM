@@ -64,6 +64,7 @@ describe('fetchLiveMarketplacePartners', () => {
         services: [],
         portfolio: [],
         clients: [],
+        superPartner: false,
         partnerTier: 'ADVANCED',
         serviceCount: 2,
         approvedCaseStudyCount: 3,
@@ -96,6 +97,39 @@ describe('fetchLiveMarketplacePartners', () => {
     rotationKey: 'weekly-key',
   };
 
+  it('reads a missing superPartner as false so an old API still ranks', async () => {
+    mockedFetch.mockResolvedValue({
+      ok: true,
+      partners: [rankablePartner],
+    });
+
+    const [partner] = await fetchLiveMarketplacePartners();
+
+    expect(partner.superPartner).toBe(false);
+  });
+
+  it('reads superPartner true from the API', async () => {
+    mockedFetch.mockResolvedValue({
+      ok: true,
+      partners: [{ ...rankablePartner, superPartner: true }],
+    });
+
+    const [partner] = await fetchLiveMarketplacePartners();
+
+    expect(partner.superPartner).toBe(true);
+  });
+
+  it('reads superPartner null as false', async () => {
+    mockedFetch.mockResolvedValue({
+      ok: true,
+      partners: [{ ...rankablePartner, superPartner: null }],
+    });
+
+    const [partner] = await fetchLiveMarketplacePartners();
+
+    expect(partner.superPartner).toBe(false);
+  });
+
   it.each([
     ['rotationKey', { rotationKey: '' }],
     ['serviceCount', { serviceCount: undefined }],
@@ -105,16 +139,24 @@ describe('fetchLiveMarketplacePartners', () => {
       { approvedCaseStudyWithCoverCount: -1 },
     ],
   ])(
-    'throws when the payload breaks the ranking contract on %s',
+    'degrades to [] and names the offending partner when the payload breaks the ranking contract on %s',
     async (field, override) => {
+      const errorSpy = jest
+        .spyOn(console, 'error')
+        .mockImplementation(() => undefined);
       mockedFetch.mockResolvedValue({
         ok: true,
         partners: [{ ...rankablePartner, ...override }],
       });
 
-      await expect(fetchLiveMarketplacePartners()).rejects.toThrow(
-        new RegExp(`${field}.*acme`),
+      expect(await fetchLiveMarketplacePartners()).toEqual([]);
+      expect(errorSpy).toHaveBeenCalledWith(
+        '[partners-marketplace] ranking contract broken:',
+        expect.objectContaining({
+          message: expect.stringMatching(new RegExp(`${field}.*acme`)),
+        }),
       );
+      errorSpy.mockRestore();
     },
   );
 

@@ -13,7 +13,7 @@ import {
   RelationType,
 } from 'twenty-shared/types';
 import { isDefined } from 'twenty-shared/utils';
-import { FindOptionsRelations, In, ObjectLiteral, QueryRunner } from 'typeorm';
+import { FindOptionsRelations, In, ObjectLiteral } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 
 import { CommonBaseQueryRunnerService } from 'src/engine/api/common/common-query-runners/common-base-query-runner.service';
@@ -52,13 +52,15 @@ import { RecordLabelFormulaService } from 'src/engine/core-modules/record-label-
 import { computeMorphOrRelationFieldJoinColumnName } from 'src/engine/metadata-modules/field-metadata/utils/compute-morph-or-relation-field-join-column-name.util';
 import { FlatEntityMaps } from 'src/engine/metadata-modules/flat-entity/types/flat-entity-maps.type';
 import { findFlatEntityByIdInFlatEntityMaps } from 'src/engine/metadata-modules/flat-entity/utils/find-flat-entity-by-id-in-flat-entity-maps.util';
-import { FlatFieldMetadata } from 'src/engine/metadata-modules/flat-field-metadata/types/flat-field-metadata.type';
+import { type OrmFlatFieldMetadata } from 'src/engine/metadata-modules/flat-field-metadata/types/orm-flat-field-metadata.type';
 import { buildFieldMapsFromFlatObjectMetadata } from 'src/engine/metadata-modules/flat-field-metadata/utils/build-field-maps-from-flat-object-metadata.util';
 import { isMorphOrRelationFlatFieldMetadata } from 'src/engine/metadata-modules/flat-field-metadata/utils/is-morph-or-relation-flat-field-metadata.util';
 import { FlatObjectMetadata } from 'src/engine/metadata-modules/flat-object-metadata/types/flat-object-metadata.type';
 import { assertMutationNotOnRemoteObject } from 'src/engine/metadata-modules/object-metadata/utils/assert-mutation-not-on-remote-object.util';
-import { WorkspaceEntityManager } from 'src/engine/twenty-orm/entity-manager/workspace-entity-manager';
-import { WorkspaceRepository } from 'src/engine/twenty-orm/repository/workspace.repository';
+import { type WorkspaceRepository } from 'src/engine/twenty-orm/repository/workspace-repository';
+import { type WorkspaceTransactionScope } from 'src/engine/twenty-orm/types/workspace-transaction-scope.type';
+import { InjectWorkspaceScopedRepository } from 'src/engine/twenty-orm/workspace-scoped-repository/inject-workspace-scoped-repository.decorator';
+import { type WorkspaceScopedRepository } from 'src/engine/twenty-orm/workspace-scoped-repository/workspace-scoped-repository';
 import { getWorkspaceSchemaName } from 'src/engine/workspace-datasource/utils/get-workspace-schema-name.util';
 
 @Injectable()
@@ -70,6 +72,10 @@ export class CommonMergeManyQueryRunnerService extends CommonBaseQueryRunnerServ
 
   constructor(
     private readonly recordLabelFormulaService: RecordLabelFormulaService,
+    @InjectWorkspaceScopedRepository(FileEntity)
+    private readonly fileRepository: WorkspaceScopedRepository<FileEntity>,
+    @InjectWorkspaceScopedRepository(PersonRecordMergeEntity)
+    private readonly personRecordMergeRepository: WorkspaceScopedRepository<PersonRecordMergeEntity>,
   ) {
     super();
   }
@@ -119,28 +125,14 @@ export class CommonMergeManyQueryRunnerService extends CommonBaseQueryRunnerServ
         })
       : null;
 
-    // Person merges rely on transactional steps (relation dedup, avatar file
-    // handover, unique-value release, soft delete) that only the v1 path
-    // implements, so they never take the ORM v2 path.
-    const updatedRecord = !this.isPersonObject(flatObjectMetadata)
-      ? await this.executeMergeWithinTransactionV2({
-          args,
-          queryRunnerContext,
-          idsToDelete,
-          priorityRecordId: priorityRecord.id,
-          mergedData,
-        })
-      : await queryRunnerContext.workspaceDataSource.transaction(
-          (transactionManager: WorkspaceEntityManager) =>
-            this.executeMergeWithinTransaction(transactionManager, {
-              args,
-              queryRunnerContext,
-              idsToDelete,
-              priorityRecordId: priorityRecord.id,
-              mergedData,
-              personAvatarFileHandover,
-            }),
-        );
+    const updatedRecord = await this.executeMergeWithinTransaction({
+      args,
+      queryRunnerContext,
+      idsToDelete,
+      priorityRecordId: priorityRecord.id,
+      mergedData,
+      personAvatarFileHandover,
+    });
 
     if (this.isPersonObject(flatObjectMetadata)) {
       await this.recordPersonMergeProvenance({
@@ -156,7 +148,6 @@ export class CommonMergeManyQueryRunnerService extends CommonBaseQueryRunnerServ
         flatObjectMetadata,
         flatObjectMetadataMaps: queryRunnerContext.flatObjectMetadataMaps,
         recordIds: [priorityRecord.id, ...idsToDelete],
-        workspaceDataSource: queryRunnerContext.workspaceDataSource,
       });
     const labelIdentifierFieldMetadata = isDefined(
       flatObjectMetadata.labelIdentifierFieldMetadataId,
@@ -181,146 +172,11 @@ export class CommonMergeManyQueryRunnerService extends CommonBaseQueryRunnerServ
     return updatedRecord;
   }
 
-  private async executeMergeWithinTransaction(
-    transactionManager: WorkspaceEntityManager,
-    {
-      args,
-      queryRunnerContext,
-      idsToDelete,
-      priorityRecordId,
-      mergedData,
-      personAvatarFileHandover,
-    }: {
-      args: CommonExtendedInput<MergeManyQueryArgs>;
-      queryRunnerContext: CommonExtendedQueryRunnerContext;
-      idsToDelete: string[];
-      priorityRecordId: string;
-      mergedData: Partial<ObjectRecord>;
-      personAvatarFileHandover: PersonAvatarFileHandover | null;
-    },
-  ): Promise<ObjectRecord> {
-    const {
-      flatObjectMetadata,
-      flatObjectMetadataMaps,
-      flatFieldMetadataMaps,
-    } = queryRunnerContext;
-
-    const columnsToReturn = buildColumnsToReturn({
-      select: args.selectedFieldsResult.select,
-      relations: args.selectedFieldsResult.relations,
-      flatObjectMetadata,
-      flatObjectMetadataMaps,
-      flatFieldMetadataMaps,
-    });
-
-    const transactionRepository = transactionManager.getRepository(
-      flatObjectMetadata.nameSingular,
-      queryRunnerContext.rolePermissionConfig,
-      queryRunnerContext.authContext,
-    );
-    const workspaceSchemaName = getWorkspaceSchemaName(
-      queryRunnerContext.authContext.workspace.id,
-    );
-
-    if (this.isPersonObject(flatObjectMetadata)) {
-      // Keep ambiguous source-to-source collisions; only remove a source row
-      // when the survivor already has an otherwise identical interaction.
-      await this.deleteClearlyRedundantPersonRelationRecords(
-        transactionManager,
-        queryRunnerContext,
-        idsToDelete,
-        priorityRecordId,
-      );
-    }
-
-    if (isDefined(personAvatarFileHandover)) {
-      await this.releasePersonAvatarFileOwnership(
-        transactionManager,
-        workspaceSchemaName,
-        personAvatarFileHandover.previousOwnerPersonIds,
-      );
-    }
-
-    await this.migrateRelatedRecords(
-      transactionManager,
-      queryRunnerContext,
-      idsToDelete,
-      priorityRecordId,
-    );
-
-    if (this.isPersonObject(flatObjectMetadata)) {
-      await this.releaseAbsorbedPersonUniqueValues(
-        transactionManager,
-        workspaceSchemaName,
-        idsToDelete,
-      );
-    }
-
-    if (this.isPersonObject(flatObjectMetadata)) {
-      // Absorbed people go to Trash so a bad merge can be undone from there.
-      // Raw SQL keeps the housekeeping soft delete out of the event stream:
-      // a "deleted" event here would spawn a timeline activity and webhook
-      // calls for what is one merge operation.
-      await this.getTransactionQueryRunner(transactionManager).query(
-        `UPDATE "${workspaceSchemaName}"."person"
-         SET "deletedAt" = now()
-         WHERE "id" = ANY($1) AND "deletedAt" IS NULL`,
-        [idsToDelete],
-      );
-    } else {
-      await transactionRepository
-        .createQueryBuilder(flatObjectMetadata.nameSingular)
-        .delete()
-        .whereInIds(idsToDelete)
-        .returning(columnsToReturn)
-        .execute();
-    }
-
-    if (!isDefined(personAvatarFileHandover)) {
-      return this.updatePriorityRecord(
-        args,
-        queryRunnerContext,
-        transactionRepository,
-        priorityRecordId,
-        mergedData,
-      );
-    }
-
-    // The FILES sync only accepts a file as an addition while it is still marked temporary,
-    // which is what an upload looks like just before it lands on a record. Put the handed
-    // over file back in that state so the survivor's update claims it the ordinary way; the
-    // sync marks it permanent again, and a failure here restores it rather than leaving it
-    // looking like an abandoned upload for the cleanup job to collect.
-    await this.setPersonAvatarFilesTemporary(
-      queryRunnerContext,
-      personAvatarFileHandover.fileIdsToClaim,
-      true,
-    );
-
-    try {
-      return await this.updatePriorityRecord(
-        args,
-        queryRunnerContext,
-        transactionRepository,
-        priorityRecordId,
-        mergedData,
-      );
-    } catch (error) {
-      await this.setPersonAvatarFilesTemporary(
-        queryRunnerContext,
-        personAvatarFileHandover.fileIdsToClaim,
-        false,
-      );
-
-      throw error;
-    }
-  }
-
   // A null value makes the FILES sync skip the field entirely, so the absorbed record lets go
   // of the avatar without the file being soft deleted along with it. Clearing it with an empty
   // array instead would read as a removal and take the file the survivor is about to claim.
   private async releasePersonAvatarFileOwnership(
-    transactionManager: WorkspaceEntityManager,
+    transactionScope: WorkspaceTransactionScope,
     workspaceSchemaName: string,
     previousOwnerPersonIds: string[],
   ): Promise<void> {
@@ -330,9 +186,8 @@ export class CommonMergeManyQueryRunnerService extends CommonBaseQueryRunnerServ
 
     // Raw SQL keeps this internal step out of the event stream: an "updated"
     // event on the absorbed person would spawn timeline activities and
-    // webhook calls for what is one merge operation. The entity manager
-    // blocks raw SQL, so go through the transaction's own query runner.
-    await this.getTransactionQueryRunner(transactionManager).query(
+    // webhook calls for what is one merge operation.
+    await transactionScope.executeRawQuery(
       `UPDATE "${workspaceSchemaName}"."person"
        SET "avatarFile" = NULL
        WHERE "id" = ANY($1)`,
@@ -341,7 +196,7 @@ export class CommonMergeManyQueryRunnerService extends CommonBaseQueryRunnerServ
   }
 
   private async setPersonAvatarFilesTemporary(
-    queryRunnerContext: CommonExtendedQueryRunnerContext,
+    workspaceId: string,
     fileIds: string[],
     isTemporaryFile: boolean,
   ): Promise<void> {
@@ -349,16 +204,15 @@ export class CommonMergeManyQueryRunnerService extends CommonBaseQueryRunnerServ
       return;
     }
 
-    await queryRunnerContext.workspaceDataSource.coreDataSource
-      .getRepository(FileEntity)
-      .update(
-        { id: In(fileIds) },
-        { settings: { isTemporaryFile, toDelete: false } },
-      );
+    await this.fileRepository.update(
+      workspaceId,
+      { id: In(fileIds) },
+      { settings: { isTemporaryFile, toDelete: false } },
+    );
   }
 
   private async releaseAbsorbedPersonUniqueValues(
-    transactionManager: WorkspaceEntityManager,
+    transactionScope: WorkspaceTransactionScope,
     workspaceSchemaName: string,
     personIds: string[],
   ): Promise<void> {
@@ -369,29 +223,13 @@ export class CommonMergeManyQueryRunnerService extends CommonBaseQueryRunnerServ
     // primary email in Trash. Other record details remain in Trash.
     // Raw SQL for the same reason as the avatar release above: no events for
     // internal housekeeping on the absorbed person.
-    await this.getTransactionQueryRunner(transactionManager).query(
+    await transactionScope.executeRawQuery(
       `UPDATE "${workspaceSchemaName}"."person"
        SET "emailsPrimaryEmail" = NULL,
            "emailsAdditionalEmails" = '[]'::jsonb
        WHERE "id" = ANY($1)`,
       [personIds],
     );
-  }
-
-  private getTransactionQueryRunner(
-    transactionManager: WorkspaceEntityManager,
-  ): QueryRunner {
-    const queryRunner = transactionManager.queryRunner;
-
-    if (!isDefined(queryRunner)) {
-      throw new CommonQueryRunnerException(
-        'Merge housekeeping must run inside a transaction',
-        CommonQueryRunnerExceptionCode.INTERNAL_SERVER_ERROR,
-        { userFriendlyMessage: STANDARD_ERROR_MESSAGE },
-      );
-    }
-
-    return queryRunner;
   }
 
   private async fetchRecordsToMerge(
@@ -485,7 +323,7 @@ export class CommonMergeManyQueryRunnerService extends CommonBaseQueryRunnerServ
     recordsToMerge: ObjectRecord[],
     priorityRecordId: string,
     flatObjectMetadata: FlatObjectMetadata,
-    flatFieldMetadataMaps: FlatEntityMaps<FlatFieldMetadata>,
+    flatFieldMetadataMaps: FlatEntityMaps<OrmFlatFieldMetadata>,
     isDryRun = false,
   ): Partial<ObjectRecord> {
     const mergedResult: Partial<ObjectRecord> = {};
@@ -570,7 +408,7 @@ export class CommonMergeManyQueryRunnerService extends CommonBaseQueryRunnerServ
   private shouldExcludeFieldFromMerge(
     fieldName: string,
     fieldIdByName: Record<string, string>,
-    flatFieldMetadataMaps: FlatEntityMaps<FlatFieldMetadata>,
+    flatFieldMetadataMaps: FlatEntityMaps<OrmFlatFieldMetadata>,
   ): boolean {
     const fieldMetadata = findFlatEntityByIdInFlatEntityMaps({
       flatEntityId: fieldIdByName[fieldName],
@@ -594,39 +432,30 @@ export class CommonMergeManyQueryRunnerService extends CommonBaseQueryRunnerServ
     return dryRunRecord;
   }
 
-  private async updatePriorityRecord(
-    args: CommonExtendedInput<MergeManyQueryArgs>,
-    queryRunnerContext: CommonExtendedQueryRunnerContext,
-    repository: WorkspaceRepository<ObjectLiteral>,
-    priorityRecordId: string,
-    mergedData: Partial<ObjectRecord>,
-  ): Promise<ObjectRecord> {
-    const {
-      flatObjectMetadata,
-      flatObjectMetadataMaps,
-      flatFieldMetadataMaps,
-    } = queryRunnerContext;
-
-    const queryBuilder = repository.createQueryBuilder(
-      flatObjectMetadata.nameSingular,
-    );
-
-    const columnsToReturn = buildColumnsToReturn({
-      select: args.selectedFieldsResult.select,
-      relations: args.selectedFieldsResult.relations,
-      flatObjectMetadata,
-      flatObjectMetadataMaps,
-      flatFieldMetadataMaps,
+  private async updatePriorityRecord({
+    objectRepository,
+    alias,
+    priorityRecordId,
+    columnsToReturn,
+    data,
+  }: {
+    objectRepository: WorkspaceRepository<ObjectRecord>;
+    alias: string;
+    priorityRecordId: string;
+    columnsToReturn: string[];
+    data: Partial<ObjectRecord>;
+  }): Promise<ObjectRecord> {
+    const updatedRecords = await objectRepository.runMutation({
+      selectQueryBuilder: objectRepository
+        .createQueryBuilder(alias)
+        .where({ id: priorityRecordId }),
+      rowLevelPermissionsApplied: false,
+      kind: 'update',
+      columnsToReturn,
+      data,
     });
 
-    const updatedObjectRecords = await queryBuilder
-      .update()
-      .set(mergedData)
-      .where({ id: priorityRecordId })
-      .returning(columnsToReturn)
-      .execute();
-
-    if (!updatedObjectRecords.generatedMaps.length) {
+    if (!isDefined(updatedRecords[0])) {
       throw new CommonQueryRunnerException(
         'Failed to update record',
         CommonQueryRunnerExceptionCode.RECORD_NOT_FOUND,
@@ -634,9 +463,7 @@ export class CommonMergeManyQueryRunnerService extends CommonBaseQueryRunnerServ
       );
     }
 
-    const updatedRecord = updatedObjectRecords.generatedMaps[0] as ObjectRecord;
-
-    return updatedRecord;
+    return updatedRecords[0];
   }
 
   private getRelationFieldsPointingToCurrentObject(
@@ -697,7 +524,7 @@ export class CommonMergeManyQueryRunnerService extends CommonBaseQueryRunnerServ
   }
 
   private async migrateRelatedRecords(
-    transactionManager: WorkspaceEntityManager,
+    transactionScope: WorkspaceTransactionScope,
     context: CommonExtendedQueryRunnerContext,
     fromIds: string[],
     toId: string,
@@ -705,19 +532,16 @@ export class CommonMergeManyQueryRunnerService extends CommonBaseQueryRunnerServ
     for (const relationField of this.getRelationFieldsPointingToCurrentObject(
       context,
     )) {
-      const repository = transactionManager.getRepository(
+      const repository = transactionScope.getRepository(
         relationField.objectMetadata.nameSingular,
         context.rolePermissionConfig,
-        context.authContext,
       );
 
-      // The update builder refuses to touch more than QUERY_MAX_RECORDS rows at
+      // runMutation refuses to update more than QUERY_MAX_RECORDS rows at
       // once, and a person auto-created by email sync can carry thousands of
       // participants and timeline activities. Repoint in batches: each pass
       // takes rows still pointing at an absorbed record, so the updates
       // themselves advance the loop.
-      //
-      // repository.update() runs outside the transaction; build from the transaction-scoped repository so the migration rolls back with the merge.
       // oxlint-disable-next-line no-constant-condition
       while (true) {
         // withDeleted keeps the old single-statement semantics: trashed rows
@@ -725,7 +549,7 @@ export class CommonMergeManyQueryRunnerService extends CommonBaseQueryRunnerServ
         // later does not resurrect a reference to a merged-away person.
         const batch = await repository.find({
           where: { [relationField.joinColumnName]: In(fromIds) },
-          select: { id: true },
+          select: ['id'],
           take: QUERY_MAX_RECORDS,
           withDeleted: true,
         });
@@ -734,13 +558,16 @@ export class CommonMergeManyQueryRunnerService extends CommonBaseQueryRunnerServ
           break;
         }
 
-        await repository
-          .createQueryBuilder(relationField.objectMetadata.nameSingular)
-          .update()
-          .set({ [relationField.joinColumnName]: toId })
-          .whereInIds(batch.map(({ id }) => id))
-          .returning('*')
-          .execute();
+        await repository.runMutation({
+          selectQueryBuilder: repository
+            .createQueryBuilder(relationField.objectMetadata.nameSingular)
+            .withDeleted()
+            .where({ id: In(batch.map(({ id }) => id)) }),
+          rowLevelPermissionsApplied: false,
+          kind: 'update',
+          columnsToReturn: ['id'],
+          data: { [relationField.joinColumnName]: toId },
+        });
 
         if (batch.length < QUERY_MAX_RECORDS) {
           break;
@@ -750,13 +577,13 @@ export class CommonMergeManyQueryRunnerService extends CommonBaseQueryRunnerServ
   }
 
   private async deleteClearlyRedundantPersonRelationRecords(
-    transactionManager: WorkspaceEntityManager,
+    transactionScope: WorkspaceTransactionScope,
     context: CommonExtendedQueryRunnerContext,
     sourcePersonIds: string[],
     survivorPersonId: string,
   ): Promise<void> {
     await this.deleteSourceRecordsWithSurvivorEquivalent({
-      transactionManager,
+      transactionScope,
       context,
       objectNameSingular: 'noteTarget',
       personRelationIdFieldName: 'targetPersonId',
@@ -765,7 +592,7 @@ export class CommonMergeManyQueryRunnerService extends CommonBaseQueryRunnerServ
     });
 
     await this.deleteSourceRecordsWithSurvivorEquivalent({
-      transactionManager,
+      transactionScope,
       context,
       objectNameSingular: 'taskTarget',
       personRelationIdFieldName: 'targetPersonId',
@@ -774,7 +601,7 @@ export class CommonMergeManyQueryRunnerService extends CommonBaseQueryRunnerServ
     });
 
     await this.deleteSourceRecordsWithSurvivorEquivalent({
-      transactionManager,
+      transactionScope,
       context,
       objectNameSingular: 'timelineActivity',
       personRelationIdFieldName: 'targetPersonId',
@@ -790,7 +617,7 @@ export class CommonMergeManyQueryRunnerService extends CommonBaseQueryRunnerServ
   }
 
   private async deleteSourceRecordsWithSurvivorEquivalent({
-    transactionManager,
+    transactionScope,
     context,
     objectNameSingular,
     personRelationIdFieldName,
@@ -798,7 +625,7 @@ export class CommonMergeManyQueryRunnerService extends CommonBaseQueryRunnerServ
     survivorPersonId,
     canBeDeduplicated,
   }: {
-    transactionManager: WorkspaceEntityManager;
+    transactionScope: WorkspaceTransactionScope;
     context: CommonExtendedQueryRunnerContext;
     objectNameSingular: 'noteTarget' | 'taskTarget' | 'timelineActivity';
     personRelationIdFieldName: string;
@@ -806,10 +633,9 @@ export class CommonMergeManyQueryRunnerService extends CommonBaseQueryRunnerServ
     survivorPersonId: string;
     canBeDeduplicated?: (record: ObjectLiteral) => boolean;
   }): Promise<void> {
-    const repository = transactionManager.getRepository(
+    const repository = transactionScope.getRepository(
       objectNameSingular,
       context.rolePermissionConfig,
-      context.authContext,
     );
 
     const records = await repository.find({
@@ -830,26 +656,30 @@ export class CommonMergeManyQueryRunnerService extends CommonBaseQueryRunnerServ
       return;
     }
 
-    await repository
-      .createQueryBuilder(objectNameSingular)
-      .delete()
-      .whereInIds(redundantSourceRecordIds)
-      .returning(['id'])
-      .execute();
+    await repository.runMutation({
+      selectQueryBuilder: repository
+        .createQueryBuilder(objectNameSingular)
+        .where({ id: In(redundantSourceRecordIds) }),
+      rowLevelPermissionsApplied: false,
+      kind: 'delete',
+      columnsToReturn: ['id'],
+    });
   }
 
-  private async executeMergeWithinTransactionV2({
+  private async executeMergeWithinTransaction({
     args,
     queryRunnerContext,
     idsToDelete,
     priorityRecordId,
     mergedData,
+    personAvatarFileHandover,
   }: {
     args: CommonExtendedInput<MergeManyQueryArgs>;
     queryRunnerContext: CommonExtendedQueryRunnerContext;
     idsToDelete: string[];
     priorityRecordId: string;
     mergedData: Partial<ObjectRecord>;
+    personAvatarFileHandover: PersonAvatarFileHandover | null;
   }): Promise<ObjectRecord> {
     const {
       flatObjectMetadata,
@@ -858,6 +688,10 @@ export class CommonMergeManyQueryRunnerService extends CommonBaseQueryRunnerServ
       rolePermissionConfig,
     } = queryRunnerContext;
     const alias = flatObjectMetadata.nameSingular;
+    const isPersonMerge = this.isPersonObject(flatObjectMetadata);
+    const workspaceSchemaName = getWorkspaceSchemaName(
+      queryRunnerContext.authContext.workspace.id,
+    );
 
     const columnsToReturn = buildColumnsToReturn({
       select: args.selectedFieldsResult.select,
@@ -873,68 +707,113 @@ export class CommonMergeManyQueryRunnerService extends CommonBaseQueryRunnerServ
       attributes: { operation: this.operationName },
     });
 
-    return this.workspaceDataSourceV2Service
-      .getDataSource({ useReplica: false })
-      .transaction(async (transactionScope) => {
-        for (const relationField of this.getRelationFieldsPointingToCurrentObject(
-          queryRunnerContext,
-        )) {
-          const relatedRepository = transactionScope.getRepository(
-            relationField.objectMetadata.nameSingular,
-            rolePermissionConfig,
+    return this.workspaceOrmManager.runInWorkspaceTransaction(
+      async (transactionScope) => {
+        if (isPersonMerge) {
+          // Keep ambiguous source-to-source collisions; only remove a source row
+          // when the survivor already has an otherwise identical interaction.
+          await this.deleteClearlyRedundantPersonRelationRecords(
+            transactionScope,
+            queryRunnerContext,
+            idsToDelete,
+            priorityRecordId,
           );
-
-          await relatedRepository.runMutation({
-            selectQueryBuilder: relatedRepository
-              .createQueryBuilder(relationField.objectMetadata.nameSingular)
-              .where({ [relationField.joinColumnName]: In(idsToDelete) }),
-            rowLevelPermissionsApplied: false,
-            kind: 'update',
-            columnsToReturn: ['id'],
-            data: { [relationField.joinColumnName]: priorityRecordId },
-          });
         }
+
+        if (isDefined(personAvatarFileHandover)) {
+          await this.releasePersonAvatarFileOwnership(
+            transactionScope,
+            workspaceSchemaName,
+            personAvatarFileHandover.previousOwnerPersonIds,
+          );
+        }
+
+        await this.migrateRelatedRecords(
+          transactionScope,
+          queryRunnerContext,
+          idsToDelete,
+          priorityRecordId,
+        );
 
         const objectRepository = transactionScope.getRepository(
           alias,
           rolePermissionConfig,
         );
 
-        await objectRepository.runMutation({
-          selectQueryBuilder: objectRepository
-            .createQueryBuilder(alias)
-            .where({ id: In(idsToDelete) }),
-          rowLevelPermissionsApplied: false,
-          kind: 'delete',
-          columnsToReturn,
-        });
+        if (isPersonMerge) {
+          await this.releaseAbsorbedPersonUniqueValues(
+            transactionScope,
+            workspaceSchemaName,
+            idsToDelete,
+          );
 
-        const [resolvedMergedData] = await this.resolveNestedRelationsForOrmV2({
+          // Absorbed people go to Trash so a bad merge can be undone from there.
+          // Raw SQL keeps the housekeeping soft delete out of the event stream:
+          // a "deleted" event here would spawn a timeline activity and webhook
+          // calls for what is one merge operation.
+          await transactionScope.executeRawQuery(
+            `UPDATE "${workspaceSchemaName}"."person"
+             SET "deletedAt" = now()
+             WHERE "id" = ANY($1) AND "deletedAt" IS NULL`,
+            [idsToDelete],
+          );
+        } else {
+          await objectRepository.runMutation({
+            selectQueryBuilder: objectRepository
+              .createQueryBuilder(alias)
+              .where({ id: In(idsToDelete) }),
+            rowLevelPermissionsApplied: false,
+            kind: 'delete',
+            columnsToReturn,
+          });
+        }
+
+        const [resolvedMergedData] = await this.resolveNestedRelations({
           records: [mergedData],
           queryRunnerContext,
           writeRepository: objectRepository,
         });
 
-        const updatedRecords = await objectRepository.runMutation({
-          selectQueryBuilder: objectRepository
-            .createQueryBuilder(alias)
-            .where({ id: priorityRecordId }),
-          rowLevelPermissionsApplied: false,
-          kind: 'update',
-          columnsToReturn,
-          data: resolvedMergedData,
-        });
-
-        if (!isDefined(updatedRecords[0])) {
-          throw new CommonQueryRunnerException(
-            'Failed to update record',
-            CommonQueryRunnerExceptionCode.RECORD_NOT_FOUND,
-            { userFriendlyMessage: STANDARD_ERROR_MESSAGE },
-          );
+        if (!isDefined(personAvatarFileHandover)) {
+          return this.updatePriorityRecord({
+            objectRepository,
+            alias,
+            priorityRecordId,
+            columnsToReturn,
+            data: resolvedMergedData,
+          });
         }
 
-        return updatedRecords[0];
-      });
+        // The FILES sync only accepts a file as an addition while it is still marked temporary,
+        // which is what an upload looks like just before it lands on a record. Put the handed
+        // over file back in that state so the survivor's update claims it the ordinary way; the
+        // sync marks it permanent again, and a failure here restores it rather than leaving it
+        // looking like an abandoned upload for the cleanup job to collect.
+        await this.setPersonAvatarFilesTemporary(
+          queryRunnerContext.authContext.workspace.id,
+          personAvatarFileHandover.fileIdsToClaim,
+          true,
+        );
+
+        try {
+          return await this.updatePriorityRecord({
+            objectRepository,
+            alias,
+            priorityRecordId,
+            columnsToReturn,
+            data: resolvedMergedData,
+          });
+        } catch (error) {
+          await this.setPersonAvatarFilesTemporary(
+            queryRunnerContext.authContext.workspace.id,
+            personAvatarFileHandover.fileIdsToClaim,
+            false,
+          );
+
+          throw error;
+        }
+      },
+    );
   }
 
   private async processNestedRelations({
@@ -989,16 +868,14 @@ export class CommonMergeManyQueryRunnerService extends CommonBaseQueryRunnerServ
       : null;
 
     try {
-      await queryRunnerContext.workspaceDataSource.coreDataSource
-        .getRepository(PersonRecordMergeEntity)
-        .insert(
-          sourcePersonIds.map((sourcePersonId) => ({
-            workspaceId: queryRunnerContext.authContext.workspace.id,
-            sourcePersonId,
-            targetPersonId,
-            mergedByWorkspaceMemberId,
-          })),
-        );
+      await this.personRecordMergeRepository.insert(
+        queryRunnerContext.authContext.workspace.id,
+        sourcePersonIds.map((sourcePersonId) => ({
+          sourcePersonId,
+          targetPersonId,
+          mergedByWorkspaceMemberId,
+        })),
+      );
     } catch {
       // The workspace merge has already committed. Do not report the merge as
       // failed after the records and their relationships have been changed.
@@ -1040,7 +917,7 @@ export class CommonMergeManyQueryRunnerService extends CommonBaseQueryRunnerServ
     queryResult: ObjectRecord,
     flatObjectMetadata: FlatObjectMetadata,
     flatObjectMetadataMaps: FlatEntityMaps<FlatObjectMetadata>,
-    flatFieldMetadataMaps: FlatEntityMaps<FlatFieldMetadata>,
+    flatFieldMetadataMaps: FlatEntityMaps<OrmFlatFieldMetadata>,
     authContext: WorkspaceAuthContext,
   ): Promise<ObjectRecord> {
     // Run the shared result getters (like every other mutation) so FILES fields such as the

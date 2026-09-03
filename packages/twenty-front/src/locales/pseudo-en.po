@@ -41,11 +41,6 @@ msgstr ""
 msgid ": Empty"
 msgstr ""
 
-#. js-lingui-id: jmJy4X
-#: src/modules/object-record/object-filter-dropdown/utils/getOperandLabel.ts
-msgid ": Exactly"
-msgstr ""
-
 #. js-lingui-id: CE75IR
 #: src/modules/object-record/object-filter-dropdown/utils/getOperandLabel.ts
 msgid ": Future"
@@ -64,11 +59,6 @@ msgstr ""
 #. js-lingui-id: 1ORnec
 #: src/modules/object-record/object-filter-dropdown/utils/getOperandLabel.ts
 msgid ": NotEmpty"
-msgstr ""
-
-#. js-lingui-id: 0DaS2L
-#: src/modules/object-record/object-filter-dropdown/utils/getOperandLabel.ts
-msgid ": NotExactly"
 msgstr ""
 
 #. js-lingui-id: 11QpPG
@@ -99,11 +89,6 @@ msgstr ""
 #. js-lingui-id: DRwoy1
 #: src/pages/onboarding/UpgradeFreeTrial.tsx
 msgid "· FREE"
-msgstr ""
-
-#. js-lingui-id: +ryuLa
-#: src/modules/object-record/record-field/ui/meta-types/utils/getNewSelectOptionErrorMessage.ts
-msgid "\"{optionName}\" cannot be used as an option name."
 msgstr ""
 
 #. js-lingui-id: TaLmrR
@@ -229,7 +214,6 @@ msgstr ""
 
 #. js-lingui-id: okrK9q
 #. placeholder {0}: preview.duplicateEmails
-#: src/modules/activities/emails/components/CampaignComposerFields.tsx
 #: src/modules/activities/emails/components/CampaignDetailsFields.tsx
 msgid "{0} duplicate"
 msgstr ""
@@ -250,13 +234,6 @@ msgstr ""
 #. placeholder {0}: preview.totalMembers
 #: src/modules/activities/emails/components/CampaignDetailsFields.tsx
 msgid "{0} in this list"
-msgstr ""
-
-#. js-lingui-id: MY0lRK
-#. placeholder {0}: preview.totalMembers
-#. placeholder {1}: preview.sendable
-#: src/modules/activities/emails/components/CampaignComposerFields.tsx
-msgid "{0} in this list — {1} sendable"
 msgstr ""
 
 #. js-lingui-id: /PXxEG
@@ -293,7 +270,6 @@ msgstr ""
 
 #. js-lingui-id: BzvoVr
 #. placeholder {0}: preview.topicUnsubscribed
-#: src/modules/activities/emails/components/CampaignComposerFields.tsx
 #: src/modules/activities/emails/components/CampaignDetailsFields.tsx
 msgid "{0} opted out of this topic"
 msgstr ""
@@ -318,7 +294,6 @@ msgstr ""
 
 #. js-lingui-id: nZUq+6
 #. placeholder {0}: preview.globallyUnsubscribed
-#: src/modules/activities/emails/components/CampaignComposerFields.tsx
 #: src/modules/activities/emails/components/CampaignDetailsFields.tsx
 msgid "{0} unsubscribed from everything"
 msgstr ""
@@ -343,7 +318,6 @@ msgstr ""
 
 #. js-lingui-id: Aixgij
 #. placeholder {0}: preview.withoutEmail
-#: src/modules/activities/emails/components/CampaignComposerFields.tsx
 #: src/modules/activities/emails/components/CampaignDetailsFields.tsx
 msgid "{0} without email"
 msgstr ""
@@ -574,11 +548,6 @@ msgstr ""
 msgid "{positionLabel} record holds priority"
 msgstr ""
 
-#. js-lingui-id: M71PWW
-#: src/modules/activities/emails/mass-email/components/MassEmailComposeCard.tsx
-msgid "{recipientCount} recipients"
-msgstr ""
-
 #. js-lingui-id: 5d0hY6
 #: src/modules/settings/admin-panel/health-status/hooks/useRetryJobs.ts
 #: src/modules/settings/admin-panel/health-status/hooks/useRetryJobs.ts
@@ -638,11 +607,6 @@ msgstr ""
 #. js-lingui-id: Bzjg0/
 #: src/pages/settings/accounts/SettingsAccountsConfigurationStepCalendar.tsx
 msgid "{stepNumber}. Calendar"
-msgstr ""
-
-#. js-lingui-id: NcsiO/
-#: src/modules/activities/emails/mass-email/hooks/useSendMassEmail.ts
-msgid "{successCount} emails sent"
 msgstr ""
 
 #. js-lingui-id: bI/mcH
@@ -1227,11 +1191,6 @@ msgstr ""
 msgid "Add a step"
 msgstr ""
 
-#. js-lingui-id: Ope30e
-#: src/modules/activities/emails/components/EmailComposerFields.tsx
-msgid "Add a subject"
-msgstr ""
-
 #. js-lingui-id: KKfos4
 #: src/modules/workflow/workflow-diagram/workflow-nodes/components/WorkflowDiagramEmptyTriggerEditable.tsx
 #: src/modules/workflow/workflow-diagram/workflow-nodes/components/WorkflowDiagramEmptyTriggerReadonly.tsx
@@ -1438,16 +1397,6 @@ msgstr ""
 msgid "Add Model"
 msgstr ""
 
-#. js-lingui-id: 4H+G/6
-#: src/modules/activities/emails/signature/components/EmailSignatureToggleRow.tsx
-msgid "Add my signature"
-msgstr ""
-
-#. js-lingui-id: 1jFlXn
-#: src/modules/settings/profile/components/SettingsProfileEmailSignature.tsx
-msgid "Add my signature to new emails by default"
-msgstr ""
-
 #. js-lingui-id: Hkobke
 #: src/modules/object-record/record-board/record-board-column/components/RecordBoardColumnHeader.tsx
 #: src/modules/object-record/record-list/components/RecordListAddNew.tsx
@@ -1496,11 +1445,6 @@ msgstr ""
 msgid "Add Output Field"
 msgstr ""
 
-#. js-lingui-id: +1O5zr
-#: src/modules/activities/emails/mass-email/components/MassEmailAddPeopleButton.tsx
-msgid "Add people"
-msgstr ""
-
 #. js-lingui-id: aYtHO6
 #: src/modules/workflow/workflow-steps/workflow-actions/ai-agent-action/components/WorkflowAiAgentPermissionsTab.tsx
 #: src/modules/workflow/workflow-steps/workflow-actions/ai-agent-action/components/WorkflowEditActionAiAgent.tsx
@@ -1508,6 +1452,7 @@ msgid "Add permission"
 msgstr ""
 
 #. js-lingui-id: AmiJYR
+#: src/modules/page-layout/widgets/field/components/FieldWidgetRelationEditAction.tsx
 #: src/modules/settings/data-model/object-details/components/tabs/ObjectFields.tsx
 msgid "Add relation"
 msgstr ""
@@ -1548,11 +1493,6 @@ msgstr ""
 #: src/modules/settings/security/components/SSO/SettingsSSOIdentitiesProvidersListCard.tsx
 #: src/modules/settings/security/components/SSO/SettingsSSOIdentitiesProvidersListCardWrapper.tsx
 msgid "Add SSO Identity Provider"
-msgstr ""
-
-#. js-lingui-id: ZAh4zP
-#: src/modules/views/view-stack/components/ViewStackTabList.tsx
-msgid "Add stack"
 msgstr ""
 
 #. js-lingui-id: 6Tl23V
@@ -1620,11 +1560,6 @@ msgstr ""
 msgid "Add view"
 msgstr ""
 
-#. js-lingui-id: oU1lna
-#: src/modules/views/view-stack/components/ViewStackTabDropdownContent.tsx
-msgid "Add view to this stack"
-msgstr ""
-
 #. js-lingui-id: 8sZiWP
 #: src/modules/page-layout/widgets/components/DashboardWidgetPlaceholder.tsx
 #: src/modules/page-layout/widgets/components/RecordPageAddWidgetSection.tsx
@@ -1673,11 +1608,6 @@ msgstr ""
 #. js-lingui-id: 9iIYOy
 #: src/modules/settings/accounts/components/SettingsAccountsBlocklistTable.tsx
 msgid "Added to blocklist"
-msgstr ""
-
-#. js-lingui-id: BrJ98E
-#: src/modules/settings/data-model/fields/forms/select/components/AddSelectOptionMenuItem.tsx
-msgid "Adding \"{trimmedName}\"..."
 msgstr ""
 
 #. js-lingui-id: hW/fMg
@@ -1794,11 +1724,6 @@ msgstr ""
 #. js-lingui-id: 5wZlI9
 #: src/modules/workflow/workflow-steps/workflow-actions/delay-actions/components/WorkflowEditActionDelay.tsx
 msgid "After a set amount of time"
-msgstr ""
-
-#. js-lingui-id: YPnvqG
-#: src/modules/object-record/record-calendar/month/hooks/useRecordCalendarQueryDateRangeFilter.tsx
-msgid "After or equal"
 msgstr ""
 
 #. js-lingui-id: fcYF58
@@ -2047,16 +1972,15 @@ msgstr ""
 msgid "All App Registrations"
 msgstr ""
 
-#. js-lingui-id: ZrLLkh
+#. js-lingui-id: REq7rb
 #: src/modules/settings/admin-panel/apps/components/SettingsAdminApps.tsx
-msgid "All application registrations across the platform, including orphaned marketplace apps"
+msgid "All application registrations across the platform, including orphaned marketplace apps ({totalCount} matching)"
 msgstr ""
 
 #. js-lingui-id: 1kLn6M
 #: src/modules/activities/calendar/components/CalendarEventComposerFields.tsx
 #: src/modules/activities/calendar/components/CalendarEventComposerFields.tsx
 #: src/modules/activities/calendar/components/CalendarEventRow.tsx
-#: src/modules/object-record/record-calendar/time-grid/components/RecordCalendarTimeGrid.tsx
 #: src/modules/workflow/workflow-steps/workflow-actions/components/WorkflowEditActionCreateCalendarEvent.tsx
 msgid "All day"
 msgstr ""
@@ -2353,11 +2277,6 @@ msgstr ""
 #. js-lingui-id: U+NKyj
 #: src/modules/settings/data-model/objects/forms/components/SettingsDataModelObjectAboutForm.tsx
 msgid "An object with this name already exists"
-msgstr ""
-
-#. js-lingui-id: oMJTL2
-#: src/modules/object-record/record-field/ui/meta-types/utils/getNewSelectOptionErrorMessage.ts
-msgid "An option matching \"{optionName}\" already exists."
 msgstr ""
 
 #. js-lingui-id: HZFm5R
@@ -3081,11 +3000,6 @@ msgstr ""
 msgid "Available"
 msgstr ""
 
-#. js-lingui-id: HsAhgd
-#: src/modules/settings/data-model/objects/forms/components/SettingsDataModelObjectLabelFormulaForm.tsx
-msgid "Available fields:"
-msgstr ""
-
 #. js-lingui-id: STA+22
 #: src/pages/settings/ai/components/SettingsAiModelsTab.tsx
 msgid "Available models"
@@ -3192,11 +3106,6 @@ msgstr ""
 msgid "Because this workflow is not using a manual trigger, the form will not open on top of the interface. To fill it, open the corresponding workflow run and complete the form there."
 msgstr ""
 
-#. js-lingui-id: EmSrGB
-#: src/modules/object-record/record-calendar/month/hooks/useRecordCalendarQueryDateRangeFilter.tsx
-msgid "Before"
-msgstr ""
-
 #. js-lingui-id: +MqoSu
 #: src/modules/settings/admin-panel/health-status/components/SettingsAdminWorkspacesStatusSummaryCard.tsx
 #: src/modules/settings/admin-panel/utils/getUpgradeHealthStatusBadge.ts
@@ -3299,7 +3208,6 @@ msgid "Blocks"
 msgstr ""
 
 #. js-lingui-id: Zn5crm
-#: src/modules/advanced-text-editor/constants/TextColorLabels.ts
 #: src/modules/settings/data-model/fields/forms/select/components/SettingsDataModelFieldSelectFormOptionRow.tsx
 msgid "Blue"
 msgstr ""
@@ -3375,7 +3283,6 @@ msgid "Bronze"
 msgstr ""
 
 #. js-lingui-id: JLxwQS
-#: src/modules/advanced-text-editor/constants/TextColorLabels.ts
 #: src/modules/settings/data-model/fields/forms/select/components/SettingsDataModelFieldSelectFormOptionRow.tsx
 msgid "Brown"
 msgstr ""
@@ -3616,13 +3523,18 @@ msgid "Call recorder"
 msgstr ""
 
 #. js-lingui-id: ahn0Ti
-#: src/modules/page-layout/widgets/calendar-event-call-recording/components/CallRecordingWidgetUnavailableDisplay.tsx
+#: src/modules/page-layout/widgets/call-recording/components/CallRecordingWidgetUnavailableDisplay.tsx
 msgid "Call recording is not available in this workspace."
 msgstr ""
 
 #. js-lingui-id: z9jSP/
-#: src/modules/page-layout/widgets/calendar-event-call-recording/components/CallRecordingWidgetUnavailableDisplay.tsx
+#: src/modules/page-layout/widgets/call-recording/components/CallRecordingWidgetUnavailableDisplay.tsx
 msgid "Call Recording Unavailable"
+msgstr ""
+
+#. js-lingui-id: 81EMVN
+#: src/modules/page-layout/widgets/call-recording/components/CallRecordingWidgetUnavailableDisplay.tsx
+msgid "Call recordings are not available on this record."
 msgstr ""
 
 #. js-lingui-id: +Kx1Id
@@ -3675,7 +3587,6 @@ msgstr ""
 #: src/modules/spreadsheet-import/steps/components/ValidationStep/ValidationStep.tsx
 #: src/modules/ui/feedback/snack-bar-manager/components/SnackBar.tsx
 #: src/modules/ui/layout/modal/components/ConfirmationModal.tsx
-#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
 #: src/pages/settings/admin-panel/SettingsAdminApplicationRegistrationDangerZone.tsx
 #: src/pages/settings/applications/components/SettingsApplicationConnectScopePickerModal.tsx
 msgid "Cancel"
@@ -3821,10 +3732,6 @@ msgstr ""
 #. js-lingui-id: RpYfjZ
 #: src/modules/activities/emails/components/EmailComposerFields.tsx
 #: src/modules/activities/emails/components/EmailComposerFields.tsx
-#: src/modules/activities/emails/mass-email/components/MassEmailComposeCard.tsx
-#: src/modules/activities/emails/mass-email/components/MassEmailComposeCard.tsx
-#: src/modules/activities/emails/mass-email/components/MassEmailComposeCard.tsx
-#: src/modules/activities/emails/mass-email/components/MassEmailComposeCard.tsx
 #: src/modules/workflow/workflow-steps/workflow-actions/components/WorkflowRunStepLogsEmailDetail.tsx
 msgid "Cc"
 msgstr ""
@@ -3848,6 +3755,11 @@ msgstr ""
 #. js-lingui-id: feCRNv
 #: src/modules/auth/sign-in-up/components/EmailVerificationSent.tsx
 msgid "Change email"
+msgstr ""
+
+#. js-lingui-id: qTyVHs
+#: src/modules/workflow/workflow-diagram/workflow-nodes/components/WorkflowDiagramStepNodeOptionsDropdown.tsx
+msgid "Change node"
 msgstr ""
 
 #. js-lingui-id: Vf6hT6
@@ -4246,7 +4158,7 @@ msgid "Close menu"
 msgstr ""
 
 #. js-lingui-id: saip/v
-#: src/modules/side-panel/components/SidePanelTopBar.tsx
+#: src/modules/side-panel/components/SidePanelCloseButton.tsx
 msgid "Close side panel"
 msgstr ""
 
@@ -4484,11 +4396,6 @@ msgstr ""
 msgid "Compare plans"
 msgstr ""
 
-#. js-lingui-id: +vJdAa
-#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
-msgid "Compare the source records and decide. Twenty never merges or separates people without your choice."
-msgstr ""
-
 #. js-lingui-id: amPBVF
 #: src/modules/settings/admin-panel/constants/CreditGrantTypeLabels.ts
 msgid "Compensation"
@@ -4684,6 +4591,8 @@ msgstr ""
 #. js-lingui-id: M1co/O
 #: src/modules/settings/admin-panel/ai/components/SettingsAdminAiProviderListCard.tsx
 #: src/modules/settings/admin-panel/apps/components/SettingsAdminApps.tsx
+#: src/modules/settings/admin-panel/apps/components/SettingsAdminApps.tsx
+#: src/modules/settings/admin-panel/apps/components/SettingsAdminApps.tsx
 msgid "Configured"
 msgstr ""
 
@@ -4731,16 +4640,6 @@ msgstr ""
 msgid "Confirm downgrade"
 msgstr ""
 
-#. js-lingui-id: EfxM6i
-#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
-msgid "Confirm merge"
-msgstr ""
-
-#. js-lingui-id: x/wPTT
-#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
-msgid "Confirm merge: the chosen survivor keeps its ID and the reviewed contact details. The other selected records move to Trash with their email fields cleared; restoring them later will not move relationships back."
-msgstr ""
-
 #. js-lingui-id: 28b8wO
 #: src/modules/settings/members/components/MemberPermissionsTab.tsx
 msgid "Confirm role update"
@@ -4781,11 +4680,6 @@ msgstr ""
 msgid "Connect a new account to your workspace"
 msgstr ""
 
-#. js-lingui-id: 2OzvqP
-#: src/pages/mass-email/MassEmailPage.tsx
-msgid "Connect account"
-msgstr ""
-
 #. js-lingui-id: CMrq4R
 #: src/modules/settings/mcp-and-apis/utils/buildMcpSetupCategories.tsx
 msgid "Connect additional MCP clients using install links or client docs."
@@ -4794,11 +4688,6 @@ msgstr ""
 #. js-lingui-id: vPCRNy
 #: src/pages/settings/ai/components/SettingsAiOverviewTab.tsx
 msgid "Connect AI assistants like Claude or Cursor to your workspace via the Model Context Protocol"
-msgstr ""
-
-#. js-lingui-id: CcYWYM
-#: src/pages/mass-email/MassEmailPage.tsx
-msgid "Connect an email account to send emails."
 msgstr ""
 
 #. js-lingui-id: TA7R1S
@@ -5111,6 +5000,16 @@ msgstr ""
 #. js-lingui-id: RTxUjI
 #: src/modules/object-record/record-field/ui/components/LightCopyIconButton.tsx
 msgid "Copy to Clipboard"
+msgstr ""
+
+#. js-lingui-id: rG2gDo
+#: src/modules/page-layout/widgets/call-recording-transcript/components/WidgetActionCallRecordingTranscript.tsx
+msgid "Copy transcript"
+msgstr ""
+
+#. js-lingui-id: afZp3R
+#: src/modules/page-layout/widgets/call-recording-transcript/components/WidgetActionCallRecordingTranscript.tsx
+msgid "Copy video download link"
 msgstr ""
 
 #. js-lingui-id: 4Tb3Ry
@@ -5431,13 +5330,6 @@ msgstr ""
 msgid "Create record"
 msgstr ""
 
-#. js-lingui-id: 8ETbKP
-#. placeholder {0}: cardDate.toLocaleString(undefined, { dateStyle: 'full', })
-#. placeholder {1}: cardTime.toLocaleString(undefined, { timeStyle: 'short' })
-#: src/modules/object-record/record-calendar/components/RecordCalendarAddNew.tsx
-msgid "Create record on {0} at {1}"
-msgstr ""
-
 #. js-lingui-id: fRYkDa
 #: src/modules/page-layout/widgets/timeline/components/WidgetActionTimelineCreateRelated.tsx
 #: src/modules/side-panel/hooks/useOpenCreateRelatedRecordInSidePanel.ts
@@ -5509,7 +5401,6 @@ msgid "Create, edit, and delete workspace views"
 msgstr ""
 
 #. js-lingui-id: d+F6q9
-#: src/modules/person-duplicate-review/components/PersonDuplicateCard.tsx
 #: src/modules/settings/admin-panel/chats/components/SettingsAdminChatsTable.tsx
 #: src/modules/settings/admin-panel/components/SettingsAdminWorkspaceContent.tsx
 #: src/modules/settings/components/SettingsDatabaseEventsForm.tsx
@@ -5955,11 +5846,6 @@ msgstr ""
 msgid "Customize your workspace security"
 msgstr ""
 
-#. js-lingui-id: xMd3+1
-#: src/modules/activities/emails/mass-email/components/MassEmailComposeCard.tsx
-msgid "Customized for this recipient"
-msgstr ""
-
 #. js-lingui-id: fFwMZv
 #: src/modules/settings/data-model/fields/forms/select/components/SettingsDataModelFieldSelectFormOptionRow.tsx
 msgid "Cyan"
@@ -6122,7 +6008,6 @@ msgid "Date"
 msgstr ""
 
 #. js-lingui-id: QIIAIQ
-#: src/modules/object-record/object-options-dropdown/components/ObjectOptionsDropdownCalendarDateFieldsContent.tsx
 #: src/modules/object-record/object-options-dropdown/components/ObjectOptionsDropdownCalendarFieldsContent.tsx
 #: src/modules/object-record/object-options-dropdown/components/ObjectOptionsDropdownCustomView.tsx
 #: src/modules/object-record/object-options-dropdown/components/ObjectOptionsDropdownLayoutContent.tsx
@@ -6130,13 +6015,6 @@ msgstr ""
 #: src/modules/side-panel/pages/page-layout/components/record-table-settings/WidgetViewLayoutSettingsRows.tsx
 #: src/modules/views/view-picker/components/ViewPickerContentCreateMode.tsx
 msgid "Date field"
-msgstr ""
-
-#. js-lingui-id: rMlHl2
-#: src/modules/object-record/object-options-dropdown/components/ObjectOptionsDropdownCalendarDateFieldsContent.tsx
-#: src/modules/object-record/object-options-dropdown/components/ObjectOptionsDropdownCustomView.tsx
-#: src/modules/object-record/object-options-dropdown/components/ObjectOptionsDropdownLayoutContent.tsx
-msgid "Date fields"
 msgstr ""
 
 #. js-lingui-id: Lhd0oQ
@@ -6266,7 +6144,6 @@ msgid "default"
 msgstr ""
 
 #. js-lingui-id: ovBPCi
-#: src/modules/advanced-text-editor/components/TextColorDropdown.tsx
 #: src/modules/settings/data-model/fields/forms/address/components/MultiSelectAddressFields.tsx
 #: src/modules/settings/data-model/fields/forms/date/utils/getDisplayFormatLabel.ts
 #: src/modules/settings/experience/components/UiScalePicker.tsx
@@ -6403,7 +6280,7 @@ msgstr ""
 #: src/modules/settings/logic-functions/components/tabs/SettingsLogicFunctionTabEnvironmentVariableTableRow.tsx
 #: src/modules/settings/security/components/SSO/SettingsSecuritySSORowDropdownMenu.tsx
 #: src/modules/side-panel/pages/page-layout/components/RegularTabSettingsContent.tsx
-#: src/modules/side-panel/pages/page-layout/components/SoloTabSettingsContent.tsx
+#: src/modules/side-panel/pages/page-layout/components/SingleWidgetTabSettingsContent.tsx
 #: src/modules/views/view-picker/components/ViewPickerCreateButton.tsx
 #: src/modules/views/view-picker/components/ViewPickerEditButton.tsx
 #: src/modules/views/view-picker/components/ViewPickerOptionDropdown.tsx
@@ -6515,8 +6392,7 @@ msgid "Delete group"
 msgstr ""
 
 #. js-lingui-id: Wk+A9S
-#: src/modules/workflow/workflow-diagram/workflow-nodes/components/WorkflowNodeDeleteButton.tsx
-#: src/modules/workflow/workflow-steps/components/WorkflowStepFooter.tsx
+#: src/modules/workflow/workflow-steps/components/WorkflowStepOptionsMenuItems.tsx
 msgid "Delete node"
 msgstr ""
 
@@ -7038,11 +6914,6 @@ msgstr ""
 msgid "Draft"
 msgstr ""
 
-#. js-lingui-id: 1dpSPf
-#: src/modules/activities/emails/hooks/useMessageCampaignDraft.ts
-msgid "Draft deleted"
-msgstr ""
-
 #. js-lingui-id: DbAw4C
 #: src/modules/workflow/workflow-steps/workflow-actions/components/WorkflowRunStepLogsEmailDetail.tsx
 msgid "Draft email"
@@ -7089,7 +6960,7 @@ msgid "Duplicate"
 msgstr ""
 
 #. js-lingui-id: qaE1sk
-#: src/modules/workflow/workflow-steps/components/WorkflowStepFooter.tsx
+#: src/modules/workflow/workflow-steps/components/WorkflowStepOptionsMenuItems.tsx
 msgid "Duplicate node"
 msgstr ""
 
@@ -7100,10 +6971,6 @@ msgstr ""
 
 #. js-lingui-id: cheWPw
 #: src/modules/object-record/record-field-list/record-detail-section/duplicate/components/RecordDetailDuplicatesSection.tsx
-#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
-#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
-#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
-#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
 msgid "Duplicates"
 msgstr ""
 
@@ -7271,11 +7138,6 @@ msgstr ""
 msgid "Edit each side"
 msgstr ""
 
-#. js-lingui-id: QjNcml
-#: src/modules/object-record/record-table/record-table-header/components/RecordTableColumnHeadDropdownMenu.tsx
-msgid "Edit field"
-msgstr ""
-
 #. js-lingui-id: 9QCQIc
 #: src/modules/object-record/object-options-dropdown/components/ObjectOptionsDropdownHiddenRecordGroupsContent.tsx
 msgid "Edit field values"
@@ -7344,10 +7206,9 @@ msgstr ""
 msgid "Edit Records on All Objects"
 msgstr ""
 
-#. js-lingui-id: CvRD+4
-#. placeholder {0}: composerState.includedRecipients.length
-#: src/modules/activities/emails/mass-email/components/MassEmailRecipientList.tsx
-msgid "Edit template · {0} recipients"
+#. js-lingui-id: 4QhQge
+#: src/modules/page-layout/widgets/field/components/FieldWidgetRelationEditAction.tsx
+msgid "Edit relation"
 msgstr ""
 
 #. js-lingui-id: /VLYQj
@@ -7485,11 +7346,6 @@ msgstr ""
 msgid "Email sharing"
 msgstr ""
 
-#. js-lingui-id: iSMIhW
-#: src/pages/settings/profile/SettingsProfile.tsx
-msgid "Email signature"
-msgstr ""
-
 #. js-lingui-id: jvneza
 #: src/modules/settings/applications/components/SettingsApplicationAboutSidebar.tsx
 msgid "Email support"
@@ -7531,8 +7387,6 @@ msgid "Email/Domain"
 msgstr ""
 
 #. js-lingui-id: BXEcos
-#: src/modules/person-duplicate-review/components/PersonDuplicateCard.tsx
-#: src/modules/person-duplicate-review/components/PersonDuplicateMergePreview.tsx
 #: src/modules/settings/accounts/components/SettingsAccountsSettingsSection.tsx
 #: src/modules/settings/hooks/useSettingsNavigationItems.tsx
 #: src/pages/settings/accounts/SettingsAccountsEmails.tsx
@@ -7661,13 +7515,6 @@ msgstr ""
 #: src/modules/settings/billing/components/SettingsBillingSubscriptionInfo.tsx
 #: src/modules/settings/event-logs/components/EventLogFilters.tsx
 msgid "End date"
-msgstr ""
-
-#. js-lingui-id: DqIce1
-#: src/modules/object-record/object-options-dropdown/components/ObjectOptionsDropdownCalendarDateFieldsContent.tsx
-#: src/modules/object-record/object-options-dropdown/components/ObjectOptionsDropdownCalendarEndFieldsContent.tsx
-#: src/modules/views/view-picker/components/ViewPickerContentCreateMode.tsx
-msgid "End date field"
 msgstr ""
 
 #. js-lingui-id: Fqu/aC
@@ -8027,11 +7874,6 @@ msgstr ""
 msgid "Environment variable"
 msgstr ""
 
-#. js-lingui-id: fa53BW
-#: src/modules/information-banner/components/environment/InformationBannerEnvironment.tsx
-msgid "Environment: {REACT_APP_ENVIRONMENT_LABEL}"
-msgstr ""
-
 #. js-lingui-id: 3dQ6zJ
 #: src/modules/settings/billing/constants/SettingsBillingPlanComparisonRows.ts
 msgid "Environments"
@@ -8325,10 +8167,6 @@ msgid "every minute"
 msgstr ""
 
 #. js-lingui-id: PsQmAw
-#: src/modules/activities/emails/mass-email/components/MassEmailComposeCard.tsx
-#: src/modules/activities/emails/mass-email/components/MassEmailComposeCard.tsx
-#: src/modules/activities/emails/mass-email/components/MassEmailRecipientList.tsx
-#: src/modules/activities/emails/mass-email/components/MassEmailRecipientList.tsx
 #: src/modules/object-record/object-options-dropdown/components/ObjectOptionsDropdownVisibilityContent.tsx
 msgid "Everyone"
 msgstr ""
@@ -8613,11 +8451,6 @@ msgstr ""
 msgid "Failed to create unsubscribe topic."
 msgstr ""
 
-#. js-lingui-id: dQhrqB
-#: src/modules/activities/emails/hooks/useMessageCampaignDraft.ts
-msgid "Failed to delete draft"
-msgstr ""
-
 #. js-lingui-id: AXveCw
 #: src/pages/settings/communications/SettingsWorkspaceCommunicationGroupChannelDetail.tsx
 msgid "Failed to delete email channel."
@@ -8725,8 +8558,7 @@ msgid "Failed to merge records. Please try again."
 msgstr ""
 
 #. js-lingui-id: DvNGzq
-#: src/modules/object-record/record-calendar/month/hooks/useRecordCalendarMonthDndKit.ts
-#: src/modules/object-record/record-calendar/week/components/RecordCalendarWeekDragDropContext.tsx
+#: src/modules/object-record/record-calendar/hooks/useRecordCalendarDndKit.ts
 msgid "Failed to move record"
 msgstr ""
 
@@ -8777,12 +8609,6 @@ msgstr ""
 msgid "Failed to revoke signing key. Please try again later."
 msgstr ""
 
-#. js-lingui-id: TQfiMk
-#: src/modules/activities/emails/hooks/useMessageCampaignDraft.ts
-#: src/modules/activities/emails/mass-email/hooks/useMassEmailCampaignDraft.ts
-msgid "Failed to save draft"
-msgstr ""
-
 #. js-lingui-id: farFvy
 #: src/modules/layout-customization/hooks/useSaveLayoutCustomization.ts
 msgid "Failed to save layout customization"
@@ -8813,11 +8639,6 @@ msgstr ""
 #: src/modules/activities/emails/hooks/useSendEmail.ts
 #: src/modules/activities/emails/hooks/useSendEmail.ts
 msgid "Failed to send email"
-msgstr ""
-
-#. js-lingui-id: B6aF8Q
-#: src/modules/activities/emails/mass-email/hooks/useSendMassEmail.ts
-msgid "Failed to send emails"
 msgstr ""
 
 #. js-lingui-id: aH/q8K
@@ -8964,7 +8785,6 @@ msgstr ""
 #. js-lingui-id: ocUvR+
 #: src/modules/object-record/object-filter-dropdown/components/ObjectFilterDropdownBooleanSelect.tsx
 #: src/modules/object-record/record-board/record-board-column/utils/getAggregateOperationShortLabel.ts
-#: src/modules/object-record/record-field/ui/utils/getFieldDisplayLabelText.ts
 #: src/modules/settings/data-model/fields/forms/boolean/constants/BooleanDataModelSelectOptions.ts
 #: src/modules/side-panel/pages/page-layout/components/dropdown-content/ChartRatioOptionValueSelectionDropdownContent.tsx
 #: src/modules/side-panel/pages/page-layout/hooks/useChartSettingsValues.ts
@@ -9438,11 +9258,9 @@ msgid "French"
 msgstr ""
 
 #. js-lingui-id: ejVYRQ
-#: src/modules/activities/emails/components/CampaignComposerFields.tsx
 #: src/modules/activities/emails/components/CampaignDetailsFields.tsx
 #: src/modules/activities/emails/components/CampaignSentEnvelope.tsx
 #: src/modules/activities/emails/components/EmailComposerFields.tsx
-#: src/modules/activities/emails/mass-email/components/MassEmailComposeCard.tsx
 #: src/modules/workflow/workflow-steps/workflow-actions/components/WorkflowEditActionEmailBase.tsx
 #: src/modules/workflow/workflow-steps/workflow-actions/components/WorkflowRunStepLogsEmailDetail.tsx
 msgid "From"
@@ -9510,9 +9328,9 @@ msgstr ""
 msgid "full server access"
 msgstr ""
 
-#. js-lingui-id: Ld0Tt4
+#. js-lingui-id: Fcl4s2
 #: src/modules/side-panel/components/hooks/usePageLayoutHeaderInfo.ts
-msgid "Full tab widget"
+msgid "Full-height Widget"
 msgstr ""
 
 #. js-lingui-id: hdxwWi
@@ -9668,11 +9486,6 @@ msgstr ""
 msgid "Go to Draft"
 msgstr ""
 
-#. js-lingui-id: MrE/Qb
-#: src/pages/mass-email/MassEmailPage.tsx
-msgid "Go to People"
-msgstr ""
-
 #. js-lingui-id: mT57+Q
 #: src/modules/object-record/record-table/empty-state/components/RecordTableEmptyStateRemote.tsx
 #: src/modules/views/view-picker/components/ViewPickerCreateButton.tsx
@@ -9785,7 +9598,6 @@ msgid "Grass"
 msgstr ""
 
 #. js-lingui-id: qS5//Q
-#: src/modules/advanced-text-editor/constants/TextColorLabels.ts
 #: src/modules/settings/data-model/fields/forms/select/components/SettingsDataModelFieldSelectFormOptionRow.tsx
 msgid "Gray"
 msgstr ""
@@ -9801,7 +9613,6 @@ msgid "Greek"
 msgstr ""
 
 #. js-lingui-id: VmkjGB
-#: src/modules/advanced-text-editor/constants/TextColorLabels.ts
 #: src/modules/settings/data-model/fields/forms/select/components/SettingsDataModelFieldSelectFormOptionRow.tsx
 msgid "Green"
 msgstr ""
@@ -10473,11 +10284,6 @@ msgstr ""
 msgid "Inactive Skill Options"
 msgstr ""
 
-#. js-lingui-id: KiXg6J
-#: src/modules/person-duplicate-review/components/PersonDuplicateCard.tsx
-msgid "Include {displayName} in merge"
-msgstr ""
-
 #. js-lingui-id: j8Bj7e
 #: src/modules/settings/security/components/SettingsSecuritySettings.tsx
 msgid "Include emails where all participants share the same domain."
@@ -10928,11 +10734,6 @@ msgstr ""
 msgid "Is empty"
 msgstr ""
 
-#. js-lingui-id: tJ3FGI
-#: src/modules/object-record/object-filter-dropdown/utils/getOperandLabel.ts
-msgid "Is exactly"
-msgstr ""
-
 #. js-lingui-id: glSyvW
 #: src/modules/object-record/object-filter-dropdown/utils/getOperandLabel.ts
 msgid "Is in future"
@@ -11001,11 +10802,6 @@ msgstr ""
 #. js-lingui-id: ldI7NO
 #: src/modules/object-record/object-filter-dropdown/utils/getOperandLabel.ts
 msgid "Is not empty"
-msgstr ""
-
-#. js-lingui-id: UmjIni
-#: src/modules/object-record/object-filter-dropdown/utils/getOperandLabel.ts
-msgid "Is not exactly"
 msgstr ""
 
 #. js-lingui-id: HQFVAU
@@ -11135,6 +10931,12 @@ msgstr ""
 msgid "JSON"
 msgstr ""
 
+#. js-lingui-id: KTaki5
+#: src/modules/page-layout/widgets/call-recording-transcript/components/CallRecordingTranscriptEntryList.tsx
+#: src/modules/page-layout/widgets/call-recording-transcript/components/CallRecordingTranscriptEntryList.tsx
+msgid "Jump to current"
+msgstr ""
+
 #. js-lingui-id: UpNpMK
 #: src/pages/settings/applications/components/SettingsApplicationConnectScopePickerModal.tsx
 #: src/pages/settings/applications/SettingsApplicationConnectionDetail.tsx
@@ -11154,27 +10956,6 @@ msgstr ""
 msgid "Kanban widget"
 msgstr ""
 
-#. js-lingui-id: ok27CW
-#. placeholder {0}: link.url
-#: src/modules/person-duplicate-review/components/PersonDuplicateMergePreview.tsx
-msgid "Keep {0}"
-msgstr ""
-
-#. js-lingui-id: tXq9mG
-#: src/modules/person-duplicate-review/components/PersonDuplicateMergePreview.tsx
-msgid "Keep {displayValue}"
-msgstr ""
-
-#. js-lingui-id: w7Wygd
-#: src/modules/person-duplicate-review/components/PersonDuplicateMergePreview.tsx
-msgid "Keep {email}"
-msgstr ""
-
-#. js-lingui-id: IwceEs
-#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
-msgid "Keep everyone separate"
-msgstr ""
-
 #. js-lingui-id: ZlHUDM
 #: src/modules/activities/calendar/components/CalendarEventComposerFields.tsx
 msgid "Keep the current record in the guest list and leave invitations on so the event remains visible on this record."
@@ -11183,11 +10964,6 @@ msgstr ""
 #. js-lingui-id: WOUOYg
 #: src/modules/activities/calendar/components/CalendarEventComposerFields.tsx
 msgid "Keep this event related"
-msgstr ""
-
-#. js-lingui-id: 4Hatax
-#: src/modules/person-duplicate-review/components/PersonDuplicateCard.tsx
-msgid "Keep this record"
 msgstr ""
 
 #. js-lingui-id: 7sMeHQ
@@ -11461,7 +11237,6 @@ msgid "Last update"
 msgstr ""
 
 #. js-lingui-id: C3yOz3
-#: src/modules/person-duplicate-review/components/PersonDuplicateCard.tsx
 #: src/modules/settings/admin-panel/components/SettingsAdminWorkspaceContent.tsx
 #: src/pages/settings/admin-panel/SettingsAdminInstanceStatus.tsx
 msgid "Last updated"
@@ -11730,6 +11505,7 @@ msgstr ""
 #: src/modules/object-record/object-options-dropdown/components/ObjectOptionsDropdownVisibilityContent.tsx
 #: src/modules/object-record/record-field/ui/meta-types/display/components/LinksFieldDisplay.tsx
 #: src/modules/object-record/record-table/record-table-cell/hooks/useGetSecondaryRecordTableCellButton.ts
+#: src/modules/page-layout/widgets/call-recording-transcript/components/WidgetActionCallRecordingTranscript.tsx
 #: src/modules/workspace/components/WorkspaceInviteLink.tsx
 msgid "Link copied to clipboard"
 msgstr ""
@@ -11755,12 +11531,6 @@ msgstr ""
 msgid "linked a {objectLabel}"
 msgstr ""
 
-#. js-lingui-id: gggTBm
-#: src/modules/person-duplicate-review/components/PersonDuplicateCard.tsx
-#: src/modules/person-duplicate-review/components/PersonDuplicateMergePreview.tsx
-msgid "LinkedIn"
-msgstr ""
-
 #. js-lingui-id: 82kQhK
 #: src/modules/advanced-text-editor/extensions/slash-command/DefaultSlashCommands.ts
 #: src/modules/advanced-text-editor/extensions/slash-command/DefaultSlashCommands.ts
@@ -11779,6 +11549,8 @@ msgid "List widget"
 msgstr ""
 
 #. js-lingui-id: Ap948/
+#: src/modules/settings/admin-panel/apps/components/SettingsAdminApps.tsx
+#: src/modules/settings/admin-panel/apps/components/SettingsAdminApps.tsx
 #: src/modules/settings/admin-panel/apps/components/SettingsAdminApps.tsx
 msgid "Listed"
 msgstr ""
@@ -12019,11 +11791,6 @@ msgstr ""
 msgid "Look up"
 msgstr ""
 
-#. js-lingui-id: 9NNx2W
-#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
-msgid "Looking for exact duplicate signals…"
-msgstr ""
-
 #. js-lingui-id: tL2lBI
 #: src/modules/workflow/workflow-diagram/utils/generateNodesAndEdgesForIteratorNode.ts
 msgid "loop"
@@ -12044,22 +11811,6 @@ msgstr ""
 msgid "Maintenance mode"
 msgstr ""
 
-#. js-lingui-id: 6nweKM
-#. placeholder {0}: link.url
-#: src/modules/person-duplicate-review/components/PersonDuplicateMergePreview.tsx
-msgid "Make {0} primary"
-msgstr ""
-
-#. js-lingui-id: HpCWO5
-#: src/modules/person-duplicate-review/components/PersonDuplicateMergePreview.tsx
-msgid "Make {displayValue} primary"
-msgstr ""
-
-#. js-lingui-id: VSfvRD
-#: src/modules/person-duplicate-review/components/PersonDuplicateMergePreview.tsx
-msgid "Make {email} primary"
-msgstr ""
-
 #. js-lingui-id: MOLprz
 #: src/modules/settings/roles/role-permissions/permission-flags/hooks/useActionRolePermissionFlagConfig.ts
 msgid "Make HTTP requests to external APIs"
@@ -12072,7 +11823,7 @@ msgstr ""
 
 #. js-lingui-id: wckWOP
 #: src/modules/settings/billing/components/internal/ResourceCreditPriceSelector.tsx
-#: src/modules/side-panel/pages/page-layout/components/SoloTabSettingsContent.tsx
+#: src/modules/side-panel/pages/page-layout/components/SingleWidgetTabSettingsContent.tsx
 #: src/modules/side-panel/pages/page-layout/components/WidgetSettingsManageSection.tsx
 msgid "Manage"
 msgstr ""
@@ -12210,11 +11961,6 @@ msgstr ""
 #. js-lingui-id: qPiqVD
 #: src/modules/settings/admin-panel/apps/components/SettingsAdminApps.tsx
 msgid "Marketplace catalog synchronization started."
-msgstr ""
-
-#. js-lingui-id: EvNy5N
-#: src/pages/mass-email/MassEmailPage.tsx
-msgid "Mass email"
 msgstr ""
 
 #. js-lingui-id: 8r6vNs
@@ -12398,19 +12144,9 @@ msgstr ""
 msgid "Merge records"
 msgstr ""
 
-#. js-lingui-id: nLKgG0
-#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
-msgid "Merge selected"
-msgstr ""
-
 #. js-lingui-id: LuriZ0
 #: src/modules/object-record/record-merge/components/MergeRecordsFooter.tsx
 msgid "Merging..."
-msgstr ""
-
-#. js-lingui-id: MJKChL
-#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
-msgid "Merging…"
 msgstr ""
 
 #. js-lingui-id: xDAtGP
@@ -12503,11 +12239,6 @@ msgstr ""
 #. js-lingui-id: cOFpUq
 #: src/modules/workflow/workflow-steps/workflow-actions/components/WorkflowEditActionCreateCalendarEvent.tsx
 msgid "Missing calendar permission."
-msgstr ""
-
-#. js-lingui-id: kVXdHR
-#: src/modules/activities/emails/mass-email/components/MassEmailComposeCard.tsx
-msgid "Missing data for:"
 msgstr ""
 
 #. js-lingui-id: URVUmK
@@ -12692,7 +12423,7 @@ msgstr ""
 #: src/modules/object-record/record-group/hooks/useRecordGroupActions.ts
 #: src/modules/object-record/record-table/record-table-header/components/RecordTableColumnHeadDropdownMenu.tsx
 #: src/modules/side-panel/pages/page-layout/components/RegularTabSettingsContent.tsx
-#: src/modules/side-panel/pages/page-layout/components/SoloTabSettingsContent.tsx
+#: src/modules/side-panel/pages/page-layout/components/SingleWidgetTabSettingsContent.tsx
 msgid "Move left"
 msgstr ""
 
@@ -12700,7 +12431,7 @@ msgstr ""
 #: src/modules/object-record/record-group/hooks/useRecordGroupActions.ts
 #: src/modules/object-record/record-table/record-table-header/components/RecordTableColumnHeadDropdownMenu.tsx
 #: src/modules/side-panel/pages/page-layout/components/RegularTabSettingsContent.tsx
-#: src/modules/side-panel/pages/page-layout/components/SoloTabSettingsContent.tsx
+#: src/modules/side-panel/pages/page-layout/components/SingleWidgetTabSettingsContent.tsx
 msgid "Move right"
 msgstr ""
 
@@ -12791,7 +12522,6 @@ msgstr ""
 #. js-lingui-id: 6YtxFj
 #: src/modules/auth/sign-in-up/components/internal/SignInUpWorkspaceCreationForm.tsx
 #: src/modules/object-core/workflows/constants/WorkflowCoreTableColumns.tsx
-#: src/modules/person-duplicate-review/components/PersonDuplicateMergePreview.tsx
 #: src/modules/settings/accounts/components/SettingsAccountsConnectionForm.tsx
 #: src/modules/settings/admin-panel/apps/components/SettingsAdminApps.tsx
 #: src/modules/settings/admin-panel/components/SettingsAdminGeneral.tsx
@@ -13020,11 +12750,6 @@ msgstr ""
 msgid "New Email Channel"
 msgstr ""
 
-#. js-lingui-id: 8ETZA5
-#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
-msgid "New exact matches on full name, email, phone, or LinkedIn will appear here. No records are merged automatically."
-msgstr ""
-
 #. js-lingui-id: k6B3QD
 #: src/modules/navigation-menu-item/display/sections/favorites/components/FavoritesSection.tsx
 msgid "New favorite"
@@ -13128,11 +12853,6 @@ msgstr ""
 msgid "New SSO provider"
 msgstr ""
 
-#. js-lingui-id: l3pyXo
-#: src/modules/views/view-picker/components/ViewPickerStackSelect.tsx
-msgid "New stack"
-msgstr ""
-
 #. js-lingui-id: 3YvS+c
 #: src/modules/page-layout/components/PageLayoutTabListNewTabDropdownContent.tsx
 msgid "New tab"
@@ -13183,7 +12903,6 @@ msgstr ""
 #: src/modules/settings/admin-panel/health-status/components/SettingsAdminQueueJobsTable.tsx
 #: src/modules/settings/billing/components/internal/SubscriptionInfoRowContainer.tsx
 #: src/modules/settings/components/SettingsPaginationControls.tsx
-#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
 #: src/pages/settings/accounts/SettingsAccountsConfigurationStepEmail.tsx
 msgid "Next"
 msgstr ""
@@ -13487,7 +13206,7 @@ msgstr ""
 
 #. js-lingui-id: lAfu/q
 #: src/modules/side-panel/pages/page-layout/components/RegularTabSettingsContent.tsx
-#: src/modules/side-panel/pages/page-layout/components/SoloTabSettingsContent.tsx
+#: src/modules/side-panel/pages/page-layout/components/SingleWidgetTabSettingsContent.tsx
 msgid "No default configuration available for this tab"
 msgstr ""
 
@@ -13509,12 +13228,6 @@ msgstr ""
 #. js-lingui-id: RRRePs
 #: src/pages/settings/applications/tabs/SettingsApplicationDetailAboutTab.tsx
 msgid "No description available for this application"
-msgstr ""
-
-#. js-lingui-id: E0HtSP
-#. placeholder {0}: formatSkippedLabels( composerState.skippedWithoutEmail.map( (skipped) => skipped.displayName, ), )
-#: src/modules/activities/emails/mass-email/components/MassEmailRecipientList.tsx
-msgid "No email address, skipped: {0}"
 msgstr ""
 
 #. js-lingui-id: mINrlz
@@ -13630,13 +13343,6 @@ msgstr ""
 msgid "No limit"
 msgstr ""
 
-#. js-lingui-id: ANScpa
-#. placeholder {0}: massEmailRelatedSource.relationFieldLabel
-#. placeholder {1}: formatSkippedLabels( massEmailRelatedSource.sourceRecordLabelsWithoutRelatedPerson, )
-#: src/modules/activities/emails/mass-email/components/MassEmailRecipientList.tsx
-msgid "No linked {0}, skipped: {1}"
-msgstr ""
-
 #. js-lingui-id: nivaRq
 #: src/modules/activities/emails/components/CampaignSentEnvelope.tsx
 msgid "No list"
@@ -13749,16 +13455,6 @@ msgstr ""
 #. js-lingui-id: pRxlf6
 #: src/pages/settings/applications/utils/getClaimErrorContent.ts
 msgid "No provenance attestation was found for this package. Publish it from GitHub Actions with npm trusted publishing, then try claiming again."
-msgstr ""
-
-#. js-lingui-id: O9dD65
-#: src/modules/activities/emails/mass-email/components/MassEmailRecipientList.tsx
-msgid "No recipients match your search."
-msgstr ""
-
-#. js-lingui-id: JPmCmL
-#: src/pages/mass-email/MassEmailPage.tsx
-msgid "No recipients selected."
 msgstr ""
 
 #. js-lingui-id: 5sv+ia
@@ -13907,29 +13603,23 @@ msgstr ""
 msgid "No targets available"
 msgstr ""
 
-#. js-lingui-id: LPYdVr
-#: src/modules/person-duplicate-review/components/PersonDuplicateCard.tsx
-msgid "No title or company"
-msgstr ""
-
 #. js-lingui-id: t0t36i
 #: src/modules/workflow/workflow-steps/workflow-actions/ai-agent-action/components/WorkflowRunStepLogsAiAgentDetail.tsx
 msgid "No tools were called"
 msgstr ""
 
 #. js-lingui-id: vK0RL8
-#: src/modules/activities/emails/components/CampaignComposerFields.tsx
 #: src/modules/activities/emails/components/CampaignDetailsFields.tsx
 msgid "No topic"
 msgstr ""
 
 #. js-lingui-id: 3Y/oDZ
-#: src/modules/page-layout/widgets/call-recording-transcript/components/CallRecordingTranscriptBody.tsx
+#: src/modules/page-layout/widgets/call-recording-transcript/components/CallRecordingTranscriptContent.tsx
 msgid "No Transcript"
 msgstr ""
 
 #. js-lingui-id: du4Icj
-#: src/modules/page-layout/widgets/call-recording-transcript/components/CallRecordingTranscriptBody.tsx
+#: src/modules/page-layout/widgets/call-recording-transcript/components/CallRecordingTranscriptContent.tsx
 msgid "No transcript is available for this recording."
 msgstr ""
 
@@ -13941,11 +13631,6 @@ msgstr ""
 #. js-lingui-id: g/fpDP
 #: src/modules/settings/logic-functions/components/tabs/SettingsLogicFunctionTriggersTab.tsx
 msgid "No trigger is enabled. Toggle one of the options above to choose how this function gets invoked."
-msgstr ""
-
-#. js-lingui-id: Bvyu3u
-#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
-msgid "No unresolved duplicate groups"
 msgstr ""
 
 #. js-lingui-id: OLsGjz
@@ -14059,17 +13744,19 @@ msgstr ""
 msgid "Node"
 msgstr ""
 
+#. js-lingui-id: 6cjyK/
+#: src/modules/workflow/workflow-diagram/workflow-nodes/components/WorkflowDiagramStepNodeOptionsDropdown.tsx
+msgid "Node options"
+msgstr ""
+
 #. js-lingui-id: EdQY6l
 #: src/modules/ai/constants/AgentChatThreadGroupByLabels.ts
-#: src/modules/object-record/object-options-dropdown/components/ObjectOptionsDropdownCalendarDateFieldsContent.tsx
-#: src/modules/object-record/object-options-dropdown/components/ObjectOptionsDropdownCalendarEndFieldsContent.tsx
 #: src/modules/object-record/object-options-dropdown/components/ObjectOptionsDropdownRecordGroupFieldsContent.tsx
 #: src/modules/object-record/record-table/record-table-footer/components/RecordTableColumnAggregateFooterAggregateOperationMenuItems.tsx
 #: src/modules/object-record/record-table/record-table-footer/components/RecordTableColumnAggregateFooterMenuContent.tsx
 #: src/modules/settings/accounts/components/SettingsAccountsMessageAutoCreationCard.tsx
 #: src/modules/settings/admin-panel/components/SettingsAdminWorkspaceContent.tsx
 #: src/modules/settings/data-model/objects/forms/components/SettingsDataModelObjectIdentifiersForm.tsx
-#: src/modules/settings/data-model/objects/forms/components/SettingsDataModelObjectLabelFormulaForm.tsx
 #: src/modules/side-panel/pages/page-layout/components/dashboard/SidePanelDashboardRecordTableSettings.tsx
 #: src/modules/side-panel/pages/page-layout/components/dashboard/SidePanelDashboardRecordTableSettings.tsx
 #: src/modules/side-panel/pages/page-layout/components/dashboard/SidePanelDashboardRecordTableSettings.tsx
@@ -14082,18 +13769,10 @@ msgstr ""
 #: src/modules/side-panel/pages/page-layout/components/record-table-settings/WidgetViewLayoutSettingsRows.tsx
 #: src/modules/side-panel/pages/page-layout/utils/getChartAxisNameDisplayOptions.ts
 #: src/modules/side-panel/pages/page-layout/utils/getDateGranularityLabel.ts
-#: src/modules/views/view-picker/components/ViewPickerContentCreateMode.tsx
 #: src/modules/workflow/workflow-steps/workflow-actions/http-request-action/components/BodyInput.tsx
 #: src/pages/settings/admin-panel/SettingsAdminInstanceStatus.tsx
 #: src/pages/settings/admin-panel/SettingsAdminNewAiProvider.tsx
 msgid "None"
-msgstr ""
-
-#. js-lingui-id: cMbQFQ
-#. placeholder {0}: objectMetadataItem.labelPlural
-#. placeholder {1}: relatedPersonFieldMetadataItem.label
-#: src/modules/activities/emails/related-people/hooks/useComposeEmailToRelatedPeople.ts
-msgid "None of the selected {0} have a linked {1}."
 msgstr ""
 
 #. js-lingui-id: 1IipHp
@@ -14116,8 +13795,12 @@ msgstr ""
 #: src/modules/object-record/object-options-dropdown/components/ObjectOptionsDropdownCustomView.tsx
 #: src/modules/object-record/object-options-dropdown/components/ObjectOptionsDropdownCustomView.tsx
 #: src/modules/object-record/object-options-dropdown/components/ObjectOptionsDropdownCustomView.tsx
-#: src/modules/object-record/object-options-dropdown/components/ObjectOptionsDropdownCustomView.tsx
 msgid "Not available on Default View"
+msgstr ""
+
+#. js-lingui-id: SDND4q
+#: src/modules/settings/admin-panel/apps/components/SettingsAdminApps.tsx
+msgid "Not configured"
 msgstr ""
 
 #. js-lingui-id: 4wUkDk
@@ -14133,6 +13816,11 @@ msgstr ""
 #. js-lingui-id: JQUXsv
 #: src/modules/settings/billing/components/internal/SettingsBillingPlanComparisonTableRow.tsx
 msgid "Not included"
+msgstr ""
+
+#. js-lingui-id: i/2ImT
+#: src/modules/settings/admin-panel/apps/components/SettingsAdminApps.tsx
+msgid "Not listed"
 msgstr ""
 
 #. js-lingui-id: iXlml9
@@ -14377,11 +14065,6 @@ msgstr ""
 msgid "of"
 msgstr ""
 
-#. js-lingui-id: EZxOWJ
-#: src/modules/settings/profile/components/SettingsProfileEmailSignature.tsx
-msgid "Off by default. You can still switch the signature on or off for each email you write."
-msgstr ""
-
 #. js-lingui-id: KNz3EF
 #: src/pages/not-found/NotFound.tsx
 msgid "Off the beaten path"
@@ -14564,12 +14247,6 @@ msgstr ""
 msgid "only on {remainingDays} and {0}"
 msgstr ""
 
-#. js-lingui-id: asP63i
-#. placeholder {0}: massEmailRelatedSource.sourceObjectLabelPlural
-#: src/modules/activities/emails/mass-email/components/MassEmailRecipientList.tsx
-msgid "Only the first {MAX_EMAIL_RECIPIENTS} selected {0} were read."
-msgstr ""
-
 #. js-lingui-id: saaSLd
 #: src/modules/activities/emails/components/EmailThreadNotShared.tsx
 msgid "Only the subject is shared"
@@ -14684,16 +14361,6 @@ msgstr ""
 msgid "Option 1"
 msgstr ""
 
-#. js-lingui-id: WYGNk6
-#: src/modules/object-record/record-field/ui/meta-types/utils/getNewSelectOptionErrorMessage.ts
-msgid "Option names are limited to {OPTION_VALUE_MAXIMUM_LENGTH} characters."
-msgstr ""
-
-#. js-lingui-id: TUkT4u
-#: src/modules/object-record/record-field/ui/meta-types/utils/getNewSelectOptionErrorMessage.ts
-msgid "Option names cannot contain a comma."
-msgstr ""
-
 #. js-lingui-id: gUeG+X
 #: src/pages/settings/admin-panel/SettingsAdminNewAiProvider.tsx
 #: src/pages/settings/admin-panel/SettingsAdminNewAiProvider.tsx
@@ -14729,7 +14396,6 @@ msgid "Or"
 msgstr ""
 
 #. js-lingui-id: 4OE5Sf
-#: src/modules/advanced-text-editor/constants/TextColorLabels.ts
 #: src/modules/settings/data-model/fields/forms/select/components/SettingsDataModelFieldSelectFormOptionRow.tsx
 msgid "Orange"
 msgstr ""
@@ -14883,11 +14549,6 @@ msgstr ""
 #: src/pages/settings/applications/components/SettingsApplicationRegistrationGeneralInfo.tsx
 #: src/pages/settings/applications/SettingsApplicationRegistrationDetails.tsx
 msgid "Owner"
-msgstr ""
-
-#. js-lingui-id: aiXStf
-#: src/modules/person-duplicate-review/components/PersonDuplicateCard.tsx
-msgid "Owner / creator"
 msgstr ""
 
 #. js-lingui-id: oDAEQq
@@ -15109,11 +14770,6 @@ msgstr ""
 msgid "People I’ve sent emails to."
 msgstr ""
 
-#. js-lingui-id: ly1vF8
-#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
-msgid "People merged. Absorbed records are available in Trash."
-msgstr ""
-
 #. js-lingui-id: qMTN0w
 #: src/pages/settings/ai/SettingsAiUsageUserDetail.tsx
 msgid "Per-day AI consumption."
@@ -15203,11 +14859,6 @@ msgstr ""
 msgid "Person ID"
 msgstr ""
 
-#. js-lingui-id: FaMom6
-#: src/modules/activities/emails/mass-email/components/MassEmailComposeCard.tsx
-msgid "Personalize for each recipient with placeholders:"
-msgstr ""
-
 #. js-lingui-id: zmwvG2
 #: src/modules/object-record/record-field/ui/meta-types/input/components/PhonesFieldInput.tsx
 msgid "Phone"
@@ -15222,12 +14873,6 @@ msgstr ""
 #: src/modules/object-record/record-field/ui/meta-types/display/components/PhonesFieldDisplay.tsx
 #: src/modules/object-record/record-table/record-table-cell/hooks/useGetSecondaryRecordTableCellButton.ts
 msgid "Phone number copied to clipboard"
-msgstr ""
-
-#. js-lingui-id: m2ivgq
-#: src/modules/person-duplicate-review/components/PersonDuplicateCard.tsx
-#: src/modules/person-duplicate-review/components/PersonDuplicateMergePreview.tsx
-msgid "Phones"
 msgstr ""
 
 #. js-lingui-id: vqKcU0
@@ -15281,12 +14926,11 @@ msgid "Pie Chart"
 msgstr ""
 
 #. js-lingui-id: 3pU8e+
-#: src/modules/side-panel/pages/page-layout/components/SoloTabSettingsContent.tsx
+#: src/modules/side-panel/pages/page-layout/components/SingleWidgetTabSettingsContent.tsx
 msgid "Pin tab"
 msgstr ""
 
 #. js-lingui-id: 2FIjLb
-#: src/modules/advanced-text-editor/constants/TextColorLabels.ts
 #: src/modules/settings/data-model/fields/forms/select/components/SettingsDataModelFieldSelectFormOptionRow.tsx
 msgid "Pink"
 msgstr ""
@@ -15305,7 +14949,7 @@ msgid "Placeholder"
 msgstr ""
 
 #. js-lingui-id: MFTZK8
-#: src/modules/side-panel/pages/page-layout/components/SoloTabSettingsContent.tsx
+#: src/modules/side-panel/pages/page-layout/components/SingleWidgetTabSettingsContent.tsx
 #: src/modules/side-panel/pages/page-layout/components/WidgetSettingsPlacementSection.tsx
 msgid "Placement"
 msgstr ""
@@ -15335,6 +14979,11 @@ msgstr ""
 #. js-lingui-id: lWy5a1
 #: src/modules/settings/billing/components/SettingsBillingTabBar.tsx
 msgid "Plans"
+msgstr ""
+
+#. js-lingui-id: XdRQm7
+#: src/modules/page-layout/widgets/call-recording-transcript/components/CallRecordingVideoPlayer.tsx
+msgid "Playback failed"
 msgstr ""
 
 #. js-lingui-id: VUi6Nf
@@ -15474,7 +15123,7 @@ msgid "Prefix"
 msgstr ""
 
 #. js-lingui-id: dVCM1s
-#: src/modules/page-layout/widgets/call-recording-transcript/components/CallRecordingTranscriptBody.tsx
+#: src/modules/page-layout/widgets/call-recording-transcript/components/CallRecordingTranscriptContent.tsx
 msgid "Preparing Transcript"
 msgstr ""
 
@@ -15509,7 +15158,6 @@ msgstr ""
 #. js-lingui-id: DHhJ7s
 #: src/modules/settings/admin-panel/health-status/components/SettingsAdminQueueJobsTable.tsx
 #: src/modules/settings/components/SettingsPaginationControls.tsx
-#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
 msgid "Previous"
 msgstr ""
 
@@ -15663,11 +15311,6 @@ msgstr ""
 msgid "Property value"
 msgstr ""
 
-#. js-lingui-id: k5ePVH
-#: src/modules/person-duplicate-review/components/PersonDuplicateMergePreview.tsx
-msgid "Proposed merged person"
-msgstr ""
-
 #. js-lingui-id: GVxbU6
 #: src/modules/settings/security/components/SSO/SettingsSSOOIDCForm.tsx
 msgid "Provide your OIDC provider details"
@@ -15721,7 +15364,6 @@ msgid "Publish your app to the marketplace so others can install it"
 msgstr ""
 
 #. js-lingui-id: mF9LxA
-#: src/modules/advanced-text-editor/constants/TextColorLabels.ts
 #: src/modules/settings/data-model/fields/forms/select/components/SettingsDataModelFieldSelectFormOptionRow.tsx
 msgid "Purple"
 msgstr ""
@@ -16021,11 +15663,6 @@ msgstr ""
 msgid "Record label"
 msgstr ""
 
-#. js-lingui-id: Pp7MBT
-#: src/modules/settings/data-model/objects/forms/components/SettingsDataModelObjectLabelFormulaForm.tsx
-msgid "Record label formula"
-msgstr ""
-
 #. js-lingui-id: XueM/X
 #: src/modules/settings/data-model/object-details/components/tabs/ObjectLayout.tsx
 msgid "Record page"
@@ -16072,7 +15709,6 @@ msgid "Records"
 msgstr ""
 
 #. js-lingui-id: wRTiSD
-#: src/modules/advanced-text-editor/constants/TextColorLabels.ts
 #: src/modules/settings/data-model/fields/forms/select/components/SettingsDataModelFieldSelectFormOptionRow.tsx
 msgid "Red"
 msgstr ""
@@ -16162,7 +15798,6 @@ msgid "Relation type"
 msgstr ""
 
 #. js-lingui-id: g87L9j
-#: src/modules/activities/inline-cell/components/ActivityTargetsInlineCell.tsx
 #: src/modules/settings/data-model/object-details/components/tabs/ObjectFields.tsx
 msgid "Relations"
 msgstr ""
@@ -16447,11 +16082,6 @@ msgstr ""
 msgid "Request"
 msgstr ""
 
-#. js-lingui-id: nTlQ1w
-#: src/modules/navigation/components/MainNavigationDrawerFeatureRequestItem.tsx
-msgid "Request a feature"
-msgstr ""
-
 #. js-lingui-id: /laZGZ
 #: src/modules/workflow/workflow-steps/workflow-actions/http-request-action/components/HttpRequestExecutionResult.tsx
 msgid "Request Failed"
@@ -16479,7 +16109,7 @@ msgstr ""
 #: src/modules/settings/data-model/object-details/components/tabs/ObjectLayout.tsx
 #: src/modules/settings/data-model/object-details/components/tabs/ObjectLayout.tsx
 #: src/modules/side-panel/pages/page-layout/components/RegularTabSettingsContent.tsx
-#: src/modules/side-panel/pages/page-layout/components/SoloTabSettingsContent.tsx
+#: src/modules/side-panel/pages/page-layout/components/SingleWidgetTabSettingsContent.tsx
 #: src/modules/side-panel/pages/page-layout/components/WidgetSettingsManageSection.tsx
 #: src/modules/views/components/ViewBarDetails.tsx
 #: src/pages/settings/applications/tabs/SettingsApplicationTimelineActivityTypeSettingsTab.tsx
@@ -16511,8 +16141,8 @@ msgstr ""
 #: src/modules/settings/translations/components/SidePanelSettingsMetadataTranslationsPage.tsx
 #: src/modules/side-panel/pages/page-layout/components/RegularTabSettingsContent.tsx
 #: src/modules/side-panel/pages/page-layout/components/RegularTabSettingsContent.tsx
-#: src/modules/side-panel/pages/page-layout/components/SoloTabSettingsContent.tsx
-#: src/modules/side-panel/pages/page-layout/components/SoloTabSettingsContent.tsx
+#: src/modules/side-panel/pages/page-layout/components/SingleWidgetTabSettingsContent.tsx
+#: src/modules/side-panel/pages/page-layout/components/SingleWidgetTabSettingsContent.tsx
 #: src/modules/side-panel/pages/page-layout/components/WidgetSettingsManageSection.tsx
 #: src/modules/side-panel/pages/page-layout/components/WidgetSettingsManageSection.tsx
 #: src/pages/settings/applications/tabs/SettingsApplicationTimelineActivityTypeSettingsTab.tsx
@@ -16617,6 +16247,7 @@ msgstr ""
 
 #. js-lingui-id: 6gRgw8
 #: src/modules/ai/components/AiChatErrorMessage.tsx
+#: src/modules/page-layout/widgets/call-recording-transcript/components/CallRecordingVideoPlayer.tsx
 #: src/modules/settings/admin-panel/health-status/components/SettingsAdminQueueJobRowDropdownMenu.tsx
 #: src/modules/settings/admin-panel/health-status/components/SettingsAdminRetryJobsConfirmationModal.tsx
 #: src/pages/onboarding/PaymentSuccess.tsx
@@ -16638,11 +16269,6 @@ msgstr ""
 #: src/modules/side-panel/pages/page-layout/utils/getSortLabelSuffixForFieldType.ts
 #: src/modules/side-panel/pages/page-layout/utils/getSortLabelSuffixForFieldType.ts
 msgid "reverse alphabetical"
-msgstr ""
-
-#. js-lingui-id: wvtGe+
-#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
-msgid "Review possible duplicate people"
 msgstr ""
 
 #. js-lingui-id: GXsAby
@@ -16878,26 +16504,6 @@ msgstr ""
 msgid "Sales"
 msgstr ""
 
-#. js-lingui-id: Ift2Jz
-#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
-msgid "Same email"
-msgstr ""
-
-#. js-lingui-id: asi7+Q
-#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
-msgid "Same full name"
-msgstr ""
-
-#. js-lingui-id: aWrH6A
-#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
-msgid "Same LinkedIn"
-msgstr ""
-
-#. js-lingui-id: Brfp+M
-#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
-msgid "Same phone"
-msgstr ""
-
 #. js-lingui-id: QeF0zb
 #: src/modules/side-panel/pages/email-block-settings/components/EmailBoxSidesInput.tsx
 msgid "Same value on every side"
@@ -16933,11 +16539,6 @@ msgstr ""
 #. js-lingui-id: 7byqGp
 #: src/modules/layout-customization/hooks/useEnterLayoutCustomizationMode.ts
 msgid "Save or cancel dashboard changes before editing the layout."
-msgstr ""
-
-#. js-lingui-id: K/F6pa
-#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
-msgid "Saving…"
 msgstr ""
 
 #. js-lingui-id: bifv6N
@@ -17009,7 +16610,6 @@ msgid "SDK"
 msgstr ""
 
 #. js-lingui-id: A1taO8
-#: src/modules/activities/emails/mass-email/components/MassEmailRecipientList.tsx
 #: src/modules/command-menu-item/engine-command/constants/EngineComponentKeyHeadlessComponentMap.tsx
 #: src/modules/command-menu-item/engine-command/constants/EngineComponentKeyHeadlessComponentMap.tsx
 #: src/modules/navigation/hooks/useMobileNavigationBarItems.ts
@@ -17206,7 +16806,6 @@ msgstr ""
 
 #. js-lingui-id: 7taA9j
 #: src/modules/object-record/advanced-filter/components/AdvancedFilterFieldSelectSearchInput.tsx
-#: src/modules/object-record/object-options-dropdown/components/ObjectOptionsDropdownCalendarEndFieldsContent.tsx
 #: src/modules/object-record/object-options-dropdown/components/ObjectOptionsDropdownCalendarFieldsContent.tsx
 #: src/modules/object-record/object-options-dropdown/components/ObjectOptionsDropdownFieldsContent.tsx
 #: src/modules/object-record/object-options-dropdown/components/ObjectOptionsDropdownRecordGroupFieldsContent.tsx
@@ -17418,6 +17017,11 @@ msgstr ""
 msgid "See all {relationLabelPlural} linked to this record"
 msgstr ""
 
+#. js-lingui-id: OhVSE4
+#: src/modules/page-layout/widgets/call-recording-transcript/components/WidgetActionCallRecordingTranscript.tsx
+msgid "See all call recordings linked to this calendar event"
+msgstr ""
+
 #. js-lingui-id: 3o+CgI
 #: src/pages/settings/applications/components/SettingsApplicationRegistrationShareLinkButtons.tsx
 msgid "See app page"
@@ -17462,6 +17066,11 @@ msgstr ""
 #. js-lingui-id: Hhnssf
 #: src/pages/settings/applications/components/SettingsApplicationTableRow.tsx
 msgid "Seeded"
+msgstr ""
+
+#. js-lingui-id: 5iyrla
+#: src/modules/page-layout/widgets/call-recording-transcript/components/CallRecordingTranscriptEntryListItem.tsx
+msgid "Seek recording to {formattedStartTimestamp}"
 msgstr ""
 
 #. js-lingui-id: rG3WVm
@@ -17536,7 +17145,6 @@ msgid "Select a section, columns, button or divider in the email body to edit it
 msgstr ""
 
 #. js-lingui-id: YkYui1
-#: src/modules/activities/emails/components/CampaignComposerFields.tsx
 #: src/modules/activities/emails/components/CampaignDetailsFields.tsx
 msgid "Select a sender"
 msgstr ""
@@ -17574,11 +17182,6 @@ msgstr ""
 #: src/modules/workflow/workflow-steps/workflow-actions/pick-record-action/components/WorkflowEditActionPickRecord.tsx
 #: src/modules/workflow/workflow-trigger/components/WorkflowEditTriggerDatabaseEventForm.tsx
 msgid "Select an option"
-msgstr ""
-
-#. js-lingui-id: lqGidJ
-#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
-msgid "Select at least two people to merge."
 msgstr ""
 
 #. js-lingui-id: 21YIUv
@@ -17714,11 +17317,6 @@ msgstr ""
 msgid "Send"
 msgstr ""
 
-#. js-lingui-id: zKE0So
-#: src/modules/activities/emails/mass-email/components/MassEmailComposeCard.tsx
-msgid "Send {recipientCount} emails"
-msgstr ""
-
 #. js-lingui-id: mjK8F3
 #: src/pages/settings/members/tabs/SettingsWorkspaceMembersInviteTab.tsx
 msgid "Send an invite email to your team"
@@ -17731,9 +17329,7 @@ msgstr ""
 
 #. js-lingui-id: i/TzEU
 #: src/modules/activities/emails/components/EmptyInboxPlaceholder.tsx
-#: src/modules/command-menu-item/components/RecordIndexCommandMenuDropdown.tsx
 #: src/modules/settings/roles/role-permissions/permission-flags/hooks/useActionRolePermissionFlagConfig.ts
-#: src/modules/side-panel/hooks/useOpenComposeEmailToRelatedPeoplePickerInSidePanel.ts
 msgid "Send Email"
 msgstr ""
 
@@ -17764,12 +17360,6 @@ msgstr ""
 msgid "Sender name"
 msgstr ""
 
-#. js-lingui-id: 34Qpoa
-#. placeholder {0}: composerState.sentCount
-#: src/modules/activities/emails/mass-email/components/MassEmailComposeCard.tsx
-msgid "Sending {0}/{recipientCount}…"
-msgstr ""
-
 #. js-lingui-id: ULtHaJ
 #: src/pages/settings/communications/SettingsWorkspaceCommunicationGroupChannelDetail.tsx
 msgid "Sending domain"
@@ -17795,13 +17385,6 @@ msgstr ""
 #: src/modules/settings/accounts/components/SettingsAccountsMessageAutoCreationCard.tsx
 #: src/modules/workflow/workflow-steps/workflow-actions/components/WorkflowRunStepLogsEmailDetail.tsx
 msgid "Sent"
-msgstr ""
-
-#. js-lingui-id: 7/XV81
-#. placeholder {0}: emails.length
-#. placeholder {1}: failedRecipients.join(', ')
-#: src/modules/activities/emails/mass-email/hooks/useSendMassEmail.ts
-msgid "Sent {successCount} of {0} emails. Failed: {1}"
 msgstr ""
 
 #. js-lingui-id: hdVMzO
@@ -17938,6 +17521,7 @@ msgstr ""
 
 #. js-lingui-id: Tz0i8g
 #: src/modules/navigation/components/NavigationDrawerOtherSection.tsx
+#: src/modules/navigation/components/SettingsNavigationDrawer.tsx
 #: src/modules/navigation/components/SettingsNavigationDrawer.tsx
 #: src/modules/object-record/record-merge/hooks/useMergeRecordsContainerTabs.ts
 #: src/modules/settings/accounts/components/SettingsAccountsSettingsSection.tsx
@@ -18144,11 +17728,6 @@ msgstr ""
 msgid "Signatory title"
 msgstr ""
 
-#. js-lingui-id: 0rl8O6
-#: src/pages/settings/profile/SettingsProfile.tsx
-msgid "Signature you can add to the emails you write from Twenty"
-msgstr ""
-
 #. js-lingui-id: Lz4j8Q
 #: src/modules/settings/legal/components/SettingsDpaAgreementRow.tsx
 msgid "Signed copy"
@@ -18276,15 +17855,7 @@ msgstr ""
 msgid "Skipped"
 msgstr ""
 
-#. js-lingui-id: L253KY
-#. placeholder {0}: relatedPersonFieldMetadataItem.label
-#. placeholder {1}: sourceRecordLabelsWithoutRelatedPerson.join(', ')
-#: src/modules/activities/emails/related-people/hooks/useComposeEmailToRelatedPeople.ts
-msgid "Skipped without a linked {0}: {1}"
-msgstr ""
-
 #. js-lingui-id: BIZl8w
-#: src/modules/advanced-text-editor/constants/TextColorLabels.ts
 #: src/modules/settings/data-model/fields/forms/select/components/SettingsDataModelFieldSelectFormOptionRow.tsx
 msgid "Sky"
 msgstr ""
@@ -18390,8 +17961,6 @@ msgstr ""
 
 #. js-lingui-id: yHwG3y
 #: src/modules/object-record/object-options-dropdown/components/ObjectOptionsDropdownCalendarViewContent.tsx
-#: src/modules/object-record/object-options-dropdown/components/ObjectOptionsDropdownCalendarViewContent.tsx
-#: src/modules/object-record/object-options-dropdown/components/ObjectOptionsDropdownCalendarViewContent.tsx
 #: src/modules/settings/components/SettingsCard.tsx
 #: src/modules/ui/navigation/navigation-drawer/components/NavigationDrawerItem.tsx
 #: src/pages/settings/communications/SettingsWorkspaceCommunications.tsx
@@ -18443,6 +18012,7 @@ msgstr ""
 
 #. js-lingui-id: wdxz7K
 #: src/modules/advanced-text-editor/constants/AdvancedTextEditorBlockCatalog.ts
+#: src/modules/settings/admin-panel/apps/components/SettingsAdminApps.tsx
 #: src/modules/settings/admin-panel/apps/components/SettingsAdminApps.tsx
 #: src/modules/settings/admin-panel/config-variables/components/ConfigVariableOptionsDropdownContent.tsx
 #: src/modules/side-panel/pages/page-layout/components/dashboard/SidePanelDashboardRecordTableSettings.tsx
@@ -18501,11 +18071,6 @@ msgstr ""
 #: src/modules/settings/roles/role-permissions/permission-flags/hooks/useSettingsRolePermissionFlagConfig.ts
 #: src/modules/settings/security/components/SettingsSecuritySettings.tsx
 msgid "SSO Bypass"
-msgstr ""
-
-#. js-lingui-id: P9fBwv
-#: src/modules/views/view-picker/components/ViewPickerStackSelect.tsx
-msgid "Stack"
 msgstr ""
 
 #. js-lingui-id: uavm+q
@@ -18733,13 +18298,11 @@ msgid "subheading"
 msgstr ""
 
 #. js-lingui-id: UJmAAK
-#: src/modules/activities/emails/components/CampaignComposerFields.tsx
-#: src/modules/activities/emails/components/CampaignComposerFields.tsx
 #: src/modules/activities/emails/components/CampaignDetailsFields.tsx
 #: src/modules/activities/emails/components/CampaignDetailsFields.tsx
 #: src/modules/activities/emails/components/CampaignSentEnvelope.tsx
 #: src/modules/activities/emails/components/EmailComposerFields.tsx
-#: src/modules/activities/emails/mass-email/components/MassEmailComposeCard.tsx
+#: src/modules/activities/emails/components/EmailComposerFields.tsx
 #: src/modules/workflow/workflow-steps/workflow-actions/components/WorkflowEditActionEmailBase.tsx
 msgid "Subject"
 msgstr ""
@@ -18894,11 +18457,6 @@ msgstr ""
 #. js-lingui-id: Gw5WrN
 #: src/pages/settings/admin-panel/SettingsAdminNewAiModel.tsx
 msgid "Supports reasoning"
-msgstr ""
-
-#. js-lingui-id: 1T4saU
-#: src/modules/person-duplicate-review/components/PersonDuplicateCard.tsx
-msgid "Survivor"
 msgstr ""
 
 #. js-lingui-id: UaISq3
@@ -19277,11 +18835,6 @@ msgstr ""
 msgid "The description of this field"
 msgstr ""
 
-#. js-lingui-id: JeOanZ
-#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
-msgid "The duplicate queue could not be loaded."
-msgstr ""
-
 #. js-lingui-id: xJSPh6
 #: src/modules/settings/members/components/MemberInfosTab.tsx
 msgid "The email associated to this account"
@@ -19310,17 +18863,6 @@ msgstr ""
 #. js-lingui-id: diO3fm
 #: src/modules/workflow/workflow-trigger/components/WorkflowEditTriggerManual.tsx
 msgid "The icon your workflow trigger will display in the command menu"
-msgstr ""
-
-#. js-lingui-id: u7SthV
-#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
-msgid "The keep-separate decision could not be saved."
-msgstr ""
-
-#. js-lingui-id: 4YoVrr
-#. placeholder {0}: relatedPersonFieldMetadataItem.label
-#: src/modules/activities/emails/related-people/hooks/useComposeEmailToRelatedPeople.ts
-msgid "The linked {0} has no email address."
 msgstr ""
 
 #. js-lingui-id: HiI1Lo
@@ -19370,9 +18912,9 @@ msgstr ""
 msgid "The PDF is pre-signed by Twenty and executed with your legal entity and authorized signatory."
 msgstr ""
 
-#. js-lingui-id: JD8guD
-#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
-msgid "The people could not be merged."
+#. js-lingui-id: 8vRPIJ
+#: src/modules/page-layout/widgets/call-recording-transcript/components/CallRecordingVideoPlayer.tsx
+msgid "The recording could not be loaded."
 msgstr ""
 
 #. js-lingui-id: wxyrqd
@@ -19395,18 +18937,12 @@ msgstr ""
 msgid "The shared email you want to use."
 msgstr ""
 
-#. js-lingui-id: 8XEPsC
-#: src/modules/person-duplicate-review/components/PersonDuplicateMergePreview.tsx
-msgid "The survivor keeps its ID. Checked contact details are preserved; the star marks the primary value."
-msgstr ""
-
 #. js-lingui-id: 9q0gnf
-#: src/modules/page-layout/widgets/call-recording-transcript/components/CallRecordingTranscriptBody.tsx
+#: src/modules/page-layout/widgets/call-recording-transcript/components/CallRecordingTranscriptContent.tsx
 msgid "The transcript could not be generated."
 msgstr ""
 
 #. js-lingui-id: qrhV2s
-#: src/modules/activities/emails/components/CampaignComposerFields.tsx
 #: src/modules/activities/emails/components/CampaignDetailsFields.tsx
 msgid "The unsubscribe topic this email belongs to. Recipients who opted out of it are skipped, and the unsubscribe link is scoped to it."
 msgstr ""
@@ -19479,11 +19015,6 @@ msgstr ""
 #. js-lingui-id: ynfkhb
 #: src/pages/auth/PasswordReset.tsx
 msgid "There was an error while updating password."
-msgstr ""
-
-#. js-lingui-id: RuO91P
-#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
-msgid "These people will remain separate unless their identity details change."
 msgstr ""
 
 #. js-lingui-id: 5Ml5Nr
@@ -19786,7 +19317,7 @@ msgstr ""
 
 #. js-lingui-id: DF2voz
 #: src/modules/side-panel/pages/page-layout/components/RegularTabSettingsContent.tsx
-#: src/modules/side-panel/pages/page-layout/components/SoloTabSettingsContent.tsx
+#: src/modules/side-panel/pages/page-layout/components/SingleWidgetTabSettingsContent.tsx
 msgid "This will cancel all modifications done on the tab and its widgets. Edit mode will be canceled and the page will refresh. This action cannot be undone."
 msgstr ""
 
@@ -19951,18 +19482,11 @@ msgstr ""
 msgid "Title"
 msgstr ""
 
-#. js-lingui-id: 6OdanD
-#: src/modules/person-duplicate-review/components/PersonDuplicateMergePreview.tsx
-msgid "Title and current company"
-msgstr ""
-
 #. js-lingui-id: /jQctM
-#: src/modules/activities/emails/components/CampaignComposerFields.tsx
 #: src/modules/activities/emails/components/CampaignDetailsFields.tsx
 #: src/modules/activities/emails/components/CampaignSentEnvelope.tsx
 #: src/modules/activities/emails/components/EmailComposerFields.tsx
 #: src/modules/activities/emails/components/EmailComposerFields.tsx
-#: src/modules/activities/emails/mass-email/components/MassEmailComposeCard.tsx
 #: src/modules/workflow/workflow-steps/workflow-actions/components/WorkflowEditActionEmailBase.tsx
 #: src/modules/workflow/workflow-steps/workflow-actions/components/WorkflowRunStepLogsEmailDetail.tsx
 msgid "To"
@@ -20034,11 +19558,9 @@ msgid "Too many guests"
 msgstr ""
 
 #. js-lingui-id: x+3/CM
-#. placeholder {0}: composerState.largestRecipientCount
 #. placeholder {0}: composerState.recipientCount
 #. placeholder {1}: composerState.maxRecipients
 #: src/modules/activities/emails/components/EmailComposerFields.tsx
-#: src/modules/activities/emails/mass-email/components/MassEmailComposeCard.tsx
 msgid "Too many recipients ({0}/{1})."
 msgstr ""
 
@@ -20143,13 +19665,23 @@ msgstr ""
 msgid "Track AI consumption across your workspace."
 msgstr ""
 
+#. js-lingui-id: DDziIo
+#: src/modules/page-layout/widgets/call-recording-transcript/components/CallRecordingTranscriptEntryList.tsx
+msgid "Transcript"
+msgstr ""
+
+#. js-lingui-id: hfpzKV
+#: src/modules/page-layout/widgets/call-recording-transcript/components/WidgetActionCallRecordingTranscript.tsx
+msgid "Transcript copied to clipboard"
+msgstr ""
+
 #. js-lingui-id: U2CSqa
-#: src/modules/page-layout/widgets/call-recording-transcript/components/CallRecordingTranscriptBody.tsx
+#: src/modules/page-layout/widgets/call-recording-transcript/components/CallRecordingTranscriptContent.tsx
 msgid "Transcript Failed"
 msgstr ""
 
 #. js-lingui-id: zDTPYv
-#: src/modules/page-layout/widgets/call-recording-transcript/components/CallRecordingTranscriptBody.tsx
+#: src/modules/page-layout/widgets/call-recording-transcript/components/CallRecordingTranscriptContent.tsx
 msgid "Transcript is being prepared…"
 msgstr ""
 
@@ -20277,7 +19809,6 @@ msgstr ""
 #. js-lingui-id: c+xCSz
 #: src/modules/object-record/object-filter-dropdown/components/ObjectFilterDropdownBooleanSelect.tsx
 #: src/modules/object-record/record-board/record-board-column/utils/getAggregateOperationShortLabel.ts
-#: src/modules/object-record/record-field/ui/utils/getFieldDisplayLabelText.ts
 #: src/modules/settings/data-model/fields/forms/boolean/constants/BooleanDataModelSelectOptions.ts
 #: src/modules/side-panel/pages/page-layout/components/dropdown-content/ChartRatioOptionValueSelectionDropdownContent.tsx
 #: src/modules/side-panel/pages/page-layout/hooks/useChartSettingsValues.ts
@@ -20345,7 +19876,6 @@ msgid "Turn Not Found"
 msgstr ""
 
 #. js-lingui-id: EdHWDU
-#: src/modules/advanced-text-editor/constants/TextColorLabels.ts
 #: src/modules/settings/data-model/fields/forms/select/components/SettingsDataModelFieldSelectFormOptionRow.tsx
 msgid "Turquoise"
 msgstr ""
@@ -20353,11 +19883,6 @@ msgstr ""
 #. js-lingui-id: JnaRPe
 #: src/modules/spreadsheet-import/steps/components/MatchColumnsStep/components/ColumnGrid.tsx
 msgid "Twenty fields"
-msgstr ""
-
-#. js-lingui-id: 7uWmv3
-#: src/modules/person-duplicate-review/components/PersonDuplicateMergePreview.tsx
-msgid "Twenty supports one current company per person, so this comes from the chosen survivor."
 msgstr ""
 
 #. js-lingui-id: YIjS4q
@@ -20437,7 +19962,6 @@ msgstr ""
 
 #. js-lingui-id: LaEX5I
 #: src/modules/activities/emails/components/CampaignBodyField.tsx
-#: src/modules/activities/emails/components/CampaignComposerFields.tsx
 #: src/modules/activities/emails/components/EmailComposerFields.tsx
 msgid "Type something or press \"/\" to see commands"
 msgstr ""
@@ -20630,6 +20154,7 @@ msgstr ""
 
 #. js-lingui-id: 0Wy3/1
 #: src/modules/page-layout/widgets/call-recording-transcript/components/CallRecordingTranscriptEntryListItem.tsx
+#: src/modules/page-layout/widgets/call-recording-transcript/utils/buildCallRecordingTranscriptPlainText.ts
 msgid "Unknown speaker"
 msgstr ""
 
@@ -20732,7 +20257,6 @@ msgid "Unsubscribe page"
 msgstr ""
 
 #. js-lingui-id: BEZcuL
-#: src/modules/activities/emails/components/CampaignComposerFields.tsx
 #: src/modules/activities/emails/components/CampaignDetailsFields.tsx
 #: src/modules/activities/emails/components/CampaignSentEnvelope.tsx
 msgid "Unsubscribe topic"
@@ -20803,7 +20327,6 @@ msgid "Untitled iFrame"
 msgstr ""
 
 #. js-lingui-id: PMPun8
-#: src/modules/activities/emails/components/CampaignComposerFields.tsx
 #: src/modules/activities/emails/components/CampaignDetailsFields.tsx
 msgid "Untitled list"
 msgstr ""
@@ -20814,7 +20337,6 @@ msgid "Untitled role"
 msgstr ""
 
 #. js-lingui-id: jxRjAG
-#: src/modules/activities/emails/components/CampaignComposerFields.tsx
 #: src/modules/activities/emails/components/CampaignDetailsFields.tsx
 #: src/modules/activities/emails/components/CampaignSentEnvelope.tsx
 #: src/modules/settings/unsubscribe-topics/components/SettingsWorkspaceUnsubscribeTopicSection.tsx
@@ -21202,11 +20724,6 @@ msgstr ""
 msgid "Use best models only"
 msgstr ""
 
-#. js-lingui-id: kp9jLK
-#: src/modules/settings/data-model/objects/forms/components/SettingsDataModelObjectLabelFormulaForm.tsx
-msgid "Use field API names in braces. Use ?? for a fallback. Clear the formula to enter labels manually."
-msgstr ""
-
 #. js-lingui-id: 5ZehS/
 #: src/pages/settings/ai/components/SettingsAgentSkillsTab.tsx
 msgid "Use filter to see existing skills or create your own"
@@ -21586,11 +21103,6 @@ msgstr ""
 msgid "view filter group"
 msgstr ""
 
-#. js-lingui-id: cKqT2J
-#: src/modules/person-duplicate-review/components/PersonDuplicateCard.tsx
-msgid "View full record"
-msgstr ""
-
 #. js-lingui-id: n7a9IR
 #: src/modules/metadata-error-handler/hooks/useMetadataErrorHandler.ts
 msgid "view group"
@@ -21669,7 +21181,7 @@ msgid "Visibility"
 msgstr ""
 
 #. js-lingui-id: XQC+sL
-#: src/modules/side-panel/pages/page-layout/components/SoloTabSettingsContent.tsx
+#: src/modules/side-panel/pages/page-layout/components/SingleWidgetTabSettingsContent.tsx
 msgid "Visibility restriction"
 msgstr ""
 
@@ -22065,19 +21577,20 @@ msgstr ""
 msgid "Whole list"
 msgstr ""
 
-#. js-lingui-id: 6rbnkB
-#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
-msgid "Why this was surfaced:"
-msgstr ""
-
 #. js-lingui-id: dmoPOu
 #: src/pages/settings/applications/SettingsAvailableApplicationDetails.tsx
 msgid "widget"
 msgstr ""
 
 #. js-lingui-id: AHXN2z
+#: src/modules/side-panel/components/hooks/usePageLayoutHeaderInfo.ts
 #: src/pages/settings/layout/SettingsLayoutPageLayoutDetail.tsx
 msgid "Widget"
+msgstr ""
+
+#. js-lingui-id: v1P7Gm
+#: src/modules/side-panel/pages/page-layout/utils/getPageLayoutPageTitle.ts
+msgid "Widget Settings"
 msgstr ""
 
 #. js-lingui-id: fANaAS
@@ -22344,11 +21857,6 @@ msgstr ""
 msgid "Write a description for this agent"
 msgstr ""
 
-#. js-lingui-id: gnkeuQ
-#: src/modules/activities/emails/mass-email/components/MassEmailComposeCard.tsx
-msgid "Write your email…"
-msgstr ""
-
 #. js-lingui-id: zeCIJi
 #: src/modules/settings/logic-functions/components/tabs/SettingsLogicFunctionCodeEditorTab.tsx
 msgid "Write your function (in typescript) below"
@@ -22406,7 +21914,6 @@ msgid "years"
 msgstr ""
 
 #. js-lingui-id: QyCqHT
-#: src/modules/advanced-text-editor/constants/TextColorLabels.ts
 #: src/modules/settings/data-model/fields/forms/select/components/SettingsDataModelFieldSelectFormOptionRow.tsx
 msgid "Yellow"
 msgstr ""
@@ -22467,19 +21974,9 @@ msgstr ""
 msgid "You can either create a private app or share it to others"
 msgstr ""
 
-#. js-lingui-id: lcoYde
-#: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
-msgid "You can review this queue, but People edit and delete permissions are required to merge or keep records separate."
-msgstr ""
-
 #. js-lingui-id: CNAoaw
 #: src/modules/workflow/workflow-steps/workflow-actions/logic-function-action/components/WorkflowEditActionLogicFunction.tsx
 msgid "You can see the function logic in your application settings."
-msgstr ""
-
-#. js-lingui-id: jedKjC
-#: src/modules/activities/emails/mass-email/components/MassEmailAddPeopleButton.tsx
-msgid "You can select at most {MAX_EMAIL_RECIPIENTS} people."
 msgstr ""
 
 #. js-lingui-id: VlX5Sq
@@ -22663,11 +22160,6 @@ msgstr ""
 #. js-lingui-id: 9ivpwk
 #: src/pages/settings/profile/SettingsProfile.tsx
 msgid "Your name as it will be displayed"
-msgstr ""
-
-#. js-lingui-id: ZV7dVk
-#: src/modules/settings/profile/components/SettingsProfileEmailSignature.tsx
-msgid "Your name, role, and anything else you want at the end of your emails"
 msgstr ""
 
 #. js-lingui-id: 8mfOAZ

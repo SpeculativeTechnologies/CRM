@@ -293,7 +293,6 @@ msgstr "Egy szükséges mező hiányzik."
 
 #. js-lingui-id: /ffPWJ
 #: src/engine/api/graphql/workspace-query-runner/constants/postgres-error-messages.constants.ts
-#: src/engine/twenty-orm/error-handling/__tests__/compute-twenty-orm-exception.spec.ts
 msgid "A required field is missing. Please provide all required values and try again."
 msgstr "Hiányzik egy kötelező mező. Adja meg az összes kötelező értéket, majd próbálja újra."
 
@@ -1617,12 +1616,6 @@ msgstr "A naptárnézetnek rendelkeznie kell egy naptári mezővel"
 msgid "Calendar view must have a calendar layout"
 msgstr "A naptárnézetnek rendelkeznie kell egy naptárelrendezéssel"
 
-#. js-lingui-id: D9pZ2l
-#: src/engine/workspace-manager/workspace-migration/workspace-migration-builder/validators/utils/validate-flat-view-calendar-fields.util.ts
-#: src/engine/workspace-manager/workspace-migration/workspace-migration-builder/validators/utils/validate-flat-view-calendar-fields.util.ts
-msgid "Calendar widget views only support the month layout"
-msgstr "A naptár widget nézetei csak a havi elrendezést támogatják"
-
 #. js-lingui-id: 0U7DBn
 #: src/engine/workspace-manager/twenty-standard-application/constants/standard-command-menu-item.constant.ts
 msgctxt "commandMenuItem.shortLabel"
@@ -2437,12 +2430,14 @@ msgid "Contradicting field permissions have been detected on a relation field."
 msgstr "Ellentmondó mezőengedélyeket észleltünk egy kapcsolati mezőben."
 
 #. js-lingui-id: X/ryFh
+#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-workflow-run-standard-flat-field-metadata.util.ts
 #: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-workflow-standard-flat-field-metadata.util.ts
 msgctxt "fieldMetadata.label"
 msgid "Core workflow id"
 msgstr "Alap munkafolyamat azonosítója"
 
 #. js-lingui-id: WkctC4
+#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-workflow-run-standard-flat-field-metadata.util.ts
 #: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-workflow-version-standard-flat-field-metadata.util.ts
 msgctxt "fieldMetadata.label"
 msgid "Core workflow version id"
@@ -3546,18 +3541,6 @@ msgctxt "fieldMetadata.label"
 msgid "Event ID"
 msgstr "Esemény azonosító"
 
-#. js-lingui-id: ygoA2u
-#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-timeline-activity-standard-flat-field-metadata.util.ts
-msgctxt "fieldMetadata.description"
-msgid "Event name"
-msgstr "Esemény neve"
-
-#. js-lingui-id: AvDRPM
-#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-timeline-activity-standard-flat-field-metadata.util.ts
-msgctxt "fieldMetadata.label"
-msgid "Event name"
-msgstr "Esemény neve"
-
 #. js-lingui-id: irEsRo
 #: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-calendar-event-standard-flat-field-metadata.util.ts
 msgctxt "fieldMetadata.description"
@@ -4150,6 +4133,7 @@ msgstr "A fájl nem található az SDK kliens archívumában."
 #: src/engine/core-modules/file/file-upload/services/file-upload.service.ts
 #: src/engine/core-modules/file/file-upload/services/file-upload.service.ts
 #: src/engine/core-modules/file/file.exception.ts
+#: src/engine/core-modules/file/files-field/services/files-field.service.ts
 #: src/engine/core-modules/tool/tools/email-tool/exceptions/email-tool.exception.ts
 msgid "File not found."
 msgstr "Fájl nem található."
@@ -6743,6 +6727,16 @@ msgstr "Navigációs menüelem nem található."
 msgid "Navigation menu item type is required"
 msgstr "A Navigációs menüelem típusa kötelező"
 
+#. js-lingui-id: sq8J4x
+#: src/engine/workspace-manager/workspace-migration/workspace-migration-builder/validators/services/flat-command-menu-item-validator.service.ts
+msgid "Navigation target object metadata not found"
+msgstr "A navigáció célobjektumának metaadatai nem találhatók"
+
+#. js-lingui-id: 4/QAvg
+#: src/engine/workspace-manager/workspace-migration/workspace-migration-builder/validators/services/flat-command-menu-item-validator.service.ts
+msgid "Navigation target object not found"
+msgstr "A navigáció célobjektuma nem található"
+
 #. js-lingui-id: B/prgH
 #: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-calendar-event-participant-standard-flat-field-metadata.util.ts
 msgctxt "fieldMetadata.label"
@@ -8300,12 +8294,14 @@ msgid "Recurring Event ID"
 msgstr "Ismétlődő Esemény Azonosító"
 
 #. js-lingui-id: zEHtXk
+#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-workflow-run-standard-flat-field-metadata.util.ts
 #: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-workflow-standard-flat-field-metadata.util.ts
 msgctxt "fieldMetadata.description"
 msgid "Reference to the core workflow row"
 msgstr "Hivatkozás az alap munkafolyamat sorára"
 
 #. js-lingui-id: avBuTv
+#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-workflow-run-standard-flat-field-metadata.util.ts
 #: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-workflow-version-standard-flat-field-metadata.util.ts
 msgctxt "fieldMetadata.description"
 msgid "Reference to the core workflowVersion row"
@@ -10010,7 +10006,7 @@ msgid "The file extension doesn't match the file content. Please check that your
 msgstr "A fájlkiterjesztés nem egyezik a fájl tartalmával. Kérjük, ellenőrizze, hogy a fájl nem sérült, és a kiterjesztése helyes."
 
 #. js-lingui-id: H+ZNr6
-#: src/engine/core-modules/file/file-upload/services/file-upload.service.ts
+#: src/engine/core-modules/file/file-upload/services/file-upload-completion.service.ts
 msgid "The file has not been uploaded yet. Please upload it before confirming."
 msgstr "A fájl még nem került feltöltésre. Töltse fel, mielőtt megerősíti."
 
@@ -10018,6 +10014,11 @@ msgstr "A fájl még nem került feltöltésre. Töltse fel, mielőtt megerősí
 #: src/engine/core-modules/file/file-upload/services/file-upload.service.ts
 msgid "The file is empty or exceeds the maximum allowed size."
 msgstr "A fájl üres, vagy meghaladja a megengedett maximális méretet."
+
+#. js-lingui-id: 2hrpBa
+#: src/engine/core-modules/file/files-field/services/files-field.service.ts
+msgid "The file upload has not been completed. Please retry the upload."
+msgstr "A fájl feltöltése nem fejeződött be. Próbálja meg újra a feltöltést."
 
 #. js-lingui-id: 9TYO3w
 #: src/engine/workspace-manager/workspace-migration/workspace-migration-builder/validators/services/flat-timeline-activity-type-validator.service.ts
@@ -10231,7 +10232,7 @@ msgid "The unsubscribe topic this campaign was sent under"
 msgstr "Az a leiratkozási témakör, amely alatt ezt a kampányt elküldték"
 
 #. js-lingui-id: uYP2Uw
-#: src/engine/core-modules/file/file-upload/services/file-upload.service.ts
+#: src/engine/core-modules/file/file-upload/services/file-upload-completion.service.ts
 #: src/engine/core-modules/file/file-upload/services/file-upload.service.ts
 msgid "The uploaded file does not match the declared size. Please retry the upload."
 msgstr "A feltöltött fájl mérete nem egyezik a megadott mérettel. Próbálja meg újra a feltöltést."
@@ -10352,11 +10353,6 @@ msgstr "Nincs korábbi bevezetési lépés, amelyre vissza lehetne lépni."
 #: src/engine/core-modules/workspace/services/workspace.service.ts
 msgid "These fields cannot be updated before the workspace is activated: {fieldsList}."
 msgstr "Ezeket a mezőket nem lehet frissíteni, amíg a munkaterület nincs aktiválva: {fieldsList}."
-
-#. js-lingui-id: Iy9pZw
-#: src/engine/api/graphql/workspace-query-runner/utils/handle-duplicate-key-error.util.ts
-msgid "This {fieldLabel} value is already in use. Please check your data and try again."
-msgstr "Ez a(z) {fieldLabel} már használatban van. Kérjük, ellenőrizze az adatait és próbálja meg újra."
 
 #. js-lingui-id: bypqPt
 #: src/engine/core-modules/server-route-trigger/exceptions/server-route-trigger.exception.ts
@@ -10528,7 +10524,7 @@ msgid "This field references an object that could not be found"
 msgstr "Ez a mező egy olyan objektumra hivatkozik, amely nem található"
 
 #. js-lingui-id: 5F02zD
-#: src/engine/core-modules/file/file-upload/services/file-upload.service.ts
+#: src/engine/core-modules/file/file-upload/services/file-upload-completion.service.ts
 msgid "This file format is not supported."
 msgstr "Ez a fájlformátum nem támogatott."
 
@@ -10611,11 +10607,6 @@ msgstr "Ez az objektumengedély már be van állítva a szerepkör számára"
 msgid "This operation is not allowed."
 msgstr "Ez a művelet nem engedélyezett."
 
-#. js-lingui-id: eitC3W
-#: src/engine/workspace-datasource/workspace-datasource.service.ts
-msgid "This operation is not allowed. Please try a different approach or contact support if you need assistance."
-msgstr "Ez a művelet nem engedélyezett. Kérjük, próbálkozzon más megközelítéssel, vagy ha szükséges, vegye fel a kapcsolatot a támogatással."
-
 #. js-lingui-id: bEhTPN
 #: src/engine/workspace-manager/workspace-migration/workspace-migration-runner/exceptions/workspace-migration-action-execution.exception.ts
 msgid "This operation is not supported."
@@ -10623,7 +10614,6 @@ msgstr "Ez a művelet nem támogatott."
 
 #. js-lingui-id: fxy039
 #: src/engine/api/graphql/workspace-query-runner/constants/postgres-error-messages.constants.ts
-#: src/engine/twenty-orm/error-handling/__tests__/compute-twenty-orm-exception.spec.ts
 msgid "This operation references a record that does not exist or cannot be modified due to existing relationships."
 msgstr "Ez a művelet egy olyan rekordra hivatkozik, amely nem létezik, vagy nem módosítható a meglévő kapcsolatok miatt."
 
@@ -10655,7 +10645,6 @@ msgstr "Ez a rekord már létezik. Kérjük, ellenőrizze az adatait és próbá
 
 #. js-lingui-id: BQ4MUY
 #: src/engine/api/graphql/workspace-query-runner/constants/postgres-error-messages.constants.ts
-#: src/engine/twenty-orm/error-handling/__tests__/compute-twenty-orm-exception.spec.ts
 msgid "This record cannot be deleted because it is still referenced by other records."
 msgstr "Ez a rekord nem törölhető, mert más rekordok még hivatkoznak rá."
 
@@ -12647,9 +12636,8 @@ msgid "You can only update one record with files field at once."
 msgstr "Egyszerre csak egy, fájlok mezőt tartalmazó rekord frissíthető."
 
 #. js-lingui-id: 4ysDL0
-#: src/engine/twenty-orm-v2/repository/workspace-repository-v2.ts
-#: src/engine/twenty-orm-v2/repository/workspace-repository-v2.ts
-#: src/engine/twenty-orm/repository/workspace-update-query-builder.ts
+#: src/engine/twenty-orm/repository/workspace-repository.ts
+#: src/engine/twenty-orm/repository/workspace-repository.ts
 msgid "You can only update up to {QUERY_MAX_RECORDS} records at once."
 msgstr ""
 

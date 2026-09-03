@@ -169,7 +169,7 @@ describe('ForkRunMissedWorkspaceCommandsCommand', () => {
     expect(runOnWorkspace).not.toHaveBeenCalled();
   });
 
-  it('should throw when a passed instance command has no completion record', async () => {
+  it('should only warn when a passed instance command has no completion record, since upgrade runs it', async () => {
     const sequence = [
       buildStep('fast-instance', 'instance-missed'),
       buildStep('fast-instance', 'instance-done'),
@@ -179,9 +179,14 @@ describe('ForkRunMissedWorkspaceCommandsCommand', () => {
       lastAttemptedName: 'instance-done',
       completedNames: new Set([]),
     });
+    const warnSpy = jest
+      .spyOn(command['logger'], 'warn')
+      .mockImplementation(() => undefined);
 
-    await expect(command.run([], {})).rejects.toThrow(
-      /instance command\(s\) were added to an already-passed version segment/,
+    await expect(command.run([], {})).resolves.toBeUndefined();
+
+    expect(warnSpy).toHaveBeenCalledWith(
+      expect.stringMatching(/instance-missed.*`upgrade` runs them/),
     );
   });
 

@@ -3,7 +3,6 @@ import { useChangeView } from '@/views/hooks/useChangeView';
 import { useCreateViewFromCurrentView } from '@/views/hooks/useCreateViewFromCurrentView';
 import { ViewType } from '@/views/types/ViewType';
 import { useCloseAndResetViewPicker } from '@/views/view-picker/hooks/useCloseAndResetViewPicker';
-import { viewPickerCalendarEndFieldMetadataIdComponentState } from '@/views/view-picker/states/viewPickerCalendarEndFieldMetadataIdComponentState';
 import { viewPickerCalendarFieldMetadataIdComponentState } from '@/views/view-picker/states/viewPickerCalendarFieldMetadataIdComponentState';
 import { viewPickerInputNameComponentState } from '@/views/view-picker/states/viewPickerInputNameComponentState';
 import { viewPickerIsDirtyComponentState } from '@/views/view-picker/states/viewPickerIsDirtyComponentState';
@@ -14,17 +13,12 @@ import { viewPickerParentViewIdComponentState } from '@/views/view-picker/states
 import { viewPickerSelectedIconComponentState } from '@/views/view-picker/states/viewPickerSelectedIconComponentState';
 import { viewPickerTypeComponentState } from '@/views/view-picker/states/viewPickerTypeComponentState';
 import { viewPickerVisibilityComponentState } from '@/views/view-picker/states/viewPickerVisibilityComponentState';
-import { useIsFeatureEnabled } from '@/workspace/hooks/useIsFeatureEnabled';
 import { useStore } from 'jotai';
 import { useCallback } from 'react';
 import { isDefined } from 'twenty-shared/utils';
-import { FeatureFlagKey } from '~/generated-metadata/graphql';
 
 export const useCreateViewFromCurrentState = () => {
   const { closeAndResetViewPicker } = useCloseAndResetViewPicker();
-  const isCalendarWeekViewEnabled = useIsFeatureEnabled(
-    FeatureFlagKey.IS_CALENDAR_WEEK_VIEW_ENABLED,
-  );
 
   const viewPickerInputNameCallbackState = useAtomComponentStateCallbackState(
     viewPickerInputNameComponentState,
@@ -45,11 +39,6 @@ export const useCreateViewFromCurrentState = () => {
   const viewPickerCalendarFieldMetadataIdCallbackState =
     useAtomComponentStateCallbackState(
       viewPickerCalendarFieldMetadataIdComponentState,
-    );
-
-  const viewPickerCalendarEndFieldMetadataIdCallbackState =
-    useAtomComponentStateCallbackState(
-      viewPickerCalendarEndFieldMetadataIdComponentState,
     );
 
   const viewPickerIsPersistingCallbackState =
@@ -85,9 +74,6 @@ export const useCreateViewFromCurrentState = () => {
     const calendarFieldMetadataId = store.get(
       viewPickerCalendarFieldMetadataIdCallbackState,
     );
-    const calendarEndFieldMetadataId = store.get(
-      viewPickerCalendarEndFieldMetadataIdCallbackState,
-    );
 
     const viewPickerMode = store.get(viewPickerModeCallbackState);
     const visibility = store.get(viewPickerVisibilityCallbackState);
@@ -107,10 +93,7 @@ export const useCreateViewFromCurrentState = () => {
         mainGroupByFieldMetadataId:
           type === ViewType.KANBAN ? mainGroupByFieldMetadataId : null,
         calendarFieldMetadataId,
-        calendarEndFieldMetadataId:
-          isCalendarWeekViewEnabled && calendarEndFieldMetadataId !== ''
-            ? calendarEndFieldMetadataId
-            : null,
+        calendarEndFieldMetadataId: null,
         visibility,
         parentViewId: parentViewId === '' ? null : parentViewId,
       },
@@ -131,13 +114,11 @@ export const useCreateViewFromCurrentState = () => {
     viewPickerIsPersistingCallbackState,
     viewPickerMainGroupByFieldMetadataIdCallbackState,
     viewPickerCalendarFieldMetadataIdCallbackState,
-    viewPickerCalendarEndFieldMetadataIdCallbackState,
     viewPickerSelectedIconCallbackState,
     viewPickerTypeCallbackState,
     viewPickerModeCallbackState,
     viewPickerVisibilityCallbackState,
     viewPickerParentViewIdCallbackState,
-    isCalendarWeekViewEnabled,
   ]);
 
   return { createViewFromCurrentState };
