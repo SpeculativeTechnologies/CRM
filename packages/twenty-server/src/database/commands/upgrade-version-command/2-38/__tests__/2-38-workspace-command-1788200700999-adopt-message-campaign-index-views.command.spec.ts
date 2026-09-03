@@ -16,7 +16,10 @@ const STANDARD_NAME_COLUMN_ID = 'standard-campaign-name-column';
 const STANDARD_STATUS_COLUMN_ID = 'standard-campaign-status-column';
 
 const buildMaps = <TMaps>(
-  entities: { universalIdentifier: string; id?: string }[],
+  entities: ({ universalIdentifier: string; id?: string } & Record<
+    string,
+    unknown
+  >)[],
 ): TMaps =>
   ({
     byUniversalIdentifier: Object.fromEntries(
