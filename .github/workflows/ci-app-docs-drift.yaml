@@ -29,8 +29,12 @@ jobs:
 
   docs-drift-check:
     needs: changed-files-check
-    # Secrets are unavailable on fork PRs; skip there and on bot PRs.
+    # Secrets are unavailable on fork PRs; skip there and on bot PRs. The
+    # check reviews upstream's app-development docs, which this fork does not
+    # maintain, so it only runs in twentyhq/twenty (2026-09-03: with a Claude
+    # token configured it ran here and failed inside the action on every PR).
     if: >-
+      github.repository == 'twentyhq/twenty' &&
       needs.changed-files-check.outputs.any_changed == 'true' &&
       github.event.pull_request.head.repo.full_name == github.repository &&
       github.event.pull_request.user.type != 'Bot'
