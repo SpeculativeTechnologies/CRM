@@ -63,6 +63,7 @@ jobs:
           echo "Resolved ${REF} to ${sha}"
 
       - name: Require that staging ran this code
+        id: staged
         env:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
@@ -84,6 +85,9 @@ jobs:
             echo "Deploy this commit to staging and exercise it before promoting."
             exit 1
           fi
+          # Read by the database gate below to tell someone who has already put
+          # this commit on staging that they do not need to deploy it again.
+          echo "sha=${staged}" >> "$GITHUB_OUTPUT"
           echo "Staging ran ${staged}, contained in ${SHA}"
 
       # The step above is satisfied by staging having run an ancestor, which is
@@ -97,11 +101,40 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
           SHA: ${{ steps.resolve.outputs.sha }}
+          STAGED: ${{ steps.staged.outputs.sha }}
         run: |
           set -euo pipefail
           # The promotion refs are ordinary branches, so fetch-depth 0 has them,
           # but be explicit rather than depend on that.
           git fetch --no-tags --quiet origin '+refs/heads/*:refs/remotes/origin/*'
+
+          # Every way this can fail says the same two things: why production
+          # will not take a database change on a redeploy's word, and what to
+          # do next. The next step differs by whether staging is already
+          # running this commit -- telling someone who staged it an hour ago to
+          # stage it again is how a gate gets read as a malfunction.
+          explain() {
+            echo
+            echo "Why: a rollback redeploys the previous image. It does not un-run a"
+            echo "migration or restore rows a data command changed, so production takes"
+            echo "database changes only once somebody has exercised them on staging and"
+            echo "recorded what they exercised."
+            echo
+            echo "What to do:"
+            if [ "$STAGED" = "$SHA" ]; then
+              echo "  Staging is already running this commit, so it does not need deploying again."
+              echo "  1. Exercise the change at https://crm-staging.spec.tech, if you have not already"
+              echo "  2. Run the 'Record a staging check' workflow and say what you exercised"
+              echo "  3. Run this workflow again for ${SHA}"
+            else
+              echo "  1. Run 'Deploy to staging' for ${SHA}"
+              echo "  2. Exercise the change at https://crm-staging.spec.tech"
+              echo "  3. Run the 'Record a staging check' workflow and say what you exercised"
+              echo "  4. Run this workflow again for ${SHA}"
+            fi
+            echo
+            echo "Background: deploy/TEAM-WORKFLOW.md, 'Database changes'."
+          }
 
           running="$(
             gh api "repos/${REPO}/git/ref/heads/production-target" --jq .object.sha 2>/dev/null || true
@@ -123,13 +156,18 @@ jobs:
             gh api "repos/${REPO}/git/ref/heads/staging-verified" --jq .object.sha 2>/dev/null || true
           )"
           if [ -z "$verified" ]; then
-            echo "::error::${SHA} changes the database and no staging check has ever been recorded."
-            echo "Deploy it to staging, exercise it, then run 'Record a staging check'."
+            echo "::error::${SHA:0:7} changes the database and no staging check has been recorded for it."
+            if [ -n "${introduced:-}" ]; then
+              echo "These reach the database:"
+              sed 's/^/  /' <<<"$introduced"
+            fi
+            explain
             exit 1
           fi
 
           if ! git merge-base --is-ancestor "$verified" "$SHA"; then
-            echo "::error::The last staging check was for ${verified}, which ${SHA} does not contain."
+            echo "::error::${SHA:0:7} changes the database, and the last staging check was for ${verified:0:7}, which is not in its history."
+            explain
             exit 1
           fi
 
@@ -137,9 +175,10 @@ jobs:
           # An empty diff from the checked commit forward is the proof.
           unchecked="$(node .github/scripts/database-changes.mjs "$verified" "$SHA")"
           if [ -n "$unchecked" ]; then
-            echo "::error::These reach the database and landed after the staging check of ${verified}:"
+            echo "::error::${SHA:0:7} changes the database in ways the staging check of ${verified:0:7} did not cover."
+            echo "These landed after that check:"
             sed 's/^/  /' <<<"$unchecked"
-            echo "Deploy ${SHA} to staging, exercise it, then run 'Record a staging check'."
+            explain
             exit 1
           fi
 
