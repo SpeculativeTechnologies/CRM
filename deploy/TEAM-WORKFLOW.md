@@ -241,9 +241,18 @@ full commit SHA; rollback is another deployment of a known-good SHA.
 
 ## Upstream synchronization
 
-Ben owns merges from `twentyhq/twenty`. Upstream changes use a normal
-`sync/upstream-YYYY-MM-DD` PR and go through CI, review, staging, and production
-like any other change. Do not bypass the PR and promotion workflows.
+Ben owns merges from `twentyhq/twenty`. The `Sync upstream` GitHub Actions
+workflow opens a `sync/upstream-YYYY-MM-DD` PR every Monday (or on demand),
+resolves the mechanical conflicts, hands real conflicts to the sync agent, and
+regenerates catalogs, snapshots and GraphQL types. The PR then goes through
+CI, review, staging, and production like any other change. With the repo
+variable `SYNC_UPSTREAM_AUTOMERGE` set to `true`, a sync whose conflicts were
+all mechanical merges to `main` on its own once CI Fork is green; a sync the
+agent resolved always waits for Ben. Merging to `main` deploys nothing.
+
+Resolution policy, recurring hotspots, verification steps, and the rules for
+keeping new fork work mergeable are in `deploy/UPSTREAM-SYNC.md`. Do not
+bypass the PR and promotion workflows.
 
 ## Emergency changes
 

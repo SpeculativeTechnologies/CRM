@@ -44,3 +44,14 @@ packages/twenty-server/src/database/commands/upgrade-version-command/workspace-c
 # The "ours" driver only exists where configured (sync-upstream.sh passes
 # -c merge.ours.driver=true); elsewhere this still conflicts, which is fine.
 CLAUDE.md merge=ours
+
+# Barrels and registries that conflicted on the 2026-09-02 sync for no reason
+# other than both sides appending. Union keeps both; typecheck catches a
+# duplicate export or import.
+packages/twenty-shared/src/constants/index.ts merge=union
+packages/twenty-shared/src/types/index.ts merge=union
+packages/twenty-shared/src/utils/index.ts merge=union
+packages/twenty-shared/src/metadata/constants/standard-object.constant.ts merge=union
+packages/twenty-shared/src/metadata/constants/standard-object-fields.constant.ts merge=union
+packages/twenty-front/src/modules/command-menu-item/engine-command/constants/EngineComponentKeyHeadlessComponentMap.tsx merge=union
+packages/twenty-server/src/engine/core-modules/message-queue/jobs.module.ts merge=union
