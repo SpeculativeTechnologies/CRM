@@ -19,6 +19,7 @@ import { AddWorkspaceMemberEmailSignatureFieldsCommand } from 'src/database/comm
 import { AddMessageEngagementTrackingFieldsCommand } from 'src/database/commands/upgrade-version-command/2-35/2-35-workspace-command-1787640000000-add-message-engagement-tracking-fields.command';
 import { AddMessageReplyTrackingFieldsCommand } from 'src/database/commands/upgrade-version-command/2-35/2-35-workspace-command-1787660000000-add-message-reply-tracking-fields.command';
 import { AddMessageHeaderMessageIdIndexCommand } from 'src/database/commands/upgrade-version-command/2-35/2-35-workspace-command-1787680000000-add-message-header-message-id-index.command';
+import { AdoptMessageCampaignIndexViewsCommand } from 'src/database/commands/upgrade-version-command/2-38/2-38-workspace-command-1788200700999-adopt-message-campaign-index-views.command';
 import { ForkRunMissedWorkspaceCommandsCommand } from 'src/database/commands/upgrade-version-command/fork-run-missed-workspace-commands.command';
 import { ApplicationModule } from 'src/engine/core-modules/application/application.module';
 import { UpgradeStatusModule } from 'src/engine/core-modules/upgrade/upgrade-status.module';
@@ -64,6 +65,7 @@ import { ConnectionModule } from 'src/modules/connection/connection.module';
     AddMessageEngagementTrackingFieldsCommand,
     AddMessageReplyTrackingFieldsCommand,
     AddMessageHeaderMessageIdIndexCommand,
+    AdoptMessageCampaignIndexViewsCommand,
     ForkRunMissedWorkspaceCommandsCommand,
   ],
 })
