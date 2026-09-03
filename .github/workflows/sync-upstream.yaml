@@ -1,0 +1,189 @@
+name: Sync upstream
+
+# Weekly merge of twentyhq/twenty main into this fork, as a pull request.
+#
+# Replaces the cron on the retired Mac deploy host, which ran whatever version
+# of deploy/sync-upstream.sh its clone happened to have (it sat at an early
+# August commit and never picked up the mechanical conflict handling). Here the
+# script always comes from main.
+#
+# What a run does, in order:
+#   1. merge upstream/main onto a sync/upstream-<date> branch;
+#   2. take upstream for locale catalogs, generated GraphQL types and jest
+#      snapshots, which conflict every week and are regenerated afterwards;
+#   3. if real code conflicts remain, hand the open merge to Claude Code with
+#      deploy/UPSTREAM-SYNC.md as the policy (skipped when no Claude secret
+#      is configured, in which case a conflict issue is filed instead);
+#   4. build a server from the merged code when the generated GraphQL types
+#      conflicted, so they can be regenerated with the fork's fields;
+#   5. regenerate, commit, push, open the PR, close open conflict issues.
+#
+# It never merges into main itself. With the repo variable
+# SYNC_UPSTREAM_AUTOMERGE=true, a PR whose conflicts were all mechanical is
+# queued with `gh pr merge --auto`, so GitHub merges it once CI Fork is green.
+# A PR the agent resolved is never auto-merged. Production is unaffected
+# either way: staging and production deploys are separate manual dispatches.
+#
+# One-time setup (repo settings):
+#   secret SYNC_UPSTREAM_TOKEN  fine-grained PAT (or GitHub App token) on this
+#                               repo with Contents, Pull requests and Issues
+#                               read/write. GITHUB_TOKEN cannot be used: PRs it
+#                               opens do not trigger CI Fork.
+#   secret CLAUDE_CODE_OAUTH_TOKEN  (optional) enables step 3.
+#   variable SYNC_UPSTREAM_AUTOMERGE  (optional) "true" enables auto-merge.
+
+on:
+  schedule:
+    - cron: '30 8 * * 1'
+  workflow_dispatch:
+    inputs:
+      resolve_with_agent:
+        description: Let Claude Code resolve real conflicts (needs CLAUDE_CODE_OAUTH_TOKEN)
+        type: boolean
+        default: true
+
+permissions: {}
+
+concurrency:
+  group: sync-upstream
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    permissions:
+      contents: read
+    env:
+      GH_TOKEN: ${{ secrets.SYNC_UPSTREAM_TOKEN }}
+      SYNC_UPSTREAM_STATE_DIR: ${{ runner.temp }}/sync-upstream-state
+      SYNC_UPSTREAM_AUTOMERGE: ${{ vars.SYNC_UPSTREAM_AUTOMERGE || 'false' }}
+    steps:
+      - name: Require the sync token
+        run: |
+          if [ -z "$GH_TOKEN" ]; then
+            echo "::error::SYNC_UPSTREAM_TOKEN is not set. Add a fine-grained PAT with Contents, Pull requests and Issues read/write on this repository."
+            exit 1
+          fi
+
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.SYNC_UPSTREAM_TOKEN }}
+
+      - name: Configure git
+        run: |
+          git config user.name sync-upstream
+          git config user.email sync-upstream@localhost
+          git remote add upstream https://github.com/twentyhq/twenty.git
+
+      - name: Install dependencies
+        uses: ./.github/actions/yarn-install
+
+      - name: Merge upstream and resolve mechanical conflicts
+        id: merge
+        run: bash deploy/sync-upstream.sh run
+
+      - name: Decide whether the agent can run
+        id: agent-gate
+        if: steps.merge.outputs.outcome == 'conflict'
+        env:
+          HAS_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN != '' }}
+          WANTED: ${{ github.event_name == 'schedule' || inputs.resolve_with_agent }}
+        run: |
+          if [ "$HAS_TOKEN" = "true" ] && [ "$WANTED" = "true" ]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::Real conflicts and no agent (token present: $HAS_TOKEN, wanted: $WANTED); a conflict issue will be filed."
+          fi
+
+      - name: Resolve real conflicts with Claude Code
+        id: agent
+        if: steps.merge.outputs.outcome == 'conflict' && steps.agent-gate.outputs.run == 'true'
+        continue-on-error: true
+        uses: anthropics/claude-code-action@ac7e24bf2938964b8ab203e417a2773802392ddd # v1.0.146
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: |
+            A merge of upstream/main into this fork is open in the working tree
+            (branch ${{ steps.merge.outputs.branch }}, ${{ steps.merge.outputs.behind }}
+            upstream commits). Locale catalogs, generated GraphQL types and jest
+            snapshots were already resolved by taking upstream. The remaining
+            conflicted files are listed in
+            ${{ runner.temp }}/sync-upstream-state/conflicts.txt.
+
+            Resolve every one of them following deploy/UPSTREAM-SYNC.md exactly:
+            keep upstream's structure and refactors, re-apply the fork's intent
+            on top, never silently drop fork behavior. Use git show :1:<file>
+            (base), :2:<file> (fork) and :3:<file> (upstream) plus
+            git log $(git merge-base origin/main upstream/main)..origin/main -- <file>
+            to understand each side. You may edit fork-owned files that must
+            follow an upstream refactor. Do not touch unrelated files. Do not
+            commit, push, or abort the merge; a later step commits.
+
+            When no conflict markers remain, run
+            npx nx run-many -t typecheck -p twenty-shared twenty-server twenty-front
+            and fix what your resolution broke. Then git add the files you
+            changed and write ${{ runner.temp }}/sync-upstream-state/agent-notes.md:
+            one bullet per resolved file saying what was decided, a section
+            "Unported" listing any fork behavior you could not carry over, and
+            a section "Needs a human" for anything uncertain. That file becomes
+            part of the PR description.
+          claude_args: '--max-turns 400 --model opus --allowedTools "Edit,Write,Read,Glob,Grep,Bash(git *),Bash(npx nx *),Bash(npx jest *),Bash(yarn *),Bash(cd *),Bash(cat *),Bash(ls *),Bash(grep *),Bash(rm *),Bash(mkdir *),Bash(diff *),Bash(sed *),Bash(head *),Bash(tail *),Bash(wc *),Bash(sort *),Bash(find *),Bash(echo *),Bash(mv *),Bash(cp *),Bash(awk *),Bash(cut *),Bash(tr *),Bash(xargs *),Bash(pwd *)"'
+
+      - name: Decide what to finish
+        id: kind
+        if: steps.merge.outputs.outcome != 'noop'
+        env:
+          OUTCOME: ${{ steps.merge.outputs.outcome }}
+          AGENT_RAN: ${{ steps.agent.outcome }}
+        run: |
+          if [ "$OUTCOME" = "conflict" ]; then
+            if [ "$AGENT_RAN" = "success" ] && [ -z "$(git diff --name-only --diff-filter=U)" ]; then
+              echo "kind=agent" >> "$GITHUB_OUTPUT"
+            else
+              echo "kind=unresolved" >> "$GITHUB_OUTPUT"
+            fi
+          else
+            echo "kind=$OUTCOME" >> "$GITHUB_OUTPUT"
+          fi
+
+      # Codegen needs a live /metadata endpoint. Only worth the ~8 minutes when
+      # the generated types actually conflicted (they were taken from upstream
+      # and are missing the fork's fields until regenerated).
+      - name: Build a server from the merged code
+        id: server
+        if: steps.kind.outputs.kind != 'unresolved' && steps.merge.outputs.outcome != 'noop' && steps.merge.outputs.regenerate_graphql == 'true'
+        continue-on-error: true
+        uses: ./.github/actions/spawn-twenty-server
+        with:
+          source: local
+          server-build-cache-key: sync-upstream-server-build
+
+      - name: Commit, regenerate, push and open the PR
+        id: finish
+        if: steps.kind.outputs.kind == 'clean' || steps.kind.outputs.kind == 'mechanical' || steps.kind.outputs.kind == 'agent'
+        env:
+          SYNC_UPSTREAM_SERVER_URL: ${{ steps.server.outputs.server-url }}
+        run: bash deploy/sync-upstream.sh finish "${{ steps.kind.outputs.kind }}"
+
+      - name: File a conflict issue
+        if: always() && steps.merge.outputs.outcome == 'conflict' && steps.finish.outcome != 'success'
+        run: bash deploy/sync-upstream.sh report-conflict
+
+      - name: Summary
+        if: always()
+        env:
+          OUTCOME: ${{ steps.merge.outputs.outcome }}
+          KIND: ${{ steps.kind.outputs.kind }}
+          PR_URL: ${{ steps.finish.outputs.pr_url }}
+          AUTOMERGE: ${{ steps.finish.outputs.automerge }}
+        run: |
+          {
+            echo "## Upstream sync"
+            echo "- merge outcome: ${OUTCOME:-failed before merging}"
+            echo "- finished as: ${KIND:-n/a}"
+            echo "- PR: ${PR_URL:-none}"
+            echo "- auto-merge: ${AUTOMERGE:-not requested}"
+          } >> "$GITHUB_STEP_SUMMARY"

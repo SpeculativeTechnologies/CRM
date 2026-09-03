@@ -231,7 +231,10 @@ Before modifying code, configuration, schema, or deployment files:
 3. Follow this file for code conventions and repository commands.
 4. Read the applicable environment guide under `deploy/` before touching
    development, staging, or production tooling.
-5. For anything about the **deployed** CRM — the cloud boxes, deploys, backups,
+5. For an upstream sync, or any conflict with `twentyhq/twenty`, follow
+   `deploy/UPSTREAM-SYNC.md`: it holds the resolution policy, the recurring
+   hotspots, and the rules that keep new fork work mergeable.
+6. For anything about the **deployed** CRM — the cloud boxes, deploys, backups,
    restores, DNS, or incident response — read the private
    `SpeculativeTechnologies/crm-ops` repository. Production runs on Google Cloud
    behind a Cloudflare tunnel, and none of that is documented in this repository.
