@@ -31,6 +31,7 @@ import { filterOutContactsThatBelongToSelfOrWorkspaceMembers } from 'src/modules
 import { getDomainNameFromHandle } from 'src/modules/contact-creation-manager/utils/get-domain-name-from-handle.util';
 import { getFirstNameAndLastNameFromHandleAndDisplayName } from 'src/modules/contact-creation-manager/utils/get-first-name-and-last-name-from-handle-and-display-name.util';
 import { getUniqueContactsAndHandles } from 'src/modules/contact-creation-manager/utils/get-unique-contacts-and-handles.util';
+import { isNonPersonEmail } from 'src/modules/contact-creation-manager/utils/is-non-person-email.util';
 import { addPersonEmailFiltersToQueryBuilder } from 'src/modules/match-participant/utils/add-person-email-filters-to-query-builder';
 import { PersonWorkspaceEntity } from 'src/modules/person/standard-objects/person.workspace-entity';
 import { WorkspaceMemberWorkspaceEntity } from 'src/modules/workspace-member/standard-objects/workspace-member.workspace-entity';
@@ -102,8 +103,14 @@ export class CreateCompanyAndPersonService {
             workspace?.isInternalMessagesImportEnabled ?? false,
           );
 
+        // Shared inboxes, automated senders and bulk mail systems are still
+        // saved as participants, but never become People.
+        const contactsThatArePeople = peopleToCreateFromOtherCompanies.filter(
+          (contact) => !isNonPersonEmail(contact.handle),
+        );
+
         const { uniqueContacts, uniqueHandles } = getUniqueContactsAndHandles(
-          peopleToCreateFromOtherCompanies,
+          contactsThatArePeople,
         );
 
         if (uniqueHandles.length === 0) {
