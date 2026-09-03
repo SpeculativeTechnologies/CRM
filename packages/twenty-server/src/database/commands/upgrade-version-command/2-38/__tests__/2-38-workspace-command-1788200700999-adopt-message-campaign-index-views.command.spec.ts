@@ -4,6 +4,10 @@ import { type WorkspaceIteratorService } from 'src/database/commands/command-run
 import { AdoptMessageCampaignIndexViewsCommand } from 'src/database/commands/upgrade-version-command/2-38/2-38-workspace-command-1788200700999-adopt-message-campaign-index-views.command';
 import { type ApplicationService } from 'src/engine/core-modules/application/application.service';
 import { type FlatEntityMaps } from 'src/engine/metadata-modules/flat-entity/types/flat-entity-maps.type';
+import { type FlatFieldMetadata } from 'src/engine/metadata-modules/flat-field-metadata/types/flat-field-metadata.type';
+import { type FlatObjectMetadata } from 'src/engine/metadata-modules/flat-object-metadata/types/flat-object-metadata.type';
+import { type FlatView } from 'src/engine/metadata-modules/flat-view/types/flat-view.type';
+import { type FlatViewField } from 'src/engine/metadata-modules/flat-view-field/types/flat-view-field.type';
 import { type WorkspaceCacheService } from 'src/engine/workspace-cache/services/workspace-cache.service';
 
 const CAMPAIGN = STANDARD_OBJECTS.messageCampaign;
@@ -11,9 +15,9 @@ const STANDARD_VIEW_ID = 'standard-campaign-index-view';
 const STANDARD_NAME_COLUMN_ID = 'standard-campaign-name-column';
 const STANDARD_STATUS_COLUMN_ID = 'standard-campaign-status-column';
 
-const buildMaps = <T extends { universalIdentifier: string; id?: string }>(
-  entities: T[],
-): FlatEntityMaps<T> =>
+const buildMaps = <TMaps>(
+  entities: { universalIdentifier: string; id?: string }[],
+): TMaps =>
   ({
     byUniversalIdentifier: Object.fromEntries(
       entities.map((entity) => [entity.universalIdentifier, entity]),
@@ -24,9 +28,9 @@ const buildMaps = <T extends { universalIdentifier: string; id?: string }>(
         .map((entity) => [entity.id as string, entity.universalIdentifier]),
     ),
     universalIdentifiersByApplicationId: {},
-  }) as unknown as FlatEntityMaps<T>;
+  }) as unknown as TMaps;
 
-const standardFlatViewMaps = buildMaps([
+const standardFlatViewMaps = buildMaps<FlatEntityMaps<FlatView>>([
   {
     id: 'std-view',
     universalIdentifier: STANDARD_VIEW_ID,
@@ -35,7 +39,7 @@ const standardFlatViewMaps = buildMaps([
   },
 ]);
 
-const standardFlatViewFieldMaps = buildMaps([
+const standardFlatViewFieldMaps = buildMaps<FlatEntityMaps<FlatViewField>>([
   {
     id: 'std-name-column',
     universalIdentifier: STANDARD_NAME_COLUMN_ID,
@@ -51,7 +55,7 @@ const standardFlatViewFieldMaps = buildMaps([
   },
 ]);
 
-const flatObjectMetadataMaps = buildMaps([
+const flatObjectMetadataMaps = buildMaps<FlatEntityMaps<FlatObjectMetadata>>([
   {
     id: 'campaign-object',
     universalIdentifier: CAMPAIGN.universalIdentifier,
@@ -59,7 +63,7 @@ const flatObjectMetadataMaps = buildMaps([
   },
 ]);
 
-const flatFieldMetadataMaps = buildMaps([
+const flatFieldMetadataMaps = buildMaps<FlatEntityMaps<FlatFieldMetadata>>([
   {
     id: 'name-field',
     universalIdentifier: CAMPAIGN.fields.name.universalIdentifier,
@@ -83,7 +87,7 @@ describe('AdoptMessageCampaignIndexViewsCommand.planAdoptions', () => {
     const adoptions = buildCommand().planAdoptions({
       flatObjectMetadataMaps,
       flatFieldMetadataMaps,
-      flatViewMaps: buildMaps([
+      flatViewMaps: buildMaps<FlatEntityMaps<FlatView>>([
         {
           id: 'newer-view',
           universalIdentifier: 'auto-generated-newer',
@@ -101,7 +105,7 @@ describe('AdoptMessageCampaignIndexViewsCommand.planAdoptions', () => {
           deletedAt: null,
         },
       ]),
-      flatViewFieldMaps: buildMaps([
+      flatViewFieldMaps: buildMaps<FlatEntityMaps<FlatViewField>>([
         {
           id: 'existing-name-column',
           universalIdentifier: 'auto-generated-name-column',
@@ -140,7 +144,7 @@ describe('AdoptMessageCampaignIndexViewsCommand.planAdoptions', () => {
     const adoptions = buildCommand().planAdoptions({
       flatObjectMetadataMaps,
       flatFieldMetadataMaps,
-      flatViewMaps: buildMaps([
+      flatViewMaps: buildMaps<FlatEntityMaps<FlatView>>([
         {
           id: 'std-view',
           universalIdentifier: STANDARD_VIEW_ID,
@@ -150,7 +154,7 @@ describe('AdoptMessageCampaignIndexViewsCommand.planAdoptions', () => {
           deletedAt: null,
         },
       ]),
-      flatViewFieldMaps: buildMaps([]),
+      flatViewFieldMaps: buildMaps<FlatEntityMaps<FlatViewField>>([]),
       standardFlatViewMaps,
       standardFlatViewFieldMaps,
     });
@@ -165,7 +169,7 @@ describe('AdoptMessageCampaignIndexViewsCommand.planAdoptions', () => {
       command.planAdoptions({
         flatObjectMetadataMaps,
         flatFieldMetadataMaps,
-        flatViewMaps: buildMaps([
+        flatViewMaps: buildMaps<FlatEntityMaps<FlatView>>([
           {
             id: 'deleted-view',
             universalIdentifier: 'auto-generated-deleted',
@@ -175,7 +179,7 @@ describe('AdoptMessageCampaignIndexViewsCommand.planAdoptions', () => {
             deletedAt: '2026-08-01T00:00:00.000Z',
           },
         ]),
-        flatViewFieldMaps: buildMaps([]),
+        flatViewFieldMaps: buildMaps<FlatEntityMaps<FlatViewField>>([]),
         standardFlatViewMaps,
         standardFlatViewFieldMaps,
       }),
@@ -183,10 +187,10 @@ describe('AdoptMessageCampaignIndexViewsCommand.planAdoptions', () => {
 
     expect(
       command.planAdoptions({
-        flatObjectMetadataMaps: buildMaps([]),
+        flatObjectMetadataMaps: buildMaps<FlatEntityMaps<FlatObjectMetadata>>([]),
         flatFieldMetadataMaps,
-        flatViewMaps: buildMaps([]),
-        flatViewFieldMaps: buildMaps([]),
+        flatViewMaps: buildMaps<FlatEntityMaps<FlatView>>([]),
+        flatViewFieldMaps: buildMaps<FlatEntityMaps<FlatViewField>>([]),
         standardFlatViewMaps,
         standardFlatViewFieldMaps,
       }),

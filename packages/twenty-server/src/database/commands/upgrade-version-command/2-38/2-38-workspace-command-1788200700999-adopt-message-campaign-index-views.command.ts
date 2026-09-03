@@ -1,5 +1,3 @@
-import { Logger } from '@nestjs/common';
-
 import { Command } from 'nest-commander';
 import { STANDARD_OBJECTS } from 'twenty-shared/metadata';
 import { isDefined } from 'twenty-shared/utils';
@@ -38,10 +36,6 @@ const CAMPAIGN_OBJECT_UNIVERSAL_IDENTIFIERS = [
     'Give pre-existing MessageCampaign, MessageList and MessageListMember index views the standard universal identifiers before the 2.38 schema sync',
 })
 export class AdoptMessageCampaignIndexViewsCommand extends ProvisionedWorkspaceCommandRunner {
-  private readonly logger = new Logger(
-    AdoptMessageCampaignIndexViewsCommand.name,
-  );
-
   constructor(
     protected readonly workspaceIteratorService: WorkspaceIteratorService,
     private readonly applicationService: ApplicationService,
