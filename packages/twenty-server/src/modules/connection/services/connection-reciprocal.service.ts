@@ -47,8 +47,7 @@ export class ConnectionReciprocalService {
     // Omit to sweep every connection, as the one-off backfill does
     connectionIds?: string[];
   }): Promise<number> {
-    const connectionRepository =
-      await this.getConnectionRepository();
+    const connectionRepository = await this.getConnectionRepository();
 
     if (isDefined(connectionIds) && connectionIds.length === 0) {
       return 0;
@@ -127,8 +126,7 @@ export class ConnectionReciprocalService {
     workspaceId: string;
     connections: Pick<ConnectionRecord, 'personId' | 'connectedToId'>[];
   }): Promise<void> {
-    const connectionRepository =
-      await this.getConnectionRepository();
+    const connectionRepository = await this.getConnectionRepository();
 
     for (const connection of connections) {
       if (
