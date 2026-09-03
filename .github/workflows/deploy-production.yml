@@ -15,6 +15,8 @@ name: Deploy to production
 # down:
 #   - the commit must already be merged into main
 #   - staging must have run something this commit contains
+#   - anything reaching the database must be inside a commit somebody signed
+#     off with Record a staging check
 #   - cd-deploy-cloud verifies the pinned image before touching the VM
 
 on:
@@ -83,6 +85,65 @@ jobs:
             exit 1
           fi
           echo "Staging ran ${staged}, contained in ${SHA}"
+
+      # The step above is satisfied by staging having run an ancestor, which is
+      # right for reversible code and wrong for a migration: merge a command on
+      # top of a staged commit and it would ride to production having never run
+      # anywhere. So database changes are held to the stricter test. They must
+      # be contained in the commit somebody signed off with Record a staging
+      # check, which can only ever name a commit staging deployed successfully.
+      - name: Require a staging check for database changes
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          SHA: ${{ steps.resolve.outputs.sha }}
+        run: |
+          set -euo pipefail
+          # The promotion refs are ordinary branches, so fetch-depth 0 has them,
+          # but be explicit rather than depend on that.
+          git fetch --no-tags --quiet origin '+refs/heads/*:refs/remotes/origin/*'
+
+          running="$(
+            gh api "repos/${REPO}/git/ref/heads/production-target" --jq .object.sha 2>/dev/null || true
+          )"
+
+          # Without a previous production deploy there is no baseline to say
+          # what this promotion introduces, so it is held to the check.
+          if [ -n "$running" ]; then
+            introduced="$(node .github/scripts/database-changes.mjs "$running" "$SHA")"
+            if [ -z "$introduced" ]; then
+              echo "Nothing in this promotion reaches the database."
+              exit 0
+            fi
+          else
+            echo "No recorded production deploy to compare against; requiring a staging check."
+          fi
+
+          verified="$(
+            gh api "repos/${REPO}/git/ref/heads/staging-verified" --jq .object.sha 2>/dev/null || true
+          )"
+          if [ -z "$verified" ]; then
+            echo "::error::${SHA} changes the database and no staging check has ever been recorded."
+            echo "Deploy it to staging, exercise it, then run 'Record a staging check'."
+            exit 1
+          fi
+
+          if ! git merge-base --is-ancestor "$verified" "$SHA"; then
+            echo "::error::The last staging check was for ${verified}, which ${SHA} does not contain."
+            exit 1
+          fi
+
+          # Everything reaching the database has to be inside what was checked.
+          # An empty diff from the checked commit forward is the proof.
+          unchecked="$(node .github/scripts/database-changes.mjs "$verified" "$SHA")"
+          if [ -n "$unchecked" ]; then
+            echo "::error::These reach the database and landed after the staging check of ${verified}:"
+            sed 's/^/  /' <<<"$unchecked"
+            echo "Deploy ${SHA} to staging, exercise it, then run 'Record a staging check'."
+            exit 1
+          fi
+
+          echo "The database changes in ${SHA} are covered by the staging check of ${verified}."
 
       # Already past the environment gate above, so the single approval that
       # guards promotion also guards this. cd-deploy-cloud deliberately declares

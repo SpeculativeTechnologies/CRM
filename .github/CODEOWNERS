@@ -19,10 +19,13 @@
 # See deploy/TEAM-WORKFLOW.md, "What needs the production owner".
 # ---------------------------------------------------------------------------
 
-# Migrations and upgrade commands: once one has run against production, the
-# previous image does not un-run it.
-/packages/twenty-server/src/database/                             @bzreinhardt
-/packages/twenty-server/src/engine/core-modules/upgrade/          @bzreinhardt
+# Migrations, upgrade commands, and entities are deliberately absent. Once one
+# has run against production the previous image does not un-run it, but the
+# thing that makes that safe is a staging deploy somebody exercised, not a
+# second pair of eyes on the diff. So they are gated at promotion instead of at
+# merge: ci-fork-release-risk labels them `risk:database`, and
+# deploy-production.yml refuses them until staging-signoff.yml has signed off a
+# staging deploy containing them. See deploy/TEAM-WORKFLOW.md.
 
 # Access control: bad state outlives the rollback in sessions and tokens.
 /packages/twenty-server/src/engine/core-modules/auth/             @bzreinhardt
@@ -38,8 +41,10 @@
 /packages/twenty-server/src/engine/core-modules/twenty-config/    @bzreinhardt
 /.github/CODEOWNERS                                               @bzreinhardt
 /.github/scripts/release-risk.mjs                                 @bzreinhardt
+/.github/scripts/database-changes.mjs                             @bzreinhardt
 /.github/workflows/ci-fork-release-risk.yaml                      @bzreinhardt
 /.github/workflows/deploy-production.yml                          @bzreinhardt
 /.github/workflows/deploy-staging.yml                             @bzreinhardt
+/.github/workflows/staging-signoff.yml                            @bzreinhardt
 /.github/workflows/cd-deploy-cloud.yaml                           @bzreinhardt
 /.github/actions/deploy-cloud-box/                                @bzreinhardt

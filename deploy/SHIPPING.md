@@ -47,10 +47,17 @@ Staging has a copy of real data, so it should feel like the real CRM. Record a
 real pass or fail; seeing no alerts is not the same as completing the smoke
 test.
 
-**6. Put that exact SHA on production.** If staging passes and Ben is available
-to monitor the release, go to **Actions → Deploy to production → Run workflow**
-and enter the same SHA. The run verifies that the commit is on `main` and
-passed through staging, then pauses for Ben's approval. Once approved, it
+**6. Write down what you tried.** Go to **Actions → Record a staging check →
+Run workflow**, pick pass or fail, and say what you exercised. This is
+mandatory if the release changes the database: production will refuse the
+promotion without it. Do it anyway when it doesn't, because it is the only
+lasting record of step 5.
+
+**7. Put that exact SHA on production.** If staging passes and someone is
+available to monitor the release, go to **Actions → Deploy to production → Run
+workflow** and enter the same SHA. The run verifies that the commit is on
+`main`, that it passed through staging, and that any database change in it was
+covered by the check you recorded, then pauses for approval. Once approved, it
 deploys the cloud production VM and waits for the result. If the release window
 ends before validation is complete, wait for the next supported window. If
 staging fails, stop and fix or revert it through another PR.
