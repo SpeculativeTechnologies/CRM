@@ -194,8 +194,9 @@ regenerate() {
   # sandbox prebuild, which needs an SDK build the runner may not have.
   local project
   for project in twenty-front twenty-server twenty-emails; do
-    if (cd "packages/$project" && npx lingui extract >/dev/null 2>&1 &&
-        npx lingui compile >/dev/null 2>&1); then
+    if (cd "packages/$project" &&
+        npx lingui extract --overwrite --clean >/dev/null 2>&1 &&
+        npx lingui compile --typescript >/dev/null 2>&1); then
       echo "- $project message catalogs re-extracted and compiled" >> "$notes"
     else
       echo "- $project lingui extract/compile FAILED" >> "$notes"
