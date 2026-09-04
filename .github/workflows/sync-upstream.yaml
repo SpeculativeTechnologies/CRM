@@ -56,7 +56,7 @@ jobs:
       contents: read
     env:
       GH_TOKEN: ${{ secrets.SYNC_UPSTREAM_TOKEN }}
-      SYNC_UPSTREAM_STATE_DIR: ${{ runner.temp }}/sync-upstream-state
+      SYNC_UPSTREAM_STATE_DIR: /tmp/sync-upstream-state
       SYNC_UPSTREAM_AUTOMERGE: ${{ vars.SYNC_UPSTREAM_AUTOMERGE || 'false' }}
     steps:
       - name: Require the sync token
@@ -111,7 +111,7 @@ jobs:
             upstream commits). Locale catalogs, generated GraphQL types and jest
             snapshots were already resolved by taking upstream. The remaining
             conflicted files are listed in
-            ${{ runner.temp }}/sync-upstream-state/conflicts.txt.
+            /tmp/sync-upstream-state/conflicts.txt.
 
             Resolve every one of them following deploy/UPSTREAM-SYNC.md exactly:
             keep upstream's structure and refactors, re-apply the fork's intent
@@ -125,7 +125,7 @@ jobs:
             When no conflict markers remain, run
             npx nx run-many -t typecheck -p twenty-shared twenty-server twenty-front
             and fix what your resolution broke. Then git add the files you
-            changed and write ${{ runner.temp }}/sync-upstream-state/agent-notes.md:
+            changed and write /tmp/sync-upstream-state/agent-notes.md:
             one bullet per resolved file saying what was decided, a section
             "Unported" listing any fork behavior you could not carry over, and
             a section "Needs a human" for anything uncertain. That file becomes
