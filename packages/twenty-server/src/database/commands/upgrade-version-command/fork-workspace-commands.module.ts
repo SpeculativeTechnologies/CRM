@@ -21,6 +21,7 @@ import { AddMessageReplyTrackingFieldsCommand } from 'src/database/commands/upgr
 import { AddMessageHeaderMessageIdIndexCommand } from 'src/database/commands/upgrade-version-command/2-35/2-35-workspace-command-1787680000000-add-message-header-message-id-index.command';
 import { AdoptTimelineActivitySearchVectorFieldCommand } from 'src/database/commands/upgrade-version-command/2-35/2-35-workspace-command-1787749299999-adopt-timeline-activity-search-vector-field.command';
 import { AdoptMessageCampaignIndexViewsCommand } from 'src/database/commands/upgrade-version-command/2-38/2-38-workspace-command-1788200700999-adopt-message-campaign-index-views.command';
+import { ConvertLegacyObjectNavigationCommandMenuItemsCommand } from 'src/database/commands/upgrade-version-command/2-38/2-38-workspace-command-1788200701001-convert-legacy-object-navigation-command-menu-items.command';
 import { ForkRunMissedWorkspaceCommandsCommand } from 'src/database/commands/upgrade-version-command/fork-run-missed-workspace-commands.command';
 import { ApplicationModule } from 'src/engine/core-modules/application/application.module';
 import { ForkMissedWorkspaceCommandsModule } from 'src/engine/core-modules/upgrade/fork-missed-workspace-commands.module';
@@ -70,6 +71,7 @@ import { ConnectionModule } from 'src/modules/connection/connection.module';
     AddMessageHeaderMessageIdIndexCommand,
     AdoptTimelineActivitySearchVectorFieldCommand,
     AdoptMessageCampaignIndexViewsCommand,
+    ConvertLegacyObjectNavigationCommandMenuItemsCommand,
     ForkRunMissedWorkspaceCommandsCommand,
   ],
 })

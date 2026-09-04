@@ -9,6 +9,8 @@ is deliberately documented elsewhere.
 - [SHIPPING.md](SHIPPING.md) — the human walkthrough from branch to production
 - [TEAM-WORKFLOW.md](TEAM-WORKFLOW.md) — authoritative branching, review, and
   promotion rules
+- [RELEASE-AUTOMATION.md](RELEASE-AUTOMATION.md) — what the deploy checks on
+  the box before and after each release, and the gaps that remain
 - [DEVELOPMENT.md](DEVELOPMENT.md) — isolated local development
 - [LLM-LOCAL-DEV.md](LLM-LOCAL-DEV.md) — the same pipeline for coding agents
 - [STAGING.md](STAGING.md) and [PRODUCTION.md](PRODUCTION.md) — public workflow
