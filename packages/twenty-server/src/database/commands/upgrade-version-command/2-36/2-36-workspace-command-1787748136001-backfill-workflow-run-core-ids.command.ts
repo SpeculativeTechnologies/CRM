@@ -83,23 +83,57 @@ export class BackfillWorkflowRunCoreIdsCommand extends ProvisionedWorkspaceComma
         return;
       }
 
-      const [, updatedVersionRowCount] = await queryRunner.query(
-        `UPDATE "${schema}"."workflowRun" workflowRun
-         SET "coreWorkflowVersionId" = workflowVersion."coreWorkflowVersionId"
-         FROM "${schema}"."workflowVersion" workflowVersion
-         WHERE workflowVersion.id = workflowRun."workflowVersionId"
-           AND workflowRun."coreWorkflowVersionId" IS NULL
-           AND workflowVersion."coreWorkflowVersionId" IS NOT NULL`,
+      // Fork: the source columns come from 2.20 and 2.23 workspace commands
+      // that never ran on workspaces provisioned before them. Skip the link
+      // whose source is missing instead of failing the whole upgrade; the
+      // 2.23 workflow core-link commands restore it when run by name.
+      const [{ workflowVersionHasCoreId }] = await queryRunner.query(
+        `SELECT EXISTS (
+           SELECT 1 FROM pg_attribute
+           WHERE attrelid = to_regclass($1) AND attname = 'coreWorkflowVersionId' AND NOT attisdropped
+         ) AS "workflowVersionHasCoreId"`,
+        [`"${schema}"."workflowVersion"`],
+      );
+      const [{ workflowHasCoreId }] = await queryRunner.query(
+        `SELECT EXISTS (
+           SELECT 1 FROM pg_attribute
+           WHERE attrelid = to_regclass($1) AND attname = 'coreWorkflowId' AND NOT attisdropped
+         ) AS "workflowHasCoreId"`,
+        [`"${schema}"."workflow"`],
       );
 
-      const [, updatedWorkflowRowCount] = await queryRunner.query(
-        `UPDATE "${schema}"."workflowRun" workflowRun
-         SET "coreWorkflowId" = workflow."coreWorkflowId"
-         FROM "${schema}"."workflow" workflow
-         WHERE workflow.id = workflowRun."workflowId"
-           AND workflowRun."coreWorkflowId" IS NULL
-           AND workflow."coreWorkflowId" IS NOT NULL`,
-      );
+      let updatedVersionRowCount = 0;
+      let updatedWorkflowRowCount = 0;
+
+      if (workflowVersionHasCoreId === true) {
+        [, updatedVersionRowCount] = await queryRunner.query(
+          `UPDATE "${schema}"."workflowRun" workflowRun
+           SET "coreWorkflowVersionId" = workflowVersion."coreWorkflowVersionId"
+           FROM "${schema}"."workflowVersion" workflowVersion
+           WHERE workflowVersion.id = workflowRun."workflowVersionId"
+             AND workflowRun."coreWorkflowVersionId" IS NULL
+             AND workflowVersion."coreWorkflowVersionId" IS NOT NULL`,
+        );
+      } else {
+        this.logger.warn(
+          `workflowVersion.coreWorkflowVersionId does not exist for workspace ${workspaceId}; leaving workflowRun.coreWorkflowVersionId unset`,
+        );
+      }
+
+      if (workflowHasCoreId === true) {
+        [, updatedWorkflowRowCount] = await queryRunner.query(
+          `UPDATE "${schema}"."workflowRun" workflowRun
+           SET "coreWorkflowId" = workflow."coreWorkflowId"
+           FROM "${schema}"."workflow" workflow
+           WHERE workflow.id = workflowRun."workflowId"
+             AND workflowRun."coreWorkflowId" IS NULL
+             AND workflow."coreWorkflowId" IS NOT NULL`,
+        );
+      } else {
+        this.logger.warn(
+          `workflow.coreWorkflowId does not exist for workspace ${workspaceId} (2.23 add-workflow-core-soft-ref-field never ran); leaving workflowRun.coreWorkflowId unset`,
+        );
+      }
 
       this.logger.log(
         `Backfilled workflowRun core ids for workspace ${workspaceId} (coreWorkflowVersionId: ${updatedVersionRowCount}, coreWorkflowId: ${updatedWorkflowRowCount})`,
