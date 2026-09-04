@@ -12,6 +12,10 @@ import {
 import { type ParsedUpgradeCommandOptions } from 'src/database/commands/upgrade-version-command/upgrade.command';
 import { TwentyConfigService } from 'src/engine/core-modules/twenty-config/twenty-config.service';
 import {
+  TWENTY_ALL_VERSIONS,
+  type TwentyAllVersion,
+} from 'src/engine/core-modules/upgrade/constants/twenty-all-versions.constant';
+import {
   type UpgradeStep,
   type WorkspaceUpgradeStep,
 } from 'src/engine/core-modules/upgrade/services/upgrade-sequence-reader.service';
@@ -31,8 +35,23 @@ export type WorkspaceCommandAttempt = {
 
 export type MissedWorkspaceCommandsPlan = {
   missedSteps: WorkspaceUpgradeStep[];
+  skippedBelowFloor: WorkspaceUpgradeStep[];
   cursorCreatedAt: Date | null;
 };
+
+// The boxes were at 2.35 when this catch-up shipped. Gaps below that predate
+// it by months (production was seeded at ~2.9, upstream backdated freely, and
+// several were run by name without a record); those commands were written for
+// schemas since dropped, so replaying them now fails or does harm (the 2.10
+// demoted-fields command reads a fieldMetadata column that no longer exists).
+// They are listed, never run. Raise the floor deliberately, never lower it.
+export const FORK_WORKSPACE_CATCH_UP_FLOOR_VERSION: TwentyAllVersion = '2.35.0';
+
+const isVersionBelow = (
+  version: TwentyAllVersion,
+  floor: TwentyAllVersion,
+): boolean =>
+  TWENTY_ALL_VERSIONS.indexOf(version) < TWENTY_ALL_VERSIONS.indexOf(floor);
 
 // This fork merges upstream weekly, so both sides keep inserting workspace
 // commands behind positions a workspace has already passed: upstream backdates
@@ -48,9 +67,11 @@ export type MissedWorkspaceCommandsPlan = {
 export const planMissedWorkspaceCommands = ({
   sequence,
   attempts,
+  floorVersion = FORK_WORKSPACE_CATCH_UP_FLOOR_VERSION,
 }: {
   sequence: UpgradeStep[];
   attempts: WorkspaceCommandAttempt[];
+  floorVersion?: TwentyAllVersion;
 }): MissedWorkspaceCommandsPlan => {
   const positionByName = new Map(
     sequence.map((step, position) => [step.name, position] as const),
@@ -63,13 +84,13 @@ export const planMissedWorkspaceCommands = ({
     .filter(isDefined);
 
   if (attemptedPositions.length === 0) {
-    return { missedSteps: [], cursorCreatedAt: null };
+    return { missedSteps: [], skippedBelowFloor: [], cursorCreatedAt: null };
   }
 
   const earliestPosition = Math.min(...attemptedPositions);
   const furthestPosition = Math.max(...attemptedPositions);
 
-  const missedSteps = sequence
+  const notCompletedSteps = sequence
     .slice(earliestPosition + 1, furthestPosition)
     .filter(
       (step): step is WorkspaceUpgradeStep =>
@@ -77,13 +98,20 @@ export const planMissedWorkspaceCommands = ({
         attemptByName.get(step.name)?.status !== 'completed',
     );
 
+  const missedSteps = notCompletedSteps.filter(
+    (step) => !isVersionBelow(step.version, floorVersion),
+  );
+  const skippedBelowFloor = notCompletedSteps.filter((step) =>
+    isVersionBelow(step.version, floorVersion),
+  );
+
   const cursorCreatedAt = attempts.reduce<Date>(
     (newest, attempt) =>
       attempt.createdAt > newest ? attempt.createdAt : newest,
     attempts[0].createdAt,
   );
 
-  return { missedSteps, cursorCreatedAt };
+  return { missedSteps, skippedBelowFloor, cursorCreatedAt };
 };
 
 @Injectable()
@@ -129,10 +157,25 @@ export class ForkMissedWorkspaceCommandsService {
   }): Promise<void> {
     const { workspaceId } = context;
     const attempts = await this.loadLatestAttempts(workspaceId);
-    const { missedSteps, cursorCreatedAt } = planMissedWorkspaceCommands({
-      sequence,
-      attempts,
-    });
+    const { missedSteps, skippedBelowFloor, cursorCreatedAt } =
+      planMissedWorkspaceCommands({ sequence, attempts });
+
+    if (skippedBelowFloor.length > 0) {
+      this.logger.warn(
+        formatUpgradeLog({
+          humanMessage:
+            `${skippedBelowFloor.length} workspace step(s) below ${FORK_WORKSPACE_CATCH_UP_FLOOR_VERSION} never completed for workspace ${workspaceId} ` +
+            'and are left alone (run by name if one is needed): ' +
+            skippedBelowFloor.map((step) => step.name).join(', '),
+          event: 'workspace.catch-up.skipped',
+          logFields: {
+            workspaceId,
+            floorVersion: FORK_WORKSPACE_CATCH_UP_FLOOR_VERSION,
+            count: skippedBelowFloor.length,
+          },
+        }),
+      );
+    }
 
     if (missedSteps.length === 0 || !isDefined(cursorCreatedAt)) {
       return;
