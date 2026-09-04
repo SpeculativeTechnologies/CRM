@@ -56,7 +56,6 @@ jobs:
       contents: read
     env:
       GH_TOKEN: ${{ secrets.SYNC_UPSTREAM_TOKEN }}
-      SYNC_UPSTREAM_STATE_DIR: ${{ runner.temp }}/sync-upstream-state
       SYNC_UPSTREAM_AUTOMERGE: ${{ vars.SYNC_UPSTREAM_AUTOMERGE || 'false' }}
     steps:
       - name: Require the sync token
