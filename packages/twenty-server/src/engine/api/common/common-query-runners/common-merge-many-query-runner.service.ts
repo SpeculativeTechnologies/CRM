@@ -21,11 +21,13 @@ import {
   CommonQueryRunnerException,
   CommonQueryRunnerExceptionCode,
 } from 'src/engine/api/common/common-query-runners/errors/common-query-runner.exception';
+import { getConflictingFields } from 'src/engine/api/common/common-query-runners/common-create-many-query-runner/utils/get-conflicting-fields.util';
 import { STANDARD_ERROR_MESSAGE } from 'src/engine/api/common/common-query-runners/errors/standard-error-message.constant';
 import {
   type PersonAvatarFileHandover,
   getPersonAvatarFileHandover,
 } from 'src/engine/api/common/common-query-runners/utils/get-person-avatar-file-handover.util';
+import { getRecordIdsCollidingAfterRepoint } from 'src/engine/api/common/common-query-runners/utils/get-record-ids-colliding-after-repoint.util';
 import { getRedundantSourceRecordIds } from 'src/engine/api/common/common-query-runners/utils/get-redundant-source-record-ids.util';
 import { CommonBaseQueryRunnerContext } from 'src/engine/api/common/types/common-base-query-runner-context.type';
 import { CommonExtendedQueryRunnerContext } from 'src/engine/api/common/types/common-extended-query-runner-context.type';
@@ -537,6 +539,14 @@ export class CommonMergeManyQueryRunnerService extends CommonBaseQueryRunnerServ
         context.rolePermissionConfig,
       );
 
+      await this.deleteRelatedRecordsCollidingAfterRepoint({
+        repository,
+        context,
+        relationField,
+        fromIds,
+        toId,
+      });
+
       // runMutation refuses to update more than QUERY_MAX_RECORDS rows at
       // once, and a person auto-created by email sync can carry thousands of
       // participants and timeline activities. Repoint in batches: each pass
@@ -574,6 +584,82 @@ export class CommonMergeManyQueryRunnerService extends CommonBaseQueryRunnerServ
         }
       }
     }
+  }
+
+  private async deleteRelatedRecordsCollidingAfterRepoint({
+    repository,
+    context,
+    relationField,
+    fromIds,
+    toId,
+  }: {
+    repository: WorkspaceRepository<ObjectRecord>;
+    context: CommonExtendedQueryRunnerContext;
+    relationField: {
+      objectMetadata: FlatObjectMetadata;
+      joinColumnName: string;
+    };
+    fromIds: string[];
+    toId: string;
+  }): Promise<void> {
+    const { flatFieldMetadataMaps, flatIndexMaps } = context;
+
+    if (!isDefined(flatIndexMaps)) {
+      return;
+    }
+
+    // Message thread and calendar event targets are unique per (parent, target),
+    // so a thread linked to two duplicate companies has one row per company and
+    // repointing both onto the survivor would violate that index. Drop the rows
+    // that would collide before the repoint. Only live rows are compared: the
+    // standard unique indexes exclude soft-deleted rows, and a trashed link
+    // must not cost the survivor a live one.
+    const uniqueGroupsOnJoinColumn = getConflictingFields(
+      relationField.objectMetadata,
+      flatFieldMetadataMaps,
+      flatIndexMaps,
+    ).filter((group) =>
+      group.conflictingProperties.some(
+        (property) => property.column === relationField.joinColumnName,
+      ),
+    );
+
+    if (uniqueGroupsOnJoinColumn.length === 0) {
+      return;
+    }
+
+    const records = await repository.find({
+      where: { [relationField.joinColumnName]: In([toId, ...fromIds]) },
+    });
+
+    const recordIdsToDelete = new Set<string>();
+
+    for (const group of uniqueGroupsOnJoinColumn) {
+      const partnerPaths = group.conflictingProperties
+        .filter((property) => property.column !== relationField.joinColumnName)
+        .map((property) => property.fullPath);
+
+      getRecordIdsCollidingAfterRepoint({
+        records,
+        joinColumnName: relationField.joinColumnName,
+        partnerPaths,
+        fromIds,
+        toId,
+      }).forEach((recordId) => recordIdsToDelete.add(recordId));
+    }
+
+    if (recordIdsToDelete.size === 0) {
+      return;
+    }
+
+    await repository.runMutation({
+      selectQueryBuilder: repository
+        .createQueryBuilder(relationField.objectMetadata.nameSingular)
+        .where({ id: In([...recordIdsToDelete]) }),
+      rowLevelPermissionsApplied: false,
+      kind: 'delete',
+      columnsToReturn: ['id'],
+    });
   }
 
   private async deleteClearlyRedundantPersonRelationRecords(

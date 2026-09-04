@@ -1,5 +1,6 @@
 import { COMPANY_GQL_FIELDS } from 'test/integration/constants/company-gql-fields.constants';
 import { createManyOperationFactory } from 'test/integration/graphql/utils/create-many-operation-factory.util';
+import { createOneOperationFactory } from 'test/integration/graphql/utils/create-one-operation-factory.util';
 import { findManyOperationFactory } from 'test/integration/graphql/utils/find-many-operation-factory.util';
 import { findOneOperationFactory } from 'test/integration/graphql/utils/find-one-operation-factory.util';
 import { makeGraphqlAPIRequest } from 'test/integration/graphql/utils/make-graphql-api-request.util';
@@ -272,6 +273,102 @@ describe('companies merge resolvers (integration)', () => {
           expect.objectContaining({ url: 'linkedin.com/company/second-sub' }),
         ]),
       );
+    });
+  });
+
+  describe('repointing rows under a unique index', () => {
+    let createdMessageThreadTargetIds: string[] = [];
+    let createdMessageThreadIds: string[] = [];
+
+    afterEach(async () => {
+      await deleteRecordsByIds(
+        'messageThreadTarget',
+        createdMessageThreadTargetIds,
+      );
+      await deleteRecordsByIds('messageThread', createdMessageThreadIds);
+      createdMessageThreadTargetIds = [];
+      createdMessageThreadIds = [];
+    });
+
+    it('should merge companies linked to the same message thread', async () => {
+      const createCompaniesOperation = createManyOperationFactory({
+        objectMetadataSingularName: 'company',
+        objectMetadataPluralName: 'companies',
+        gqlFields: COMPANY_GQL_FIELDS,
+        data: [{ name: 'Thread Survivor' }, { name: 'Thread Duplicate' }],
+      });
+
+      const createResponse = await makeGraphqlAPIRequest(
+        createCompaniesOperation,
+      );
+      const survivorCompanyId = createResponse.body.data.createCompanies[0].id;
+      const absorbedCompanyId = createResponse.body.data.createCompanies[1].id;
+
+      createdCompanyIds.push(survivorCompanyId, absorbedCompanyId);
+
+      await waitForTimelineActivities('targetCompanyId', [
+        survivorCompanyId,
+        absorbedCompanyId,
+      ]);
+
+      const createThreadResponse = await makeGraphqlAPIRequest(
+        createOneOperationFactory({
+          objectMetadataSingularName: 'messageThread',
+          gqlFields: 'id',
+          data: {},
+        }),
+      );
+      const messageThreadId =
+        createThreadResponse.body.data.createMessageThread.id;
+
+      createdMessageThreadIds.push(messageThreadId);
+
+      for (const companyId of [survivorCompanyId, absorbedCompanyId]) {
+        const createTargetResponse = await makeGraphqlAPIRequest(
+          createOneOperationFactory({
+            objectMetadataSingularName: 'messageThreadTarget',
+            gqlFields: 'id',
+            data: { messageThreadId, targetCompanyId: companyId },
+          }),
+        );
+
+        expect(createTargetResponse.body.errors).toBeUndefined();
+        createdMessageThreadTargetIds.push(
+          createTargetResponse.body.data.createMessageThreadTarget.id,
+        );
+      }
+
+      // Both companies target the same thread, and messageThreadTarget is unique
+      // per (thread, company): repointing the duplicate's row onto the survivor
+      // without cleanup raises a unique violation.
+      const mergeResponse = await makeGraphqlAPIRequest(
+        mergeManyOperationFactory({
+          objectMetadataPluralName: 'companies',
+          gqlFields: COMPANY_GQL_FIELDS,
+          ids: [survivorCompanyId, absorbedCompanyId],
+          conflictPriorityIndex: 0,
+        }),
+      );
+
+      expect(mergeResponse.body.errors).toBeUndefined();
+      expect(mergeResponse.body.data.mergeCompanies.id).toBe(survivorCompanyId);
+
+      const findTargetsResponse = await makeGraphqlAPIRequest(
+        findManyOperationFactory({
+          objectMetadataSingularName: 'messageThreadTarget',
+          objectMetadataPluralName: 'messageThreadTargets',
+          gqlFields: 'id targetCompanyId',
+          filter: { messageThreadId: { eq: messageThreadId } },
+        }),
+      );
+      const remainingTargets =
+        findTargetsResponse.body.data.messageThreadTargets.edges.map(
+          (edge: { node: { id: string; targetCompanyId: string } }) =>
+            edge.node,
+        );
+
+      expect(remainingTargets).toHaveLength(1);
+      expect(remainingTargets[0].targetCompanyId).toBe(survivorCompanyId);
     });
   });
 
