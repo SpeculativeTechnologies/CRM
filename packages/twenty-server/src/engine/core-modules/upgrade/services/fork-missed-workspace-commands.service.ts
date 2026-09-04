@@ -200,10 +200,8 @@ export class ForkMissedWorkspaceCommandsService {
         }),
       );
 
-      if (isDryRun) {
-        continue;
-      }
-
+      // The command receives the dry-run flag and prints its own plan, as it
+      // does under the sequencer; only the bookkeeping is skipped.
       try {
         await step.command.runOnWorkspace({
           options,
@@ -212,6 +210,10 @@ export class ForkMissedWorkspaceCommandsService {
           index: context.index,
           total: context.total,
         });
+
+        if (isDryRun) {
+          continue;
+        }
 
         await this.recordAttempt({
           name: step.name,
@@ -222,6 +224,10 @@ export class ForkMissedWorkspaceCommandsService {
           createdAt: recordCreatedAt,
         });
       } catch (error) {
+        if (isDryRun) {
+          throw error;
+        }
+
         await this.recordAttempt({
           name: step.name,
           workspaceId,

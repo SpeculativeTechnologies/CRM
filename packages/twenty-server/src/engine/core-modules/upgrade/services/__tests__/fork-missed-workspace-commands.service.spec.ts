@@ -266,7 +266,7 @@ describe('ForkMissedWorkspaceCommandsService', () => {
     );
   });
 
-  it('should not run or record anything in dry-run mode', async () => {
+  it('should let the command print its own plan but record nothing in dry-run mode', async () => {
     const runOnWorkspace = jest.fn();
     const sequence = [
       buildStep('workspace', 'ws-1'),
@@ -286,7 +286,9 @@ describe('ForkMissedWorkspaceCommandsService', () => {
       options: { dryRun: true },
     });
 
-    expect(runOnWorkspace).not.toHaveBeenCalled();
+    expect(runOnWorkspace).toHaveBeenCalledWith(
+      expect.objectContaining({ options: { dryRun: true } }),
+    );
     expect(insert).not.toHaveBeenCalled();
   });
 
