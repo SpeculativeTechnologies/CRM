@@ -132,6 +132,7 @@ export const createStandardViewFieldFlatMetadata = <
     isVisible,
     size,
     aggregateOperation,
+    aggregateValue: null,
     isActive: true,
     isSystemSideEffect: parentView.isSystemSideEffect,
     overrides: null,

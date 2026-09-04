@@ -22,6 +22,7 @@ export type RecordTableWidgetContextValue = {
     viewFieldId: string,
     update: {
       aggregateOperation?: AggregateOperations | null;
+      aggregateValue?: string | null;
       size?: number;
     },
   ) => void;

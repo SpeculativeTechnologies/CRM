@@ -5,15 +5,17 @@ import { DropdownContent } from '@/ui/layout/dropdown/components/DropdownContent
 import { DropdownMenuHeader } from '@/ui/layout/dropdown/components/DropdownMenuHeader/DropdownMenuHeader';
 import { DropdownMenuHeaderLeftComponent } from '@/ui/layout/dropdown/components/DropdownMenuHeader/internal/DropdownMenuHeaderLeftComponent';
 import { DropdownMenuItemsContainer } from '@/ui/layout/dropdown/components/DropdownMenuItemsContainer';
-import { useContext } from 'react';
+import { type ReactNode, useContext } from 'react';
 import { IconChevronLeft } from 'twenty-ui/icon';
 
 export const RecordTableColumnAggregateFooterDropdownSubmenuContent = ({
   aggregateOperations,
   title,
+  children,
 }: {
   aggregateOperations: ExtendedAggregateOperations[];
   title: string;
+  children?: ReactNode;
 }) => {
   const { resetContent } = useContext(
     RecordTableColumnAggregateFooterDropdownContext,
@@ -34,7 +36,9 @@ export const RecordTableColumnAggregateFooterDropdownSubmenuContent = ({
       <DropdownMenuItemsContainer>
         <RecordTableColumnAggregateFooterAggregateOperationMenuItems
           aggregateOperations={aggregateOperations}
-        />
+        >
+          {children}
+        </RecordTableColumnAggregateFooterAggregateOperationMenuItems>
       </DropdownMenuItemsContainer>
     </DropdownContent>
   );

@@ -47,6 +47,10 @@ const CreateViewFieldInputSchema = z.object({
     .describe(
       'Aggregate operation for this field (e.g., "SUM", "AVG", "COUNT").',
     ),
+  aggregateValue: z
+    .string()
+    .optional()
+    .describe('Select option value used by a COUNT aggregate.'),
 });
 
 const UpdateViewFieldInputSchema = z.object({
@@ -63,6 +67,11 @@ const UpdateViewFieldInputSchema = z.object({
     .enum(Object.values(AggregateOperations) as [string, ...string[]])
     .optional()
     .describe('Aggregate operation for this field.'),
+  aggregateValue: z
+    .string()
+    .nullable()
+    .optional()
+    .describe('Select option value used by a COUNT aggregate.'),
 });
 
 const DeleteViewFieldInputSchema = z.object({
@@ -149,6 +158,7 @@ export class ViewFieldToolsFactory {
                 size: viewField.size,
                 position: viewField.position,
                 aggregateOperation: viewField.aggregateOperation,
+                aggregateValue: viewField.aggregateValue,
               };
             }),
           );
@@ -173,6 +183,7 @@ export class ViewFieldToolsFactory {
           size?: number;
           position?: number;
           aggregateOperation?: string;
+          aggregateValue?: string;
         }) => {
           try {
             const viewField = await this.viewFieldService.createOne({
@@ -184,6 +195,7 @@ export class ViewFieldToolsFactory {
                 position: parameters.position ?? 0,
                 aggregateOperation:
                   parameters.aggregateOperation as AggregateOperations,
+                aggregateValue: parameters.aggregateValue,
               },
               workspaceId,
             });
@@ -196,6 +208,7 @@ export class ViewFieldToolsFactory {
               size: viewField.size,
               position: viewField.position,
               aggregateOperation: viewField.aggregateOperation,
+              aggregateValue: viewField.aggregateValue,
             };
           } catch (error) {
             if (error instanceof WorkspaceMigrationBuilderException) {
@@ -216,6 +229,7 @@ export class ViewFieldToolsFactory {
           size?: number;
           position?: number;
           aggregateOperation?: string;
+          aggregateValue?: string | null;
         }) => {
           try {
             const viewField = await this.viewFieldService.updateOne({
@@ -227,6 +241,7 @@ export class ViewFieldToolsFactory {
                   position: parameters.position,
                   aggregateOperation:
                     parameters.aggregateOperation as AggregateOperations,
+                  aggregateValue: parameters.aggregateValue,
                 },
               },
               workspaceId,
@@ -240,6 +255,7 @@ export class ViewFieldToolsFactory {
               size: viewField.size,
               position: viewField.position,
               aggregateOperation: viewField.aggregateOperation,
+              aggregateValue: viewField.aggregateValue,
             };
           } catch (error) {
             if (error instanceof WorkspaceMigrationBuilderException) {
@@ -285,6 +301,7 @@ export class ViewFieldToolsFactory {
             size?: number;
             position?: number;
             aggregateOperation?: string;
+            aggregateValue?: string;
           }>;
         }) => {
           try {
@@ -297,6 +314,7 @@ export class ViewFieldToolsFactory {
                 position: viewField.position ?? 0,
                 aggregateOperation:
                   viewField.aggregateOperation as AggregateOperations,
+                aggregateValue: viewField.aggregateValue,
               })),
               workspaceId,
             });
@@ -321,6 +339,7 @@ export class ViewFieldToolsFactory {
             size?: number;
             position?: number;
             aggregateOperation?: string;
+            aggregateValue?: string | null;
           }>;
         }) => {
           try {
@@ -335,6 +354,7 @@ export class ViewFieldToolsFactory {
                       position: viewField.position,
                       aggregateOperation:
                         viewField.aggregateOperation as AggregateOperations,
+                      aggregateValue: viewField.aggregateValue,
                     },
                   },
                   workspaceId,

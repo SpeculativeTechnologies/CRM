@@ -246,6 +246,7 @@ export class FieldIndexViewFieldOnCreateSideEffectHandlerService extends Metadat
       size: DEFAULT_VIEW_FIELD_SIZE,
       position,
       aggregateOperation: null,
+      aggregateValue: null,
       isActive: true,
       isSystemSideEffect: true,
       universalOverrides: null,

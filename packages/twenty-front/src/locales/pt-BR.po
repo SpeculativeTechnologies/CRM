@@ -3505,6 +3505,11 @@ msgstr "por {author}"
 msgid "By using Twenty, you agree to the"
 msgstr "Ao usar o Twenty, você concorda com os"
 
+#. js-lingui-id: 0l5nE1
+#: src/modules/object-record/record-table/record-table-footer/components/RecordTableColumnAggregateFooterDropdownContent.tsx
+msgid "By value"
+msgstr ""
+
 #. js-lingui-id: Yx41df
 #: src/modules/auth/sign-in-up/components/FooterNote.tsx
 msgid "Bypass SSO"
@@ -5373,6 +5378,11 @@ msgstr "Contar todos"
 #: src/modules/workflow/workflow-steps/workflow-actions/pick-record-action/components/WorkflowEditActionPickRecord.tsx
 msgid "Count by"
 msgstr "Contar por"
+
+#. js-lingui-id: 19YLUq
+#: src/modules/object-record/record-table/record-table-footer/components/RecordTableColumnAggregateFooterSelectValueMenuContent.tsx
+msgid "Count by value"
+msgstr ""
 
 #. js-lingui-id: vQJINq
 #: src/modules/object-record/record-board/record-board-column/utils/getAggregateOperationLabel.ts
@@ -13949,6 +13959,11 @@ msgstr "Nenhum objeto com visualizações encontrado"
 #: src/modules/ui/field/input/components/MultiSelectInput.tsx
 msgid "No option found"
 msgstr "Nenhuma opção encontrada"
+
+#. js-lingui-id: Hz+sxK
+#: src/modules/object-record/record-table/record-table-footer/components/RecordTableColumnAggregateFooterSelectValueMenuContent.tsx
+msgid "No options"
+msgstr ""
 
 #. js-lingui-id: XRc1G9
 #: src/modules/ai/components/TerminalOutput.tsx

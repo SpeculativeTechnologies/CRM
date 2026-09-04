@@ -4,6 +4,7 @@ import { useColumnDefinitionsFromObjectMetadata } from '@/object-metadata/hooks/
 import { useObjectMetadataItem } from '@/object-metadata/hooks/useObjectMetadataItem';
 import { useRecordIndexContextOrThrow } from '@/object-record/record-index/contexts/RecordIndexContext';
 import { viewFieldAggregateOperationState } from '@/object-record/record-table/record-table-footer/states/viewFieldAggregateOperationState';
+import { viewFieldAggregateValueState } from '@/object-record/record-table/record-table-footer/states/viewFieldAggregateValueState';
 import { convertAggregateOperationToExtendedAggregateOperation } from '@/object-record/utils/convertAggregateOperationToExtendedAggregateOperation';
 import { useGetCurrentViewOnly } from '@/views/hooks/useGetCurrentViewOnly';
 import { type ViewField } from '@/views/types/ViewField';
@@ -53,6 +54,21 @@ export const RecordIndexTableContainerEffect = () => {
             viewFieldId: viewField.id,
           }),
           convertedViewFieldAggregateOperation,
+        );
+      }
+
+      const aggregateValueForViewField = store.get(
+        viewFieldAggregateValueState.atomFamily({
+          viewFieldId: viewField.id,
+        }),
+      );
+
+      if (aggregateValueForViewField !== viewField.aggregateValue) {
+        store.set(
+          viewFieldAggregateValueState.atomFamily({
+            viewFieldId: viewField.id,
+          }),
+          viewField.aggregateValue,
         );
       }
     },

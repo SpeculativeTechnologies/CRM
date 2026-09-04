@@ -63,6 +63,7 @@ export const useSaveCurrentViewFields = () => {
               isVisible: viewFieldToCreateOrUpdate.isVisible,
               size: viewFieldToCreateOrUpdate.size,
               aggregateOperation: viewFieldToCreateOrUpdate.aggregateOperation,
+              aggregateValue: viewFieldToCreateOrUpdate.aggregateValue,
               viewId: currentViewId,
             };
             const existingField = currentViewFields.find(
@@ -88,12 +89,14 @@ export const useSaveCurrentViewFields = () => {
                   size: existingField.size,
                   isVisible: existingField.isVisible,
                   aggregateOperation: existingField.aggregateOperation,
+                  aggregateValue: existingField.aggregateValue,
                 },
                 {
                   position: createViewFieldInput.position,
                   size: createViewFieldInput.size,
                   isVisible: createViewFieldInput.isVisible,
                   aggregateOperation: createViewFieldInput.aggregateOperation,
+                  aggregateValue: createViewFieldInput.aggregateValue,
                 },
               )
             ) {
@@ -113,6 +116,7 @@ export const useSaveCurrentViewFields = () => {
                     update: {
                       aggregateOperation:
                         createViewFieldInput.aggregateOperation,
+                      aggregateValue: createViewFieldInput.aggregateValue,
                       isVisible: createViewFieldInput.isVisible,
                       position: createViewFieldInput.position,
                       size: createViewFieldInput.size,

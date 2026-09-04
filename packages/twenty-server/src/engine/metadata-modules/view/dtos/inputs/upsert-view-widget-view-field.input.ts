@@ -5,6 +5,7 @@ import {
   IsEnum,
   IsNumber,
   IsOptional,
+  IsString,
   IsUUID,
 } from 'class-validator';
 import { AggregateOperations } from 'twenty-shared/types';
@@ -49,4 +50,9 @@ export class UpsertViewWidgetViewFieldInput {
   @IsEnum(AggregateOperations)
   @Field(() => AggregateOperations, { nullable: true })
   aggregateOperation?: AggregateOperations | null;
+
+  @IsOptional()
+  @IsString()
+  @Field(() => String, { nullable: true })
+  aggregateValue?: string | null;
 }
