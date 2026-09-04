@@ -13,11 +13,7 @@ type UseRecordTableWidgetFieldUpdateParams = {
 type RecordTableWidgetFieldUpdate = Partial<
   Pick<
     RecordTableWidgetDraftViewField,
-    | 'aggregateOperation'
-    | 'aggregateValue'
-    | 'isVisible'
-    | 'position'
-    | 'size'
+    'aggregateOperation' | 'aggregateValue' | 'isVisible' | 'position' | 'size'
   >
 >;
 
