@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 
+import { isNonEmptyString } from '@sniptt/guards';
 import { MessageParticipantRole } from 'twenty-shared/types';
 import { isDefined } from 'twenty-shared/utils';
 import { In, IsNull, Not } from 'typeorm';
@@ -21,6 +22,8 @@ type RecordReplyArgs = {
   workspaceId: string;
   replyHeaderMessageIds: string[];
   senderHandle: string;
+  messageThreadId?: string;
+  receivedAt?: string;
 };
 
 @Injectable()
@@ -47,6 +50,8 @@ export class MessageEngagementService {
     workspaceId,
     replyHeaderMessageIds,
     senderHandle,
+    messageThreadId,
+    receivedAt,
   }: RecordReplyArgs): Promise<void> {
     const normalizedSenderHandle = senderHandle.trim().toLowerCase();
 
@@ -54,54 +59,35 @@ export class MessageEngagementService {
       return;
     }
 
+    const repliedAt = isNonEmptyString(receivedAt)
+      ? new Date(receivedAt)
+      : new Date();
+
     await this.workspaceOrmManager.executeInWorkspaceContext(async () => {
-      const messageRepository = this.workspaceOrmManager.getRepository(
-        MessageWorkspaceEntity,
-        { shouldBypassPermissionChecks: true },
-      );
-
-      const candidateMessages = await messageRepository.find({
-        where: {
-          headerMessageId: In(replyHeaderMessageIds),
-          messageCampaignId: Not(IsNull()),
-          repliedAt: IsNull(),
-        },
-      });
-
-      if (candidateMessages.length === 0) {
-        return;
-      }
-
-      // A campaign's Cc addresses are the same on every send and carry no
-      // message of their own, so without this the Cc'd party answering any
-      // recipient's email would be counted as that recipient replying.
-      const recipientMessageIds = await this.findMessageIdsAddressedTo({
-        messageIds: candidateMessages.map(({ id }) => id),
-        handle: normalizedSenderHandle,
-      });
-
-      // replyHeaderMessageIds is ordered most-specific first, so a reply deep in
-      // a thread is attributed to the message it actually answers rather than to
-      // whichever ancestor the database happened to return first.
-      const message = replyHeaderMessageIds
-        .map((headerMessageId) =>
-          candidateMessages.find(
-            (candidate) =>
-              candidate.headerMessageId === headerMessageId &&
-              recipientMessageIds.has(candidate.id),
-          ),
-        )
-        .find(isDefined);
+      const message =
+        (await this.findRepliedCampaignMessageByHeader({
+          replyHeaderMessageIds,
+          senderHandle: normalizedSenderHandle,
+        })) ??
+        (await this.findRepliedCampaignMessageByThread({
+          messageThreadId,
+          senderHandle: normalizedSenderHandle,
+          repliedAt,
+        }));
 
       if (!isDefined(message) || !isDefined(message.messageCampaignId)) {
         return;
       }
 
       const campaignId = message.messageCampaignId;
+      const messageRepository = this.workspaceOrmManager.getRepository(
+        MessageWorkspaceEntity,
+        { shouldBypassPermissionChecks: true },
+      );
 
       await messageRepository.update(
         { id: message.id, repliedAt: IsNull() },
-        { repliedAt: new Date() },
+        { repliedAt },
       );
 
       this.logger.log(
@@ -113,6 +99,107 @@ export class MessageEngagementService {
         campaignId,
       });
     }, buildSystemAuthContext(workspaceId));
+  }
+
+  private async findRepliedCampaignMessageByHeader({
+    replyHeaderMessageIds,
+    senderHandle,
+  }: {
+    replyHeaderMessageIds: string[];
+    senderHandle: string;
+  }): Promise<MessageWorkspaceEntity | null> {
+    const messageRepository = this.workspaceOrmManager.getRepository(
+      MessageWorkspaceEntity,
+      { shouldBypassPermissionChecks: true },
+    );
+
+    const candidateMessages = await messageRepository.find({
+      where: {
+        headerMessageId: In(replyHeaderMessageIds),
+        messageCampaignId: Not(IsNull()),
+        repliedAt: IsNull(),
+      },
+    });
+
+    if (candidateMessages.length === 0) {
+      return null;
+    }
+
+    // A campaign's Cc addresses are the same on every send and carry no
+    // message of their own, so without this the Cc'd party answering any
+    // recipient's email would be counted as that recipient replying.
+    const recipientMessageIds = await this.findMessageIdsAddressedTo({
+      messageIds: candidateMessages.map(({ id }) => id),
+      handle: senderHandle,
+    });
+
+    // replyHeaderMessageIds is ordered most-specific first, so a reply deep in
+    // a thread is attributed to the message it actually answers rather than to
+    // whichever ancestor the database happened to return first.
+    return (
+      replyHeaderMessageIds
+        .map((headerMessageId) =>
+          candidateMessages.find(
+            (candidate) =>
+              candidate.headerMessageId === headerMessageId &&
+              recipientMessageIds.has(candidate.id),
+          ),
+        )
+        .find(isDefined) ?? null
+    );
+  }
+
+  // A connected-account send stores the Message-ID the composer generated,
+  // while the provider puts its own on the wire, so a reply's In-Reply-To names
+  // an id no campaign message carries and header matching cannot succeed. The
+  // provider still threads the reply with the message it answers, so the thread
+  // is what connects them. Same identification the reply backfill command uses.
+  private async findRepliedCampaignMessageByThread({
+    messageThreadId,
+    senderHandle,
+    repliedAt,
+  }: {
+    messageThreadId?: string;
+    senderHandle: string;
+    repliedAt: Date;
+  }): Promise<MessageWorkspaceEntity | null> {
+    if (!isNonEmptyString(messageThreadId)) {
+      return null;
+    }
+
+    const messageRepository = this.workspaceOrmManager.getRepository(
+      MessageWorkspaceEntity,
+      { shouldBypassPermissionChecks: true },
+    );
+
+    const campaignMessages = await messageRepository.find({
+      where: {
+        messageThreadId,
+        messageCampaignId: Not(IsNull()),
+        repliedAt: IsNull(),
+      },
+      order: { receivedAt: 'DESC' },
+    });
+
+    if (campaignMessages.length === 0) {
+      return null;
+    }
+
+    const recipientMessageIds = await this.findMessageIdsAddressedTo({
+      messageIds: campaignMessages.map(({ id }) => id),
+      handle: senderHandle,
+    });
+
+    // Ordered newest first, so this answers the most recent campaign message in
+    // the thread that was addressed to the sender and predates the reply.
+    return (
+      campaignMessages.find(
+        (campaignMessage) =>
+          recipientMessageIds.has(campaignMessage.id) &&
+          isDefined(campaignMessage.receivedAt) &&
+          campaignMessage.receivedAt < repliedAt,
+      ) ?? null
+    );
   }
 
   private async findMessageIdsAddressedTo({
