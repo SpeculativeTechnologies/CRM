@@ -11,11 +11,12 @@ const buildStep = (
   kind: UpgradeStep['kind'],
   name: string,
   runOnWorkspace = jest.fn(),
+  version = '2.38.0',
 ): UpgradeStep =>
   ({
     kind,
     name,
-    version: '2.38.0',
+    version,
     timestamp: 0,
     command: { runOnWorkspace },
   }) as unknown as UpgradeStep;
@@ -128,8 +129,33 @@ describe('planMissedWorkspaceCommands', () => {
   it('should return nothing when the workspace has no record', () => {
     expect(planMissedWorkspaceCommands({ sequence, attempts: [] })).toEqual({
       missedSteps: [],
+      skippedBelowFloor: [],
       cursorCreatedAt: null,
     });
+  });
+
+  it('should only list, never run, gaps below the floor version', () => {
+    const oldSequence = [
+      buildStep('workspace', 'ws-2-9', jest.fn(), '2.9.0'),
+      buildStep('workspace', 'ws-2-10-gap', jest.fn(), '2.10.0'),
+      buildStep('workspace', 'ws-2-34-gap', jest.fn(), '2.34.0'),
+      buildStep('workspace', 'ws-2-35-gap', jest.fn(), '2.35.0'),
+      buildStep('workspace', 'ws-2-38', jest.fn(), '2.38.0'),
+    ];
+
+    const { missedSteps, skippedBelowFloor } = planMissedWorkspaceCommands({
+      sequence: oldSequence,
+      attempts: [
+        attempt('ws-2-9', 'completed', '2026-06-01T00:00:00Z'),
+        attempt('ws-2-38', 'completed', '2026-09-01T00:00:00Z'),
+      ],
+    });
+
+    expect(missedSteps.map((step) => step.name)).toEqual(['ws-2-35-gap']);
+    expect(skippedBelowFloor.map((step) => step.name)).toEqual([
+      'ws-2-10-gap',
+      'ws-2-34-gap',
+    ]);
   });
 });
 

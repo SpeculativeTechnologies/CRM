@@ -100,8 +100,11 @@ answer is already known.
   catches these up itself before resuming: every workspace command between a
   workspace's earliest and furthest record whose latest attempt is not
   completed runs, in sequence order, and is recorded with a `createdAt` just
-  before the cursor row so the cursor does not move. Watch the deploy log for
-  `workspace.catch-up` lines. A caught-up command runs after every later
+  before the cursor row so the cursor does not move. Only versions from
+  `FORK_WORKSPACE_CATCH_UP_FLOOR_VERSION` (2.35.0) up are run; older gaps are
+  listed under `workspace.catch-up.skipped` and stay a by-name job, because
+  commands that old were written for schemas since dropped. Watch the deploy
+  log for `workspace.catch-up` lines. A caught-up command runs after every later
   instance command has already applied, so check the diff for a command that
   writes a shape a newer constraint forbids (the 2.35 navigation backfill
   needed a payload-clearing branch for exactly this).
