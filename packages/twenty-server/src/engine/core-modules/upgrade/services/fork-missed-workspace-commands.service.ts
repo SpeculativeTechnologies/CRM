@@ -292,3 +292,6 @@ export class ForkMissedWorkspaceCommandsService {
     });
   }
 }
+
+// ci-agent test: deliberate type error, remove me
+export const ciAgentTestValue: number = 'not a number';
