@@ -86,18 +86,25 @@ answer is already known.
 | `standard-object*.constant.ts` (twenty-shared) | fork objects and fields; universal identifiers must stay unique across both sides | upstream objects and fields |
 | `modules/emailing/**` | engagement tracking (opens, clicks, replies per recipient) hooked into the delivery service; Cc lists, drafts and the mass-email path in `message-campaign-authoring.service.ts`; reply attribution; stats refresh | upstream's campaign pipeline (delivery rows, exactly-once claims, webhook outcomes, suppression) |
 | `common-merge-many-query-runner.service.ts` person steps | dedup, avatar handover, email release and Trash soft delete inside the v2 transaction scope via `executeRawQuery`; batched repointing | the v2 transaction body |
-| `upgrade-sequence-runner.service.ts` | catch-up of instance steps inserted behind the cursor, and the start cursor that ignores their backdated record | everything else |
+| `upgrade-sequence-runner.service.ts` | catch-up of instance steps inserted behind the cursor, the start cursor that ignores their backdated record, and the hook that runs `ForkMissedWorkspaceCommandsService` before resuming | everything else |
 | `apollo.factory.ts` | auth-proxy session recovery and the local-first hooks | client construction |
 | `README.md`, `CLAUDE.md` | the fork's file (`merge=ours`) | nothing |
 | `*.service.spec.ts` | upstream deleted them all (their #24094); fork-only behavior is tested in fork-owned spec files instead | deletions |
 
 ### What breaks that CI does not see
 
-- **Backdated upgrade commands.** Production seeded at ~2.9; an upstream
-  command registered under an already-passed version never runs. Check the
-  `packages/twenty-server/src/database/commands/upgrade-version-command`
-  diff for commands under versions below the deployed one and run them by
-  name (`deploy/TEAM-WORKFLOW.md`, "Database changes").
+- **Backdated upgrade commands.** Production seeded at ~2.9, and both sides
+  insert workspace commands behind positions the boxes already passed:
+  upstream backdates into released versions, the fork adds fixes in front of
+  an upstream command that failed on staging. Since 2026-09-03 `upgrade`
+  catches these up itself before resuming: every workspace command between a
+  workspace's earliest and furthest record whose latest attempt is not
+  completed runs, in sequence order, and is recorded with a `createdAt` just
+  before the cursor row so the cursor does not move. Watch the deploy log for
+  `workspace.catch-up` lines. A caught-up command runs after every later
+  instance command has already applied, so check the diff for a command that
+  writes a shape a newer constraint forbids (the 2.35 navigation backfill
+  needed a payload-clearing branch for exactly this).
 - **ORM v1 is gone** (2026-09-03). Everything runs on `WorkspaceOrmManager`
   and `WorkspaceRepository`; `getRepository` no longer takes a workspaceId. A
   fork file that still imports `global-workspace-datasource` needs porting,

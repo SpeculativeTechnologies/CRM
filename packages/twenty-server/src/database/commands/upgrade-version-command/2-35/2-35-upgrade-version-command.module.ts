@@ -8,6 +8,7 @@ import { RepairTimelineActivityTargetFieldNamesCommand } from 'src/database/comm
 import { ContractTimelineActivityCompatibilityCommand } from 'src/database/commands/upgrade-version-command/2-35/2-35-workspace-command-1787648000000-contract-timeline-activity-compatibility.command';
 import { BackfillTimelineActivitySearchFieldMetadataCommand } from 'src/database/commands/upgrade-version-command/2-35/2-35-workspace-command-1787749300000-backfill-timeline-activity-search-field-metadata.command';
 import { ApplicationModule } from 'src/engine/core-modules/application/application.module';
+import { UpgradeStatusModule } from 'src/engine/core-modules/upgrade/upgrade-status.module';
 import { WorkspaceCacheModule } from 'src/engine/workspace-cache/workspace-cache.module';
 import { WorkspaceMigrationRunnerModule } from 'src/engine/workspace-manager/workspace-migration/workspace-migration-runner/workspace-migration-runner.module';
 import { WorkspaceMigrationModule } from 'src/engine/workspace-manager/workspace-migration/workspace-migration.module';
@@ -15,6 +16,7 @@ import { WorkspaceMigrationModule } from 'src/engine/workspace-manager/workspace
 @Module({
   imports: [
     ApplicationModule,
+    UpgradeStatusModule,
     WorkspaceCacheModule,
     WorkspaceIteratorModule,
     WorkspaceMigrationRunnerModule,

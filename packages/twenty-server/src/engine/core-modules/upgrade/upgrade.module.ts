@@ -5,6 +5,7 @@ import { WorkspaceIteratorModule } from 'src/database/commands/command-runners/w
 import { InstanceCommandProviderModule } from 'src/database/commands/upgrade-version-command/instance-command-provider.module';
 import { WorkspaceCommandProviderModule } from 'src/database/commands/upgrade-version-command/workspace-command-provider.module';
 import { MetricsModule } from 'src/engine/core-modules/metrics/metrics.module';
+import { ForkMissedWorkspaceCommandsModule } from 'src/engine/core-modules/upgrade/fork-missed-workspace-commands.module';
 import { InstanceCommandRunnerService } from 'src/engine/core-modules/upgrade/services/instance-command-runner.service';
 import { UpgradeSequenceRunnerService } from 'src/engine/core-modules/upgrade/services/upgrade-sequence-runner.service';
 import { WorkspaceCommandRunnerService } from 'src/engine/core-modules/upgrade/services/workspace-command-runner.service';
@@ -16,6 +17,7 @@ import { WorkspaceVersionModule } from 'src/engine/workspace-manager/workspace-v
 @Module({
   imports: [
     CommandShutdownModule,
+    ForkMissedWorkspaceCommandsModule,
     InstanceCommandProviderModule,
     MetricsModule,
     UpgradeStatusModule,

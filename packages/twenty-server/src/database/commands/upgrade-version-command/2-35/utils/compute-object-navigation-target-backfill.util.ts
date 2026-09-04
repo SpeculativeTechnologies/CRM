@@ -16,10 +16,14 @@ export const computeObjectNavigationTargetBackfill = ({
   flatCommandMenuItemMaps,
   flatObjectMetadataMaps,
   now,
+  clearPayload = false,
 }: {
   flatCommandMenuItemMaps: FlatEntityMaps<FlatCommandMenuItem>;
   flatObjectMetadataMaps: FlatEntityMaps<FlatObjectMetadata>;
   now: string;
+  // Fork: once 2.38 has made payload and target mutually exclusive, the
+  // legacy payload has to go in the same write that sets the target.
+  clearPayload?: boolean;
 }): ObjectNavigationTargetBackfill => {
   const backfill: ObjectNavigationTargetBackfill = {
     flatCommandMenuItemsToUpdate: [],
@@ -51,6 +55,7 @@ export const computeObjectNavigationTargetBackfill = ({
 
     backfill.flatCommandMenuItemsToUpdate.push({
       ...flatCommandMenuItem,
+      ...(clearPayload ? { payload: null } : {}),
       navigationTargetObjectMetadataId: flatObjectMetadata.id,
       navigationTargetObjectMetadataUniversalIdentifier:
         flatObjectMetadata.universalIdentifier,

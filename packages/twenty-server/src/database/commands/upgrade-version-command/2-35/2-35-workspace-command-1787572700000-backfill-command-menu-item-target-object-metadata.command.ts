@@ -6,8 +6,12 @@ import { type RunOnWorkspaceArgs } from 'src/database/commands/command-runners/w
 import { computeObjectNavigationTargetBackfill } from 'src/database/commands/upgrade-version-command/2-35/utils/compute-object-navigation-target-backfill.util';
 import { ApplicationService } from 'src/engine/core-modules/application/application.service';
 import { RegisteredWorkspaceCommand } from 'src/engine/core-modules/upgrade/decorators/registered-workspace-command.decorator';
+import { UpgradeMigrationService } from 'src/engine/core-modules/upgrade/services/upgrade-migration.service';
 import { WorkspaceCacheService } from 'src/engine/workspace-cache/services/workspace-cache.service';
 import { WorkspaceMigrationValidateBuildAndRunService } from 'src/engine/workspace-manager/workspace-migration/services/workspace-migration-validate-build-and-run-service';
+
+const PAYLOAD_ERASURE_INSTANCE_COMMAND_NAME =
+  '2.38.0_EraseObjectNavigationCommandMenuItemPayloadsSlowInstanceCommand_1788272351971';
 
 @RegisteredWorkspaceCommand('2.35.0', 1787572700000)
 @Command({
@@ -21,6 +25,7 @@ export class BackfillCommandMenuItemTargetObjectMetadataCommand extends Provisio
     private readonly applicationService: ApplicationService,
     private readonly workspaceCacheService: WorkspaceCacheService,
     private readonly workspaceMigrationValidateBuildAndRunService: WorkspaceMigrationValidateBuildAndRunService,
+    private readonly upgradeMigrationService: UpgradeMigrationService,
   ) {
     super(workspaceIteratorService);
   }
@@ -37,11 +42,22 @@ export class BackfillCommandMenuItemTargetObjectMetadataCommand extends Provisio
         'flatObjectMetadataMaps',
       ]);
 
+    // Fork: this command can run after the 2.38 payload erasure (upstream
+    // backdated it into a version the fork had already deployed). The check
+    // constraint is exclusive by then, so the legacy payload must be cleared
+    // in the same write or the update is rejected.
+    const isPayloadExclusive =
+      await this.upgradeMigrationService.isLastAttemptCompleted({
+        name: PAYLOAD_ERASURE_INSTANCE_COMMAND_NAME,
+        workspaceId: null,
+      });
+
     const { flatCommandMenuItemsToUpdate, flatCommandMenuItemsToDelete } =
       computeObjectNavigationTargetBackfill({
         flatCommandMenuItemMaps,
         flatObjectMetadataMaps,
         now: new Date().toISOString(),
+        clearPayload: isPayloadExclusive,
       });
 
     if (flatCommandMenuItemsToDelete.length > 0) {

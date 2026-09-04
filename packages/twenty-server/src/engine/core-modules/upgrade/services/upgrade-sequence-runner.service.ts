@@ -6,6 +6,7 @@ import {
   WorkspaceIteratorService,
 } from 'src/database/commands/command-runners/workspace-iterator.service';
 import { type ParsedUpgradeCommandOptions } from 'src/database/commands/upgrade-version-command/upgrade.command';
+import { ForkMissedWorkspaceCommandsService } from 'src/engine/core-modules/upgrade/services/fork-missed-workspace-commands.service';
 import { InstanceCommandRunnerService } from 'src/engine/core-modules/upgrade/services/instance-command-runner.service';
 import {
   UpgradeMigrationService,
@@ -41,6 +42,7 @@ export class UpgradeSequenceRunnerService {
     private readonly workspaceIteratorService: WorkspaceIteratorService,
     private readonly workspaceVersionService: WorkspaceVersionService,
     private readonly commandShutdownService: CommandShutdownService,
+    private readonly forkMissedWorkspaceCommandsService: ForkMissedWorkspaceCommandsService,
   ) {}
 
   async run({
@@ -92,6 +94,35 @@ export class UpgradeSequenceRunnerService {
       startCursor,
       skipDataMigration: allProvisionedWorkspaceIds.length === 0,
     });
+
+    // Fork: workspace steps inserted behind a workspace's cursor never ran
+    // either; run them before resuming so the segment ahead can rely on them.
+    const catchUpReport =
+      await this.forkMissedWorkspaceCommandsService.runForWorkspaces({
+        sequence,
+        workspaceIds: this.deriveWorkspaceIdsToProcess({
+          allProvisionedWorkspaceIds,
+          options,
+        }),
+        options,
+      });
+
+    if (catchUpReport.fail.length > 0) {
+      this.logger.error(
+        formatUpgradeLog({
+          humanMessage:
+            `Catch-up of missed workspace steps ended with ${catchUpReport.fail.length} failure(s). ` +
+            'Aborting — cannot resume the sequence.',
+          event: 'sequence.aborted',
+          logFields: {
+            failures: catchUpReport.fail.length,
+            reason: 'workspace-catch-up-failures',
+          },
+        }),
+      );
+
+      return { totalSuccesses: 0, totalFailures: catchUpReport.fail.length };
+    }
 
     let totalSuccesses = 0;
     let totalFailures = 0;
