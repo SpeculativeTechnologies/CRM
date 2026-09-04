@@ -156,6 +156,9 @@ jobs:
         uses: anthropics/claude-code-action@ac7e24bf2938964b8ab203e417a2773802392ddd # v1.0.146
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          # Without this the action mints a token over OIDC, which needs the Claude
+          # GitHub App and id-token: write; the workflow's own token is enough here.
+          github_token: ${{ github.token }}
           prompt: |
             A CI workflow failed on a pull request branch of this fork and you
             are checked out on that branch. Read .github/ci-agent/PR-CHECKS-AGENT.md
