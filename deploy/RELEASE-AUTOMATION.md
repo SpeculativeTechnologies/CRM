@@ -108,12 +108,29 @@ this was written). Anything a script runs that might read stdin needs
   production's was not). A nightly rehearsal of `main` against a restored
   production dump would catch production-only timing and data before anyone
   promotes. Not built.
-- **PR checks.** Flaky jobs (`twenty-sdk:build`, Lingui catalogs) and real
-  failures on PR branches are still noticed by people. The next piece is a
-  workflow on failed check suites that downloads the failed logs, runs the
-  relevant check locally, classifies flaky against real, and either pushes a
-  fix to the PR branch or comments with the cause. It reuses the Claude Code
-  action and token the upstream sync already uses; it never merges or deploys.
+## PR checks: the agent that reads failures first
+
+`pr-checks-agent.yaml` runs when CI Fork, the image build, CI Utils Test or CI
+Client SDK fails on a pull request branch of this repository. It downloads the
+failed jobs' logs, checks out the branch, installs dependencies and hands the
+logs to Claude Code with `.github/ci-agent/PR-CHECKS-AGENT.md` as the policy.
+The agent has no GitHub token: it reproduces the failure with the command CI
+ran, edits files if the cause is in the branch or a fork-owned file, and writes
+a verdict. The workflow then does the one write the verdict calls for:
+
+- **fixed**: commits `ci-agent: <summary>` and pushes to the PR branch with
+  the sync token, so CI Fork re-runs. The comment carries the diffstat.
+- **flaky**: re-runs the failed jobs once and says why it thinks so.
+- **needs-human**: comments with what it established and the next step.
+
+The loop is bounded: a branch whose head commit already starts with
+`ci-agent:` is not fixed again, the second failure gets an escalation comment.
+One agent run per branch at a time. The label `no-ci-agent` opts a pull
+request out; drafts and forks are skipped. To triage an old failure by hand,
+dispatch the workflow with the run id. Known limits: it runs unit tests, lint
+and typecheck but has no database, so a failure in an integration job is
+usually needs-human; and it never edits the deploy workflows or `deploy/`
+scripts that run on a box.
 
 ## Reading a failed run
 

@@ -1,0 +1,243 @@
+name: PR checks agent
+run-name: "PR checks agent: ${{ github.event.workflow_run.name || format('run {0}', inputs.run_id) }} on ${{ github.event.workflow_run.head_branch || 'manual' }}"
+
+# Fork. When a CI workflow fails on a pull request branch, triage it without
+# waiting for a person to notice: download the failed job logs, hand them and
+# the checkout to Claude Code, and act on its verdict. The agent has no GitHub
+# token and only edits files; this workflow owns every write:
+#   fixed        -> commit "ci-agent: ..." and push to the PR branch (CI reruns)
+#   flaky        -> rerun the failed jobs once
+#   needs-human  -> comment with what was established and the next step
+# A branch whose head commit is already a ci-agent commit is never touched
+# again: the second failure gets an escalation comment, so the loop is bounded
+# at one automatic fix per failure round. The label `no-ci-agent` on a PR opts
+# it out. Policy the agent follows: .github/ci-agent/PR-CHECKS-AGENT.md.
+#
+# Secrets (already present for sync-upstream.yaml):
+#   CLAUDE_CODE_OAUTH_TOKEN  runs the agent; without it the workflow only comments.
+#   SYNC_UPSTREAM_TOKEN      pushes the fix. GITHUB_TOKEN pushes do not trigger CI.
+
+on:
+  workflow_run:
+    workflows: [CI Fork, Build and push custom image, CI Utils Test, CI Client SDK]
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: Id of a failed workflow run on a pull request branch to triage
+        required: true
+
+permissions: {}
+
+concurrency:
+  group: pr-checks-agent-${{ github.event.workflow_run.head_branch || inputs.run_id }}
+  cancel-in-progress: false
+
+jobs:
+  triage:
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'failure' &&
+       github.event.workflow_run.event == 'pull_request')
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    permissions:
+      contents: read
+      actions: write # rerun failed jobs, read logs
+      pull-requests: write # comment
+    env:
+      GH_TOKEN: ${{ github.token }}
+      REPO: ${{ github.repository }}
+      RUN_ID: ${{ github.event.workflow_run.id || inputs.run_id }}
+    steps:
+      - name: Resolve the failed run and decide what to do
+        id: run
+        run: |
+          set -euo pipefail
+          # runner.temp is not available in job-level env (see #223).
+          echo "CI_AGENT_DIR=${RUNNER_TEMP}/ci-agent" >> "$GITHUB_ENV"
+          run_json="$(gh api "repos/${REPO}/actions/runs/${RUN_ID}")"
+          conclusion="$(jq -r .conclusion <<<"$run_json")"
+          event="$(jq -r .event <<<"$run_json")"
+          branch="$(jq -r .head_branch <<<"$run_json")"
+          sha="$(jq -r .head_sha <<<"$run_json")"
+          head_repo="$(jq -r .head_repository.full_name <<<"$run_json")"
+          workflow_name="$(jq -r .name <<<"$run_json")"
+          run_url="$(jq -r .html_url <<<"$run_json")"
+          {
+            echo "branch=${branch}"
+            echo "sha=${sha}"
+            echo "workflow_name=${workflow_name}"
+            echo "run_url=${run_url}"
+          } >> "$GITHUB_OUTPUT"
+
+          skip() { echo "mode=skip" >> "$GITHUB_OUTPUT"; echo "::notice::skipping: $*"; exit 0; }
+
+          [ "$conclusion" = "failure" ] || skip "run ${RUN_ID} concluded ${conclusion}, not failure"
+          [ "$event" = "pull_request" ] || skip "run ${RUN_ID} was a ${event} event, not a pull request"
+          [ "$head_repo" = "$REPO" ] || skip "head repository ${head_repo} is not this repository"
+
+          owner="${REPO%%/*}"
+          pr_json="$(gh api "repos/${REPO}/pulls?head=${owner}:${branch}&state=open" --jq '.[0] // empty')"
+          [ -n "$pr_json" ] || skip "no open pull request for ${branch}"
+          pr="$(jq -r .number <<<"$pr_json")"
+          echo "pr=${pr}" >> "$GITHUB_OUTPUT"
+
+          if jq -e '.labels[] | select(.name == "no-ci-agent")' <<<"$pr_json" >/dev/null; then
+            skip "pull request #${pr} carries no-ci-agent"
+          fi
+          if jq -e '.draft' <<<"$pr_json" >/dev/null && [ "$(jq -r .draft <<<"$pr_json")" = "true" ]; then
+            skip "pull request #${pr} is a draft"
+          fi
+
+          head_message="$(gh api "repos/${REPO}/commits/${sha}" --jq '.commit.message' | head -1)"
+          if [[ "$head_message" == ci-agent:* ]]; then
+            echo "mode=escalate" >> "$GITHUB_OUTPUT"
+            echo "::notice::head commit is already an agent fix; escalating instead of fixing again"
+            exit 0
+          fi
+
+          echo "mode=agent" >> "$GITHUB_OUTPUT"
+          echo "triaging ${workflow_name} failure on #${pr} (${branch} @ ${sha:0:7})"
+
+      - name: Check out the pull request branch
+        if: steps.run.outputs.mode == 'agent'
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          ref: ${{ steps.run.outputs.branch }}
+          fetch-depth: 0
+          token: ${{ secrets.SYNC_UPSTREAM_TOKEN || github.token }}
+
+      - name: Collect the failed job logs
+        if: steps.run.outputs.mode != 'skip'
+        env:
+          PR: ${{ steps.run.outputs.pr }}
+          BRANCH: ${{ steps.run.outputs.branch }}
+          SHA: ${{ steps.run.outputs.sha }}
+          WORKFLOW_NAME: ${{ steps.run.outputs.workflow_name }}
+          RUN_URL: ${{ steps.run.outputs.run_url }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$CI_AGENT_DIR"
+          gh run view "$RUN_ID" --repo "$REPO" --json jobs \
+            --jq '.jobs[] | select(.conclusion == "failure") | .name' > "$CI_AGENT_DIR/jobs.txt"
+          # The agent reads the whole file; keep it to the last 2 MB, which is
+          # far more than any real error needs.
+          gh run view "$RUN_ID" --repo "$REPO" --log-failed 2>/dev/null \
+            | tail -c 2000000 > "$CI_AGENT_DIR/failed.log" || true
+          jq -n --arg pr "$PR" --arg branch "$BRANCH" --arg sha "$SHA" \
+            --arg workflow "$WORKFLOW_NAME" --arg run_url "$RUN_URL" \
+            '{pull_request: ($pr | tonumber), branch: $branch, head_sha: $sha, workflow: $workflow, run_url: $run_url}' \
+            > "$CI_AGENT_DIR/context.json"
+          echo "failed jobs:"; sed 's/^/  /' "$CI_AGENT_DIR/jobs.txt"
+          echo "log bytes: $(wc -c < "$CI_AGENT_DIR/failed.log")"
+
+      - name: Decide whether the agent can run
+        id: gate
+        if: steps.run.outputs.mode == 'agent'
+        env:
+          HAS_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN != '' }}
+        run: |
+          if [ "$HAS_TOKEN" = "true" ]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::CLAUDE_CODE_OAUTH_TOKEN is not set; the failure will only be reported."
+          fi
+
+      - name: Install dependencies
+        if: steps.run.outputs.mode == 'agent' && steps.gate.outputs.run == 'true'
+        uses: ./.github/actions/yarn-install
+
+      - name: Triage with Claude Code
+        id: agent
+        if: steps.run.outputs.mode == 'agent' && steps.gate.outputs.run == 'true'
+        continue-on-error: true
+        uses: anthropics/claude-code-action@ac7e24bf2938964b8ab203e417a2773802392ddd # v1.0.146
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: |
+            A CI workflow failed on a pull request branch of this fork and you
+            are checked out on that branch. Read .github/ci-agent/PR-CHECKS-AGENT.md
+            first and follow it exactly.
+
+            The inputs are in ${{ runner.temp }}/ci-agent: context.json (pull
+            request, branch, sha, the failed workflow and its URL), jobs.txt (the
+            failed jobs) and failed.log (their logs). Dependencies are installed.
+
+            Reproduce the failure with the command CI ran, fix it only if the
+            cause is in this branch or a fork-owned file, and re-run that command
+            to prove it. Otherwise classify it as flaky or needs-human with the
+            evidence. Do not commit, push, or call gh; the workflow does that.
+
+            Before you finish, write ${{ runner.temp }}/ci-agent/verdict.json as
+            the policy describes. Without it the failure is reported as
+            needs-human.
+          claude_args: '--max-turns 200 --model opus --allowedTools "Edit,Write,Read,Glob,Grep,Bash(git *),Bash(npx nx *),Bash(npx jest *),Bash(npx oxlint *),Bash(npx oxfmt *),Bash(npx tsc *),Bash(yarn *),Bash(node *),Bash(cd *),Bash(cat *),Bash(ls *),Bash(grep *),Bash(rm *),Bash(mkdir *),Bash(diff *),Bash(sed *),Bash(head *),Bash(tail *),Bash(wc *),Bash(sort *),Bash(find *),Bash(echo *),Bash(mv *),Bash(cp *),Bash(awk *),Bash(cut *),Bash(tr *),Bash(xargs *),Bash(pwd *),Bash(jq *)"'
+
+      - name: Act on the verdict
+        if: steps.run.outputs.mode != 'skip'
+        env:
+          MODE: ${{ steps.run.outputs.mode }}
+          AGENT_RAN: ${{ steps.gate.outputs.run || 'false' }}
+          AGENT_OUTCOME: ${{ steps.agent.outcome || 'skipped' }}
+          PR: ${{ steps.run.outputs.pr }}
+          BRANCH: ${{ steps.run.outputs.branch }}
+          SHA: ${{ steps.run.outputs.sha }}
+          WORKFLOW_NAME: ${{ steps.run.outputs.workflow_name }}
+          RUN_URL: ${{ steps.run.outputs.run_url }}
+          AGENT_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          verdict_file="$CI_AGENT_DIR/verdict.json"
+          classification="needs-human"
+          summary="The agent did not run or did not leave a verdict."
+          details=""
+          if [ "$MODE" = "escalate" ]; then
+            summary="My previous fix (the head commit starts with ci-agent:) did not make ${WORKFLOW_NAME} pass. I am not pushing again."
+            details="A person needs to look at this run. The failed jobs: $(paste -sd ',' "$CI_AGENT_DIR/jobs.txt")"
+          elif [ "$AGENT_RAN" != "true" ]; then
+            summary="CLAUDE_CODE_OAUTH_TOKEN is not configured, so this failure is only reported."
+          elif [ -f "$verdict_file" ] && jq -e '.classification' "$verdict_file" >/dev/null 2>&1; then
+            classification="$(jq -r '.classification' "$verdict_file")"
+            summary="$(jq -r '.summary // ""' "$verdict_file")"
+            details="$(jq -r '.details // ""' "$verdict_file")"
+          elif [ "$AGENT_OUTCOME" != "success" ]; then
+            summary="The agent step ended with outcome ${AGENT_OUTCOME} and left no verdict."
+          fi
+          case "$classification" in fixed|flaky|needs-human) ;; *) classification="needs-human" ;; esac
+
+          action_taken=""
+          if [ "$classification" = "fixed" ]; then
+            if [ -z "$(git status --porcelain)" ]; then
+              classification="needs-human"
+              action_taken="The agent reported a fix but changed no file, so nothing was pushed."
+            else
+              git config user.name "ci-agent"
+              git config user.email "ci-agent@users.noreply.github.com"
+              git add -A
+              diffstat="$(git diff --cached --stat | tail -20)"
+              git commit -q -m "ci-agent: ${summary}" -m "${details}" -m "Triage of ${WORKFLOW_NAME} failure ${RUN_URL}"
+              git push origin "HEAD:${BRANCH}"
+              action_taken="Pushed $(git rev-parse --short HEAD) to \`${BRANCH}\`; CI is re-running."$'\n\n```\n'"${diffstat}"$'\n```'
+            fi
+          fi
+          if [ "$classification" = "flaky" ]; then
+            if gh run rerun "$RUN_ID" --repo "$REPO" --failed >/dev/null 2>&1; then
+              action_taken="Re-ran the failed jobs of ${WORKFLOW_NAME} once. If they fail again, a person should look."
+            else
+              action_taken="Could not re-run the failed jobs (already re-run, or the run is too old). Re-run them by hand if you agree it is flaky."
+            fi
+          fi
+
+          case "$classification" in
+            fixed) heading="Fixed a **${WORKFLOW_NAME}** failure" ;;
+            flaky) heading="**${WORKFLOW_NAME}** failed on something that looks flaky" ;;
+            *) heading="**${WORKFLOW_NAME}** failed and needs a person" ;;
+          esac
+
+          footer="Failed run: ${RUN_URL} (${SHA:0:7}). Triage: ${AGENT_RUN_URL}. Add the no-ci-agent label to stop this on the pull request."
+          body="$(printf '%s\n' '<!-- pr-checks-agent -->' "### ${heading}" '' "${summary}" '' "${details}" '' "${action_taken}" '' "<sub>${footer}</sub>")"
+          gh pr comment "$PR" --repo "$REPO" --body "$body" >/dev/null
+          echo "classification=${classification}"
+          echo "${summary}"
