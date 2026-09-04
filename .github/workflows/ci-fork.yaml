@@ -57,6 +57,7 @@ jobs:
             .github/workflows/deploy-production.yml \
             .github/workflows/staging-signoff.yml \
             .github/workflows/cd-deploy-cloud.yaml \
+            .github/workflows/pr-checks-agent.yaml \
             .github/workflows/ci-fork.yaml
       - name: Build shared packages
         run: npx nx run-many -t build -p twenty-shared twenty-ui
