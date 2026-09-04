@@ -68,6 +68,24 @@ describe('computeObjectNavigationTargetBackfill', () => {
     });
   });
 
+  it('clears the legacy payload alongside the target when asked to', () => {
+    const backfill = computeObjectNavigationTargetBackfill({
+      flatCommandMenuItemMaps: buildFlatCommandMenuItemMaps([
+        buildFlatCommandMenuItem({ id: 'command-1' }),
+      ]),
+      flatObjectMetadataMaps,
+      now: NOW,
+      clearPayload: true,
+    });
+
+    expect(backfill.flatCommandMenuItemsToUpdate).toHaveLength(1);
+    expect(backfill.flatCommandMenuItemsToUpdate[0]).toMatchObject({
+      id: 'command-1',
+      payload: null,
+      navigationTargetObjectMetadataId: COMPANY_OBJECT_ID,
+    });
+  });
+
   it('is idempotent once the target column is set', () => {
     const backfill = computeObjectNavigationTargetBackfill({
       flatCommandMenuItemMaps: buildFlatCommandMenuItemMaps([

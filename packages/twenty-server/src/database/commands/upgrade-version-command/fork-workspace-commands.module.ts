@@ -22,6 +22,7 @@ import { AddMessageHeaderMessageIdIndexCommand } from 'src/database/commands/upg
 import { AdoptMessageCampaignIndexViewsCommand } from 'src/database/commands/upgrade-version-command/2-38/2-38-workspace-command-1788200700999-adopt-message-campaign-index-views.command';
 import { ForkRunMissedWorkspaceCommandsCommand } from 'src/database/commands/upgrade-version-command/fork-run-missed-workspace-commands.command';
 import { ApplicationModule } from 'src/engine/core-modules/application/application.module';
+import { ForkMissedWorkspaceCommandsModule } from 'src/engine/core-modules/upgrade/fork-missed-workspace-commands.module';
 import { UpgradeStatusModule } from 'src/engine/core-modules/upgrade/upgrade-status.module';
 import { WorkspaceVersionModule } from 'src/engine/workspace-manager/workspace-version/workspace-version.module';
 import { FieldMetadataEntity } from 'src/engine/metadata-modules/field-metadata/field-metadata.entity';
@@ -38,6 +39,7 @@ import { ConnectionModule } from 'src/modules/connection/connection.module';
 @Module({
   imports: [
     ApplicationModule,
+    ForkMissedWorkspaceCommandsModule,
     UpgradeStatusModule,
     WorkspaceVersionModule,
     ConnectionModule,
