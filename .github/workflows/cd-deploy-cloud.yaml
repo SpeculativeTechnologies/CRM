@@ -155,12 +155,54 @@ jobs:
             done
           fi
 
+      # Fork: the box's own data decides whether an upgrade works, not CI. The
+      # dry run from the target image lists every step it would run, including
+      # commands caught up from behind the cursor, and fails on the errors that
+      # cost six deploys on 2026-09-03/04. Read its output in the step summary.
+      - name: Rehearse the upgrade against the box
+        run: |
+          set -euo pipefail
+          REHEARSAL=$(mktemp)
+          gcloud compute ssh "${{ steps.target.outputs.vm }}" \
+            --zone "${{ steps.target.outputs.zone }}" --tunnel-through-iap --quiet \
+            --command "sudo IMAGE_SHA=${{ steps.target.outputs.sha }} bash -s" \
+            < deploy/cloud-rehearse.sh | tee "$REHEARSAL"
+          {
+            echo "## Upgrade rehearsal (${{ steps.target.outputs.env_name }}, ${{ steps.target.outputs.sha }})"
+            echo
+            echo '```'
+            grep -E '^\[rehearse\]|DRY RUN|catch-up|ERROR' "$REHEARSAL" | sed 's/.*\(LOG \|WARN \|ERROR \)//' | cut -c1-200 | head -120
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
       - name: Deploy
         run: |
           set -euo pipefail
           gcloud compute ssh "${{ steps.target.outputs.vm }}" \
             --zone "${{ steps.target.outputs.zone }}" --tunnel-through-iap --quiet \
             --command "sudo /opt/twenty/cloud-deploy.sh ${{ steps.target.outputs.sha }}"
+      # Fork: a green health check is not a working CRM. These are the invariants
+      # that were false while healthz answered ok this week. The image is already
+      # live when this runs; a failure here fails the run so the promotion that
+      # caused it is refused, and says exactly what to look at.
+      - name: Verify the box
+        run: |
+          set -euo pipefail
+          VERIFY=$(mktemp)
+          set +e
+          gcloud compute ssh "${{ steps.target.outputs.vm }}" \
+            --zone "${{ steps.target.outputs.zone }}" --tunnel-through-iap --quiet \
+            --command "sudo EXPECTED_SHA=${{ steps.target.outputs.sha }} bash -s" \
+            < deploy/cloud-verify.sh | tee "$VERIFY"
+          STATUS=${PIPESTATUS[0]}
+          set -e
+          {
+            echo "## Box verification (${{ steps.target.outputs.env_name }})"
+            echo
+            echo '```'
+            grep '^\[verify\]' "$VERIFY"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          exit "$STATUS"
 
       - name: Verify from outside
         run: |

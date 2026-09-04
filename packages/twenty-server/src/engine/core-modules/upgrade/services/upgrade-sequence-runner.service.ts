@@ -93,6 +93,7 @@ export class UpgradeSequenceRunnerService {
       sequence,
       startCursor,
       skipDataMigration: allProvisionedWorkspaceIds.length === 0,
+      dryRun: options.dryRun ?? false,
     });
 
     // Fork: workspace steps inserted behind a workspace's cursor never ran
@@ -183,6 +184,22 @@ export class UpgradeSequenceRunnerService {
             previousWorkspaceStep: previousStep,
             workspaceCursors,
           });
+        }
+
+        // Fork: a dry run must not touch the schema. Upstream runs instance
+        // steps regardless, which made `upgrade --dry-run` unsafe on a box
+        // with pending instance commands.
+        if (options.dryRun) {
+          this.logger.log(
+            formatUpgradeLog({
+              humanMessage: `[DRY RUN] Would run instance step "${step.name}"`,
+              event: 'instance.dry-run',
+              logFields: { step: step.name },
+            }),
+          );
+
+          cursor++;
+          continue;
         }
 
         await this.runInstanceStep({
@@ -382,10 +399,12 @@ export class UpgradeSequenceRunnerService {
     sequence,
     startCursor,
     skipDataMigration,
+    dryRun,
   }: {
     sequence: UpgradeStep[];
     startCursor: number;
     skipDataMigration: boolean;
+    dryRun: boolean;
   }): Promise<void> {
     for (const step of sequence.slice(0, startCursor)) {
       if (step.kind === 'workspace') {
@@ -406,11 +425,15 @@ export class UpgradeSequenceRunnerService {
         formatUpgradeLog({
           humanMessage:
             `Instance step "${step.name}" sits behind the cursor but never ran ` +
-            '(added to an already-passed version). Running it now.',
+            `(added to an already-passed version). ${dryRun ? 'Would run' : 'Running'} it now.`,
           event: 'instance.catch-up',
-          logFields: { step: step.name },
+          logFields: { step: step.name, dryRun },
         }),
       );
+
+      if (dryRun) {
+        continue;
+      }
 
       await this.runInstanceStep({ instanceStep: step, skipDataMigration });
       await this.upgradeAwareEntityMetadataAdapter.refresh();

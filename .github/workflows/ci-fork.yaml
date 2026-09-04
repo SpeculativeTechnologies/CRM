@@ -43,6 +43,21 @@ jobs:
           key: ci-fork-checks
       - name: Resolve affected base
         run: echo "NX_BASE=$(git merge-base origin/main HEAD)" >> "$GITHUB_ENV"
+      # Fork: an invalid workflow file fails silently as a red run on every push
+      # and stops its schedule (sync-upstream.yaml, 2026-09-02 to 09-04). Lint
+      # the fork-owned workflows so the PR that breaks one is the one that fails.
+      - name: Lint fork-owned workflows
+        run: |
+          set -euo pipefail
+          curl -sSfL https://github.com/rhysd/actionlint/releases/download/v1.7.7/actionlint_1.7.7_linux_amd64.tar.gz \
+            | tar xz -C /tmp actionlint
+          /tmp/actionlint -shellcheck= -pyflakes= -ignore 'description is required' \
+            .github/workflows/sync-upstream.yaml \
+            .github/workflows/deploy-staging.yml \
+            .github/workflows/deploy-production.yml \
+            .github/workflows/staging-signoff.yml \
+            .github/workflows/cd-deploy-cloud.yaml \
+            .github/workflows/ci-fork.yaml
       - name: Build shared packages
         run: npx nx run-many -t build -p twenty-shared twenty-ui
       - name: Typecheck affected
