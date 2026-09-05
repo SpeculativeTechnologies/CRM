@@ -88,6 +88,7 @@ this was written). Anything a script runs that might read stdin needs
 | Search column rebuild exceeded 10 s on production | rehearsal passes (it reads); deploy needs `CLOUD_MIGRATION_QUERY_TIMEOUT_MS` in `cloud-deploy.sh`, see below |
 | 92 navigation items hidden by the API | verify fails: "object navigation item(s) still carry a payload" |
 | Green deploy on an invalid workflow file | CI Fork lints fork-owned workflows with actionlint |
+| Fixed metadata, browser still shows the old labels after reload | the server recomputes any collection whose cache hash is missing after `cache:flush`, so clients see the change; check the API before trusting a screenshot, and vice versa |
 | No staging check recorded | unchanged: Record a staging check is a human step by design |
 
 ## Gaps that remain

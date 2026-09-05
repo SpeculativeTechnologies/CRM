@@ -11,6 +11,7 @@ import { isDefined, uncapitalize } from 'twenty-shared/utils';
 import { I18nService } from 'src/engine/core-modules/i18n/i18n.service';
 import { ALL_FLAT_ENTITY_MAPS_PROPERTIES } from 'src/engine/metadata-modules/flat-entity/constant/all-flat-entity-maps-properties.constant';
 import { WorkspaceManyOrAllFlatEntityMapsCacheService } from 'src/engine/metadata-modules/flat-entity/services/workspace-many-or-all-flat-entity-maps-cache.service';
+import { forkGetCompleteCacheHashes } from 'src/engine/metadata-modules/minimal-metadata/utils/fork-get-complete-cache-hashes.util';
 import { type CollectionHashDTO } from 'src/engine/metadata-modules/minimal-metadata/dtos/collection-hash.dto';
 import { MinimalMetadataDTO } from 'src/engine/metadata-modules/minimal-metadata/dtos/minimal-metadata.dto';
 import { MinimalObjectMetadataDTO } from 'src/engine/metadata-modules/minimal-metadata/dtos/minimal-object-metadata.dto';
@@ -51,10 +52,15 @@ export class MinimalMetadataService {
           workspaceId,
           flatMapsKeys: ['flatObjectMetadataMaps', 'flatViewMaps'],
         }),
-        this.workspaceCacheService.getCacheHashes(
+        // Fork: recompute collections whose hash is missing after a cache
+        // flush, or clients never learn they are stale.
+        forkGetCompleteCacheHashes({
           workspaceId,
-          ALL_FLAT_ENTITY_MAPS_PROPERTIES as WorkspaceCacheKeyName[],
-        ),
+          cacheKeyNames:
+            ALL_FLAT_ENTITY_MAPS_PROPERTIES as WorkspaceCacheKeyName[],
+          workspaceCacheService: this.workspaceCacheService,
+          flatEntityMapsCacheService: this.flatEntityMapsCacheService,
+        }),
       ]);
 
     const collectionHashes: CollectionHashDTO[] = Object.entries(cacheHashes)
