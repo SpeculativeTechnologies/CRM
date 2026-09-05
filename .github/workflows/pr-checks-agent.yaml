@@ -147,9 +147,16 @@ jobs:
           login="$(GH_TOKEN="$PUSH_TOKEN" gh api user --jq .login 2>/dev/null || echo '(token rejected)')"
           push="$(GH_TOKEN="$PUSH_TOKEN" gh api "repos/${REPO}" --jq '.permissions.push // false' 2>/dev/null || echo 'unknown')"
           scopes="$(GH_TOKEN="$PUSH_TOKEN" gh api -i user 2>/dev/null | grep -i '^x-oauth-scopes:' | cut -d: -f2- | tr -d '\r' || true)"
-          echo "sync token acts as: ${login}; push permission on ${REPO}: ${push}; classic scopes:${scopes:- (none / fine-grained)}"
-          if [ "$push" != "true" ]; then
-            echo "::warning::The sync token cannot push to ${REPO}; a fix will be reported instead of pushed."
+          # .permissions reflects the user, not a fine-grained token's grants.
+          # Creating an unreferenced blob needs Contents: write and is harmless.
+          if GH_TOKEN="$PUSH_TOKEN" gh api -X POST "repos/${REPO}/git/blobs" -f content="pr-checks-agent write probe" -f encoding=utf-8 >/dev/null 2>&1; then
+            can_write=true
+          else
+            can_write=false
+          fi
+          echo "sync token acts as: ${login}; user push permission on ${REPO}: ${push}; token Contents write: ${can_write}; classic scopes:${scopes:- (none / fine-grained)}"
+          if [ "$can_write" != "true" ]; then
+            echo "::warning::The sync token cannot write contents on ${REPO} (fine-grained token without Contents: Read and write?); a fix will be reported instead of pushed."
           fi
 
       - name: Decide whether the agent can run
