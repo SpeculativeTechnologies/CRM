@@ -240,7 +240,10 @@ jobs:
               git add -A
               diffstat="$(git diff --cached --stat | tail -20)"
               git commit -q -m "ci-agent: ${summary}" -m "${details}" -m "Triage of ${WORKFLOW_NAME} failure ${RUN_URL}"
-              if [ -n "$PUSH_TOKEN" ] && git push "https://x-access-token:${PUSH_TOKEN}@github.com/${REPO}.git" "HEAD:${BRANCH}" 2>&1 | sed "s/${PUSH_TOKEN}/***/g"; then
+              # actions/checkout leaves an Authorization extraheader for the
+              # workflow token in the repo config; it would override the URL
+              # credential, so clear it for this one push.
+              if [ -n "$PUSH_TOKEN" ] && git -c "http.https://github.com/.extraheader=" push "https://x-access-token:${PUSH_TOKEN}@github.com/${REPO}.git" "HEAD:${BRANCH}" 2>&1 | sed "s/${PUSH_TOKEN}/***/g"; then
                 action_taken="Pushed $(git rev-parse --short HEAD) to \`${BRANCH}\`; CI is re-running."$'\n\n```\n'"${diffstat}"$'\n```'
               else
                 classification="needs-human"
