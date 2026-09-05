@@ -205,6 +205,10 @@ jobs:
           WORKFLOW_NAME: ${{ steps.run.outputs.workflow_name }}
           RUN_URL: ${{ steps.run.outputs.run_url }}
           AGENT_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          # The Claude action rewrites the checkout's git credentials to the
+          # workflow token, which cannot push and whose pushes would not
+          # trigger CI anyway. Push with the sync token explicitly.
+          PUSH_TOKEN: ${{ secrets.SYNC_UPSTREAM_TOKEN }}
         run: |
           set -euo pipefail
           verdict_file="$CI_AGENT_DIR/verdict.json"
@@ -236,8 +240,12 @@ jobs:
               git add -A
               diffstat="$(git diff --cached --stat | tail -20)"
               git commit -q -m "ci-agent: ${summary}" -m "${details}" -m "Triage of ${WORKFLOW_NAME} failure ${RUN_URL}"
-              git push origin "HEAD:${BRANCH}"
-              action_taken="Pushed $(git rev-parse --short HEAD) to \`${BRANCH}\`; CI is re-running."$'\n\n```\n'"${diffstat}"$'\n```'
+              if [ -n "$PUSH_TOKEN" ] && git push "https://x-access-token:${PUSH_TOKEN}@github.com/${REPO}.git" "HEAD:${BRANCH}" 2>&1 | sed "s/${PUSH_TOKEN}/***/g"; then
+                action_taken="Pushed $(git rev-parse --short HEAD) to \`${BRANCH}\`; CI is re-running."$'\n\n```\n'"${diffstat}"$'\n```'
+              else
+                classification="needs-human"
+                action_taken="The agent prepared a fix but the push to \`${BRANCH}\` failed (SYNC_UPSTREAM_TOKEN missing or lacking Contents write). The change is below; apply it by hand."$'\n\n```\n'"${diffstat}"$'\n```'
+              fi
             fi
           fi
           if [ "$classification" = "flaky" ]; then
