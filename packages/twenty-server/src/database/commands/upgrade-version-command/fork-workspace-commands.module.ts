@@ -22,7 +22,8 @@ import { AddMessageHeaderMessageIdIndexCommand } from 'src/database/commands/upg
 import { AdoptTimelineActivitySearchVectorFieldCommand } from 'src/database/commands/upgrade-version-command/2-35/2-35-workspace-command-1787749299999-adopt-timeline-activity-search-vector-field.command';
 import { AdoptMessageCampaignIndexViewsCommand } from 'src/database/commands/upgrade-version-command/2-38/2-38-workspace-command-1788200700999-adopt-message-campaign-index-views.command';
 import { ConvertLegacyObjectNavigationCommandMenuItemsCommand } from 'src/database/commands/upgrade-version-command/2-38/2-38-workspace-command-1788200701001-convert-legacy-object-navigation-command-menu-items.command';
-import { RestoreStandardCommandMenuItemDisplayFieldsCommand } from 'src/database/commands/upgrade-version-command/2-38/2-38-workspace-command-1788200701002-restore-standard-command-menu-item-display-fields.command';
+import { RewriteTemplateCommandMenuItemLabelsCommand } from 'src/database/commands/upgrade-version-command/2-38/2-38-workspace-command-1788200701003-rewrite-template-command-menu-item-labels.command';
+import { RestoreSettingsNavigationLabelsAfterLabelRewriteCommand } from 'src/database/commands/upgrade-version-command/2-38/2-38-workspace-command-1788200701004-restore-settings-navigation-labels-after-label-rewrite.command';
 import { ForkRunMissedWorkspaceCommandsCommand } from 'src/database/commands/upgrade-version-command/fork-run-missed-workspace-commands.command';
 import { ApplicationModule } from 'src/engine/core-modules/application/application.module';
 import { ForkMissedWorkspaceCommandsModule } from 'src/engine/core-modules/upgrade/fork-missed-workspace-commands.module';
@@ -73,7 +74,8 @@ import { ConnectionModule } from 'src/modules/connection/connection.module';
     AdoptTimelineActivitySearchVectorFieldCommand,
     AdoptMessageCampaignIndexViewsCommand,
     ConvertLegacyObjectNavigationCommandMenuItemsCommand,
-    RestoreStandardCommandMenuItemDisplayFieldsCommand,
+    RewriteTemplateCommandMenuItemLabelsCommand,
+    RestoreSettingsNavigationLabelsAfterLabelRewriteCommand,
     ForkRunMissedWorkspaceCommandsCommand,
   ],
 })
