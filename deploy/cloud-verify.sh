@@ -16,6 +16,8 @@
 #     deployed image has nothing left to catch up (so no command was skipped);
 #   - object navigation command menu items carry a target, not a legacy
 #     payload the 2.38 API hides (broken left navigation otherwise);
+#   - no command menu item label is still a pre-2.33 template expression
+#     (the 2.38 UI shows it raw, e.g. "New ${capitalize(...)}");
 #   - timelineActivity has its search column and search metadata (search over
 #     the timeline is dead otherwise);
 #   - the server log has no errors since it started.
@@ -100,6 +102,13 @@ if [ "$EMPTY_NAV" = "0" ]; then
   pass "no navigation item without target or payload"
 else
   fail "$EMPTY_NAV navigation item(s) have neither target nor payload"
+fi
+
+TEMPLATE_LABELS="$(sql "SELECT count(*) FROM core.\"commandMenuItem\" WHERE label LIKE '%\${%' OR \"shortLabel\" LIKE '%\${%' OR icon LIKE '%\${%';")"
+if [ "$TEMPLATE_LABELS" = "0" ]; then
+  pass "no command menu item label still stored as a template expression"
+else
+  fail "$TEMPLATE_LABELS command menu item(s) still carry a pre-2.33 template label (shows as raw \${...} in the UI)"
 fi
 
 # --- timeline search ---------------------------------------------------------
