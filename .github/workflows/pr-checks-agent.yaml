@@ -132,6 +132,26 @@ jobs:
           echo "failed jobs:"; sed 's/^/  /' "$CI_AGENT_DIR/jobs.txt"
           echo "log bytes: $(wc -c < "$CI_AGENT_DIR/failed.log")"
 
+      # Says up front whether a fix could be pushed, so a bad or under-scoped
+      # sync token is read in the log instead of inferred from a 403 later.
+      - name: Check the push token
+        if: steps.run.outputs.mode == 'agent'
+        env:
+          PUSH_TOKEN: ${{ secrets.SYNC_UPSTREAM_TOKEN }}
+        run: |
+          set -uo pipefail
+          if [ -z "$PUSH_TOKEN" ]; then
+            echo "::warning::SYNC_UPSTREAM_TOKEN is not set; fixes cannot be pushed."
+            exit 0
+          fi
+          login="$(GH_TOKEN="$PUSH_TOKEN" gh api user --jq .login 2>/dev/null || echo '(token rejected)')"
+          push="$(GH_TOKEN="$PUSH_TOKEN" gh api "repos/${REPO}" --jq '.permissions.push // false' 2>/dev/null || echo 'unknown')"
+          scopes="$(GH_TOKEN="$PUSH_TOKEN" gh api -i user 2>/dev/null | grep -i '^x-oauth-scopes:' | cut -d: -f2- | tr -d '\r' || true)"
+          echo "sync token acts as: ${login}; push permission on ${REPO}: ${push}; classic scopes:${scopes:- (none / fine-grained)}"
+          if [ "$push" != "true" ]; then
+            echo "::warning::The sync token cannot push to ${REPO}; a fix will be reported instead of pushed."
+          fi
+
       - name: Decide whether the agent can run
         id: gate
         if: steps.run.outputs.mode == 'agent'
