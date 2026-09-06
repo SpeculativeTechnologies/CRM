@@ -59,7 +59,9 @@ export class AddOpportunityContactsCommand extends ProvisionedWorkspaceCommandRu
       ![STANDARD_OBJECTS.person, STANDARD_OBJECTS.opportunity].every(
         ({ universalIdentifier }) =>
           isDefined(
-            existing.flatObjectMetadataMaps.byUniversalIdentifier[universalIdentifier],
+            existing.flatObjectMetadataMaps.byUniversalIdentifier[
+              universalIdentifier
+            ],
           ),
       )
     ) {
