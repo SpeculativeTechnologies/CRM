@@ -141,12 +141,18 @@ is false. Then the box, read-only:
 
 ```bash
 gcloud compute ssh twenty-staging-e2 --zone=us-central1-a --tunnel-through-iap \
-  --command 'sudo EXPECTED_SHA=<sha> bash -s' < deploy/cloud-verify.sh
+  --command 'sudo EXPECTED_SHA=<sha> EXPECTED_IMAGE=<image@sha256:digest> bash -s' < deploy/cloud-verify.sh
 gcloud compute ssh twenty-staging-e2 --zone=us-central1-a --tunnel-through-iap \
-  --command 'sudo IMAGE_SHA=<sha> bash -s' < deploy/cloud-rehearse.sh
+  --command 'sudo IMAGE_SHA=<sha> IMAGE_REF=<image@sha256:digest> bash -s' < deploy/cloud-rehearse.sh
 ```
 
 Neither changes the box. A migration that has to run by hand (a timeout, a
 command below the floor) is the production owner's action, as
 `deploy/TEAM-WORKFLOW.md` says; the twenty-gated-upgrade-command runbook has
 the recipe.
+
+The immutable-artifact pipeline now supersedes SHA-tag promotion. See
+[MIGRATION-TESTING.md](MIGRATION-TESTING.md) for local/CI rehearsals and
+[TEAM-WORKFLOW.md](TEAM-WORKFLOW.md#immutable-artifact-promotion) for the exact
+source, digest and deployment-ID gates. The paired private host contract must
+be installed by the owner before the new workflow can deploy.

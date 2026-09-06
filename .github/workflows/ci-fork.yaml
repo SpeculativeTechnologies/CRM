@@ -159,8 +159,7 @@ jobs:
               --paginate --jq '.[].filename'
           )"
 
-          if printf '%s\n' "$files" | grep -qvE \
-            '^(deploy/|\.github/|packages/twenty-server/|packages/twenty-docker/)'; then
+          if grep -qvE '^(deploy/|\.github/|packages/twenty-server/|packages/twenty-docker/)' <<<"$files"; then
             echo "Changed paths can reach twenty-front; running the shards."
             echo "run-shards=true" >> "$GITHUB_OUTPUT"
           else
@@ -194,7 +193,8 @@ jobs:
         run: |
           bash .github/scripts/ci-range.sh
           source "$GITHUB_ENV"
-          if npx nx show projects --affected --base=$NX_BASE --head=$NX_HEAD | grep -qx twenty-front; then
+          npx nx show projects --affected --base=$NX_BASE --head=$NX_HEAD --json > /tmp/affected-projects.json
+          if jq -e 'index("twenty-front") != null' /tmp/affected-projects.json >/dev/null; then
             echo "affected=true" >> "$GITHUB_OUTPUT"
           else
             echo "affected=false" >> "$GITHUB_OUTPUT"
