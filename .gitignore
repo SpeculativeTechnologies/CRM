@@ -73,3 +73,10 @@ screenshots/
 /.diag*.mjs
 /.compare*.mjs
 /.narrow*.mjs
+
+# Frozen migration baselines and private attempt diagnostics (may contain mirror data).
+deploy/.migration-tests/
+**/__pycache__/
+
+# Worktrees may link installed dependencies as directories or symlinks.
+**/node_modules
