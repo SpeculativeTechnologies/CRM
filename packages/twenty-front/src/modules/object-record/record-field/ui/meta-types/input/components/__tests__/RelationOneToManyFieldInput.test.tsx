@@ -124,11 +124,9 @@ const PickerHarness = () => {
 describe('RelationOneToManyFieldInput contact selection', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    jest
-      .mocked(useObjectMetadataItems)
-      .mockReturnValue({
-        objectMetadataItems: getTestEnrichedObjectMetadataItemsMock(),
-      });
+    jest.mocked(useObjectMetadataItems).mockReturnValue({
+      objectMetadataItems: getTestEnrichedObjectMetadataItemsMock(),
+    });
   });
 
   const renderPicker = (nameSingular: string) => {
