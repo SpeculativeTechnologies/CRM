@@ -14,7 +14,7 @@ import path from 'node:path';
 import { test } from 'node:test';
 
 import { changedFiles, lintCommands, resolveBase } from './lint-changed.mjs';
-import { checkArguments } from '../../deploy/local-check.mjs';
+import { checkArguments, checkEnvironment } from '../../deploy/local-check.mjs';
 
 const fixture = (context) => {
   const root = mkdtempSync(path.join(os.tmpdir(), 'twenty-lint-test-'));
@@ -146,6 +146,17 @@ test('retains all four required checks and bounds concurrency', () => {
   for (const value of ['0', '5', '-1', 'two', '2;echo unsafe']) {
     assert.throws(() => checkArguments(value));
   }
+});
+
+test('avoids conflicting Nx color settings without mutating the parent environment', () => {
+  const environment = { NO_COLOR: '1', FORCE_COLOR: '1', PATH: '/test/bin' };
+  assert.deepEqual(checkEnvironment(environment, 'base-sha'), {
+    FORCE_COLOR: '1',
+    PATH: '/test/bin',
+    NX_LOAD_DOT_ENV_FILES: 'false',
+    TWENTY_LINT_BASE: 'base-sha',
+  });
+  assert.equal(environment.NO_COLOR, '1');
 });
 
 test('plan needs no installed dependencies; execution invokes Nx once and propagates failure', (context) => {

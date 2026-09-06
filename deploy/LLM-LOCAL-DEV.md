@@ -105,6 +105,13 @@ prints the command and resolved comparison base without running checks or needin
 installed dependencies. These static checks do not need Docker or a database
 setup/reset.
 
+The wrapper also removes inherited `NO_COLOR` for this invocation. Nx sets
+`FORCE_COLOR` in its children; with both variables present, Node's warning can
+leave the shared barrel generator's synchronous Prettier workers hanging.
+If an individual Nx command stalls at `twenty-shared:generateBarrels` with a
+`NO_COLOR`/`FORCE_COLOR` warning, use `env -u NO_COLOR npx nx ...` for that command.
+The wrapper does not suppress Node warnings or modify your shell environment.
+
 Changed-file lint includes committed, staged, unstaged and untracked source
 files. It compares with the merge base of fetched `origin/main` (local `main`
 only if that remote ref is absent). Fetch at the start of a task; the check does

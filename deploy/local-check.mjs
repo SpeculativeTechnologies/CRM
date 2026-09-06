@@ -8,6 +8,19 @@ import { resolveBase } from '../.github/scripts/lint-changed.mjs';
 
 const ROOT = fileURLToPath(new URL('../', import.meta.url));
 
+export const checkEnvironment = (environment, base) => {
+  const result = {
+    ...environment,
+    NX_LOAD_DOT_ENV_FILES: 'false',
+    TWENTY_LINT_BASE: base,
+  };
+  // Nx sets FORCE_COLOR on child commands. When NO_COLOR is also inherited,
+  // Node emits a warning in Prettier's sync workers and barrel generation hangs.
+  // Remove the conflicting setting only for this invocation, not the shell.
+  delete result.NO_COLOR;
+  return result;
+};
+
 export const checkArguments = (parallel) => {
   if (!/^[1-4]$/.test(parallel)) {
     throw new Error('--parallel must be 1, 2, 3 or 4 (default: 2)');
@@ -65,11 +78,7 @@ const main = () => {
   const result = spawnSync(executable, arguments_, {
     cwd: ROOT,
     stdio: 'inherit',
-    env: {
-      ...process.env,
-      NX_LOAD_DOT_ENV_FILES: 'false',
-      TWENTY_LINT_BASE: base,
-    },
+    env: checkEnvironment(process.env, base),
   });
   if (result.error) throw result.error;
   process.exitCode = result.status || (result.signal ? 1 : 0);
