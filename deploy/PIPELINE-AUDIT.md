@@ -168,3 +168,17 @@ frontend and backend dependents. Restoring the source reused its original
 passing result. The temporary regression was removed. Comparable follow-up
 timings and the final certified digest are recorded in
 [PR #234](https://github.com/SpeculativeTechnologies/CRM/pull/234).
+
+The comparable warm checks job completed in 3m42s: dependency setup 54s,
+typecheck/lint results fully cached, catalogs 72s. The warm image build/push
+took 12s and the full artifact workflow including fresh rehearsal took 5m45s.
+A repeat of the already certified image skipped both build jobs, retained the
+identical digest/image ID and passed a new baseline rehearsal.
+
+The warm PR migration job exposed a separate cache failure. Its server was
+built and loaded in about 48s, then uploading a duplicate Docker layer to
+Actions cache stalled for over eleven minutes. The superseded isolated run was
+canceled to collect diagnostics; it is not counted as a passing full CI run.
+The duplicate Actions Docker cache tier was removed. Migration builds now reuse
+the existing registry cache written by the release builder; Yarn and Nx retain
+their own Actions caches. No migration or application check was removed.

@@ -43,10 +43,10 @@ jobs:
           load: true
           tags: twenty-migration:branch
           labels: org.opencontainers.image.revision=${{ github.sha }}
-          cache-from: |
-            type=registry,ref=ghcr.io/speculativetechnologies/twenty:buildcache-linux-amd64
-            type=gha,scope=migration-server
-          cache-to: type=gha,scope=migration-server,mode=min
+          # Reuse the release builder's registry layers. Duplicating this image
+          # into Actions cache stalled a warm job for over eleven minutes and
+          # competes with the dependency/Nx caches for the same storage quota.
+          cache-from: type=registry,ref=ghcr.io/speculativetechnologies/twenty:buildcache-linux-amd64
       - name: Freeze declared fixture baseline
         if: steps.scope.outputs.required == 'true'
         run: |
