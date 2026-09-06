@@ -42,7 +42,9 @@ jobs:
           load: true
           tags: twenty-migration:branch
           labels: org.opencontainers.image.revision=${{ github.sha }}
-          cache-from: type=registry,ref=ghcr.io/speculativetechnologies/twenty:buildcache-linux-amd64
+          cache-from: |
+            type=registry,ref=ghcr.io/speculativetechnologies/twenty:buildcache-linux-amd64
+            type=gha,scope=migration-server
           cache-to: type=gha,scope=migration-server,mode=min
       - name: Freeze declared fixture baseline
         if: steps.scope.outputs.required == 'true'
@@ -56,6 +58,23 @@ jobs:
         run: |
           bash deploy/migration-test.sh run --baseline deploy/.migration-tests/baseline \
             --image twenty-migration:branch --logs deploy/.migration-tests/attempt
+      - name: Retain redacted synthetic failure diagnostics
+        if: failure()
+        run: |
+          for phase in freeze attempt; do
+            if [ -f "deploy/.migration-tests/$phase/dataset.json" ]; then
+              bash deploy/migration-test.sh report --logs "deploy/.migration-tests/$phase" \
+                --output "deploy/.migration-tests/diagnostics/$phase"
+            fi
+          done
+      - name: Upload synthetic failure diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: migration-failure-diagnostics
+          path: deploy/.migration-tests/diagnostics/
+          retention-days: 7
+          if-no-files-found: ignore
       - name: Publish timing and verdict only
         if: always() && steps.scope.outputs.required == 'true'
         uses: actions/upload-artifact@v4

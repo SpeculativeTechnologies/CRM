@@ -315,6 +315,23 @@ jobs:
           RELEASE_DEPLOYMENT_ID: ${{ steps.verification.outputs.deployment_id }}
           RELEASE_RESULT: failure
         run: node .github/scripts/release-record.mjs finish "$SHA"
+      - name: Retain redacted synthetic failure diagnostics
+        if: failure()
+        run: |
+          for phase in freeze release; do
+            if [ -f "deploy/.migration-tests/$phase/dataset.json" ]; then
+              bash deploy/migration-test.sh report --logs "deploy/.migration-tests/$phase" \
+                --output "deploy/.migration-tests/diagnostics/$phase"
+            fi
+          done
+      - name: Upload synthetic failure diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-failure-diagnostics
+          path: deploy/.migration-tests/diagnostics/
+          retention-days: 7
+          if-no-files-found: ignore
       - name: Retain safe verification report
         if: always()
         uses: actions/upload-artifact@v4

@@ -95,11 +95,15 @@ from sharing migration/cache state.
 Every failure exits nonzero, retains private phase and service logs, and removes
 the disposable stack unless `--keep` was requested. `result.json` and
 `timings.json` provide machine-readable evidence. Check phase logs locally;
-never upload raw mirror diagnostics. CI uploads only synthetic verdict/timing
-records and runs the migration command directly, outside Nx result caching.
+never upload raw mirror diagnostics. CI uploads synthetic verdict/timing
+records and redacted fixture failure logs and runs the migration command directly, outside Nx result caching.
 
 The synthetic fixture does not contain this fork's seven custom objects. Before
 promoting schema, metadata, view, search or permission changes, repeat against a
 verified mirror as required by `LLM-LOCAL-DEV.md`. Assess long backfills and locks
 with representative volume/concurrent traffic. Restore time is measured; no
 filesystem snapshot mechanism or new hosting platform is introduced.
+
+`report --logs <attempt> --output <directory>` exports token-redacted diagnostics
+only when the attempt is recorded as synthetic. Mirror and unknown datasets are
+refused before any export is written.

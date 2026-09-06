@@ -36,3 +36,25 @@ class MigrationGates(unittest.TestCase):
             (root / 'baseline.dump').write_bytes(b'changed migration ledger')
             with self.assertRaises(RuntimeError):
                 validate_manifest(root)
+
+class DiagnosticExports(unittest.TestCase):
+    def test_refuses_mirror_and_redacts_fixture_tokens(self):
+        import subprocess
+        import sys
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            logs = root / 'logs'
+            logs.mkdir()
+            (logs / 'dataset.json').write_text(json.dumps({'kind': 'mirror'}))
+            command = [sys.executable, str(Path(__file__).with_name('main.py')), 'report',
+                       '--logs', str(logs), '--output', str(root / 'report')]
+            result = subprocess.run(command, capture_output=True)
+            self.assertNotEqual(result.returncode, 0)
+            self.assertFalse((root / 'report').exists())
+            (logs / 'dataset.json').write_text(json.dumps({'kind': 'fixture'}))
+            (logs / 'test.log').write_text('TOKEN:eyJhbGciOi.TEST.SIGNATURE postgres://postgres:password@db/default')
+            result = subprocess.run(command, capture_output=True)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            report = (root / 'report/test.log').read_text()
+            self.assertNotIn('eyJhbGciOi', report)
+            self.assertNotIn('password', report)

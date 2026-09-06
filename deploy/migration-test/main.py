@@ -34,7 +34,7 @@ def validate_manifest(directory):
 
 
 def resolve_image(image, source_sha=None):
-    docker('pull', image) if '@sha256:' in image else None
+    docker('pull', '--platform', 'linux/amd64', image) if '@sha256:' in image else None
     metadata = json.loads(docker('image', 'inspect', image).stdout)[0]
     revision = metadata['Config'].get('Labels', {}).get('org.opencontainers.image.revision')
     bootstrap = json.loads((ROOT / 'deploy/migration-baseline.json').read_text())
@@ -188,15 +188,32 @@ def main():
     for command in [frozen, attempt]:
         command.add_argument('--logs', default=str(ROOT / 'deploy/.migration-tests' / time.strftime('%Y%m%d-%H%M%S')))
         command.add_argument('--keep', action='store_true')
+    report = commands.add_parser('report', help='Export redacted diagnostics for synthetic fixture attempts only')
+    report.add_argument('--logs', required=True)
+    report.add_argument('--output', required=True)
     reset = commands.add_parser('reset', help='Remove a retained attempt; the next run restores the original baseline')
     reset.add_argument('--logs', required=True)
     args = parser.parse_args()
+    if args.action == 'report':
+        source = Path(args.logs)
+        if json.loads((source / 'dataset.json').read_text()).get('kind') != 'fixture':
+            raise RuntimeError('Refusing to export mirror or unknown-data diagnostics')
+        destination = Path(args.output)
+        destination.mkdir(parents=True, exist_ok=True)
+        for file in source.glob('*.log'):
+            contents = file.read_text(errors='replace')
+            contents = re.sub(r'eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+', '[REDACTED_TOKEN]', contents)
+            contents = re.sub(r'(postgres(?:ql)?://[^:]+:)[^@]+@', r'\1[REDACTED]@', contents)
+            (destination / file.name).write_text(contents)
+        return
     guard()
     if args.action == 'reset':
         cleanup(json.loads((Path(args.logs) / 'resources.json').read_text())['name'])
         return
     stack = Stack(args.logs)
     try:
+        kind = ('mirror' if args.dump else 'fixture') if args.action == 'freeze' else validate_manifest(Path(args.baseline))['kind']
+        (stack.directory / 'dataset.json').write_text(json.dumps({'kind': kind}))
         freeze(args, stack) if args.action == 'freeze' else run(args, stack)
     except Exception as error:
         if hasattr(error, 'output'):
