@@ -19,6 +19,10 @@ that exact snapshot, including the record of which migrations already ran.
 - **Mirror:** a verified, scrubbed copy of the CRM, including this fork's seven
   custom objects, custom fields and views. Use this for database, search,
   permissions and custom-object work. It still contains confidential records.
+  Application runtime variables (including non-secret encrypted values) are
+  removed along with credentials; configure any test integration separately
+  with developer-owned values. Version 1 mirrors must be rebuilt with the
+  current publisher before use.
 
 Create a fixture snapshot with the existing baseline tool:
 

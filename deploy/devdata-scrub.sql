@@ -8,8 +8,9 @@
 -- Synced mailbox and calendar content is not kept, because it belongs to
 -- thousands of third parties who never interacted with the CRM.
 --
--- Row counts, foreign keys and column types survive everywhere, so migrations
--- and workspace upgrades are exercised against production-scale structure.
+-- CRM row counts, foreign keys and column types survive, so migrations and
+-- workspace upgrades are exercised against production-scale structure.
+-- Credentials and application runtime variables are removed entirely.
 --
 -- This never runs against staging or production. deploy/devdata-publish.sh
 -- restores a snapshot into a throwaway build database first.
@@ -40,14 +41,12 @@ SET
 
 UPDATE core."connectionProvider" SET "oauthConfig" = NULL;
 
-UPDATE core."applicationVariable"
-SET value = 'scrubbed'
-WHERE "isSecret";
-
--- A check constraint requires either an empty string or an enc:v2: payload.
-UPDATE core."applicationRegistrationVariable"
-SET "encryptedValue" = ''
-WHERE "isSecret";
+-- Both secret and non-secret variables now require encrypted envelopes.
+-- Removing runtime configuration avoids retaining production ciphertext or
+-- inventing values that cannot decrypt with the developer's fresh secret.
+-- Application definitions, CRM objects, fields and records remain intact.
+DELETE FROM core."applicationVariable";
+DELETE FROM core."applicationRegistrationVariable";
 
 -- Every account gets the same documented local password. Teammates who have no
 -- production account still need to sign in to the mirror.
