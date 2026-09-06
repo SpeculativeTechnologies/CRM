@@ -76,6 +76,7 @@ screenshots/
 
 # Frozen migration baselines and private attempt diagnostics (may contain mirror data).
 deploy/.migration-tests/
+deploy/.local-dev/
 **/__pycache__/
 
 # Worktrees may link installed dependencies as directories or symlinks.

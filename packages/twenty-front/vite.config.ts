@@ -23,7 +23,8 @@ import {
 } from './src/config/apiProxyPrefixes';
 
 export default defineConfig(({ mode }) => {
-  const env = loadEnv(mode, __dirname, '');
+  const disableDotenv = process.env.TWENTY_DISABLE_DOTENV === 'true';
+  const env = disableDotenv ? process.env : loadEnv(mode, __dirname, '');
 
   const {
     VITE_BUILD_SOURCEMAP,
@@ -77,6 +78,7 @@ export default defineConfig(({ mode }) => {
 
   return {
     root: __dirname,
+    ...(disableDotenv ? { envDir: false as const } : {}),
     cacheDir: '../../node_modules/.vite/packages/twenty-front',
 
     server: {
@@ -97,8 +99,8 @@ export default defineConfig(({ mode }) => {
         ? {
             protocol: 'https',
             https: {
-              key: fs.readFileSync(env.SSL_KEY_PATH),
-              cert: fs.readFileSync(env.SSL_CERT_PATH),
+              key: fs.readFileSync(SSL_KEY_PATH),
+              cert: fs.readFileSync(SSL_CERT_PATH),
             },
           }
         : {

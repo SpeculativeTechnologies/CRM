@@ -217,6 +217,11 @@ Never run setup or reset commands on a staging or production cloud VM.
 
 ## Isolated migration iteration
 
+For the daily edit/save/browser loop with a private database per worktree, use
+[LOCAL-DEV.md](LOCAL-DEV.md). `local-dev.sh start` runs source watchers;
+`local-dev.sh reset` restores the saved starting database and replays migrations.
+Ordinary hot reloads and stops preserve local record edits.
+
 See [MIGRATION-TESTING.md](MIGRATION-TESTING.md) for `migration-test.sh freeze`,
 `run`, and `reset`. This separate stack preserves the normal `twenty-dev`
 database while restoring the same migration ledger on every attempt. CI uses

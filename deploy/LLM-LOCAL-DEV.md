@@ -24,6 +24,11 @@ Human context is in [TEAM-WORKFLOW.md](TEAM-WORKFLOW.md) and
 
 ## Step 0: confirm where you are
 
+For an isolated worktree with source hot reload and a saved starting database,
+follow [LOCAL-DEV.md](LOCAL-DEV.md). That supervisor supplies its own local
+connections; do not run the standard setup/reset commands below against its
+database. Keep the same dataset choices and verification requirements.
+
 ```bash
 pwd
 git status --short --branch

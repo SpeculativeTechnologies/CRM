@@ -14,6 +14,7 @@ import { EnvironmentConfigDriver } from 'src/engine/core-modules/twenty-config/d
     ConfigModule.forRoot({
       isGlobal: true,
       expandVariables: true,
+      ignoreEnvFile: process.env.TWENTY_DISABLE_DOTENV === 'true',
       validate,
       envFilePath: process.env.NODE_ENV === 'test' ? '.env.test' : '.env',
     }),
