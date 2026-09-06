@@ -148,7 +148,7 @@ schema work unrealistic:
 - people, companies, fellows, mentors, candidates, enrollments, connections,
   employment history, opportunities, tasks, notes
 - every object and field definition, view, filter, and page layout
-- production row counts and relationships throughout
+- CRM record counts and relationships
 
 Removed:
 
@@ -159,6 +159,11 @@ Removed:
 - timeline activity field diffs, assistant conversations, attachment names
 - all credentials: signing keys, sessions, API keys, 2FA methods, OAuth tokens,
   SSO configuration, and application secrets
+- application runtime variable rows, including encrypted non-secret values;
+  production ciphertext cannot be used with the developer's fresh secret
+
+The publisher now emits scrub version 2. Rebuild older mirrors before restoring
+them; verification rejects version 1 and any retained application variables.
 
 Message and calendar rows are kept, only emptied. Row counts, foreign keys, and
 column types match production, which is the point: a missing workspace field on
@@ -216,6 +221,11 @@ bash packages/twenty-utils/setup-dev-env.sh --docker --reset
 Never run setup or reset commands on a staging or production cloud VM.
 
 ## Isolated migration iteration
+
+For the daily edit/save/browser loop with a private database per worktree, use
+[LOCAL-DEV.md](LOCAL-DEV.md). `local-dev.sh start` runs source watchers;
+`local-dev.sh reset` restores the saved starting database and replays migrations.
+Ordinary hot reloads and stops preserve local record edits.
 
 See [MIGRATION-TESTING.md](MIGRATION-TESTING.md) for `migration-test.sh freeze`,
 `run`, and `reset`. This separate stack preserves the normal `twenty-dev`

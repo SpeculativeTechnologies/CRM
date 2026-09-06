@@ -19,9 +19,9 @@ BEGIN
   END IF;
 
   SELECT scrub_version INTO manifest_version FROM public.devdata_manifest;
-  IF manifest_version IS DISTINCT FROM 1 THEN
+  IF manifest_version IS DISTINCT FROM 2 THEN
     RAISE EXCEPTION
-      'devdata_manifest reports scrub version %, expected 1.',
+      'devdata_manifest reports scrub version %, expected 2. Rebuild the mirror.',
       manifest_version;
   END IF;
 
@@ -30,6 +30,8 @@ BEGIN
     + (SELECT count(*) FROM core."appToken")
     + (SELECT count(*) FROM core."apiKey")
     + (SELECT count(*) FROM core."twoFactorAuthenticationMethod")
+    + (SELECT count(*) FROM core."applicationVariable")
+    + (SELECT count(*) FROM core."applicationRegistrationVariable")
     + (SELECT count(*) FROM core."connectedAccount"
         WHERE "accessToken" IS NOT NULL OR "refreshToken" IS NOT NULL)
     + (SELECT count(*) FROM core."messageChannel" WHERE "isSyncEnabled")

@@ -1,16 +1,145 @@
-# Environment guide
+# Daily local development
 
-The old workflow in this file mixed local development with a live backend. It
-is retired.
+Use this when you want to edit the frontend or backend repeatedly without
+building a release image or deploying. Each worktree gets its own Postgres,
+Redis, local uploads, ports and signing secret. Your normal `twenty-dev`
+database and other worktrees are left alone.
 
-Use the current guides:
+Prerequisites: local Docker, Python 3, Node 24 and this worktree's dependencies
+(`yarn install --immutable`). Run the commands from the worktree you are editing.
 
-- [DEVELOPMENT.md](DEVELOPMENT.md): isolated development in the public CRM repo
-- [STAGING.md](STAGING.md): staging promotion boundary
-- [PRODUCTION.md](PRODUCTION.md): production promotion boundary
-- [TEAM-WORKFLOW.md](TEAM-WORKFLOW.md): branching, review, and promotion protocol
-- [`crm-ops/deploy/CLOUD-OPS.md`](https://github.com/SpeculativeTechnologies/crm-ops/blob/main/deploy/CLOUD-OPS.md):
-  private cloud operations and incident response
+## Choose the starting database once
 
-Do not run development setup, source processes, tests, or reset commands on a
-staging or production cloud VM.
+A **saved starting database**, called a baseline by the migration tool, is a
+snapshot of both the records and schema before your change. Resetting restores
+that exact snapshot, including the record of which migrations already ran.
+
+- **Fixture:** invented people, companies and other example records. Use this
+  for frontend iteration and screenshots. It has Twenty's standard objects.
+- **Mirror:** a verified, scrubbed copy of the CRM, including this fork's seven
+  custom objects, custom fields and views. Use this for database, search,
+  permissions and custom-object work. It still contains confidential records.
+  Application runtime variables (including non-secret encrypted values) are
+  removed along with credentials; configure any test integration separately
+  with developer-owned values. Version 1 mirrors must be rebuilt with the
+  current publisher before use.
+
+Create a fixture snapshot with the existing baseline tool:
+
+```bash
+bash deploy/migration-test.sh freeze \
+  --baseline deploy/.migration-tests/baselines/fixture \
+  --source-sha "$(jq -r .source_sha deploy/migration-baseline.json)" \
+  --image "$(jq -r .image deploy/migration-baseline.json)"
+```
+
+For a mirror, obtain a verified dump through the approved developer data
+workflow in [DEVELOPMENT.md](DEVELOPMENT.md). Freeze it using the full source
+revision that actually produced the backup, not the scrubber's checkout SHA:
+
+```bash
+bash deploy/migration-test.sh freeze \
+  --baseline deploy/.migration-tests/baselines/mirror \
+  --source-sha <backup-source-sha> --dump <verified-mirror.dump>
+```
+
+Verification runs before application code touches the restored mirror. A raw
+production dump is not accepted. If approved backup access or a verified dump
+is unavailable, the fixture works for UI development, but cannot certify the
+CRM's custom schema. Refresh into a **new** snapshot directory when needed;
+keep the snapshot fixed while iterating on a migration.
+
+## Start, edit, repeat
+
+```bash
+bash deploy/local-dev.sh start \
+  --baseline deploy/.migration-tests/baselines/fixture
+```
+
+The first start restores the snapshot, builds the server and its dependencies,
+and applies the current branch's migrations. It then starts Vite, one Nest
+compiler watcher, and restarting API and worker processes. It prints the local
+URL. Ports are picked automatically and remembered; optionally specify
+`--port 3101 --api-port 3100`. An occupied port causes an error, never a silently
+changed URL or a connection to another developer's service.
+
+- Save a frontend edit: Vite updates the browser through hot module reload.
+- Save backend code: the compiler rebuilds it and the API and worker restart.
+- Edit records in the app: changes stay in this worktree's database across
+  source reloads and subsequent starts.
+- Edit an entity or migration: generate the required instance command, then
+  use the reset workflow below. Reloading code does not replay migrations.
+- Edit a built shared package or dependencies: stop and start again to rebuild
+  dependencies. Frontend imports of source files reload directly.
+
+Ctrl-C stops the watchers and their children while keeping the database.
+Resume with `yarn dev:local` or `bash deploy/local-dev.sh start`; the selected
+snapshot and ports are remembered. Do not run the ordinary `yarn start` in
+parallel in the same worktree: it uses different connection settings and shares
+the server's build output.
+
+Compilation and application logs are private files under
+`deploy/.local-dev/<resource-name>/`. The tool prints the directory. Look at
+`compiler.log`, `api.log`, `worker.log`, or `front.log` when a change fails.
+Mirror logs can contain CRM records; do not publish them or mirror screenshots.
+
+## Reset and replay a database change
+
+Generate commands against this environment through its wrapper, after stopping
+the watchers. The ordinary Nx database commands read the standard developer
+`.env`, so they are not the commands to use for this isolated database:
+
+```bash
+bash deploy/local-dev.sh command -- generate:instance-command --name <name> --type fast
+```
+
+The wrapper also supports other server CLI commands, such as `upgrade:status`,
+and keeps their output in the private diagnostics directory. It uses this
+worktree's source and guarded local connections.
+
+Stop the watchers with Ctrl-C, then run:
+
+```bash
+yarn dev:reset
+# equivalent: bash deploy/local-dev.sh reset
+```
+
+This removes only this worktree's database, Redis queues and uploaded files,
+restores the saved snapshot, builds the edited source, reruns migrations, and
+starts the watchers again. Local record edits are discarded; the saved
+snapshot and your source edits are retained. The command refuses to reset while
+the watchers are running. A failed restore or migration requires a reset before
+the next start, so a partially upgraded database is not silently reused.
+
+To switch to a mirror or a fresh snapshot:
+
+```bash
+bash deploy/local-dev.sh reset --baseline <new-snapshot-directory>
+```
+
+Use `bash deploy/local-dev.sh status` to see the dataset, checksum
+and URL. Use `bash deploy/local-dev.sh down` to remove this worktree's database,
+queues and uploads. This retains the saved snapshot and private diagnostics;
+delete confidential snapshots/logs when they are no longer needed.
+
+## Boundaries and release checks
+
+The supervisor supplies a fresh environment and disables dotenv loading in Nx,
+Vite, Nest, both TypeORM sources and frontend runtime configuration. Existing
+shell variables or `.env` files cannot redirect this workflow to other services.
+The API, frontend, Postgres and Redis bind only to loopback. Cloud configuration
+stored in the database is disabled, email uses the logger, and mailbox/calendar
+providers, cron registration and logic-function execution are disabled.
+
+Source processes run on the developer's host and **do have network access**.
+Do not connect real integrations or add cloud credentials to this workflow.
+Use the offline image rehearsal for stronger network isolation and final
+validation. Startup waits for migration jobs and upgrade status, but this
+development mode does not certify a release artifact or the intended data
+transformation just because the UI opens.
+
+Before review, follow [LLM-LOCAL-DEV.md](LLM-LOCAL-DEV.md) for focused tests,
+lint/typechecks, clean initialization and mirror verification. Run the frozen
+baseline image rehearsal in [MIGRATION-TESTING.md](MIGRATION-TESTING.md) for
+migration changes. Staging remains the final check of the actual release image;
+it is not needed for every frontend or database experiment.

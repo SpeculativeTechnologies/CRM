@@ -1,5 +1,9 @@
 # Frozen-baseline migration rehearsals
 
+For hot-reloading frontend/backend development against a saved starting
+database, see [LOCAL-DEV.md](LOCAL-DEV.md). Use this image rehearsal for final
+migration checks; it complements the faster source-editing loop.
+
 Use `bash deploy/migration-test.sh` locally and in CI. Each `run` restores the
 same frozen database into new, labeled Docker resources. It never reads a server
 `.env`, connects to `twenty-dev`, or reuses Redis, storage, or a migration ledger

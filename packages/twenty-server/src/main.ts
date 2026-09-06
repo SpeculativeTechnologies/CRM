@@ -10,6 +10,7 @@ import compression from 'compression';
 import session from 'express-session';
 import graphqlUploadExpress from 'graphql-upload/graphqlUploadExpress.mjs';
 import { ApiPath } from 'twenty-shared/types';
+import { isDefined } from 'twenty-shared/utils';
 
 import { NodeEnvironment } from 'src/engine/core-modules/twenty-config/interfaces/node-environment.interface';
 
@@ -140,7 +141,13 @@ const bootstrap = async () => {
     });
   }
 
-  await app.listen(twentyConfigService.get('NODE_PORT'));
+  const nodeHost = twentyConfigService.get('NODE_HOST');
+
+  if (isDefined(nodeHost)) {
+    await app.listen(twentyConfigService.get('NODE_PORT'), nodeHost);
+  } else {
+    await app.listen(twentyConfigService.get('NODE_PORT'));
+  }
 };
 
 void bootstrap();

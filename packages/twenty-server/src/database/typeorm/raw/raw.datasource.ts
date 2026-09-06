@@ -1,9 +1,11 @@
 import { config } from 'dotenv';
 import { DataSource, type DataSourceOptions } from 'typeorm';
-config({
-  path: process.env.NODE_ENV === 'test' ? '.env.test' : '.env',
-  override: true,
-});
+if (process.env.TWENTY_DISABLE_DOTENV !== 'true') {
+  config({
+    path: process.env.NODE_ENV === 'test' ? '.env.test' : '.env',
+    override: true,
+  });
+}
 
 const typeORMRawModuleOptions: DataSourceOptions = {
   url: process.env.PG_DATABASE_URL,
