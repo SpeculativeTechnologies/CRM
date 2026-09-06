@@ -24,6 +24,25 @@ const buildExisting = (installed = false) => {
       twentyStandardApplicationId: APPLICATION_ID,
       now: '2026-01-01T00:00:00.000Z',
     });
+  const contactList =
+    allFlatEntityMaps.flatPageLayoutWidgetMaps.byUniversalIdentifier[
+      HOME_WIDGETS.additionalContacts.universalIdentifier
+    ];
+  if (!contactList) throw new Error('Missing contact list template');
+  // Exercise the pre-feature layout, independently of the new defaults.
+  allFlatEntityMaps.flatPageLayoutWidgetMaps.byUniversalIdentifier[
+    HOME_WIDGETS.pointOfContact.universalIdentifier
+  ] = {
+    ...contactList,
+    id: '20202020-3333-4333-8333-333333333333',
+    universalIdentifier: HOME_WIDGETS.pointOfContact.universalIdentifier,
+    title: 'Point of Contact',
+    universalConfiguration: {
+      ...contactList.universalConfiguration,
+      fieldMetadataId:
+        STANDARD_OBJECTS.opportunity.fields.pointOfContact.universalIdentifier,
+    },
+  } as typeof contactList;
   if (!installed) {
     delete allFlatEntityMaps.flatObjectMetadataMaps.byUniversalIdentifier[
       STANDARD_OBJECTS.opportunityContact.universalIdentifier

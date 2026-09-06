@@ -394,11 +394,11 @@ export const buildOpportunityStandardFlatFieldMetadatas = ({
       morphId: null,
       fieldName: 'additionalContacts',
       label: i18nLabel(
-        msg({ message: `Additional contacts`, context: 'fieldMetadata.label' }),
+        msg({ message: `Points of contact`, context: 'fieldMetadata.label' }),
       ),
       description: i18nLabel(
         msg({
-          message: `Additional points of contact for this opportunity. The primary point of contact is kept separately.`,
+          message: `People linked to this opportunity. The contact list also includes its primary point of contact.`,
           context: 'fieldMetadata.description',
         }),
       ),
@@ -419,11 +419,14 @@ export const buildOpportunityStandardFlatFieldMetadatas = ({
       morphId: null,
       fieldName: 'pointOfContact',
       label: i18nLabel(
-        msg({ message: `Point of Contact`, context: 'fieldMetadata.label' }),
+        msg({
+          message: `Primary point of contact`,
+          context: 'fieldMetadata.label',
+        }),
       ),
       description: i18nLabel(
         msg({
-          message: `Opportunity point of contact`,
+          message: `Primary person to contact about this opportunity`,
           context: 'fieldMetadata.description',
         }),
       ),

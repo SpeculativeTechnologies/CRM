@@ -234,11 +234,17 @@ verification step is worse than a failed one.
   mirror: add two contacts, reload, remove one, and verify the other and primary
   contact survive. Keep mirror screenshots, responses and names out of output.
 - Run focused behavior tests and required diff lint/typechecks while iterating.
+  Format changed source with `oxfmt`; also lint new, uncommitted files directly,
+  because `lint:diff-with-main` only considers committed changes. Use the
+  migration formatter convention for new upgrade commands, which are excluded
+  from the general formatter to protect committed commands.
   Batch independent reads/checks; keep database mutations and source builds
   sequential. Run the final image rehearsals and exact-commit CI after the
   coherent change is ready. Repeat checks only for changed code or new failures.
 - Read `timings.json` and the named phase log when startup is slow. Report the
   phase being checked instead of repeatedly polling an unchanged browser.
+- Finish shared-package builds and typechecks before browser acceptance tests;
+  replacing shared bundles during a browser run can trigger a full reload.
 - Before returning a local testing link, confirm the mirror is running, sign-in
   works, the changed control is visible, and the requested interaction persists.
 

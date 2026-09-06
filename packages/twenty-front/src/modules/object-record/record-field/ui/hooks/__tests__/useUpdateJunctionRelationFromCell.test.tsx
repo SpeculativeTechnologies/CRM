@@ -16,6 +16,9 @@ import { getMockObjectMetadataItemOrThrow } from '~/testing/utils/getMockObjectM
 import { getTestEnrichedObjectMetadataItemsMock } from '~/testing/utils/getTestEnrichedObjectMetadataItemsMock';
 
 jest.mock('@/object-metadata/hooks/useObjectMetadataItems');
+jest.mock('@/object-record/hooks/useUpdateOneRecord', () => ({
+  useUpdateOneRecord: () => ({ updateOneRecord: mockUpdateOneRecord }),
+}));
 jest.mock('@/object-record/hooks/useCreateManyRecords', () => ({
   useCreateManyRecords: jest.fn(),
 }));
@@ -37,6 +40,7 @@ const fieldDefinition = formatFieldMetadataItemAsFieldDefinition({
 
 const mockCreateManyRecords = jest.fn();
 const mockDeleteOneRecord = jest.fn();
+const mockUpdateOneRecord = jest.fn();
 
 const createWrapper = (store: ReturnType<typeof createStore>) =>
   function Wrapper({ children }: { children: ReactNode }) {
@@ -178,4 +182,74 @@ describe('useUpdateJunctionRelationFromCell', () => {
     expect(mockDeleteOneRecord).toHaveBeenCalledWith('task-target-id');
     expect(mockCreateManyRecords).not.toHaveBeenCalled();
   });
+
+  it.each([true, false])(
+    'should clear a removed primary and delete only its real link when a link exists: %s',
+    async (hasLink) => {
+      const store = createStore();
+      const sourceRecordId = 'opportunity-id';
+      const targetRecordId = 'person-id';
+      const contactObjects = objectMetadataItems.map((object) => ({
+        ...object,
+        nameSingular:
+          object.nameSingular === 'rocket'
+            ? 'opportunity'
+            : object.nameSingular === 'taskTarget'
+              ? 'opportunityContact'
+              : object.nameSingular,
+      }));
+      jest
+        .mocked(useObjectMetadataItems)
+        .mockReturnValue({ objectMetadataItems: contactObjects });
+      store.set(recordStoreFamilyState.atomFamily(sourceRecordId), {
+        id: sourceRecordId,
+        __typename: 'Opportunity',
+        pointOfContactId: targetRecordId,
+        additionalContacts: hasLink
+          ? [
+              {
+                id: 'real-link',
+                __typename: 'OpportunityContact',
+                task: { id: targetRecordId, __typename: 'Task' },
+              },
+            ]
+          : [],
+      });
+      const { result } = renderHook(
+        () =>
+          useUpdateJunctionRelationFromCell({
+            fieldMetadataItem: taskTargetsField,
+            fieldDefinition: {
+              ...fieldDefinition,
+              metadata: {
+                ...fieldDefinition.metadata,
+                fieldName: 'additionalContacts',
+                objectMetadataNameSingular: 'opportunity',
+                relationObjectMetadataNameSingular: 'opportunityContact',
+              },
+            },
+            recordId: sourceRecordId,
+          }),
+        { wrapper: createWrapper(store) },
+      );
+      await act(async () => {
+        await result.current.updateJunctionRelationFromCell({
+          morphItem: {
+            recordId: targetRecordId,
+            objectMetadataId: taskMetadata.id,
+            isSelected: false,
+            isMatchingSearchFilter: true,
+          },
+        });
+      });
+      expect(mockUpdateOneRecord).toHaveBeenCalledWith({
+        objectNameSingular: 'opportunity',
+        idToUpdate: sourceRecordId,
+        updateOneRecordInput: { pointOfContactId: null },
+      });
+      if (hasLink)
+        expect(mockDeleteOneRecord).toHaveBeenCalledWith('real-link');
+      else expect(mockDeleteOneRecord).not.toHaveBeenCalled();
+    },
+  );
 });

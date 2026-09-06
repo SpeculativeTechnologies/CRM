@@ -148,7 +148,7 @@ describe('Opportunity contacts', () => {
         widgetIdentifier
       ],
     ).toMatchObject({
-      title: 'Additional contacts',
+      title: 'Points of contact',
     });
   });
 });

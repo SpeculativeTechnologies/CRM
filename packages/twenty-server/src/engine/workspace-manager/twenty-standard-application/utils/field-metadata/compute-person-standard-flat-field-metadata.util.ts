@@ -462,13 +462,13 @@ export const buildPersonStandardFlatFieldMetadatas = ({
       fieldName: 'additionalOpportunities',
       label: i18nLabel(
         msg({
-          message: `Additional opportunities`,
+          message: `Opportunities`,
           context: 'fieldMetadata.label',
         }),
       ),
       description: i18nLabel(
         msg({
-          message: `Opportunities for which this person is an additional point of contact.`,
+          message: `Linked opportunities, including those where this person is the primary point of contact.`,
           context: 'fieldMetadata.description',
         }),
       ),
@@ -490,11 +490,11 @@ export const buildPersonStandardFlatFieldMetadatas = ({
       morphId: null,
       fieldName: 'pointOfContactForOpportunities',
       label: i18nLabel(
-        msg({ message: `Opportunities`, context: 'fieldMetadata.label' }),
+        msg({ message: `Primary contact for`, context: 'fieldMetadata.label' }),
       ),
       description: i18nLabel(
         msg({
-          message: `List of opportunities for which that person is the point of contact`,
+          message: `Opportunities for which this person is the primary point of contact`,
           context: 'fieldMetadata.description',
         }),
       ),

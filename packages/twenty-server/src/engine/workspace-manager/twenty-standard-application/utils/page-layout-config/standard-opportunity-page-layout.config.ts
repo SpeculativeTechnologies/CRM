@@ -27,24 +27,13 @@ const OPPORTUNITY_PAGE_TABS = {
             .home.widgets.fields.universalIdentifier,
         ...WIDGET_PROPS.fields,
       },
-      pointOfContact: {
-        universalIdentifier:
-          STANDARD_PAGE_LAYOUT_UNIVERSAL_IDENTIFIERS.opportunityRecordPage.tabs
-            .home.widgets.pointOfContact.universalIdentifier,
-        title: 'Point of Contact',
-        type: WidgetType.FIELD,
-        position: VERTICAL_LIST_LAYOUT_POSITIONS.SECOND,
-        fieldUniversalIdentifier:
-          STANDARD_OBJECTS.opportunity.fields.pointOfContact
-            .universalIdentifier,
-      },
       additionalContacts: {
         universalIdentifier:
           STANDARD_PAGE_LAYOUT_UNIVERSAL_IDENTIFIERS.opportunityRecordPage.tabs
             .home.widgets.additionalContacts.universalIdentifier,
-        title: 'Additional contacts',
+        title: 'Points of contact',
         type: WidgetType.FIELD,
-        position: VERTICAL_LIST_LAYOUT_POSITIONS.FIFTH,
+        position: VERTICAL_LIST_LAYOUT_POSITIONS.SECOND,
         fieldUniversalIdentifier:
           STANDARD_OBJECTS.opportunity.fields.additionalContacts
             .universalIdentifier,

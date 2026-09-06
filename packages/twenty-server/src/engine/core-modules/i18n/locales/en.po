@@ -606,29 +606,11 @@ msgctxt "commandMenuItem.label"
 msgid "Add to Favorites"
 msgstr "Add to Favorites"
 
-#. js-lingui-id: 7NvpqV
-#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-opportunity-standard-flat-field-metadata.util.ts
-msgctxt "fieldMetadata.label"
-msgid "Additional contacts"
-msgstr "Additional contacts"
-
 #. js-lingui-id: Cs7QvJ
 #: src/engine/metadata-modules/page-layout-widget/constants/standard-page-layout-widget-titles.ts
 msgctxt "pageLayoutWidget.title"
 msgid "Additional contacts"
 msgstr "Additional contacts"
-
-#. js-lingui-id: kwJYVn
-#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-person-standard-flat-field-metadata.util.ts
-msgctxt "fieldMetadata.label"
-msgid "Additional opportunities"
-msgstr "Additional opportunities"
-
-#. js-lingui-id: OqrOMV
-#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-opportunity-standard-flat-field-metadata.util.ts
-msgctxt "fieldMetadata.description"
-msgid "Additional points of contact for this opportunity. The primary point of contact is kept separately."
-msgstr "Additional points of contact for this opportunity. The primary point of contact is kept separately."
 
 #. js-lingui-id: EtSC0Y
 #: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-company-standard-flat-field-metadata.util.ts
@@ -6119,6 +6101,12 @@ msgctxt "fieldMetadata.label"
 msgid "Linked Object Metadata Id"
 msgstr "Linked Object Metadata Id"
 
+#. js-lingui-id: UgE0xi
+#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-person-standard-flat-field-metadata.util.ts
+msgctxt "fieldMetadata.description"
+msgid "Linked opportunities, including those where this person is the primary point of contact."
+msgstr "Linked opportunities, including those where this person is the primary point of contact."
+
 #. js-lingui-id: Vo3NrU
 #: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-timeline-activity-standard-flat-field-metadata.util.ts
 msgctxt "fieldMetadata.label"
@@ -6179,12 +6167,6 @@ msgstr "List member record position"
 msgctxt "objectMetadata.labelPlural"
 msgid "List Members"
 msgstr "List Members"
-
-#. js-lingui-id: GRxWmN
-#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-person-standard-flat-field-metadata.util.ts
-msgctxt "fieldMetadata.description"
-msgid "List of opportunities for which that person is the point of contact"
-msgstr "List of opportunities for which that person is the point of contact"
 
 #. js-lingui-id: Lgr7Gd
 #: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-message-list-standard-flat-field-metadata.util.ts
@@ -7616,11 +7598,11 @@ msgctxt "pageLayoutWidget.title"
 msgid "Opportunities by Owner"
 msgstr "Opportunities by Owner"
 
-#. js-lingui-id: /eUEUn
+#. js-lingui-id: oACWtI
 #: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-person-standard-flat-field-metadata.util.ts
 msgctxt "fieldMetadata.description"
-msgid "Opportunities for which this person is an additional point of contact."
-msgstr "Opportunities for which this person is an additional point of contact."
+msgid "Opportunities for which this person is the primary point of contact"
+msgstr "Opportunities for which this person is the primary point of contact"
 
 #. js-lingui-id: x31eoV
 #: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-company-standard-flat-field-metadata.util.ts
@@ -7692,12 +7674,6 @@ msgstr "Opportunity contacts"
 msgctxt "fieldMetadata.description"
 msgid "Opportunity owner"
 msgstr "Opportunity owner"
-
-#. js-lingui-id: vqM7BR
-#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-opportunity-standard-flat-field-metadata.util.ts
-msgctxt "fieldMetadata.description"
-msgid "Opportunity point of contact"
-msgstr "Opportunity point of contact"
 
 #. js-lingui-id: ATrBjm
 #: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-opportunity-standard-flat-field-metadata.util.ts
@@ -8027,6 +8003,12 @@ msgctxt "fieldMetadata.description"
 msgid "People linked to the company."
 msgstr "People linked to the company."
 
+#. js-lingui-id: J153Rf
+#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-opportunity-standard-flat-field-metadata.util.ts
+msgctxt "fieldMetadata.description"
+msgid "People linked to this opportunity. The contact list also includes its primary point of contact."
+msgstr "People linked to this opportunity. The contact list also includes its primary point of contact."
+
 #. js-lingui-id: wHLbpa
 #: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-workflow-run-standard-flat-field-metadata.util.ts
 msgctxt "fieldMetadata.description"
@@ -8255,17 +8237,17 @@ msgstr "Please use Settings to remove a workspace member."
 msgid "Please use single sign-on to authenticate."
 msgstr "Please use single sign-on to authenticate."
 
-#. js-lingui-id: pxTMbt
-#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-opportunity-standard-flat-field-metadata.util.ts
-msgctxt "fieldMetadata.label"
-msgid "Point of Contact"
-msgstr "Point of Contact"
-
 #. js-lingui-id: oX1zsX
 #: src/engine/metadata-modules/page-layout-widget/constants/standard-page-layout-widget-titles.ts
 msgctxt "pageLayoutWidget.title"
 msgid "Point of Contact"
 msgstr "Point of Contact"
+
+#. js-lingui-id: /40A9c
+#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-opportunity-standard-flat-field-metadata.util.ts
+msgctxt "fieldMetadata.label"
+msgid "Points of contact"
+msgstr "Points of contact"
 
 #. js-lingui-id: rLOFsu
 #: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/build-standard-target-flat-field-metadatas.util.ts
@@ -8380,6 +8362,24 @@ msgstr "Primary axis group by field is required for line chart"
 #: src/engine/metadata-modules/flat-page-layout-widget/validators/utils/validate-line-chart-configuration.util.ts
 msgid "Primary axis group by field is required for line chart widget \"{widgetTitle}\""
 msgstr "Primary axis group by field is required for line chart widget \"{widgetTitle}\""
+
+#. js-lingui-id: dF05NF
+#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-person-standard-flat-field-metadata.util.ts
+msgctxt "fieldMetadata.label"
+msgid "Primary contact for"
+msgstr "Primary contact for"
+
+#. js-lingui-id: 22oHaU
+#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-opportunity-standard-flat-field-metadata.util.ts
+msgctxt "fieldMetadata.description"
+msgid "Primary person to contact about this opportunity"
+msgstr "Primary person to contact about this opportunity"
+
+#. js-lingui-id: /mK86o
+#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-opportunity-standard-flat-field-metadata.util.ts
+msgctxt "fieldMetadata.label"
+msgid "Primary point of contact"
+msgstr "Primary point of contact"
 
 #. js-lingui-id: cTz6/1
 #: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-call-recording-standard-flat-field-metadata.util.ts
