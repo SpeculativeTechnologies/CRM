@@ -38,6 +38,17 @@ const OPPORTUNITY_PAGE_TABS = {
           STANDARD_OBJECTS.opportunity.fields.pointOfContact
             .universalIdentifier,
       },
+      additionalContacts: {
+        universalIdentifier:
+          STANDARD_PAGE_LAYOUT_UNIVERSAL_IDENTIFIERS.opportunityRecordPage.tabs
+            .home.widgets.additionalContacts.universalIdentifier,
+        title: 'Additional contacts',
+        type: WidgetType.FIELD,
+        position: VERTICAL_LIST_LAYOUT_POSITIONS.FIFTH,
+        fieldUniversalIdentifier:
+          STANDARD_OBJECTS.opportunity.fields.additionalContacts
+            .universalIdentifier,
+      },
       company: {
         universalIdentifier:
           STANDARD_PAGE_LAYOUT_UNIVERSAL_IDENTIFIERS.opportunityRecordPage.tabs
