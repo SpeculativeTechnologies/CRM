@@ -142,3 +142,29 @@ The first artifact build also caught an overly broad new Docker exclusion:
 `**/build` removed SDK source assets under `src/cli/utilities/build`. Exclusions
 are now limited to top-level package output directories. This was diagnosed from
 the failing SDK copy step, not retried as an infrastructure failure.
+
+## GitHub acceptance and cache evidence
+
+[CI #34008643574](https://github.com/SpeculativeTechnologies/CRM/actions/runs/34008643574)
+passed for source `e84cdf28d60b9562ae8d538b93e8bedebfe75bb3`, testing synthetic merge
+`f73010a9e9745bd08ba931de542aab7c89c1e030`. Critical path was 15m53s with the new
+dependency/task keys cold. Checks took 15m20s: checkout 112s, dependency setup and
+cache save 294s, shared build 60s, full affected typecheck 81s, lint 58s, unit
+tests 231s, catalogs 74s. All 7,380 frontend tests passed on separate runners.
+This root-configuration change validates more projects than the historical
+server PR, so those totals are not a controlled speed comparison.
+
+The independent migration job passed in 10m39s, including checkout 108s, server
+build/load/cache export 257s, frozen baseline creation 153s and rehearsal 91s.
+Restore itself took 2.647s. Both workspaces were current and API, metadata,
+persistence, authentication and worker checks passed. The image build succeeded;
+its build/push step took 681s, including a 198s registry cache export. These
+one-time cache-transition costs must not be presented as warm build performance.
+
+Logs explicitly show dependency and all four Nx job caches saved. A separate
+local behavior experiment made `isDefined('')` incorrectly return false: the
+existing test failed instead of replaying its cached pass, and Nx included
+frontend and backend dependents. Restoring the source reused its original
+passing result. The temporary regression was removed. Comparable follow-up
+timings and the final certified digest are recorded in
+[PR #234](https://github.com/SpeculativeTechnologies/CRM/pull/234).

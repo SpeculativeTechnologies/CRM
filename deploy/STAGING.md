@@ -10,15 +10,16 @@ Staging runs on its own Google Cloud VM and is available to authorized users at
 2. After required CI and review, merge the PR to `main` on GitHub.
 3. At the scheduled release window, typically at the end of the day, select the
    exact full SHA on `main` that will be the release candidate and wait for CI
-   to publish its image.
+   to publish its image and certify its fresh-baseline artifact rehearsal.
 4. Run **Deploy to staging** with that exact SHA.
 5. Wait for the workflow to deploy the pinned image, run migrations and health
    checks, and report success.
 6. Exercise the changed behavior and the normal CRM smoke-test paths at
    `https://crm-staging.spec.tech`. Record an affirmative pass or fail; the
    absence of alerts alone is not a successful smoke test.
-7. Run **Record a staging check** with that pass or fail and what you
-   exercised. It signs off whatever staging is currently running.
+7. Run **Record a staging check** with the deployment ID from the cloud child
+   run, that pass or fail, and what you exercised. It refuses an ID that no
+   longer identifies the current successful staging deployment.
 8. Promote only the exact SHA that passed. If staging fails, stop and fix or
    revert the issue through another reviewed PR before trying a new `main` SHA.
 
@@ -30,8 +31,8 @@ from `main` before production.
 
 The workflow in `.github/workflows/deploy-staging.yml` records the exact commit
 staging ran, and `.github/workflows/staging-signoff.yml` records that a human
-exercised it. Production uses both as promotion gates: the first for everything,
-the second for anything reaching the database.
+exercised it. Production requires both for every release, bound to the same
+source SHA, image digest and deployment ID.
 
 ## Operational boundary
 

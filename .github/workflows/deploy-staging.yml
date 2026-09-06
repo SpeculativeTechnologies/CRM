@@ -28,6 +28,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      checks: read
       deployments: write
       packages: read
       actions: read # to read the cd-deploy-cloud run this waits on
@@ -65,11 +66,8 @@ jobs:
           token: ${{ github.token }}
 
       # Nothing deploys from this ref any more; the Mac that polled it is retired.
-      # It stays because deploy-production.yml reads it to refuse promoting code
-      # staging never ran. That makes it a claim about what staging has actually
-      # had on it, so it is only safe to move once the deploy above succeeded --
-      # moving it first would let a failed staging deploy clear the way to
-      # production.
+      # Keep it as a convenience pointer after success. Promotion uses durable
+      # source/digest/deployment records, so moving this ref cannot clear a gate.
       - name: Record what staging now runs
         env:
           GH_TOKEN: ${{ github.token }}

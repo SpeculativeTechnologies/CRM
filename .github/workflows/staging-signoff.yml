@@ -1,16 +1,8 @@
 name: Record a staging check
 
-# Records that a human exercised what is currently on staging, so that a
-# database change can be promoted without the production owner reviewing it.
-#
-# Deploy to production reads the `staging-verified` ref this writes and refuses
-# to promote a database change the ref does not cover. That is the whole point
-# of the separation: an attestation typed into the promotion run proves nothing
-# about what staging ever had on it, whereas this can only ever sign off the
-# commit staging actually deployed, and only after the deploy succeeded.
-#
-# There is deliberately no ref input. The commit is read from `staging-target`,
-# which deploy-staging.yml moves only on a successful deploy.
+# Records the exercised staging deployment's source, digest and deployment ID.
+# Every production release requires its latest affirmative check. The input ID
+# must match the current successful deployment; convenience refs cannot certify it.
 
 on:
   workflow_dispatch:
@@ -107,10 +99,8 @@ jobs:
             '{kind:"staging-check",sha:$sha,image:$image,deployment_id:$deployment_id,staging_check:$staging_check,exercised:$exercised}')"
           node .github/scripts/release-record.mjs publish "$SHA"
 
-      # Only a pass moves the ref. A failed check leaves the previous sign-off
-      # standing, which is correct: that commit really was checked, and the
-      # containment test in deploy-production.yml is what then refuses to
-      # promote the newer database change on top of it.
+      # Only a pass moves the convenience ref. A failed deployment record above
+      # overrides all older passes regardless of where this ref points.
       - name: Mark the commit as checked
         if: inputs.result == 'pass'
         env:

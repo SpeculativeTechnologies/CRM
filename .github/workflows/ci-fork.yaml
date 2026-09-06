@@ -88,10 +88,8 @@ jobs:
       # normalised rather than grepped directly.
       - name: Extract and compile message catalogs
         run: |
-          # An empty affected list is normal, not an error: it is every push:main
-          # run (base == HEAD by design) and any PR touching no nx project. grep
-          # exits 1 when it matches nothing, and under `bash -e` that failed the
-          # step outright, which is what turned main red from 2026-08-01 01:54.
+          # A change outside Nx projects can have an empty affected list. Handle
+          # that case without treating grep's no-match status as a failure.
           affected="$(
             npx nx show projects --affected --base=$NX_BASE --head=$NX_HEAD |
               tr -d '[]"' | tr ',' '\n' | sed 's/^ *//; s/ *$//' | grep -v '^$' || true

@@ -15,7 +15,7 @@ Two GCP VMs, `twenty-staging-e2` and `twenty-production-e2`, each running the
 stack under Docker Compose from `/opt/twenty`, reached only over IAP, fronted by
 a Cloudflare tunnel with Access in front of both the app and the API. One image
 per commit on `main` (and on labeled PRs) in GHCR. A deploy is
-`cloud-deploy.sh <sha>` on the box: pull, migrate in a one-off container,
+`cloud-deploy.sh <sha> <image@sha256:digest>` on the box: pull, migrate in a one-off container,
 restart server and worker, roll the image back on failure. The migration is
 `run-instance-commands --force --include-slow` then `upgrade` then
 `cache:flush`. Two workspaces exist on each box, with identical history until
@@ -61,7 +61,7 @@ production alike:
    2026-09-03 this plan predicted every remaining failure once run by hand.
 2. **Deploy** (`cloud-deploy.sh` on the box, from `crm-ops`).
 3. **Verify** (`deploy/cloud-verify.sh`). The image is live at this point.
-   Checks: the image is the requested sha (a rollback fails here), containers
+   Checks: both containers use the requested digest (a rollback fails here), containers
    running, healthz, `upgrade --dry-run` from the deployed image plans nothing
    more, every workspace cursor is completed, no object navigation item in the
    legacy payload shape the API hides, no navigation item with neither target

@@ -14,9 +14,8 @@ name: Deploy to production
 # The workflow encodes the promotion rules that were previously only written
 # down:
 #   - the commit must already be merged into main
-#   - staging must have run something this commit contains
-#   - anything reaching the database must be inside a commit somebody signed
-#     off with Record a staging check
+#   - staging must have run the exact certified source and image digest
+#   - the latest Record a staging check must pass for that deployment ID
 #   - cd-deploy-cloud verifies the pinned image before touching the VM
 
 on:

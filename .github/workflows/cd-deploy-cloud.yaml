@@ -54,6 +54,7 @@ on:
 
 permissions:
   contents: read
+  checks: read
   id-token: write # required to mint the OIDC token for federation
   deployments: write
   packages: read # GITHUB_TOKEN cannot read a private GHCR package without this
