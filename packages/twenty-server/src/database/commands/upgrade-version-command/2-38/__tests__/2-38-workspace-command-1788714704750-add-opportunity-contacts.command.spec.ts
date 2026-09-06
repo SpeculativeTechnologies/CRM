@@ -153,6 +153,92 @@ describe('AddOpportunityContactsCommand', () => {
     expect(migrate).not.toHaveBeenCalled();
   });
 
+  it('should attach the picker to an older opportunity layout after contact metadata was installed', async () => {
+    const existing = buildExisting(true);
+    const homeIdentifier =
+      STANDARD_PAGE_LAYOUT_UNIVERSAL_IDENTIFIERS.opportunityRecordPage.tabs.home
+        .universalIdentifier;
+    const home =
+      existing.flatPageLayoutTabMaps.byUniversalIdentifier[homeIdentifier];
+    if (!home) throw new Error('Missing home tab');
+    const legacyIdentifier = '20202020-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
+    delete existing.flatPageLayoutTabMaps.byUniversalIdentifier[homeIdentifier];
+    existing.flatPageLayoutTabMaps.byUniversalIdentifier[legacyIdentifier] = {
+      ...home,
+      title: 'Renamed contact tab',
+      universalIdentifier: legacyIdentifier,
+    };
+    for (const widget of Object.values(
+      existing.flatPageLayoutWidgetMaps.byUniversalIdentifier,
+    )) {
+      if (widget?.pageLayoutTabUniversalIdentifier === homeIdentifier) {
+        widget.pageLayoutTabUniversalIdentifier = legacyIdentifier;
+      }
+    }
+    delete existing.flatPageLayoutWidgetMaps.byUniversalIdentifier[
+      HOME_WIDGETS.additionalContacts.universalIdentifier
+    ];
+    const before = structuredClone(existing);
+    const { migrate, run } = createCommand(existing);
+    await run();
+    const operations =
+      migrate.mock.calls[0][0].allFlatEntityOperationByMetadataName;
+    expect(operations.objectMetadata?.flatEntityToCreate).toEqual([]);
+    expect(operations.pageLayoutWidget?.flatEntityToCreate).toEqual([
+      expect.objectContaining({
+        pageLayoutTabId: home.id,
+        pageLayoutTabUniversalIdentifier: legacyIdentifier,
+      }),
+    ]);
+    expect(existing).toEqual(before);
+  });
+
+  it('should keep an existing custom contact picker without adding a duplicate', async () => {
+    const existing = buildExisting(true);
+    const identifier = HOME_WIDGETS.additionalContacts.universalIdentifier;
+    const widget =
+      existing.flatPageLayoutWidgetMaps.byUniversalIdentifier[identifier];
+    if (!widget) throw new Error('Missing contact picker');
+    delete existing.flatPageLayoutWidgetMaps.byUniversalIdentifier[identifier];
+    const customIdentifier = '20202020-bbbb-4bbb-8bbb-bbbbbbbbbbbb';
+    existing.flatPageLayoutWidgetMaps.byUniversalIdentifier[customIdentifier] =
+      {
+        ...widget,
+        universalIdentifier: customIdentifier,
+        title: 'Our contacts',
+      };
+    const { migrate, run } = createCommand(existing);
+    await run();
+    expect(migrate).not.toHaveBeenCalled();
+  });
+
+  it('should append after overridden positions without moving existing widgets', async () => {
+    const existing = buildExisting();
+    const widget =
+      existing.flatPageLayoutWidgetMaps.byUniversalIdentifier[
+        HOME_WIDGETS.pointOfContact.universalIdentifier
+      ];
+    if (!widget) throw new Error('Missing contact picker');
+    widget.overrides = {
+      position: {
+        layoutMode: PageLayoutTabLayoutMode.VERTICAL_LIST,
+        index: 100,
+      },
+    };
+    const { migrate, run } = createCommand(existing);
+    await run();
+    expect(
+      migrate.mock.calls[0][0].allFlatEntityOperationByMetadataName
+        .pageLayoutWidget?.flatEntityToCreate?.[0].position,
+    ).toEqual({
+      layoutMode: PageLayoutTabLayoutMode.VERTICAL_LIST,
+      index: 101,
+    });
+    expect(widget.overrides.position?.layoutMode).toBe(
+      PageLayoutTabLayoutMode.VERTICAL_LIST,
+    );
+  });
+
   it('should leave an already upgraded workspace unchanged', async () => {
     const { migrate, run } = createCommand(buildExisting(true));
     await run();

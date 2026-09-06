@@ -56,3 +56,33 @@ BEGIN
     END IF;
   END LOOP;
 END $$;
+
+-- Resolve through the field and tab, including retained legacy layout IDs.
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1
+    FROM core."pageLayoutWidget" primary_widget
+    JOIN core."fieldMetadata" primary_field
+      ON primary_field.id::text = primary_widget.configuration->>'fieldMetadataId'
+    JOIN core."objectMetadata" object
+      ON object.id = primary_field."objectMetadataId"
+    JOIN core."pageLayoutTab" tab ON tab.id = primary_widget."pageLayoutTabId"
+    WHERE object."nameSingular" = 'opportunity'
+      AND primary_field.name = 'pointOfContact'
+      AND primary_widget."deletedAt" IS NULL
+      AND tab."deletedAt" IS NULL
+      AND tab."layoutMode" = 'VERTICAL_LIST'
+      AND NOT EXISTS (
+        SELECT 1 FROM core."pageLayoutWidget" contact_widget
+        JOIN core."fieldMetadata" contact_field
+          ON contact_field.id::text = contact_widget.configuration->>'fieldMetadataId'
+        WHERE contact_widget."pageLayoutTabId" = tab.id
+          AND contact_widget."deletedAt" IS NULL
+          AND contact_field."objectMetadataId" = object.id
+          AND contact_field.name = 'additionalContacts'
+      )
+  ) THEN
+    RAISE EXCEPTION 'Opportunity layout is missing the additional contact picker';
+  END IF;
+END $$;

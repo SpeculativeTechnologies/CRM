@@ -12,6 +12,7 @@ import { type RunOnWorkspaceArgs } from 'src/database/commands/command-runners/w
 import { getStandardFlatEntitiesToCreateOrThrow } from 'src/database/commands/upgrade-version-command/2-10/utils/get-standard-flat-entities-to-create-or-throw.util';
 import { ApplicationService } from 'src/engine/core-modules/application/application.service';
 import { RegisteredWorkspaceCommand } from 'src/engine/core-modules/upgrade/decorators/registered-workspace-command.decorator';
+import { WidgetConfigurationType } from 'src/engine/metadata-modules/page-layout-widget/enums/widget-configuration-type.type';
 import { WorkspaceCacheService } from 'src/engine/workspace-cache/services/workspace-cache.service';
 import { computeTwentyStandardApplicationAllFlatEntityMaps } from 'src/engine/workspace-manager/twenty-standard-application/utils/twenty-standard-application-all-flat-entity-maps.constant';
 import { WorkspaceMigrationValidateBuildAndRunService } from 'src/engine/workspace-manager/workspace-migration/services/workspace-migration-validate-build-and-run-service';
@@ -50,6 +51,7 @@ export class AddOpportunityContactsCommand extends ProvisionedWorkspaceCommandRu
         'flatObjectMetadataMaps',
         'flatFieldMetadataMaps',
         'flatIndexMaps',
+        'flatPageLayoutMaps',
         'flatPageLayoutTabMaps',
         'flatPageLayoutWidgetMaps',
       ],
@@ -81,12 +83,67 @@ export class AddOpportunityContactsCommand extends ProvisionedWorkspaceCommandRu
         workspaceId,
         twentyStandardApplicationId: twentyStandardFlatApplication.id,
       });
-    const homeTabIdentifier =
-      STANDARD_PAGE_LAYOUT_UNIVERSAL_IDENTIFIERS.opportunityRecordPage.tabs.home
-        .universalIdentifier;
+    const opportunityLayouts = Object.values(
+      existing.flatPageLayoutMaps.byUniversalIdentifier,
+    )
+      .filter(isDefined)
+      .filter(
+        (layout) =>
+          layout.objectMetadataUniversalIdentifier ===
+          STANDARD_OBJECTS.opportunity.universalIdentifier,
+      );
+    const opportunityTabs = Object.values(
+      existing.flatPageLayoutTabMaps.byUniversalIdentifier,
+    )
+      .filter(isDefined)
+      .filter((tab) =>
+        opportunityLayouts.some(
+          (layout) =>
+            layout.universalIdentifier === tab.pageLayoutUniversalIdentifier,
+        ),
+      );
+    const opportunityWidgets = Object.values(
+      existing.flatPageLayoutWidgetMaps.byUniversalIdentifier,
+    )
+      .filter(isDefined)
+      .filter((widget) =>
+        opportunityTabs.some(
+          (tab) =>
+            tab.universalIdentifier === widget.pageLayoutTabUniversalIdentifier,
+        ),
+      );
+    const primaryContactWidget = opportunityWidgets.find(
+      (widget) =>
+        widget.universalConfiguration.configurationType ===
+          WidgetConfigurationType.FIELD &&
+        widget.universalConfiguration.fieldMetadataId ===
+          STANDARD_OBJECTS.opportunity.fields.pointOfContact
+            .universalIdentifier,
+    );
+    // Older workspaces retain pre-2.31 layout identifiers. Resolve their
+    // actual contact tab through its field, without renaming or replacing it.
     const existingHomeTab =
-      existing.flatPageLayoutTabMaps.byUniversalIdentifier[homeTabIdentifier];
+      opportunityTabs.find(
+        (tab) =>
+          tab.universalIdentifier ===
+          primaryContactWidget?.pageLayoutTabUniversalIdentifier,
+      ) ??
+      opportunityTabs.find(
+        (tab) =>
+          tab.universalIdentifier ===
+          STANDARD_PAGE_LAYOUT_UNIVERSAL_IDENTIFIERS.opportunityRecordPage.tabs
+            .home.universalIdentifier,
+      );
+    const hasContactList = opportunityWidgets.some(
+      (widget) =>
+        widget.universalConfiguration.configurationType ===
+          WidgetConfigurationType.FIELD &&
+        widget.universalConfiguration.fieldMetadataId ===
+          STANDARD_OBJECTS.opportunity.fields.additionalContacts
+            .universalIdentifier,
+    );
     const widgets =
+      !hasContactList &&
       isDefined(existingHomeTab) &&
       existingHomeTab.layoutMode === PageLayoutTabLayoutMode.VERTICAL_LIST
         ? getStandardFlatEntitiesToCreateOrThrow({
@@ -98,6 +155,9 @@ export class AddOpportunityContactsCommand extends ProvisionedWorkspaceCommandRu
             ],
           }).map((widget) => ({
             ...widget,
+            pageLayoutTabId: existingHomeTab.id,
+            pageLayoutTabUniversalIdentifier:
+              existingHomeTab.universalIdentifier,
             // Append without moving any owner-customized widgets.
             position: {
               layoutMode: PageLayoutTabLayoutMode.VERTICAL_LIST as const,
@@ -112,12 +172,17 @@ export class AddOpportunityContactsCommand extends ProvisionedWorkspaceCommandRu
                     .filter(
                       (existingWidget) =>
                         existingWidget.pageLayoutTabUniversalIdentifier ===
-                        homeTabIdentifier,
+                        existingHomeTab.universalIdentifier,
+                    )
+                    .map(
+                      (existingWidget) =>
+                        existingWidget.overrides?.position ??
+                        existingWidget.position,
                     )
                     .map((existingWidget) =>
-                      existingWidget.position?.layoutMode ===
+                      existingWidget?.layoutMode ===
                       PageLayoutTabLayoutMode.VERTICAL_LIST
-                        ? existingWidget.position.index
+                        ? existingWidget.index
                         : -1,
                     ),
                 ),

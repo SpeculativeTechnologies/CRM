@@ -173,11 +173,20 @@ export const useUpdateJunctionRelationFromCell = ({
           searchRecordStoreFamilyState.atomFamily(morphItem.recordId),
         );
 
-        if (!isDefined(searchRecord?.record)) {
+        const targetObjectMetadata = objectMetadataItems.find(
+          (object) => object.id === morphItem.objectMetadataId,
+        );
+
+        if (!isDefined(searchRecord) || !isDefined(targetObjectMetadata)) {
           return;
         }
 
-        const targetRecord = searchRecord.record;
+        // Search labels arrive before the full records. A visible selection
+        // still has the IDs needed to save its link; do not silently drop it.
+        const targetRecord = searchRecord.record ?? {
+          id: morphItem.recordId,
+          __typename: getObjectTypename(targetObjectMetadata.nameSingular),
+        };
         const optimisticJunctionId = v4();
         const now = new Date().toISOString();
 

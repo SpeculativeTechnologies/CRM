@@ -58,72 +58,77 @@ describe('useUpdateJunctionRelationFromCell', () => {
     } as ReturnType<typeof useDeleteOneRecord>);
   });
 
-  it('creates a pivot from the source record to the selected terminal record', async () => {
-    const store = createStore();
-    const sourceRecordId = 'rocket-id';
-    const targetRecordId = 'task-id';
+  it.each([true, false])(
+    'should save a selected link when full search record loading is %s',
+    async (isRecordLoaded) => {
+      const store = createStore();
+      const sourceRecordId = 'rocket-id';
+      const targetRecordId = 'task-id';
 
-    store.set(recordStoreFamilyState.atomFamily(sourceRecordId), {
-      id: sourceRecordId,
-      __typename: 'Rocket',
-      taskTargets: [],
-    });
-    store.set(searchRecordStoreFamilyState.atomFamily(targetRecordId), {
-      recordId: targetRecordId,
-      label: 'Prepare launch',
-      objectLabelSingular: 'Task',
-      objectNameSingular: 'task',
-      tsRank: 1,
-      tsRankCD: 1,
-      record: {
-        id: targetRecordId,
-        __typename: 'Task',
-        title: 'Prepare launch',
-      },
-    });
-    mockCreateManyRecords.mockResolvedValue([
-      {
-        id: 'persisted-task-target-id',
-        __typename: 'TaskTarget',
-      },
-    ]);
-
-    const { result } = renderHook(
-      () =>
-        useUpdateJunctionRelationFromCell({
-          fieldMetadataItem: taskTargetsField,
-          fieldDefinition,
-          recordId: sourceRecordId,
-        }),
-      { wrapper: createWrapper(store) },
-    );
-
-    expect(result.current.junctionConfig).toMatchObject({
-      direction: 'reverse',
-      targetFields: [{ name: 'task' }],
-    });
-
-    await act(async () => {
-      await result.current.updateJunctionRelationFromCell({
-        morphItem: {
-          recordId: targetRecordId,
-          objectMetadataId: taskMetadata.id,
-          isSelected: true,
-          isMatchingSearchFilter: true,
-        },
+      store.set(recordStoreFamilyState.atomFamily(sourceRecordId), {
+        id: sourceRecordId,
+        __typename: 'Rocket',
+        taskTargets: [],
       });
-    });
-
-    expect(mockCreateManyRecords).toHaveBeenCalledWith({
-      recordsToCreate: [
+      store.set(searchRecordStoreFamilyState.atomFamily(targetRecordId), {
+        recordId: targetRecordId,
+        label: 'Prepare launch',
+        objectLabelSingular: 'Task',
+        objectNameSingular: 'task',
+        tsRank: 1,
+        tsRankCD: 1,
+        record: isRecordLoaded
+          ? {
+              id: targetRecordId,
+              __typename: 'Task',
+              title: 'Prepare launch',
+            }
+          : undefined,
+      });
+      mockCreateManyRecords.mockResolvedValue([
         {
-          targetRocketId: sourceRecordId,
-          taskId: targetRecordId,
+          id: 'persisted-task-target-id',
+          __typename: 'TaskTarget',
         },
-      ],
-      upsert: true,
-    });
-  });
+      ]);
+
+      const { result } = renderHook(
+        () =>
+          useUpdateJunctionRelationFromCell({
+            fieldMetadataItem: taskTargetsField,
+            fieldDefinition,
+            recordId: sourceRecordId,
+          }),
+        { wrapper: createWrapper(store) },
+      );
+
+      expect(result.current.junctionConfig).toMatchObject({
+        direction: 'reverse',
+        targetFields: [{ name: 'task' }],
+      });
+
+      await act(async () => {
+        await result.current.updateJunctionRelationFromCell({
+          morphItem: {
+            recordId: targetRecordId,
+            objectMetadataId: taskMetadata.id,
+            isSelected: true,
+            isMatchingSearchFilter: true,
+          },
+        });
+      });
+
+      expect(mockCreateManyRecords).toHaveBeenCalledWith({
+        recordsToCreate: [
+          {
+            targetRocketId: sourceRecordId,
+            taskId: targetRecordId,
+          },
+        ],
+        upsert: true,
+      });
+    },
+  );
 
   it('deletes the pivot instead of detaching or updating it', async () => {
     const store = createStore();
