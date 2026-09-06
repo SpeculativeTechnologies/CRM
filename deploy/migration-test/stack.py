@@ -112,7 +112,9 @@ class Stack:
                 arguments.extend(['-e', f'{key}={value}'])
             extra = ['postgres', '-c', 'wal_level=logical'] if service == 'db' else ['redis-server', '--maxmemory-policy', 'noeviction']
             docker(*arguments, image, *extra)
-        wait_for(lambda: docker('exec', f'{self.name}-db', 'pg_isready', '-U', 'postgres',
+        # The image's temporary initialization server accepts Unix sockets and
+        # then shuts down. Only the final server accepts TCP connections.
+        wait_for(lambda: docker('exec', f'{self.name}-db', 'pg_isready', '-h', '127.0.0.1', '-U', 'postgres',
                                 check=False).returncode == 0)
         wait_for(lambda: docker('exec', f'{self.name}-redis', 'redis-cli', 'ping',
                                 check=False).stdout.strip() == b'PONG')
