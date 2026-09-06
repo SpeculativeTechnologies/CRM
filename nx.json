@@ -4,7 +4,7 @@
     "libsDir": "packages"
   },
   "namedInputs": {
-    "default": ["{projectRoot}/**/*"],
+    "default": ["{projectRoot}/**/*", "sharedGlobals"],
     "excludeStories": [
       "default",
       "!{projectRoot}/.storybook/*",
@@ -27,6 +27,15 @@
       "excludeTests",
       "!{projectRoot}/**/__mocks__/*",
       "!{projectRoot}/**/testing/*"
+    ],
+    "sharedGlobals": [
+      "{workspaceRoot}/tsconfig.base.json",
+      "{workspaceRoot}/nx.json",
+      "{workspaceRoot}/package.json",
+      "{workspaceRoot}/yarn.lock",
+      "{workspaceRoot}/.yarnrc.yml",
+      "{workspaceRoot}/.yarn/patches/**/*",
+      "{workspaceRoot}/.nvmrc"
     ]
   },
   "targetDefaults": {
@@ -246,6 +255,21 @@
     "@nx/vitest:test": {
       "cache": true,
       "inputs": ["default", "^default"]
+    },
+    "database:init": {
+      "cache": false
+    },
+    "database:migrate": {
+      "cache": false
+    },
+    "database:reset": {
+      "cache": false
+    },
+    "command": {
+      "cache": false
+    },
+    "command-no-deps": {
+      "cache": false
     }
   },
   "generators": {

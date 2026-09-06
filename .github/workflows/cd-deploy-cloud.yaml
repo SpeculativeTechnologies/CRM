@@ -43,6 +43,10 @@ on:
         required: true
         type: choice
         options: [staging, production]
+      image:
+        description: Tested immutable GHCR image reference, including digest
+        required: true
+        type: string
       sha:
         description: 40-character commit SHA to deploy (defaults to this ref)
         required: false
@@ -51,6 +55,7 @@ on:
 permissions:
   contents: read
   id-token: write # required to mint the OIDC token for federation
+  deployments: write
   packages: read # GITHUB_TOKEN cannot read a private GHCR package without this
 
 concurrency:
@@ -66,19 +71,21 @@ jobs:
     environment: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.environment || '' }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Resolve target
         id: target
+        env:
+          REQUESTED_ENVIRONMENT: ${{ github.event.inputs.environment || github.event.client_payload.environment }}
+          REQUESTED_SHA: ${{ github.event.inputs.sha || github.event.client_payload.sha }}
+          REQUESTED_IMAGE: ${{ github.event.inputs.image || github.event.client_payload.image }}
         run: |
           set -euo pipefail
-          ENV_NAME="${{ github.event.inputs.environment || github.event.client_payload.environment }}"
-          SHA="${{ github.event.inputs.sha || github.event.client_payload.sha || github.sha }}"
-          # A repository_dispatch runs from the default branch, so github.sha is
-          # main rather than what is being deployed. Refuse rather than silently
-          # deploying main if the payload arrives without a sha.
-          if [ "${{ github.event_name }}" = "repository_dispatch" ] && [ -z "${{ github.event.client_payload.sha }}" ]; then
-            echo "repository_dispatch arrived without client_payload.sha"; exit 1
-          fi
+          ENV_NAME="$REQUESTED_ENVIRONMENT"
+          SHA="$REQUESTED_SHA"
+          [[ "$REQUESTED_IMAGE" =~ ^ghcr.io/[a-z0-9/-]+@sha256:[0-9a-f]{64}$ ]] || { echo 'Immutable image required'; exit 1; }
+          echo "image=$REQUESTED_IMAGE" >> "$GITHUB_OUTPUT"
           case "$ENV_NAME" in
             staging | production) ;;
             *) echo "not a known environment: '$ENV_NAME'"; exit 1 ;;
@@ -103,21 +110,35 @@ jobs:
           echo "env_name=$ENV_NAME" >> "$GITHUB_OUTPUT"
           echo "sha=$SHA" >> "$GITHUB_OUTPUT"
 
-      - name: Verify the image exists before touching the box
+      - name: Recheck promotion identity before touching the box
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SHA: ${{ steps.target.outputs.sha }}
+          IMAGE: ${{ steps.target.outputs.image }}
+          ENVIRONMENT: ${{ steps.target.outputs.env_name }}
         run: |
-          set -euo pipefail
-          # GHCR paths are case-sensitive and must be lowercase. The owner is
-          # mixed-case (SpeculativeTechnologies), so lowercase it rather than
-          # interpolating it straight in; a mixed-case path returns 403.
-          OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
-          SHA="${{ steps.target.outputs.sha }}"
-          TOKEN=$(curl -sSf -u "${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}" \
-            "https://ghcr.io/token?scope=repository:$OWNER/twenty:pull&service=ghcr.io" \
-            | python3 -c 'import json,sys; print(json.load(sys.stdin)["token"])')
-          curl -sSfI -H "Authorization: Bearer $TOKEN" \
-            -H "Accept: application/vnd.oci.image.index.v1+json,application/vnd.docker.distribution.manifest.list.v2+json" \
-            "https://ghcr.io/v2/$OWNER/twenty/manifests/$SHA" >/dev/null
-          echo "image present: ghcr.io/$OWNER/twenty:$SHA"
+          mode=artifact
+          if [ "$ENVIRONMENT" = production ]; then
+            git merge-base --is-ancestor "$SHA" origin/main
+            mode=promote
+          fi
+          record="$(node .github/scripts/release-record.mjs "$mode" "$SHA")"
+          [ "$(jq -r .image <<<"$record")" = "$IMAGE" ] || { echo 'Artifact changed'; exit 1; }
+
+      - name: Record the deployment attempt
+        id: attempt
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SHA: ${{ steps.target.outputs.sha }}
+          IMAGE: ${{ steps.target.outputs.image }}
+          RELEASE_ENVIRONMENT: ${{ steps.target.outputs.env_name }}
+          RELEASE_RESULT: pending
+        run: |
+          kind=staged-artifact
+          [ "$RELEASE_ENVIRONMENT" != production ] || kind=production-artifact
+          export RELEASE_PAYLOAD="$(jq -nc --arg sha "$SHA" --arg image "$IMAGE" --arg kind "$kind" \
+            '{kind:$kind,sha:$sha,image:$image}')"
+          node .github/scripts/release-record.mjs publish "$SHA"
 
       - uses: google-github-actions/auth@v2
         with:
@@ -159,13 +180,19 @@ jobs:
       # dry run from the target image lists every step it would run, including
       # commands caught up from behind the cursor, and fails on the errors that
       # cost six deploys on 2026-09-03/04. Read its output in the step summary.
+      - name: Require digest-aware host deploy contract
+        run: |
+          gcloud compute ssh "${{ steps.target.outputs.vm }}" \
+            --zone "${{ steps.target.outputs.zone }}" --tunnel-through-iap --quiet \
+            --command 'sudo grep -qx "# RELEASE_ARTIFACT_CONTRACT=1" /opt/twenty/cloud-deploy.sh'
+
       - name: Rehearse the upgrade against the box
         run: |
           set -euo pipefail
           REHEARSAL=$(mktemp)
           gcloud compute ssh "${{ steps.target.outputs.vm }}" \
             --zone "${{ steps.target.outputs.zone }}" --tunnel-through-iap --quiet \
-            --command "sudo IMAGE_SHA=${{ steps.target.outputs.sha }} bash -s" \
+            --command "sudo IMAGE_SHA=${{ steps.target.outputs.sha }} IMAGE_REF=${{ steps.target.outputs.image }} bash -s" \
             < deploy/cloud-rehearse.sh | tee "$REHEARSAL"
           {
             echo "## Upgrade rehearsal (${{ steps.target.outputs.env_name }}, ${{ steps.target.outputs.sha }})"
@@ -179,7 +206,7 @@ jobs:
           set -euo pipefail
           gcloud compute ssh "${{ steps.target.outputs.vm }}" \
             --zone "${{ steps.target.outputs.zone }}" --tunnel-through-iap --quiet \
-            --command "sudo /opt/twenty/cloud-deploy.sh ${{ steps.target.outputs.sha }}"
+            --command "sudo /opt/twenty/cloud-deploy.sh ${{ steps.target.outputs.sha }} ${{ steps.target.outputs.image }}"
       # Fork: a green health check is not a working CRM. These are the invariants
       # that were false while healthz answered ok this week. The image is already
       # live when this runs; a failure here fails the run so the promotion that
@@ -191,7 +218,7 @@ jobs:
           set +e
           gcloud compute ssh "${{ steps.target.outputs.vm }}" \
             --zone "${{ steps.target.outputs.zone }}" --tunnel-through-iap --quiet \
-            --command "sudo EXPECTED_SHA=${{ steps.target.outputs.sha }} bash -s" \
+            --command "sudo EXPECTED_SHA=${{ steps.target.outputs.sha }} EXPECTED_IMAGE=${{ steps.target.outputs.image }} bash -s" \
             < deploy/cloud-verify.sh | tee "$VERIFY"
           STATUS=${PIPESTATUS[0]}
           set -e
@@ -213,6 +240,15 @@ jobs:
           CODE=$(curl -sS -o /dev/null -w '%{http_code}' "https://$HOST/healthz" --max-time 30)
           echo "$HOST unauthenticated -> $CODE"
           [ "$CODE" = "403" ] || { echo "expected 403 from Access"; exit 1; }
+
+      - name: Record deployment outcome
+        if: always() && steps.attempt.outputs.deployment_id != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SHA: ${{ steps.target.outputs.sha }}
+          RELEASE_DEPLOYMENT_ID: ${{ steps.attempt.outputs.deployment_id }}
+          RELEASE_RESULT: ${{ job.status == 'success' && 'success' || 'failure' }}
+        run: node .github/scripts/release-record.mjs finish "$SHA"
 
       - name: Stop staging again when idle
         # Production stays up. Staging costs far more running than stopped, so a

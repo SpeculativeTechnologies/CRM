@@ -37,7 +37,8 @@ fail() { echo "[rehearse] FAIL: $*" >&2; exit 1; }
 [ -f "$ENV_FILE" ] || fail "$ENV_FILE missing"
 
 cd "$COMPOSE_DIR"
-TARGET="$IMAGE_REPO:$IMAGE_SHA"
+TARGET="${IMAGE_REF:-}"
+[[ "$TARGET" =~ ^ghcr.io/[a-z0-9/-]+@sha256:[0-9a-f]{64}$ ]] || fail "IMAGE_REF must include an immutable digest"
 
 log "pulling $TARGET"
 docker pull --quiet "$TARGET" >/dev/null || fail "cannot pull $TARGET"

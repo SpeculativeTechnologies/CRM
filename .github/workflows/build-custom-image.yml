@@ -24,6 +24,10 @@ on:
     types: [labeled, synchronize, reopened]
   workflow_dispatch: {}
 
+concurrency:
+  group: release-image-${{ github.event.pull_request.head.sha || github.sha }}
+  cancel-in-progress: false
+
 jobs:
   prepare:
     if: >-
@@ -34,6 +38,7 @@ jobs:
       image: ${{ steps.target.outputs.image }}
       sha: ${{ steps.target.outputs.sha }}
       tags: ${{ steps.tags.outputs.list }}
+      existing-image: ${{ steps.existing.outputs.image }}
     steps:
       - name: Resolve target commit and image name
         id: target
@@ -49,6 +54,24 @@ jobs:
           # On pull_request, github.sha is the ephemeral merge commit. Nobody
           # can deploy that commit, so tag the branch head instead.
           echo "sha=${PR_HEAD_SHA:-$PUSH_SHA}" >> "$GITHUB_OUTPUT"
+
+      - name: Reuse a previously certified artifact for this source SHA
+        id: existing
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SHA: ${{ steps.target.outputs.sha }}
+          REPO: ${{ github.repository }}
+        run: |
+          records="$(gh api "repos/$REPO/deployments?environment=release-artifact&sha=$SHA&per_page=100")"
+          id="$(jq -r '[.[] | select(.payload.kind == "release-artifact")] | first | .id // empty' <<<"$records")"
+          if [ -n "$id" ]; then
+            state="$(gh api "repos/$REPO/deployments/$id/statuses?per_page=1" --jq '.[0].state')"
+            if [ "$state" = success ] || [ "$state" = failure ] || [ "$state" = pending ]; then
+              image="$(jq -r --argjson id "$id" '.[] | select(.id == $id) | .payload.image' <<<"$records")"
+              [[ "$image" =~ ^ghcr.io/[a-z0-9/-]+@sha256:[0-9a-f]{64}$ ]]
+              echo "image=$image" >> "$GITHUB_OUTPUT"
+            fi
+          fi
 
       - name: Compute tags
         id: tags
@@ -69,6 +92,7 @@ jobs:
           } >> "$GITHUB_OUTPUT"
 
   build:
+    if: needs.prepare.outputs.existing-image == ''
     needs: prepare
     strategy:
       fail-fast: false
@@ -124,6 +148,7 @@ jobs:
           # starts against an external one. `twenty` is the backend + frontend
           # image these deployments actually run.
           target: twenty
+          labels: org.opencontainers.image.revision=${{ needs.prepare.outputs.sha }}
           platforms: ${{ matrix.platform }}
           outputs: type=image,name=${{ needs.prepare.outputs.image }},push-by-digest=true,name-canonical=true,push=true
           # Layer cache lives in GHCR, not GitHub's Actions cache. The Actions
@@ -152,12 +177,18 @@ jobs:
           retention-days: 1
 
   merge:
+    if: needs.prepare.outputs.existing-image == ''
     needs: [prepare, build]
+    outputs:
+      image: ${{ steps.release.outputs.image }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
     steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.prepare.outputs.sha }}
       - name: Download digests
         uses: actions/download-artifact@v4
         with:
@@ -212,3 +243,82 @@ jobs:
             printf '%s\n' "$platforms" | grep -qx "$required" ||
               { echo "::error::${IMAGE}:${SHA} is missing $required"; exit 1; }
           done
+
+      - name: Record immutable image identity
+        id: release
+        env:
+          IMAGE: ${{ needs.prepare.outputs.image }}
+          SHA: ${{ needs.prepare.outputs.sha }}
+        run: |
+          digest="$(docker buildx imagetools inspect "$IMAGE:$SHA" --format '{{json .Manifest}}' | jq -r .digest)"
+          [[ "$digest" =~ ^sha256:[0-9a-f]{64}$ ]]
+          echo "image=$IMAGE@$digest" >> "$GITHUB_OUTPUT"
+
+  verify-release:
+    if: always() && !cancelled() && needs.prepare.result == 'success' && (needs.merge.result == 'success' || needs.prepare.outputs.existing-image != '')
+    needs: [prepare, merge]
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      packages: read
+      deployments: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.prepare.outputs.sha }}
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+      - name: Record release verification attempt
+        id: verification
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SHA: ${{ needs.prepare.outputs.sha }}
+          IMAGE: ${{ needs.prepare.outputs.existing-image || needs.merge.outputs.image }}
+          RELEASE_ENVIRONMENT: release-artifact
+          RELEASE_RESULT: pending
+        run: |
+          export RELEASE_PAYLOAD="$(jq -nc --arg sha "$SHA" --arg image "$IMAGE" \
+            '{kind:"release-artifact",sha:$sha,image:$image}')"
+          node .github/scripts/release-record.mjs publish "$SHA"
+      - name: Freeze declared baseline
+        run: |
+          bash deploy/migration-test.sh freeze --baseline deploy/.migration-tests/baseline \
+            --image "$(jq -r .image deploy/migration-baseline.json)" \
+            --source-sha "$(jq -r .source_sha deploy/migration-baseline.json)" \
+            --logs deploy/.migration-tests/freeze
+      - name: Test the release artifact
+        env:
+          IMAGE: ${{ needs.prepare.outputs.existing-image || needs.merge.outputs.image }}
+        run: |
+          bash deploy/migration-test.sh run --baseline deploy/.migration-tests/baseline \
+            --image "$IMAGE" --preview --logs deploy/.migration-tests/release
+      - name: Certify the tested artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SHA: ${{ needs.prepare.outputs.sha }}
+          IMAGE: ${{ needs.prepare.outputs.existing-image || needs.merge.outputs.image }}
+          RELEASE_ENVIRONMENT: release-artifact
+        run: |
+          export RELEASE_PAYLOAD="$(jq -nc --arg sha "$SHA" --arg image "$IMAGE" \
+            --slurpfile result deploy/.migration-tests/release/result.json \
+            '{kind:"release-artifact", sha:$sha, image:$image, rehearsal:$result[0]}')"
+          node .github/scripts/release-record.mjs publish "$SHA"
+      - name: Invalidate a failed release verification
+        if: failure() && steps.verification.outputs.deployment_id != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SHA: ${{ needs.prepare.outputs.sha }}
+          RELEASE_DEPLOYMENT_ID: ${{ steps.verification.outputs.deployment_id }}
+          RELEASE_RESULT: failure
+        run: node .github/scripts/release-record.mjs finish "$SHA"
+      - name: Retain safe verification report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-verification
+          path: deploy/.migration-tests/release/result.json
+          if-no-files-found: error

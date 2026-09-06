@@ -6,8 +6,7 @@ name: CI Fork
 # this fork. The `ci-fork-status-check` job below is the single required
 # status check for merging into main.
 #
-# push:main runs are near no-ops (affected base == HEAD) but populate the
-# node_modules cache that all PR branches restore from.
+# Main validates the actual merge result against the previous pushed SHA.
 
 on:
   pull_request:
@@ -42,7 +41,7 @@ jobs:
         with:
           key: ci-fork-checks
       - name: Resolve affected base
-        run: echo "NX_BASE=$(git merge-base origin/main HEAD)" >> "$GITHUB_ENV"
+        run: bash .github/scripts/ci-range.sh
       # Fork: an invalid workflow file fails silently as a red run on every push
       # and stops its schedule (sync-upstream.yaml, 2026-09-02 to 09-04). Lint
       # the fork-owned workflows so the PR that breaks one is the one that fails.
@@ -58,18 +57,24 @@ jobs:
             .github/workflows/staging-signoff.yml \
             .github/workflows/cd-deploy-cloud.yaml \
             .github/workflows/pr-checks-agent.yaml \
-            .github/workflows/ci-fork.yaml
+            .github/workflows/ci-fork.yaml \
+            .github/workflows/build-custom-image.yml \
+            .github/workflows/ci-fork-migrations.yaml
+      - name: Test pipeline tooling
+        run: |
+          python3 -m unittest discover -s deploy/migration-test -p "test_*.py"
+          node --test .github/scripts/release-record.test.mjs
       - name: Build shared packages
         run: npx nx run-many -t build -p twenty-shared twenty-ui
       - name: Typecheck affected
-        run: npx nx affected --nxBail -t typecheck --parallel=2 --base=$NX_BASE
+        run: npx nx affected --nxBail -t typecheck --parallel=2 --base=$NX_BASE --head=$NX_HEAD
       - name: Lint affected
-        run: npx nx affected --nxBail -t lint --parallel=2 --base=$NX_BASE
+        run: npx nx affected --nxBail -t lint --parallel=2 --base=$NX_BASE --head=$NX_HEAD
       # Excluded from the unit-test gate: twenty-front runs sharded in its own
       # job below; twenty-e2e-testing's `test` target is Playwright E2E and
       # needs a live app; website/zapier tests need their own upstream CI setup.
       - name: Unit-test affected (except twenty-front / e2e / website / zapier)
-        run: npx nx affected --nxBail -t test --exclude=twenty-front,twenty-e2e-testing,twenty-website,twenty-zapier --parallel=1 --base=$NX_BASE
+        run: npx nx affected --nxBail -t test --exclude=twenty-front,twenty-e2e-testing,twenty-website,twenty-zapier --parallel=1 --base=$NX_BASE --head=$NX_HEAD
       # Adding a `t` or `<Trans>` string without re-extracting leaves the
       # catalogs with no entry for its generated id, and Lingui then renders
       # the id itself ("cKqT2J" where "View full record" belongs). Nothing
@@ -88,7 +93,7 @@ jobs:
           # exits 1 when it matches nothing, and under `bash -e` that failed the
           # step outright, which is what turned main red from 2026-08-01 01:54.
           affected="$(
-            npx nx show projects --affected --base=$NX_BASE |
+            npx nx show projects --affected --base=$NX_BASE --head=$NX_HEAD |
               tr -d '[]"' | tr ',' '\n' | sed 's/^ *//; s/ *$//' | grep -v '^$' || true
           )"
           for project in twenty-front twenty-server twenty-emails; do
@@ -187,8 +192,9 @@ jobs:
       - name: Check whether twenty-front is affected
         id: front-affected
         run: |
-          NX_BASE=$(git merge-base origin/main HEAD)
-          if npx nx show projects --affected --base=$NX_BASE | grep -qx twenty-front; then
+          bash .github/scripts/ci-range.sh
+          source "$GITHUB_ENV"
+          if npx nx show projects --affected --base=$NX_BASE --head=$NX_HEAD | grep -qx twenty-front; then
             echo "affected=true" >> "$GITHUB_OUTPUT"
           else
             echo "affected=false" >> "$GITHUB_OUTPUT"
@@ -211,6 +217,12 @@ jobs:
         with:
           key: ${{ steps.task-cache.outputs.cache-primary-key }}
 
+  migrations:
+    uses: ./.github/workflows/ci-fork-migrations.yaml
+    permissions:
+      contents: read
+      packages: read
+
   # Single stable name to mark as the required status check on main.
   # front-tests is skipped, not failed, when front-scope rules the frontend
   # out, and a skipped job does not match the failure check below.
@@ -218,8 +230,8 @@ jobs:
     if: always() && !cancelled()
     timeout-minutes: 5
     runs-on: ubuntu-latest
-    needs: [checks, front-scope, front-tests]
+    needs: [checks, front-scope, front-tests, migrations]
     steps:
       - name: Fail if any needed job failed
-        if: contains(needs.*.result, 'failure')
+        if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')
         run: exit 1
