@@ -238,6 +238,9 @@ verification step is worse than a failed one.
   because `lint:diff-with-main` only considers committed changes. Use the
   migration formatter convention for new upgrade commands, which are excluded
   from the general formatter to protect committed commands.
+  For built-in layout changes, also run `standard-metadata-label-catalog.spec.ts`
+  and the affected layout snapshot test. Plain-string widget titles require a
+  matching literal in the widget-title catalog before Lingui can extract them.
   Batch independent reads/checks; keep database mutations and source builds
   sequential. Run the final image rehearsals and exact-commit CI after the
   coherent change is ready. Repeat checks only for changed code or new failures.

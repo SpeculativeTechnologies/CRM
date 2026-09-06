@@ -8249,6 +8249,12 @@ msgctxt "fieldMetadata.label"
 msgid "Points of contact"
 msgstr "Points of contact"
 
+#. js-lingui-id: g1GhZb
+#: src/engine/metadata-modules/page-layout-widget/constants/standard-page-layout-widget-titles.ts
+msgctxt "pageLayoutWidget.title"
+msgid "Points of contact"
+msgstr "Points of contact"
+
 #. js-lingui-id: rLOFsu
 #: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/build-standard-target-flat-field-metadatas.util.ts
 #: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-attachment-standard-flat-field-metadata.util.ts
