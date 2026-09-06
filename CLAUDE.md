@@ -314,3 +314,12 @@ This handles everything: starts Postgres + Redis (auto-detects local services vs
 - `tsconfig.base.json` - Base TypeScript configuration
 - `package.json` - Root package with workspace definitions
 - `.cursor/rules/` - Detailed development guidelines and best practices
+
+### Migration rehearsal and CI follow-through
+
+Use `deploy/MIGRATION-TESTING.md` for the shared local/CI frozen-baseline command.
+Run `bash deploy/ci-follow.sh <full-sha>` after pushing each coherent change;
+diagnose failures and verify fixes for their exact commit. Follow the bounded
+repair policy and completion fields in `deploy/LLM-LOCAL-DEV.md`, under
+“Exact-commit follow-through”. Deployment remains subject to the operating
+contract above. A green build or successful push is not the completion report.

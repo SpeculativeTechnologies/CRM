@@ -214,3 +214,11 @@ bash packages/twenty-utils/setup-dev-env.sh --docker --reset
 ```
 
 Never run setup or reset commands on a staging or production cloud VM.
+
+## Isolated migration iteration
+
+See [MIGRATION-TESTING.md](MIGRATION-TESTING.md) for `migration-test.sh freeze`,
+`run`, and `reset`. This separate stack preserves the normal `twenty-dev`
+database while restoring the same migration ledger on every attempt. CI uses
+that same command with a synthetic baseline. A mirror remains mandatory for
+fork-specific schema/data verification.

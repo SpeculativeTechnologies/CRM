@@ -263,3 +263,27 @@ If the normal process must be bypassed:
 3. Make the smallest possible change.
 4. Open a follow-up PR immediately so Git remains the source of truth.
 5. Record verification and rollback results.
+
+## Immutable artifact promotion
+
+The digest promotion protocol supersedes the SHA-tag/ancestor-containment
+mechanics described above. Production still requires a commit on `main` and its
+normal environment approval. Every release now requires the exact source SHA,
+the exact image digest certified by the release-artifact rehearsal, and the
+latest affirmative staging check for that specific deployment ID. An older
+ancestor, moving tag, failed signoff, or signoff from a prior redeploy cannot
+satisfy the gate. `staging-target` and `staging-verified` remain convenience
+pointers; durable deployment records are authoritative.
+
+The staging workflow prints the deployment ID in the child cloud run. Enter that
+ID when recording the paths exercised through **Record a staging check**. If
+staging has changed, exercise the new deployment and record its own ID. No
+production or staging image is recompiled during promotion. Runtime URL and
+label configuration already comes from the server at startup.
+
+Rollout requires coordinated review of this repository and the private
+`crm-ops` digest-aware host script. The workflow refuses the old host contract
+before migration. The owner installs it through the private runbook, then
+stages and signs off the new release. Do not force the workflow past that check.
+A code rollback does not restore migrated data; use a reviewed compensating
+migration or backup recovery when old and new schemas are incompatible.

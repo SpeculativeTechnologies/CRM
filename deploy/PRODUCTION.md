@@ -31,3 +31,8 @@ and rollback. Start with
 Do not use `deploy/production-converge.sh`, `deploy/serve-public.sh`, the launchd
 files, or the former `/Users/ben/Deploy/twenty` checkout to operate production.
 They describe the retired Mac-hosted deployment.
+
+Digest protocol: production now requires exact source/digest equality with the
+latest successful staging deployment and an affirmative check of that deployment
+ID for every release. Ancestor containment alone no longer clears this gate.
+See [TEAM-WORKFLOW.md](TEAM-WORKFLOW.md#immutable-artifact-promotion).

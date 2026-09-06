@@ -45,3 +45,8 @@ is authoritative.
 Do not use `deploy/compose.staging.yml`, `deploy/staging.sh`, the launchd files,
 or the old converger instructions to operate cloud staging. Those assets are
 retired remnants of the former Mac-hosted environment.
+
+Digest protocol: staging now requires an artifact whose exact source SHA passed
+CI and whose immutable digest passed the release rehearsal. The cloud child run
+records its deployment ID; provide that ID when recording a staging check.
+See [TEAM-WORKFLOW.md](TEAM-WORKFLOW.md#immutable-artifact-promotion).
