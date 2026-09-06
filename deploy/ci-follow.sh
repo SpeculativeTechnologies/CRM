@@ -12,7 +12,8 @@ mkdir -p "$directory"
 deadline=$(( $(date +%s) + minutes * 60 ))
 while [ "$(date +%s)" -lt "$deadline" ]; do
   gh run list --repo "$repo" --commit "$sha" --limit 100 \
-    --json databaseId,workflowName,status,conclusion,headSha,url > "$directory/runs.json"
+    --json databaseId,workflowName,status,conclusion,headSha,url |
+    jq 'sort_by(.databaseId) | group_by(.workflowName) | map(max_by(.databaseId))' > "$directory/runs.json"
   # Require the intended workflow to exist; an empty result is not a pass.
   if jq -e 'any(.[]; .workflowName == "CI Fork") and all(.[]; .status == "completed")' "$directory/runs.json" >/dev/null; then
     failed="$(jq -r '.[] | select(.conclusion != "success" and .conclusion != "skipped" and .conclusion != "neutral") | .databaseId' "$directory/runs.json")"
