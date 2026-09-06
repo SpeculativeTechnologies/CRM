@@ -82,9 +82,10 @@ lack it:
 
 > **Does redeploying the previous SHA undo this?**
 
-Deploys are pinned to a full commit SHA, the commit must already be on `main`,
-and staging must have exercised it. Rollback is another deploy of a known-good
-SHA. So a change whose worst case is *the application misbehaves until someone
+Deploys are pinned to a full commit SHA and immutable image digest. The commit
+must already be on `main`, and staging must have exercised that exact artifact.
+Rollback requires staging and approving a known-good artifact. So a change whose
+worst case is *the application misbehaves until someone
 redeploys* needs no special gate. Frontend work, styling, copy, views, and most
 server logic are in this category. Ship them.
 
@@ -154,18 +155,16 @@ Promotion is where the gate is:
 1. Merge, then run **Deploy to staging** for the merged SHA.
 2. Exercise the change on staging against the mirrored data, not just the
    application's health check.
-3. Run **Record a staging check**, describing what you exercised. It signs off
-   whatever `staging-target` points at, which is only ever a commit staging
-   deployed successfully, and moves `staging-verified` to it.
-4. Run **Deploy to production**. It refuses the promotion unless every
-   database-touching file in it is already inside the signed-off commit.
+3. Run **Record a staging check**, entering the successful staging deployment
+   ID and describing what you exercised. It records the source SHA, digest and
+   deployment ID together, and moves `staging-verified` on a pass.
+4. Run **Deploy to production** for that exact SHA. Every release requires the
+   same staged digest and the latest affirmative check for that deployment.
 
-Step 4 is stricter than the general staging rule on purpose. Ordinary code only
-has to have an ancestor on staging, which is fine when a redeploy undoes it. A
-migration merged on top of a staged commit would otherwise ride to production
-having never run anywhere, so it is held to containment in the checked commit
-instead. The consequence worth knowing: merging another database change after
-the check invalidates the check, and staging has to run and be checked again.
+A newer commit must be staged and checked before it can be promoted. A failed
+check or a new staging deployment invalidates prior signoff, even when the
+source SHA has not changed. Database changes additionally require verification
+of the intended transformation against mirrored records and relevant volume.
 
 None of this constrains what someone with an interactive shell on the box can
 do. The gate is on the promotion workflow, not on the machine. Server access is
@@ -203,21 +202,20 @@ must be handled.
    push directly to `main`.
 2. At the scheduled release window, typically at the end of the day, identify
    the exact full commit SHA on `main` to release and wait for CI to publish its
-   GHCR image.
+   GHCR image and certify its fresh-baseline artifact rehearsal.
 3. Run **Deploy to staging** with that exact SHA. The workflow wakes cloud
    staging, deploys the pinned image, runs migrations and health checks, and
    reports the result.
 4. Exercise the changed behavior and the normal CRM smoke-test paths at
    `https://crm-staging.spec.tech`. Record an affirmative pass or fail; the
    absence of alerts alone is not a successful smoke test.
-5. Run **Record a staging check** with that pass or fail and what you
-   exercised. Required before a database change can be promoted, and worth
-   doing either way: it is the only durable record of what step 4 actually
-   covered.
+5. Run **Record a staging check** with the deployment ID, pass or fail, and what
+   you exercised. This is required for every release and records what step 4
+   actually covered.
 6. If staging passes, run **Deploy to production** for the exact SHA staging
    ran. The workflow verifies that the commit is on `main`, that it passed
-   through staging, and that anything reaching the database is inside the
-   commit step 5 signed off, then waits for the production approval gate.
+   through staging as the same image digest, and that step 5 signed off that
+   deployment. The production environment approval gate also remains required.
    Anyone on the
    `production` environment's reviewer list can approve it, including their own
    run; the gate is a deliberate pause and an audit record, not a second
@@ -236,8 +234,9 @@ an image for the unmerged PR, deploy its exact SHA, and record what was tested.
 This exception does not replace CI or review. The normal release train still
 deploys a selected SHA from `main` to staging before production.
 
-Do not use `latest` to identify a staging or production release. Deploys use a
-full commit SHA; rollback is another deployment of a known-good SHA.
+Do not use `latest` to identify a staging or production release. Deploys resolve
+a full commit SHA to its certified digest. Rollback follows the same staging
+and promotion gates; an emergency exception requires the protocol below.
 
 ## Upstream synchronization
 
@@ -263,3 +262,26 @@ If the normal process must be bypassed:
 3. Make the smallest possible change.
 4. Open a follow-up PR immediately so Git remains the source of truth.
 5. Record verification and rollback results.
+
+## Immutable artifact promotion
+
+Production requires a commit on `main` and its normal environment approval.
+Every release requires the exact source SHA,
+the exact image digest certified by the release-artifact rehearsal, and the
+latest affirmative staging check for that specific deployment ID. An older
+ancestor, moving tag, failed signoff, or signoff from a prior redeploy cannot
+satisfy the gate. `staging-target` and `staging-verified` remain convenience
+pointers; durable deployment records are authoritative.
+
+The staging workflow prints the deployment ID in the child cloud run. Enter that
+ID when recording the paths exercised through **Record a staging check**. If
+staging has changed, exercise the new deployment and record its own ID. No
+production or staging image is recompiled during promotion. Runtime URL and
+label configuration already comes from the server at startup.
+
+Rollout requires coordinated review of this repository and the private
+`crm-ops` digest-aware host script. The workflow refuses the old host contract
+before migration. The owner installs it through the private runbook, then
+stages and signs off the new release. Do not force the workflow past that check.
+A code rollback does not restore migrated data; use a reviewed compensating
+migration or backup recovery when old and new schemas are incompatible.

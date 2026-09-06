@@ -10,9 +10,9 @@ The workflow:
 
 1. resolves the requested ref to an exact commit SHA;
 2. refuses commits that are not on `main`;
-3. refuses commits that do not contain what staging last ran;
-4. refuses database changes that are not inside a commit signed off through
-   **Record a staging check**;
+3. requires the certified digest from the latest successful staging deployment;
+4. requires an affirmative **Record a staging check** for that exact source,
+   digest and deployment ID, for every release;
 5. waits for the production approval gate; and
 6. deploys the pinned cloud image and waits for the result.
 
@@ -31,3 +31,6 @@ and rollback. Start with
 Do not use `deploy/production-converge.sh`, `deploy/serve-public.sh`, the launchd
 files, or the former `/Users/ben/Deploy/twenty` checkout to operate production.
 They describe the retired Mac-hosted deployment.
+
+See [TEAM-WORKFLOW.md](TEAM-WORKFLOW.md#immutable-artifact-promotion) for the
+coordinated digest-aware host-script rollout and database rollback limits.

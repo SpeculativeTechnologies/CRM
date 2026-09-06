@@ -1,0 +1,87 @@
+name: CI Fork Migrations
+
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+  packages: read
+
+jobs:
+  rehearse:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Resolve tested range
+        run: bash .github/scripts/ci-range.sh
+      - name: Determine migration scope
+        id: scope
+        run: |
+          # Conservatively includes server consumers, lockfiles and build tooling.
+          git diff --name-only "$NX_BASE" "$NX_HEAD" > /tmp/migration-changed-files
+          if grep -qE '^(deploy/|\.github/|packages/twenty-(server|shared|emails|client-sdk|docker)/|package.json$|yarn.lock$|nx.json$|tsconfig.base.json$|\.yarn)' /tmp/migration-changed-files; then
+            echo 'required=true' >> "$GITHUB_OUTPUT"
+          fi
+      - uses: docker/login-action@v3
+        if: steps.scope.outputs.required == 'true'
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+      - uses: docker/setup-buildx-action@v3
+        if: steps.scope.outputs.required == 'true'
+      - name: Build branch server with reusable layers
+        if: steps.scope.outputs.required == 'true'
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: packages/twenty-docker/twenty/Dockerfile
+          target: twenty-server
+          load: true
+          tags: twenty-migration:branch
+          labels: org.opencontainers.image.revision=${{ github.sha }}
+          # Reuse the release builder's registry layers. Duplicating this image
+          # into Actions cache stalled a warm job for over eleven minutes and
+          # competes with the dependency/Nx caches for the same storage quota.
+          cache-from: type=registry,ref=ghcr.io/speculativetechnologies/twenty:buildcache-linux-amd64
+      - name: Freeze declared fixture baseline
+        if: steps.scope.outputs.required == 'true'
+        run: |
+          image="$(jq -r .image deploy/migration-baseline.json)"
+          sha="$(jq -r .source_sha deploy/migration-baseline.json)"
+          bash deploy/migration-test.sh freeze --baseline deploy/.migration-tests/baseline \
+            --image "$image" --source-sha "$sha" --logs deploy/.migration-tests/freeze
+      - name: Rehearse migrations and application behavior
+        if: steps.scope.outputs.required == 'true'
+        run: |
+          bash deploy/migration-test.sh run --baseline deploy/.migration-tests/baseline \
+            --image twenty-migration:branch --logs deploy/.migration-tests/attempt
+      - name: Retain redacted synthetic failure diagnostics
+        if: failure()
+        run: |
+          for phase in freeze attempt; do
+            if [ -f "deploy/.migration-tests/$phase/dataset.json" ]; then
+              bash deploy/migration-test.sh report --logs "deploy/.migration-tests/$phase" \
+                --output "deploy/.migration-tests/diagnostics/$phase"
+            fi
+          done
+      - name: Upload synthetic failure diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: migration-failure-diagnostics
+          path: deploy/.migration-tests/diagnostics/
+          retention-days: 7
+          if-no-files-found: ignore
+      - name: Publish timing and verdict only
+        if: always() && steps.scope.outputs.required == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: migration-result
+          path: |
+            deploy/.migration-tests/attempt/result.json
+            deploy/.migration-tests/attempt/timings.json
+          if-no-files-found: error

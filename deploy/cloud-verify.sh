@@ -43,11 +43,21 @@ sql() { docker exec "$DB" psql -U postgres -d twenty -At -c "$1"; }
 
 # --- image and containers ----------------------------------------------------
 RUNNING_IMAGE="$(grep -E '^CLOUD_IMAGE=' "$ENV_FILE" | cut -d= -f2-)"
-if [ -n "$EXPECTED_SHA" ]; then
-  case "$RUNNING_IMAGE" in
-    *:"$EXPECTED_SHA") pass "image is $EXPECTED_SHA" ;;
-    *) fail "image is $RUNNING_IMAGE, expected sha $EXPECTED_SHA (rolled back?)" ;;
-  esac
+EXPECTED_IMAGE="${EXPECTED_IMAGE:-}"
+if ! [[ "$EXPECTED_IMAGE" =~ ^ghcr.io/[a-z0-9/-]+@sha256:[0-9a-f]{64}$ ]]; then
+  fail "EXPECTED_IMAGE must include an immutable digest"
+elif [ "$RUNNING_IMAGE" != "$EXPECTED_IMAGE" ]; then
+  fail "configured image differs from the tested artifact"
+else
+  EXPECTED_ID="$(docker image inspect -f '{{.Id}}' "$EXPECTED_IMAGE")"
+  for service in server worker; do
+    container="$(compose ps -q "$service")"
+    if [ -n "$container" ] && [ "$(docker inspect -f '{{.Image}}' "$container")" = "$EXPECTED_ID" ]; then
+      pass "$service runs the tested digest for $EXPECTED_SHA"
+    else
+      fail "$service is missing or runs a different image"
+    fi
+  done
 fi
 
 NOT_RUNNING="$(compose ps --format '{{.Service}} {{.State}}' | grep -v ' running$' || true)"

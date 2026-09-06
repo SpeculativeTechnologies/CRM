@@ -28,6 +28,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      checks: read
       deployments: write
       packages: read
       actions: read # to read the cd-deploy-cloud run this waits on
@@ -49,37 +50,24 @@ jobs:
           echo "sha=${sha}" >> "$GITHUB_OUTPUT"
           echo "Resolved ${REF} to ${sha}"
 
-      - name: Require a published image for that commit
+      - name: Require a tested immutable artifact and exact-commit CI
+        id: artifact
         env:
-          OWNER: ${{ github.repository_owner }}
+          GH_TOKEN: ${{ github.token }}
           SHA: ${{ steps.resolve.outputs.sha }}
-          ACTOR: ${{ github.actor }}
-          TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          owner_lower="$(echo "$OWNER" | tr '[:upper:]' '[:lower:]')"
-          image="ghcr.io/${owner_lower}/twenty:${SHA}"
-          echo "$TOKEN" | docker login ghcr.io -u "$ACTOR" --password-stdin
-          if ! docker manifest inspect "$image" >/dev/null 2>&1; then
-            echo "::error::No image published for ${SHA}."
-            echo "Add the 'needs-staging' label to the pull request, or run" \
-              "'Build and push custom image' on this ref, then retry."
-            exit 1
-          fi
-          echo "Found ${image}"
+        run: node .github/scripts/release-record.mjs artifact "$SHA"
 
       - name: Deploy the cloud box
         uses: ./.github/actions/deploy-cloud-box
         with:
           environment: staging
           sha: ${{ steps.resolve.outputs.sha }}
+          image: ${{ steps.artifact.outputs.image }}
           token: ${{ github.token }}
 
       # Nothing deploys from this ref any more; the Mac that polled it is retired.
-      # It stays because deploy-production.yml reads it to refuse promoting code
-      # staging never ran. That makes it a claim about what staging has actually
-      # had on it, so it is only safe to move once the deploy above succeeded --
-      # moving it first would let a failed staging deploy clear the way to
-      # production.
+      # Keep it as a convenience pointer after success. Promotion uses durable
+      # source/digest/deployment records, so moving this ref cannot clear a gate.
       - name: Record what staging now runs
         env:
           GH_TOKEN: ${{ github.token }}
@@ -94,44 +82,3 @@ jobs:
               -f ref=refs/heads/staging-target -f sha="$SHA" >/dev/null
           fi
           echo "staging-target now points at ${SHA}"
-
-      - name: Record the deployment
-        env:
-          GH_TOKEN: ${{ github.token }}
-          REPO: ${{ github.repository }}
-          SHA: ${{ steps.resolve.outputs.sha }}
-          REQUESTED_REF: ${{ inputs.ref }}
-          ACTOR: ${{ github.actor }}
-        run: |
-          # `ref` stays the resolved SHA rather than the branch: GitHub would
-          # re-resolve a branch here, and staging deploys unmerged branches
-          # that move, so the record could name a commit whose image was never
-          # verified above. The branch is recorded beside it, because a bare
-          # SHA does not say what was deployed.
-          #
-          # Built with jq so a ref containing quotes cannot break the JSON.
-          # GitHub truncates descriptions past 140 characters.
-          description="$(printf '%s @ %s, requested by %s' \
-            "$REQUESTED_REF" "${SHA:0:7}" "$ACTOR" | cut -c1-140)"
-          body="$(jq -nc \
-            --arg sha "$SHA" \
-            --arg description "$description" \
-            --arg requested_ref "$REQUESTED_REF" \
-            --arg actor "$ACTOR" \
-            '{
-              ref: $sha,
-              environment: "staging",
-              description: $description,
-              payload: {
-                requested_ref: $requested_ref,
-                sha: $sha,
-                requested_by: $actor
-              },
-              auto_merge: false,
-              required_contexts: []
-            }')"
-          id="$(gh api --method POST "repos/${REPO}/deployments" --jq .id --input - <<<"$body")"
-          gh api --method POST "repos/${REPO}/deployments/${id}/statuses" \
-            -f state=success \
-            -f description="deployed and verified on cloud staging" >/dev/null
-          echo "Deployment ${id} recorded for ${SHA}"

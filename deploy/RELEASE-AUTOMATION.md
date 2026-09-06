@@ -15,7 +15,7 @@ Two GCP VMs, `twenty-staging-e2` and `twenty-production-e2`, each running the
 stack under Docker Compose from `/opt/twenty`, reached only over IAP, fronted by
 a Cloudflare tunnel with Access in front of both the app and the API. One image
 per commit on `main` (and on labeled PRs) in GHCR. A deploy is
-`cloud-deploy.sh <sha>` on the box: pull, migrate in a one-off container,
+`cloud-deploy.sh <sha> <image@sha256:digest>` on the box: pull, migrate in a one-off container,
 restart server and worker, roll the image back on failure. The migration is
 `run-instance-commands --force --include-slow` then `upgrade` then
 `cache:flush`. Two workspaces exist on each box, with identical history until
@@ -61,7 +61,7 @@ production alike:
    2026-09-03 this plan predicted every remaining failure once run by hand.
 2. **Deploy** (`cloud-deploy.sh` on the box, from `crm-ops`).
 3. **Verify** (`deploy/cloud-verify.sh`). The image is live at this point.
-   Checks: the image is the requested sha (a rollback fails here), containers
+   Checks: both containers use the requested digest (a rollback fails here), containers
    running, healthz, `upgrade --dry-run` from the deployed image plans nothing
    more, every workspace cursor is completed, no object navigation item in the
    legacy payload shape the API hides, no navigation item with neither target
@@ -141,12 +141,18 @@ is false. Then the box, read-only:
 
 ```bash
 gcloud compute ssh twenty-staging-e2 --zone=us-central1-a --tunnel-through-iap \
-  --command 'sudo EXPECTED_SHA=<sha> bash -s' < deploy/cloud-verify.sh
+  --command 'sudo EXPECTED_SHA=<sha> EXPECTED_IMAGE=<image@sha256:digest> bash -s' < deploy/cloud-verify.sh
 gcloud compute ssh twenty-staging-e2 --zone=us-central1-a --tunnel-through-iap \
-  --command 'sudo IMAGE_SHA=<sha> bash -s' < deploy/cloud-rehearse.sh
+  --command 'sudo IMAGE_SHA=<sha> IMAGE_REF=<image@sha256:digest> bash -s' < deploy/cloud-rehearse.sh
 ```
 
 Neither changes the box. A migration that has to run by hand (a timeout, a
 command below the floor) is the production owner's action, as
 `deploy/TEAM-WORKFLOW.md` says; the twenty-gated-upgrade-command runbook has
 the recipe.
+
+The immutable-artifact pipeline now supersedes SHA-tag promotion. See
+[MIGRATION-TESTING.md](MIGRATION-TESTING.md) for local/CI rehearsals and
+[TEAM-WORKFLOW.md](TEAM-WORKFLOW.md#immutable-artifact-promotion) for the exact
+source, digest and deployment-ID gates. The paired private host contract must
+be installed by the owner before the new workflow can deploy.

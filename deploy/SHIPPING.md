@@ -17,9 +17,9 @@ There are three places code can be running:
 | **Production** | The live CRM everyone uses |
 
 Staging and production run on separate Google Cloud VMs. GitHub Actions reaches
-them through identity federation and IAP, deploys an image pinned to the exact
-commit SHA, and waits until the deployment succeeds or rolls back. That is why
-you do not need server access.
+them through identity federation and IAP, deploys the tested image digest for the
+exact commit SHA, and waits until the deployment succeeds or rolls back. That
+is why you do not need server access.
 
 The application and its promotion workflows live in the public
 `SpeculativeTechnologies/CRM` repository. The private
@@ -38,8 +38,8 @@ directly to `main`.
 
 **4. Put the release candidate on staging.** At the scheduled release window,
 typically at the end of the day, choose the exact full commit SHA on `main`
-that you intend to release and wait for its image build. Then go to **Actions →
-Deploy to staging → Run workflow** and enter that SHA.
+that you intend to release and wait for its image build and artifact rehearsal.
+Then go to **Actions → Deploy to staging → Run workflow** and enter that SHA.
 
 **5. Actually try it.** Open `https://crm-staging.spec.tech` and use the thing
 you changed. Click around the normal stuff too — people, companies, search.
@@ -48,16 +48,16 @@ real pass or fail; seeing no alerts is not the same as completing the smoke
 test.
 
 **6. Write down what you tried.** Go to **Actions → Record a staging check →
-Run workflow**, pick pass or fail, and say what you exercised. This is
-mandatory if the release changes the database: production will refuse the
-promotion without it. Do it anyway when it doesn't, because it is the only
-lasting record of step 5.
+Run workflow**, enter the deployment ID printed by the cloud deployment run,
+pick pass or fail, and say what you exercised. This is mandatory for every
+release. If staging has been redeployed, exercise that deployment and record
+its own ID.
 
 **7. Put that exact SHA on production.** If staging passes and someone is
 available to monitor the release, go to **Actions → Deploy to production → Run
 workflow** and enter the same SHA. The run verifies that the commit is on
-`main`, that it passed through staging, and that any database change in it was
-covered by the check you recorded, then pauses for approval. Once approved, it
+`main` and that its exact image digest passed staging and the check you recorded.
+The production approval remains required. Once approved, it
 deploys the cloud production VM and waits for the result. If the release window
 ends before validation is complete, wait for the next supported window. If
 staging fails, stop and fix or revert it through another PR.

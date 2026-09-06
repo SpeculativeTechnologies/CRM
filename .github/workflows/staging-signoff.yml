@@ -1,20 +1,15 @@
 name: Record a staging check
 
-# Records that a human exercised what is currently on staging, so that a
-# database change can be promoted without the production owner reviewing it.
-#
-# Deploy to production reads the `staging-verified` ref this writes and refuses
-# to promote a database change the ref does not cover. That is the whole point
-# of the separation: an attestation typed into the promotion run proves nothing
-# about what staging ever had on it, whereas this can only ever sign off the
-# commit staging actually deployed, and only after the deploy succeeded.
-#
-# There is deliberately no ref input. The commit is read from `staging-target`,
-# which deploy-staging.yml moves only on a successful deploy.
+# Records the exercised staging deployment's source, digest and deployment ID.
+# Every production release requires its latest affirmative check. The input ID
+# must match the current successful deployment; convenience refs cannot certify it.
 
 on:
   workflow_dispatch:
     inputs:
+      deployment_id:
+        description: Exact staging deployment ID that you exercised (from Deploy to staging)
+        required: true
       result:
         description: Did staging pass?
         required: true
@@ -28,7 +23,7 @@ on:
         required: true
 
 concurrency:
-  group: staging-signoff
+  group: deploy-staging
   cancel-in-progress: false
 
 jobs:
@@ -38,6 +33,7 @@ jobs:
       contents: write
       deployments: write
     steps:
+      - uses: actions/checkout@v4
       - name: Read what staging is running
         id: staging
         env:
@@ -54,6 +50,17 @@ jobs:
           fi
           echo "sha=${sha}" >> "$GITHUB_OUTPUT"
           echo "Staging is running ${sha}"
+
+      - name: Bind the check to the deployment that was exercised
+        id: artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SHA: ${{ steps.staging.outputs.sha }}
+          EXPECTED_DEPLOYMENT: ${{ inputs.deployment_id }}
+        run: |
+          record="$(node .github/scripts/release-record.mjs staged "$SHA")"
+          [ "$(jq -r .deployment_id <<<"$record")" = "$EXPECTED_DEPLOYMENT" ] || \
+            { echo 'Staging changed since this deployment was exercised'; exit 1; }
 
       # A sign-off nobody can read later is not a record. The floor is low on
       # purpose: it rejects "ok", not brevity.
@@ -77,60 +84,23 @@ jobs:
       - name: Record the check
         env:
           GH_TOKEN: ${{ github.token }}
-          REPO: ${{ github.repository }}
           SHA: ${{ steps.staging.outputs.sha }}
+          IMAGE: ${{ steps.artifact.outputs.image }}
+          DEPLOYMENT_ID: ${{ steps.artifact.outputs.deployment_id }}
           RESULT: ${{ inputs.result }}
           EXERCISED: ${{ inputs.exercised }}
-          ACTOR: ${{ github.actor }}
+          RELEASE_ENVIRONMENT: staging-check
         run: |
-          set -euo pipefail
-          # Durable in the deployments API, unlike a step summary, which goes
-          # away with the run. auto_inactive is off so recording a check does
-          # not mark the deploy that put the code there as inactive.
-          description="$(printf 'staging %s at %s, checked by %s' \
-            "$RESULT" "${SHA:0:7}" "$ACTOR" | cut -c1-140)"
-          body="$(jq -nc \
-            --arg sha "$SHA" \
-            --arg description "$description" \
-            --arg result "$RESULT" \
+          export RELEASE_RESULT=success
+          [ "$RESULT" = pass ] || export RELEASE_RESULT=failure
+          export RELEASE_PAYLOAD="$(jq -nc --arg sha "$SHA" --arg image "$IMAGE" \
+            --argjson deployment_id "$DEPLOYMENT_ID" --arg staging_check "$RESULT" \
             --arg exercised "$EXERCISED" \
-            --arg actor "$ACTOR" \
-            '{
-              ref: $sha,
-              environment: "staging",
-              description: $description,
-              payload: {
-                sha: $sha,
-                staging_check: $result,
-                exercised: $exercised,
-                checked_by: $actor
-              },
-              auto_merge: false,
-              required_contexts: []
-            }')"
-          id="$(gh api --method POST "repos/${REPO}/deployments" --jq .id --input - <<<"$body")"
-          state=success
-          if [ "$RESULT" != "pass" ]; then
-            state=failure
-          fi
-          gh api --method POST "repos/${REPO}/deployments/${id}/statuses" \
-            -f state="$state" \
-            -F auto_inactive=false \
-            -f description="$description" >/dev/null
-          {
-            echo "## Staging check"
-            echo
-            echo "- Commit: \`${SHA}\`"
-            echo "- Result: **${RESULT}**"
-            echo "- Checked by: @${ACTOR}"
-            echo
-            echo "${EXERCISED}"
-          } >> "$GITHUB_STEP_SUMMARY"
+            '{kind:"staging-check",sha:$sha,image:$image,deployment_id:$deployment_id,staging_check:$staging_check,exercised:$exercised}')"
+          node .github/scripts/release-record.mjs publish "$SHA"
 
-      # Only a pass moves the ref. A failed check leaves the previous sign-off
-      # standing, which is correct: that commit really was checked, and the
-      # containment test in deploy-production.yml is what then refuses to
-      # promote the newer database change on top of it.
+      # Only a pass moves the convenience ref. A failed deployment record above
+      # overrides all older passes regardless of where this ref points.
       - name: Mark the commit as checked
         if: inputs.result == 'pass'
         env:

@@ -12,6 +12,9 @@ inputs:
   sha:
     description: 40-character commit SHA to deploy.
     required: true
+  image:
+    description: Tested immutable image reference, including sha256 digest.
+    required: true
   token:
     description: Token used to dispatch and to read the resulting run.
     required: true
@@ -31,6 +34,7 @@ runs:
         REPO: ${{ github.repository }}
         ENVIRONMENT: ${{ inputs.environment }}
         SHA: ${{ inputs.sha }}
+        IMAGE: ${{ inputs.image }}
       run: |
         set -euo pipefail
         # The dispatch API returns nothing to identify the run it creates, so a
@@ -42,6 +46,7 @@ runs:
           -f event_type=deploy-cloud \
           -F "client_payload[environment]=${ENVIRONMENT}" \
           -F "client_payload[sha]=${SHA}" \
+          -F "client_payload[image]=${IMAGE}" \
           -F "client_payload[correlation_id]=${correlation_id}" >/dev/null
         echo "correlation_id=${correlation_id}" >>"$GITHUB_OUTPUT"
         echo "asked cd-deploy-cloud to put ${SHA} on ${ENVIRONMENT} (${correlation_id})"

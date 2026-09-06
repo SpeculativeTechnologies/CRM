@@ -1,0 +1,7 @@
+{
+  "source_sha": "db7df026e3efeb7984e0fc3defa0988dcea6bbd1",
+  "image": "ghcr.io/speculativetechnologies/twenty@sha256:603284ca7d4468ec9dbdbbb0d679e0b1cc465907d37cff1f6c2dc259ce95e9d9",
+  "kind": "fixture",
+  "description": "Bootstrap at the explicitly selected 2.38 fork release. Refresh in a reviewed PR when production advances; a fixture does not establish mirror/backfill-volume correctness.",
+  "provenance": "https://github.com/SpeculativeTechnologies/CRM/actions/runs/33988555621"
+}

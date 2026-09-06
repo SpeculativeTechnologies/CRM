@@ -209,3 +209,39 @@ and the counts, not the rows.
 
 Report failures with the command and its real output. A silently skipped
 verification step is worse than a failed one.
+
+## Exact-commit follow-through
+
+Follow [MIGRATION-TESTING.md](MIGRATION-TESTING.md) for isolated frozen-baseline
+rehearsals and [PIPELINE-AUDIT.md](PIPELINE-AUDIT.md) for the release graph.
+The existing `twenty-dev` guard remains unchanged. For migration work, run the
+branch against a frozen mirror as well as a fixture and clean initialization.
+Do not use a previously upgraded database to test an edited unreleased command.
+
+After each coherent change, run local checks, commit, push the feature branch,
+and run `bash deploy/ci-follow.sh <full-source-sha>`. It waits for that commit's
+runs, retrieves failed-job logs into an ignored private directory, and fails on
+an absent, failed, canceled or timed-out required run. Diagnose those logs and
+fix branch defects before pushing another commit. Repeat local verification for
+the fix and follow the new exact SHA. Do not stop at a successful push.
+
+Limit a repair cycle to two diagnosed correction attempts before reporting the
+remaining blocker; `CI_FOLLOW_TIMEOUT_MINUTES` controls each watch (40 default).
+Do not retry code/data failures unchanged. Retry an infrastructure failure at
+most once and only with log evidence that it was transient. Never weaken a
+check or dispatch a deployment to find out whether a local migration works.
+The existing PR checks agent remains available; do not race its branch edits.
+
+When staging deployment is explicitly authorized, follow its correlated cloud
+run, inspect rehearsal/migration/API/worker logs through the approved operations
+workflow, and test affected API/UI paths on that recorded deployment. Otherwise
+finish with the exact staging blocker and owner handoff. Promotion permission
+is not implied by pushing a branch. Keep private CRM rows and raw mirror logs
+out of GitHub and user-facing evidence.
+
+The handoff must name source SHA, PR, digest (or why unavailable), check results,
+migration status, baseline checksum, behaviors tested, timings, staging URL and
+deployment ID (or “not deployed”), and limitations. Production must consume the
+same verified digest and still requires its normal approval. Installing the
+paired `crm-ops` host-script contract is an owner operation, never a local-test
+side effect.
