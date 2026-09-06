@@ -129,3 +129,16 @@ denied even with the available GitHub login, so this is source-built local image
 verification, not verification of the published release digest. The CI release
 job performs that latter check. Seven existing runtime-config tests passed;
 actual staging/production URL rendering remains an owner staging check.
+
+Further verification found an existing cache-write bug: the cache actions tested
+`pull_request.head.repo.fork`, which is true for this repository's own branches
+because the entire repository is a fork. Logs from the first new CI run show
+successful installs followed by skipped saves. Both cache actions now compare
+head/base repository identities, retaining the external-PR write guard. The
+one-time corrected-key cold install took about 176s in the checks job. A warm
+comparison must use a run after the first successful cache save.
+
+The first artifact build also caught an overly broad new Docker exclusion:
+`**/build` removed SDK source assets under `src/cli/utilities/build`. Exclusions
+are now limited to top-level package output directories. This was diagnosed from
+the failing SDK copy step, not retried as an infrastructure failure.

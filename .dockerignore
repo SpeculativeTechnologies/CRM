@@ -5,7 +5,8 @@
 packages/twenty-server/.env
 # A release must compile tracked source, never local builds, dumps or diagnostics.
 **/.env*
-**/dist
-**/build
+packages/*/dist
+packages/*/build
 deploy/.devdata
 deploy/.migration-tests
+!**/.env.example
