@@ -41,14 +41,14 @@ bash deploy/migration-test.sh freeze \
   --dump /private/path/to/verified-mirror.dump
 ```
 
-Obtain it through `deploy/devdata-publish.sh` and the approved read-only backup
-configuration. **The mirror's legacy `git_sha` identifies the scrubber checkout,
+Obtain it through `deploy/devdata-download.sh` and your read-only mirror
+configuration. Its adjacent `.dump.json` supplies the backup's `source_sha`. **The mirror's legacy `git_sha` identifies the scrubber checkout,
 not necessarily the deployed source.** Supply the source revision independently
 from the backup's release provenance. Never guess it. Import verifies the existing
 scrub assertions before any application process starts. Network isolation and
 runtime settings disable outbound access, cron registration, email delivery,
 provider connections, and logic functions. A mirror still contains private CRM
-records: never upload it, its logs, or screenshots.
+records: never upload it outside the approved publisher/store, or upload its logs or screenshots.
 
 The baseline manifest records the dump checksum, source and image, PostgreSQL
 version, extensions, database settings and the supported local role contract.

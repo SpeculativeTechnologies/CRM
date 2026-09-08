@@ -18,7 +18,8 @@ Human context is in [TEAM-WORKFLOW.md](TEAM-WORKFLOW.md) and
 4. Never repair schema drift with manual SQL. Schema changes travel as
    committed instance commands and workspace upgrades.
 5. Never upload a mirror dump, or rows from one, to a commit, pull request,
-   issue, log, or hosted artifact. See "Handling mirror data" below.
+   issue, log, or unapproved hosted artifact. Only the reviewed publisher may
+   write verified dumps to the designated private mirror store.
 6. If a command refuses to run because of an environment guard, stop and report
    it. Do not work around the guard.
 7. When local testing is finished, stop this task's source watchers and Docker
@@ -70,10 +71,11 @@ For the standard developer checkout:
 bash deploy/local-data.sh mirror
 ```
 
-Takes a few minutes. It builds a scrubbed mirror locally from the latest
-available nightly production backup, replaces the local database, verifies the
-scrub, and runs `local-schema.sh sync`. Access to the backup is read-only and
-comes from the developer's ignored local configuration. Sign in at
+Takes a few minutes. It downloads a published scrubbed mirror, checks its
+source-backup age and checksum, replaces the local database, verifies the scrub, and runs
+`local-schema.sh sync`. Individual read-only mirror credentials live outside the
+repository; see `DEVELOPMENT.md`. Developers do not need raw-backup access.
+Sign in at
 `http://localhost:3001` with any account it prints, password `devmirror`.
 
 Check what is installed at any time with `bash deploy/local-data.sh verify`.
@@ -250,8 +252,9 @@ actual people, companies, and internal notes about them.
 
 - Do not paste mirror rows into commits, PR descriptions, issues, comments, or
   commit messages.
-- Do not upload a dump or query results anywhere, including to a hosted
-  artifact, gist, or paste service.
+- The reviewed publisher may upload verified scrubbed dumps only to the
+  approved private mirror store. Do not upload dumps or query results to any
+  other hosted artifact, gist, paste service, issue, or log.
 - Do not include real records in test fixtures. Test data goes in the seeder.
 - Prefer aggregate queries when investigating. `count(*)` and `group by` answer
   most questions without reading anyone's record.
@@ -271,7 +274,7 @@ and the counts, not the rows.
 | Blank screen, "Cannot return null for non-nullable field" | schema behind the checkout | `bash deploy/local-schema.sh sync` |
 | `local-schema.sh` refuses to run | not the guarded `twenty-dev` target | stop, report; do not bypass |
 | `mirror` reports "not a verified mirror" | the dump was not produced by `devdata-publish.sh` | stop and report; the local database was already wiped |
-| `mirror` cannot read the nightly backup | missing or expired local R2 read credentials | obtain the approved read-only configuration, or ask for a verified mirror dump and use `mirror --from-file` |
+| `mirror` cannot download a recent publication | missing/expired mirror credentials or stale/failed publication | check the private mirror configuration and publisher; an authorized teammate can provide a verified dump for `mirror --from-file` |
 | Custom object page is blank | the object has no view rows | create a view for it, then `npx nx run twenty-server:command -- cache:flat-cache-invalidate --metadataName view` |
 | Upgrade status reports "behind" or "failed" | a workspace upgrade did not apply | report the exact output; do not patch the database by hand |
 

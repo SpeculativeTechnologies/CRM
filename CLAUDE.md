@@ -273,7 +273,9 @@ private because it describes a live system; this repository is public.
 - Never repair schema drift with manual SQL. Schema changes travel through
   committed instance commands and workspace upgrades.
 - Never expose mirror records, dumps, names, companies, notes, or screenshots in
-  commits, pull requests, issues, logs, or hosted artifacts.
+  commits, pull requests, issues, logs, or unapproved hosted artifacts. Only the
+  reviewed mirror publisher may write verified dumps to the designated private
+  mirror store; see `deploy/DEVELOPMENT.md`.
 
 ### Data and verification
 

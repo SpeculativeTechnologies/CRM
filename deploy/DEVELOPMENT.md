@@ -178,7 +178,8 @@ about them. It is not public data and it is not anonymized. Treat it like the
 CRM itself:
 
 - keep full-disk encryption on
-- never commit a dump, attach one to an issue, or upload one anywhere
+- never commit a dump, attach one to an issue, or upload one outside the approved
+  private scrubbed-mirror store; only its reviewed publisher writes to that store
 - run `bash deploy/local-data.sh reset --yes` when you stop working on the
   project, and before returning or reimaging a machine
 
@@ -187,10 +188,62 @@ publisher keeps only the three newest.
 
 ### Refreshing and troubleshooting
 
-Each `mirror` run builds a fresh scrubbed copy locally from the latest available
-nightly production backup in R2. The raw backup is restored only into a
-temporary local database, scrubbed, verified, and removed before the mirror is
-installed into `twenty-dev`.
+Each `mirror` run downloads the latest verified publication from the private
+scrubbed-mirror store. Developers receive individual read-only credentials for
+that store; they do not need access to raw backups. The publisher runs nightly
+and can be run on demand by its owner. Publication checks the scrub, restores
+and checks the exported dump, uploads an immutable snapshot, verifies its
+checksum after download, and only then changes `latest.json`.
+
+The downloader checks the snapshot's checksum and the age of its **source
+backup**, refusing data older than 72 hours. The restore checks the scrub again
+before starting the app. Missing configuration or failed downloads never fall
+back to raw backups and do not replace the existing local database.
+
+### Configure shared mirror access
+
+Install Python 3 and rclone, then obtain your own read-only mirror credential
+through the private operations workflow. Copy `deploy/devdata-read.env.example`
+to `~/.config/twenty-devdata/r2.env`, fill in the provided values, and restrict
+the file to mode `600`. `TWENTY_DEVDATA_CONFIG` selects another private config
+path. Keep this configuration outside the repository and application `.env`.
+The provider's Object Read token must be scoped only to the mirror bucket.
+
+For the standard Docker developer stack:
+
+```bash
+bash deploy/local-data.sh mirror
+```
+
+For an isolated worktree, download a snapshot without replacing a database:
+
+```bash
+bash deploy/devdata-download.sh --output deploy/.devdata/mirror-2026-09-08.dump
+```
+
+Use a fresh filename for each download. The adjacent `.dump.json` records
+`source_sha`, `source_backup_at`, `scrubber_sha`, size and checksum. Use its
+`source_sha` when freezing a baseline with `migration-test.sh`; do not use the
+legacy database manifest's `git_sha`, which identifies the scrubber checkout.
+See [LOCAL-DEV.md](LOCAL-DEV.md) for freezing and starting the worktree.
+
+### When migrations require a refresh
+
+A new migration in your branch does **not** require rebuilding the shared mirror.
+The standard `local-schema.sh sync` advances the installed database. The isolated
+worktree's reset workflow restores its frozen baseline and reruns the edited
+migrations. Keep that baseline fixed while diagnosing a migration so every
+attempt starts from the same state.
+
+Refresh to get recent production records, custom metadata, or a new starting
+release. The nightly publisher normally covers this. After a significant
+production migration/backfill, the owner can take a fresh backup and publish an
+extra mirror; rerunning the publisher against an older backup does not include
+the new state. Use a new frozen baseline directory when adopting it. A mirror
+from a newer production release cannot be downgraded by an older checkout;
+update the checkout or use a saved compatible baseline.
+
+### Publisher failure and access
 
 Check what you currently have:
 
@@ -198,11 +251,12 @@ Check what you currently have:
 bash deploy/local-data.sh verify
 ```
 
-This reports the fixture's record counts, or the mirror's build time and source
-commit, depending on which dataset is installed.
+This reports the fixture's record counts, or the mirror's build time and
+scrubber commit, depending on which dataset is installed. The downloaded
+`.dump.json` carries the actual source release.
 
-If the developer does not have the approved read-only R2 configuration, have an
-authorized teammate build a verified mirror and hand it over out of band:
+If shared access is unavailable, an authorized backup operator can still build
+a verified mirror and hand it over through an approved private channel:
 
 ```bash
 bash deploy/devdata-publish.sh              # on an authorized developer machine
