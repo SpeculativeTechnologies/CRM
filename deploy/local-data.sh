@@ -132,7 +132,8 @@ seed_fixture() {
 }
 
 verify_mirror() {
-  psql_dev --quiet <"$VERIFY_SQL"
+  # This function is used as an if-condition, which disables Bash errexit.
+  psql_dev --quiet <"$VERIFY_SQL" || return 1
 
   local manifest
 
@@ -140,7 +141,7 @@ verify_mirror() {
     psql_dev -AtF ' ' -c \
       'SELECT "scrubbed_at", "source_host", "git_sha"
        FROM public.devdata_manifest'
-  )"
+  )" || return 1
   info "mirror built at $manifest"
   info "mirror verification passed"
 }
@@ -159,13 +160,8 @@ fetch_mirror() {
     info "using the mirror dump at $source_file"
     cp "$source_file" "$destination"
   else
-    # The mirror is built locally from the nightly production dump in R2
-    # (devdata-publish.sh). The old ssh path to the Mac's staging host died with
-    # that staging at the 2026-08 cloud cutover. Building requires R2 read
-    # credentials; developers without them consume a dump someone else built,
-    # via --from-file.
-    info "building a fresh mirror from the latest production backup"
-    bash "$REPO_ROOT/deploy/devdata-publish.sh" --stdout >"$destination"
+    info "downloading the latest published scrubbed mirror"
+    bash "$REPO_ROOT/deploy/devdata-download.sh" --output "$destination"
   fi
 
   [ -s "$destination" ] || fail "The mirror dump is empty."
@@ -191,13 +187,17 @@ install_mirror() {
   info "replacing the local twenty-dev database with the mirror"
   wipe_local_database
   docker cp "$dump_file" "$db_container:/tmp/devdata.dump"
-  "${COMPOSE[@]}" exec -T db pg_restore \
+  if ! "${COMPOSE[@]}" exec -T db pg_restore \
     --username=postgres \
     --dbname=default \
     --no-owner \
     --no-privileges \
     --exit-on-error \
-    /tmp/devdata.dump
+    /tmp/devdata.dump; then
+    "${COMPOSE[@]}" exec -T db rm -f /tmp/devdata.dump
+    wipe_local_database
+    fail "Mirror restore failed. The partial local database was wiped."
+  fi
   "${COMPOSE[@]}" exec -T db rm -f /tmp/devdata.dump
 
   # Fail closed: an unscrubbed dump must not survive on the machine, whatever

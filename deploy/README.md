@@ -36,7 +36,7 @@ response. Its `deploy/CLOUD-OPS.md` is authoritative for the deployed CRM.
 bash deploy/local-schema.sh check
 bash deploy/local-schema.sh sync
 bash deploy/local-data.sh seed     # small synthetic fixture
-bash deploy/local-data.sh mirror   # scrubbed copy built from a nightly backup
+bash deploy/local-data.sh mirror   # download the latest verified scrubbed publication
 bash deploy/local-data.sh verify
 ```
 
@@ -65,6 +65,7 @@ deployment. They do not operate the current cloud environments. Do not use them
 for staging or production; current equivalents and procedures live in
 `crm-ops`.
 
-The mirror tools remain active: `devdata-publish.sh` restores the latest nightly
+The owner-only fallback `devdata-publish.sh` restores the latest nightly
 production backup into a temporary local database, scrubs and verifies it, and
-`local-data.sh mirror` installs the resulting dump into `twenty-dev`.
+`devdata-download.sh` downloads from the approved private mirror store;
+`local-data.sh mirror` verifies and installs that publication into `twenty-dev`.

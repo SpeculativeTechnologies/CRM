@@ -201,9 +201,8 @@ requesting review. Never repair drift with manual production SQL, and never
 promote a schema by copying it between environments.
 
 Copying *data* downward is supported only through the mirror pipeline: `bash
-deploy/local-data.sh mirror` builds a verified scrubbed copy from the latest
-available nightly production backup, installs it on a developer machine, and
-brings it forward to the checked-out commit with `local-schema.sh sync`. Schema
+deploy/local-data.sh mirror` downloads the latest verified scrubbed publication,
+installs it on a developer machine, and brings it forward to the checked-out commit with `local-schema.sh sync`. Schema
 still travels only through committed instance commands and workspace upgrades.
 See [DEVELOPMENT.md](DEVELOPMENT.md) for what the mirror contains and how it
 must be handled.
