@@ -12,7 +12,7 @@ const permissionFor = (objectUniversalIdentifier: string) =>
   );
 
 describe('default role', () => {
-  it('only grants write access to the CRM records with last-contact fields', () => {
+  it('allows the app form to save contact logs and update last-contact fields', () => {
     expect(defaultRole.success).toBe(true);
     expect(defaultRole.config).toMatchObject({
       canReadAllObjectRecords: false,
@@ -22,6 +22,7 @@ describe('default role', () => {
     });
 
     for (const objectUniversalIdentifier of [
+      CONTACT_LOG_OBJECT_UNIVERSAL_IDENTIFIER,
       STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.person.universalIdentifier,
       STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.company.universalIdentifier,
       STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.opportunity.universalIdentifier,
@@ -35,9 +36,8 @@ describe('default role', () => {
     }
   });
 
-  it('keeps interaction source records read-only', () => {
+  it('keeps synced interaction source records read-only', () => {
     for (const objectUniversalIdentifier of [
-      CONTACT_LOG_OBJECT_UNIVERSAL_IDENTIFIER,
       STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.message.universalIdentifier,
       STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.messageParticipant
         .universalIdentifier,

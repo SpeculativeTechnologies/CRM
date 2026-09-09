@@ -13,7 +13,7 @@ export default defineApplicationRole({
   universalIdentifier: DEFAULT_ROLE_UNIVERSAL_IDENTIFIER,
   label: `${APP_DISPLAY_NAME} function role`,
   description:
-    'Reads synced email, calendar, and manually logged interactions, then updates last-contact fields on people, companies, and opportunities.',
+    'Records manual contact, reads synced email and calendar interactions, and updates last-contact fields on people, companies, and opportunities.',
   canReadAllObjectRecords: false,
   canUpdateAllObjectRecords: false,
   canSoftDeleteAllObjectRecords: false,
@@ -24,6 +24,7 @@ export default defineApplicationRole({
   canBeAssignedToApiKeys: false,
   objectPermissions: [
     ...[
+      CONTACT_LOG_OBJECT_UNIVERSAL_IDENTIFIER,
       STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.person.universalIdentifier,
       STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.company.universalIdentifier,
       STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.opportunity.universalIdentifier,
@@ -35,7 +36,6 @@ export default defineApplicationRole({
       canDestroyObjectRecords: false,
     })),
     ...[
-      CONTACT_LOG_OBJECT_UNIVERSAL_IDENTIFIER,
       STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.message.universalIdentifier,
       STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.messageParticipant
         .universalIdentifier,

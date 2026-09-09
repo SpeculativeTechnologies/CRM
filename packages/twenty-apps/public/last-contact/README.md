@@ -60,7 +60,9 @@ The app manifest adds the Contact log object, its fields/view/action, and a new
 Last contact item relation on People, Companies, and Opportunities. These schema
 changes are applied by the app upgrade; no core entity or instance command changes
 are needed. Verify both upgrading 1.2.4 with existing contact values and a clean
-install, including the restricted function role reading Contact logs. Test against
+install, including saving from the form with the restricted app role. The form
+uses the app's token, so this role grants read/write access to Contact logs while
+keeping synced email and calendar source records read-only. Test against
 a development mirror before promotion; capture UI evidence only with fixture data.
 
 To roll back after contact logs have been entered, retain the new schema and logs

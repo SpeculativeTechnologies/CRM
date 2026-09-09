@@ -6,6 +6,7 @@
 - Include contact logs in live last-contact updates and every backfill, linking the latest interaction from People, Companies, and Opportunities.
 - Recalculate after edits, deletion, restoration, and reassignment, and guard recalculation against concurrent writes.
 - Guard inbound/outbound and email/meeting fallback updates so a slower sync cannot overwrite newer manual contact.
+- Allow the app form to create Contact logs through its restricted application token.
 
 ## 1.2.4
 
