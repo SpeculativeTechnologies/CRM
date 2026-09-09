@@ -220,8 +220,8 @@ IMPORTANT: Use Context7 for code generation, setup or configuration steps, or li
 ## Working on a developer machine
 
 This fork runs the live CRM used by the team. Treat repository and data safety as
-part of every implementation task. This section mirrors `AGENTS.md`; keep the two
-in sync.
+part of every implementation task. `AGENTS.md` is a Git symlink to this file;
+edit this file to update instructions for both agents, and preserve that link.
 
 ### Mandatory sources
 
@@ -256,11 +256,57 @@ private because it describes a live system; this repository is public.
   includes creating a feature branch, implementing and verifying the change,
   committing it, pushing that feature branch, and opening or updating a pull
   request when GitHub access is available.
-- Never push directly to `main`, merge a pull request, initiate staging, or
-  initiate production deployment. Ben, the production owner, controls promotion.
+- Never push directly to `main`. Merging a pull request, deploying to staging,
+  and recording a staging check require explicit user approval under the
+  delegation below. An implementation request or successful local test alone
+  does not authorize these actions.
+- Do not initiate production deployment or approve its environment gate under
+  this delegation. Production remains a separate owner-controlled decision.
 - End implementation work with a clear handoff: branch or pull request,
   verification performed, failures or omissions, risk areas, and what Ben should
   validate on staging.
+
+### Explicitly approved workflow through staging
+
+The user may delegate all or part of this sequence to the coding agent:
+
+1. Review the PR and its exact-head CI results, resolve actionable findings,
+   and merge it through GitHub once explicitly approved and all required checks
+   and reviews are satisfied. Follow `deploy/TEAM-WORKFLOW.md` and CODEOWNERS
+   for review requirements; do not substitute the agent's own review for a
+   required independent or production-owner review.
+2. Wait for CI to publish and certify the resulting full merge SHA's immutable
+   release image. Report its digest and the exact-commit check results.
+3. Run **Deploy to staging** for that approved SHA and digest, follow the
+   correlated deployment to completion, and exercise the agreed behavior and
+   normal CRM smoke-test paths on that recorded staging deployment.
+4. Run **Record a staging check** with the deployment ID, the actual pass/fail
+   result, and a concrete account of what was exercised. A health check alone
+   or local acceptance is not evidence that the staging behavior passed.
+
+Prepare the review, check results, risks, and proposed staging test scope before
+requesting approval. Read-only review and CI inspection do not need approval.
+Approval must identify the PR and reviewed head SHA, the permitted steps, and
+staging as the destination. One explicit approval may cover steps 1-4, including
+the immutable artifact produced by merging that approved head and recording the
+observed staging result. Carry that approval forward without asking again for
+already authorized steps. Editing these instructions is not approval to run
+the sequence for a particular PR.
+
+If the PR head, release contents, destination, or test scope changes beyond the
+approval, prepare the changed proposal and obtain approval for the affected
+action. Never silently deploy a newer moving `main`. If staging changes during
+testing, retest the actual deployment before recording its result.
+
+Read `deploy/LLM-LOCAL-DEV.md`, `deploy/TEAM-WORKFLOW.md`, `deploy/STAGING.md`,
+and the private `crm-ops` runbook before staging operations. Use the normal
+GitHub workflows; preserve environment guards, required reviews, artifact
+certification, authentication, and audit records. Approval does not grant
+missing credentials or bypass platform restrictions. If an independent review,
+human environment approval, or interactive sign-in is required, report that
+specific dependency and complete the unblocked work. Never claim an untested
+path passed. Stop after recording the staging result and provide the SHA,
+digest, deployment ID, tested behavior, and remaining production handoff.
 
 ### Hard safety rules
 

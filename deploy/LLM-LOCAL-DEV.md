@@ -13,8 +13,10 @@ Human context is in [TEAM-WORKFLOW.md](TEAM-WORKFLOW.md) and
    storage. Never use a cloud VM as a development environment.
 2. Never point local development at cloud services, secrets, or environment
    files.
-3. Never push to `main`, and never deploy. Promotion is the production owner's
-   action.
+3. Never push directly to `main`. Merge, staging deployment, and recording a
+   staging check require explicit user approval as defined in `CLAUDE.md`,
+   "Explicitly approved workflow through staging". Production deployment and
+   its environment approval are outside that delegation.
 4. Never repair schema drift with manual SQL. Schema changes travel as
    committed instance commands and workspace upgrades.
 5. Never upload a mirror dump, or rows from one, to a commit, pull request,
@@ -206,31 +208,40 @@ fixture, not the mirror. Mirror screenshots
 contain real names, companies, and notes, and a pull request is a permanent
 public-to-the-team record.
 
-Wait for `ci-fork-status-check` and review. Do not merge your own PR without
-review. `deploy/**`, `packages/twenty-server/src/database/**`, auth, roles,
-permissions, secrets, integrations, and background jobs require the production
-owner's review.
+Wait for `ci-fork-status-check` and the reviews required by
+`deploy/TEAM-WORKFLOW.md`, CODEOWNERS, and GitHub's current rules. With explicit
+user approval, the agent may merge through GitHub after those requirements
+are satisfied. The agent's code review does not replace a required independent
+review, and using the PR author's account cannot supply that independent
+approval. Database changes follow the promotion gate in `TEAM-WORKFLOW.md`;
+do not invent a blanket production-owner review requirement for every migration.
 
 ## Step 5 and 6: staging and production
 
-Promotion runs through GitHub Actions against the cloud environments and is the
-production owner's action. Do not initiate staging or production deployment on
-your own initiative, and do not operate the cloud VMs directly.
+Promotion runs through GitHub Actions against the cloud environments. The agent
+may perform the approved merge-through-staging sequence in `CLAUDE.md`; do not
+initiate it on your own initiative or operate the cloud VMs directly. A single
+explicit approval can cover the named PR/head, resulting release artifact,
+staging deployment and tests, and recording their observed result. Production
+deployment and its environment approval remain outside this delegation.
 
-The sequence, for reference when reporting readiness:
+The sequence, when approved or when reporting readiness:
 
-1. After required CI and review, an authorized maintainer merges the PR to
-   `main`.
+1. After required CI and review, merge the explicitly approved PR/head through
+   GitHub, or hand off to an authorized maintainer if approval is absent.
 2. At the scheduled release window, typically at the end of the day, select the
-   exact full SHA on `main` and wait for CI to publish its image.
+   exact full SHA resulting from the approved merge and wait for CI to publish
+   and certify its immutable image. Do not silently include later changes.
 3. Run **Deploy to staging** for that exact SHA and wait for the cloud
-   deployment result.
+   deployment result, retaining the source SHA, digest, and deployment ID.
 4. Exercise the changed behavior and the normal CRM smoke-test paths at
-   `https://crm-staging.spec.tech`, then record an affirmative pass or fail.
-5. If staging passes and the production owner is available to monitor the
-   release, run **Deploy to production** for the exact SHA staging ran and
-   obtain the production approval. Otherwise wait for the next supported
-   release window.
+   `https://crm-staging.spec.tech`. Run **Record a staging check** with that
+   deployment ID, the actual pass/fail result, and what was exercised. Do not
+   certify paths blocked by missing access or skipped tests.
+5. The agent stops here with a production handoff. The production owner may
+   then follow `TEAM-WORKFLOW.md` to promote the same verified SHA and digest,
+   including the production environment approval and release monitoring.
+   This delegation does not authorize the agent to perform that promotion.
 6. If staging fails, do not promote it. Revert or fix the issue through another
    reviewed PR and test the new `main` SHA on staging.
 7. Follow the private
@@ -242,8 +253,11 @@ validation before review can finish. Such a PR needs the `needs-staging` label
 to publish an image. This does not replace CI, review, or the normal release
 train from `main`.
 
-Your job ends at a reviewed PR plus a clear statement of what needs verifying
-on staging. The production owner owns merging and promotion.
+Without explicit approval, stop at the PR and a concrete proposal for the
+remaining steps. With approval, continue through the authorized steps and end
+with the recorded staging result and production handoff. Approval is not a
+substitute for required independent reviews, platform/environment permissions,
+interactive sign-in, or successful verification; report any such blocker.
 
 ## Handling mirror data
 
