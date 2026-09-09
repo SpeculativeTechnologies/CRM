@@ -1,192 +1,132 @@
-# Local-first spike -- status and next steps
+# Experimental local-first CRM
 
-Goal: make Twenty local-first in the Ink & Switch sense -- instant local
-reads/writes, works offline, syncs to the shared Postgres in the background.
-This is a proof-of-concept, not a shipped feature. Nothing here is wired into
-the real record-table/record-board data path yet.
+This branch is a research worktree. **Do not merge or deploy it.** All gates
+remain disabled by default. It now contains a durable scalar edit path and
+personal tools, alongside the earlier read-replica experiment. It does not make
+the entire Twenty application work offline.
 
-## What exists right now
+## Try it locally
 
-- **Sync engine**: ElectricSQL, added to `packages/twenty-docker/docker-compose.dev.yml`
-  behind a `local-first` profile (`docker compose ... --profile local-first up -d`).
-  Reads Postgres's logical replication stream (`wal_level=logical`, also set in
-  that compose file) and serves HTTP "shape" subscriptions. Bound to loopback
-  only -- nothing but the twenty-server proxy should reach it.
-- **Auth proxy**: `GET /local-first/shape/:tableName` on twenty-server
-  (`engine/core-modules/local-first/`). Authenticates the caller with the
-  same middleware/guard chain as `/metadata` (session cookie or bearer
-  token), resolves the workspace's Postgres schema from
-  `workspace.databaseSchema`, and forwards to Electric with a server-side
-  whitelist of tables and columns
-  (`constants/local-first-synced-tables.constant.ts`). The browser never
-  talks to Electric directly and never names a schema. Enabled by setting
-  `ELECTRIC_URL` on the server; without it the route answers 404.
-- **Local database**: `@electric-sql/pglite` (real Postgres compiled to WASM),
-  opened lazily in `services/getLocalFirstDatabase.ts`, persisted to IndexedDB
-  in the browser tab.
-- **Sync loop**: `services/syncPersonShapeToLocalFirstDatabase.ts` polls the
-  shape proxy (plain `fetch`, not the official
-  `@electric-sql/client`/`pglite-sync` packages -- see "Known issues" below)
-  and applies rows to the local `person` table in batched, transactional
-  multi-row upserts.
-- **Proof surface**: `components/LocalFirstDebugPanel.tsx`, mounted in
-  `app/components/App.tsx`, a small floating panel showing sync status and
-  row count. Only renders when `REACT_APP_IS_LOCAL_FIRST_ENABLED=true`.
-  This is a debug affordance, not a real feature -- delete it once the real
-  integration (see Phase 2 below) lands.
-- Covers exactly one object (`person`) and a handful of its fields (see
-  `constants/LOCAL_FIRST_PERSON_COLUMNS.ts`, mirrored server-side in the
-  synced-tables whitelist).
-
-## Local reads (Phase 3)
-
-The People list can now be answered from the browser's Postgres with no list
-query on the wire. Two independent flags:
-
-- `REACT_APP_IS_LOCAL_FIRST_ENABLED` -- sync and compare. Local reads are
-  computed and checked against the server's answer, but the server's answer is
-  what renders.
-- `REACT_APP_IS_LOCAL_FIRST_READS_ENABLED` -- also serve them. Only meaningful
-  with the first flag on.
-
-Shape of it:
-
-- `services/getLocalFirstMirror.ts` builds the mirror once: fetches each
-  table's columns from `GET /local-first/schema/:table` and creates the local
-  tables from that. `tryGetReadyLocalFirstMirror()` returns it only if already
-  built -- reads never wait on PGlite booting, because that made a cold page
-  slower than asking the server.
-- `services/startLocalFirstSync.ts` runs one independent loop per table, so a
-  lagging table does not stall the others.
-- `utils/buildLocalReadPlan.ts` turns a query's selection into a plan, or
-  refuses. It only understands declared relations
-  (`constants/LOCAL_FIRST_RELATION_SOURCES.ts`) and mirrored columns.
-- `services/executeLocalReadPlan.ts` runs the plan and assembles API-shaped
-  records, fetching each relation once per page rather than per row.
-- `services/createLocalFirstReadLink.ts` serves the result when serving is on,
-  and otherwise forwards and compares.
-
-Why five tables for one list: the record table requests every field of the
-object plus its relations, and a local read must answer the whole selection or
-fall back. Twenty models many-to-many through a first-class join object, so
-People reaches person, company, `_petCareAgreement`, `_pet` and
-`_employmentHistory`.
-
-Verified: 60 of 60 rows agree with the server across 2136 compared fields,
-relations included; the table renders from local with zero GraphQL calls.
-
-### Traps found here, do not re-learn them
-
-1. **Boolean and numeric columns silently synced nothing.** Electric sends
-   Postgres text format ("false", "1234.5") and PGlite's parameter serialiser
-   rejects it. `utils/coerceValueForLocalColumn.ts` coerces by column type.
-2. **The sync advanced its offset before applying**, so any apply failure
-   skipped that batch forever -- which is why the above was invisible rather
-   than loud.
-3. **To-many relations came back empty** because the target plan did not
-   select the back-reference column it groups by.
-4. **Serving is not comparing.** The comparison normalises a `Date` and an ISO
-   string to equal on purpose, so it could not catch that serving handed the
-   UI a `Date` where the API sends a string -- which crashed the date field
-   and blanked the table via the error boundary. `utils/toApiValue.ts`.
-5. **Composites flatten two ways**: `name { firstName }` is the column
-   `nameFirstName`, `avatarFile { url }` is one jsonb column.
-   `utils/resolveLocalFieldSource.ts` handles both.
-6. **Absence is not a divergence.** A field a view does not display is not
-   selected, so it is missing from the response.
-7. Two PGlite instances on one IndexedDB directory block each other; the
-   mirror must stay a singleton.
-
-### Not yet measured
-
-The speed claim is **not** demonstrated. Warm tab switches were already
-instant from Apollo's cache in both modes, and dev-server timings are
-meaningless for paint (see the `twenty-front-perf-benchmark` skill). Proving
-the win needs a production build with emulated tunnel latency, measuring
-`roundTripsToPaint` on the paths that actually hit the network: first view of
-a page, pagination, filter and sort changes, and post-resync refetches.
-
-## Known issues / deliberate shortcuts
-
-1. **Hand-rolled sync loop instead of the official Electric client.** In
-   testing, `@electric-sql/client`'s `ShapeStream` (and `pglite-sync`'s
-   `syncShapeToTable`, which wraps it) never issued a request or surfaced an
-   error, even after fixing all import/bundling issues -- confirmed via
-   `hasStarted`/`isLoading`/`isConnected` all staying `null`. Root cause not
-   found. The current code works around this with a plain `fetch` poll loop,
-   which is correct but doesn't do real long-polling (falls back to a 3s
-   timer once caught up; the proxy already forwards the `live` and `cursor`
-   params when the client starts sending them). Worth re-investigating
-   before this goes beyond spike stage.
-2. **Generated columns must be excluded explicitly.** Postgres
-   `GENERATED ALWAYS` columns (e.g. `person.searchVector`) can't travel over
-   logical replication, so any new object's column list needs the same
-   exclusion `person` gets in the server-side whitelist.
-3. **Column whitelist is duplicated** between the server
-   (`local-first-synced-tables.constant.ts`, authoritative) and the frontend
-   (`LOCAL_FIRST_PERSON_COLUMNS.ts`, used to create the local table). Worth
-   moving to `twenty-shared` once more objects sync.
-4. **No field-level permission filtering.** The proxy scopes by workspace,
-   which matches how this single-workspace fork runs, but Electric shapes
-   bypass per-role field permissions -- revisit before syncing objects with
-   restricted fields.
-5. **Read-only.** This only proves data flowing Postgres -> local. No local
-   write path, no offline mutation queue.
-6. **Deploy prerequisite**: `local-first` is a new `ApiPath` prefix, so the
-   deployed reverse proxy (crm-ops) must route it to the server before this
-   works anywhere but local dev, and an Electric service (loopback-only,
-   `ELECTRIC_URL` set on the server) must run next to Postgres with
-   `wal_level=logical`.
-
-## Done since the spike
-
-- ~~Workspace schema hardcoded via env var~~ -- resolved per logged-in user
-  by the shape proxy from `workspace.databaseSchema`.
-- ~~No auth in front of Electric~~ -- Electric is loopback-only and every
-  shape request authenticates through the server proxy.
-- ~~No insert batching~~ -- shape batches now apply as transactional
-  multi-row upserts (order-preserving around deletes).
-- ~~127.0.0.1-vs-localhost fetch quirk~~ -- moot; the browser only talks to
-  the API origin now.
-
-## Next steps (Phase 2+)
-
-In rough order:
-
-1. **Measure it.** Production build, emulated latency, `roundTripsToPaint`
-   before and after. Until that exists there is no evidence this is faster,
-   only that it is correct.
-2. **Widen the supported subset.** View filters and sorts are the common
-   cases still reported `unsupported`, and they are what people actually use.
-   Cursor pagination too.
-3. **Cold start.** The mirror takes seconds to build on a fresh page, so the
-   first view of a session always falls back. Persisting the schema and
-   keeping PGlite warm across navigations would close that.
-2. **Write path**: local mutation outbox -- queue create/update/delete
-   locally when offline, replay through the existing GraphQL mutations
-   (reusing/extending `modules/apollo/optimistic-effect/`) when back online.
-   Writes should keep going through GraphQL mutations, not direct-to-Postgres,
-   so all the existing validation/permissions/custom-object logic still runs.
-3. **Expand object coverage** beyond `person` once the pattern above is
-   proven, and figure out how newly-added custom fields/objects (workspace
-   metadata changes) get their shape definitions kept in sync.
-4. **Decide whether to keep fighting the official Electric client** (known
-   issue #1) or commit to the hand-rolled poller long-term -- the official
-   client would matter more once real-time push (not 3s polling) and
-   multi-table shape management are needed.
-
-## Running it locally
+Use the guarded, mirror-backed worktree supervisor in [LOCAL-DEV.md](../../../../../deploy/LOCAL-DEV.md):
 
 ```bash
-# one-time / after docker-compose changes:
-docker compose -f packages/twenty-docker/docker-compose.dev.yml --profile local-first up -d
-
-# packages/twenty-server/.env:
-ELECTRIC_URL=http://127.0.0.1:3010
-
-# packages/twenty-front/.env:
-REACT_APP_IS_LOCAL_FIRST_ENABLED=true
+bash deploy/local-dev.sh start --local-first --built-front
 ```
 
-Then run the app as usual. The debug panel appears bottom-right once the
-frontend flag is set.
+This enables `IS_LOCAL_FIRST_WRITES_ENABLED` on the local API and
+`REACT_APP_IS_LOCAL_FIRST_WRITES_ENABLED` in the frontend. `--built-front`
+builds and serves the frontend on the workspace's usual origin. This matters
+for authentication and for the service worker; another port is another origin.
+Without `--built-front`, source hot reload is available but offline reopening
+is not. `--no-local-first` disables the edit experiment on the next start.
+Nx's build cache includes all three local-first gates.
+
+Open an existing record and expand **Local changes**. Supported field edits
+commit to browser Postgres before the existing editor reports success. Use
+**Copy this record into a personal tool** to make a detached, personal working
+copy of loaded, readable scalar fields. Relations, rich text and attachments
+are not copied. **Open personal tools** also lets you start from an empty tool.
+
+In the personal workspace, add fields and rows, rename/archive/restore fields,
+duplicate views, choose columns, filter and sort. Definitions are interpreted
+at runtime. Their stable field IDs preserve values through renames. Every save
+appends a revision containing the definition and rows. Restoring history creates
+a new revision. A stale browser tab must reload before it can save over a newer
+revision; personal tools do not yet merge concurrent changes automatically.
+
+Export a template to share a definition without its records. Export a tool and
+history for a portable backup. Import validates the format, IDs, field types and
+references, and creates a new personal tool from the exported current revision.
+It does not overwrite another tool or replay the historical revisions. There is
+a 10 MB import limit; large histories can currently exceed it. There is no code
+evaluation or automatic publication to the shared CRM.
+
+Opening Personal tools automatically caches the built workspace's static assets.
+The status shows preparation and then confirms offline readiness. A failed
+preparation offers a retry and retries when the connection returns. Wait for
+the ready message on the first visit before closing the page.
+`/local-workspace/` can then
+open in a fresh offline tab, read saved tools and accept edits. Its service
+worker only controls that path and only caches a build-generated static asset
+allowlist. It never caches API responses or CRM records. Removing the offline
+copy unregisters it and removes that static cache, while retaining tool data.
+This opts out of automatic preparation across visits; **Enable offline access**
+turns it back on. An existing ready copy opens without contacting the server.
+An installed old copy can remain usable after a server flag is disabled; remove
+it explicitly from that page. Updates activate when old personal tabs close.
+
+## Record edits and reconciliation
+
+PGlite runs in a worker with strict durability and coordinates tabs. Storage is
+scoped by API origin, workspace and user. The local document and immutable
+operation journal commit in one transaction. A lost HTTP response keeps the
+same operation ID for retry. Fresh query results are overlaid with pending work.
+
+The new authenticated REST endpoint also checks the captured user/workspace against
+the cookie-authenticated session, preventing an old tab from sending its journal
+as a newly signed-in account. It resolves stable object/field IDs, locks the
+record, compares field base values, and calls Twenty's common query runners for
+read/write permissions, validation and normal update behavior. It commits an
+operation receipt in the same database transaction. Repeated delivery does not
+mutate the record again. Only active, non-system text, number, boolean and
+single-choice fields on ordinary objects are supported. Other edits retain the
+existing online mutation path.
+
+Independent field edits can merge. Conflicting scalar edits retain the local
+intent and server values. Resolving a conflict folds later pending edits for
+that record, preserves unrelated fields and keeps superseded intent in history.
+Rejections remain visible and exportable, and may be retried with the same ID.
+Queued edits sync while the main CRM's Local changes panel is mounted. The
+personal workspace itself currently edits detached copies only.
+
+Label formula reads and writes now use the caller's transaction, including
+related/dependent labels. Using another connection would read stale values or
+wait on the row lock held by the same request.
+
+## Read-replica foundation
+
+The separate existing `REACT_APP_IS_LOCAL_FIRST_ENABLED` and
+`REACT_APP_IS_LOCAL_FIRST_READS_ENABLED` flags remain off, including when the
+supervisor enables local edits. Electric still requires `ELECTRIC_URL` and its
+authenticated shape proxy. The current proxy scopes by workspace but does not
+apply object/field/row permissions to shapes. **Do not enable this replica for
+general team use or widen its allowlist yet.** The edit endpoint does not use
+Electric and enforces permissions through the common runners.
+
+The replica persists schema and checkpoints, commits rows with their checkpoint,
+waits for complete initial snapshots and required relations, cancels old-scope
+requests, and coordinates a single sync owner. Expired shapes replace server
+snapshots atomically without touching authored tables. Supported complete People
+queries can return locally without racing an unnecessary network request.
+Unsupported queries fall back to the ordinary API. The legacy unscoped v4
+browser database is left untouched; it cannot be attributed safely to a user.
+
+## Verification and remaining work
+
+Focused Jest wrappers run real PGlite/NodeFS behavior scenarios in native Node
+subprocesses, avoiding Jest VM restrictions on Emscripten. They cover reopening,
+atomic rollback, retry IDs, conflicts, stale tabs, schema/checkpoint replacement,
+personal history, validated imports and view interpretation. Server tests cover
+receipts, permission-runner use and transaction-aware labels. Browser acceptance
+uses the isolated mirror; public screenshots use synthetic data only.
+
+Use explicit `--runTestsByPath` paths: a broad `local-first` pattern matches the
+worktree's path and can accidentally select the entire suite. Run
+`yarn check:local --parallel 1` for both packages' lint and typechecks.
+
+Before this can become a general local-first CRM, it still needs:
+
+- Offline startup and complete record/detail reads in the main CRM, beyond the
+  separate personal workspace. Creating/deleting records, relations, bulk edits,
+  rich text and actions remain online.
+- Permission-aware, metadata-driven replication; permission revocation and local
+  data removal semantics. Local account scoping is not encryption against someone
+  with access to the browser profile. Clearing site storage removes local work.
+- Cross-device replication of personal tools, collaborative text CRDTs, an explicit
+  reviewed publication/migration flow, and reactive cross-tab record updates.
+- A transactional server outbox. Receipts prevent duplicate record mutations, but
+  existing post-commit event/workflow callbacks can still be lost in a server crash.
+- Bounded history/storage growth, larger-data performance, richer import/export,
+  permission-change acceptance, and more extensive device/browser testing.
+
+See [ARCHITECTURE.md](ARCHITECTURE.md) for the target contracts.

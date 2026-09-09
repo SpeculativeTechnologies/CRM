@@ -2,7 +2,7 @@ import { type OrderBy } from 'twenty-shared/types';
 import { isDefined } from 'twenty-shared/utils';
 
 export type LocalPersonQueryTranslation =
-  | { isSupported: true; sql: string; params: unknown[] }
+  | { isSupported: true; sql: string; countSql: string; params: unknown[] }
   | { isSupported: false; reason: string };
 
 const ORDER_BY_SQL: Record<OrderBy, string> = {
@@ -156,6 +156,7 @@ export const buildLocalPersonQuery = ({
   return {
     isSupported: true,
     sql: `select ${selectColumns.map((column) => `"${column}"`).join(', ')} from person${whereSql}${orderByResult.orderBySql}${limitSql}${offsetSql}`,
+    countSql: `select count(*)::int as count from person${whereSql}`,
     params,
   };
 };

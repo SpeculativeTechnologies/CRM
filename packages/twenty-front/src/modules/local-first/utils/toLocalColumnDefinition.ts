@@ -1,3 +1,5 @@
+import { quoteLocalIdentifier } from '@/local-first/utils/quoteLocalIdentifier';
+
 // Maps an information_schema data_type to the DDL used for the local mirror.
 // Anything unrecognised becomes text: the local copy only has to sort, filter
 // and render the same way the server did, and unknown types are safer as text
@@ -35,5 +37,5 @@ export const toLocalColumnDefinition = ({
 }): string => {
   const localType = toLocalColumnType(dataType);
 
-  return `"${name}" ${localType}${isPrimaryKey ? ' primary key' : ''}`;
+  return `${quoteLocalIdentifier(name)} ${localType}${isPrimaryKey ? ' primary key' : ''}`;
 };

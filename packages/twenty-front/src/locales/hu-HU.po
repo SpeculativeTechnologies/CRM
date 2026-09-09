@@ -1385,6 +1385,11 @@ msgstr "Adjon meg részleteket a vendégek számára"
 msgid "Add email channel"
 msgstr "E-mail csatorna hozzáadása"
 
+#. js-lingui-id: Va3xJe
+#: src/modules/local-first/components/PersonalToolFields.tsx
+msgid "Add field"
+msgstr ""
+
 #. js-lingui-id: DpV70M
 #: src/modules/settings/data-model/object-details/components/tabs/ObjectFields.tsx
 #: src/modules/workflow/workflow-steps/workflow-actions/form-action/components/WorkflowEditActionFormBuilder.tsx
@@ -1542,6 +1547,11 @@ msgstr ""
 #: src/modules/workflow/workflow-steps/workflow-actions/ai-agent-action/components/WorkflowEditActionAiAgent.tsx
 msgid "Add permission"
 msgstr "Adjon hozzá jogosultságot"
+
+#. js-lingui-id: fKtnB/
+#: src/modules/local-first/components/PersonalToolTable.tsx
+msgid "Add record"
+msgstr ""
 
 #. js-lingui-id: AmiJYR
 #: src/modules/page-layout/widgets/field/components/FieldWidgetRelationEditAction.tsx
@@ -2167,6 +2177,11 @@ msgstr "Minden objektum már az oldalsávban van"
 msgid "All reasons"
 msgstr "Minden ok"
 
+#. js-lingui-id: rAUKN+
+#: src/modules/local-first/components/PersonalToolDesigner.tsx
+msgid "All records"
+msgstr ""
+
 #. js-lingui-id: Hm90t3
 #: src/modules/settings/roles/components/SettingsRolesList.tsx
 msgid "All roles"
@@ -2699,6 +2714,11 @@ msgstr "Arab"
 msgid "Archive"
 msgstr "Archiválás"
 
+#. js-lingui-id: fbs2GN
+#: src/modules/local-first/components/PersonalToolFields.tsx
+msgid "Archive field"
+msgstr ""
+
 #. js-lingui-id: i19Zro
 #: src/modules/activities/files/components/DocumentViewer.tsx
 msgid "Archive files cannot be previewed. Please download the file to access its contents."
@@ -2710,6 +2730,11 @@ msgstr "Az archívumok nem tekinthetők meg előnézetben. Töltse le a fájlt, 
 #: src/modules/settings/admin-panel/chats/components/SettingsAdminChatsTableRow.tsx
 msgid "Archived"
 msgstr "Archivált"
+
+#. js-lingui-id: 24KsMl
+#: src/modules/local-first/components/PersonalToolFields.tsx
+msgid "Archived fields keep their values and can be restored here."
+msgstr ""
 
 #. js-lingui-id: Faev6R
 #: src/pages/settings/communications/SettingsWorkspaceCommunicationGroupChannelDetail.tsx
@@ -2794,6 +2819,7 @@ msgid "ascending"
 msgstr "növekvő"
 
 #. js-lingui-id: nYD/Cq
+#: src/modules/local-first/components/PersonalToolDesigner.tsx
 #: src/modules/object-record/object-sort-dropdown/components/ObjectSortDropdownButton.tsx
 #: src/modules/object-record/object-sort-dropdown/components/ObjectSortDropdownButton.tsx
 #: src/modules/side-panel/pages/page-layout/components/record-table-settings/RecordTableSettingsSorts.tsx
@@ -3079,6 +3105,11 @@ msgstr ""
 msgid "Auto-upgrade"
 msgstr "Automatikus frissítés"
 
+#. js-lingui-id: Ml3WQP
+#: src/modules/local-first/components/PersonalWorkspaceOfflineStatus.tsx
+msgid "Automatic offline access is turned off."
+msgstr ""
+
 #. js-lingui-id: YRT7ZW
 #: src/modules/settings/accounts/components/SettingsAccountsCalendarChannelDetails.tsx
 msgid "Automatically create contacts for people you've participated in an event with."
@@ -3163,6 +3194,12 @@ msgstr "Vissza ide: {text}"
 #: src/pages/not-found/NotFound.tsx
 msgid "Back to content"
 msgstr "Vissza a tartalomhoz"
+
+#. js-lingui-id: +eQGWj
+#: src/local-workspace.tsx
+#: src/modules/local-first/components/PersonalWorkspace.tsx
+msgid "Back to CRM"
+msgstr ""
 
 #. js-lingui-id: 9aZHfH
 #: src/modules/marketplace/components/SettingsApplicationInstallPermissionValidationModal.tsx
@@ -3423,6 +3460,11 @@ msgstr "AI csevegési szálak böngészése az összes munkaterületen ({totalCo
 #: src/modules/settings/admin-panel/ai/components/SettingsAdminAI.tsx
 msgid "Browse AI chat threads across all workspaces, including onboarding chats"
 msgstr "AI csevegési szálak böngészése az összes munkaterületen, beleértve a bevezető (onboarding) csevegéseket is"
+
+#. js-lingui-id: tdqx41
+#: src/modules/local-first/components/PersonalToolHistory.tsx
+msgid "Browse history"
+msgstr ""
 
 #. js-lingui-id: hKAV/O
 #: src/pages/settings/community/SettingsCommunity.tsx
@@ -3960,6 +4002,11 @@ msgstr "Váltás évesre?"
 msgid "Change visibility?"
 msgstr "Láthatóság módosítása?"
 
+#. js-lingui-id: evKMDY
+#: src/modules/local-first/components/PersonalWorkspace.tsx
+msgid "Changes here stay personal. CRM copies are snapshots; editing them does not update shared records."
+msgstr ""
+
 #. js-lingui-id: rnTfap
 #: src/pages/settings/applications/SettingsApplicationConnectionDetail.tsx
 msgid "Changing visibility requires reconnecting this OAuth connection. You will be redirected to authorize it again."
@@ -4044,6 +4091,11 @@ msgstr "Ellenőrizze az e-mailjeit"
 msgid "Check your inbox to verify your new email address."
 msgstr "Ellenőrizze a beérkező leveleit az új e-mail-cím megerősítéséhez."
 
+#. js-lingui-id: G1XxbZ
+#: src/modules/local-first/components/PersonalToolFields.tsx
+msgid "Checkbox"
+msgstr ""
+
 #. js-lingui-id: SxwQE8
 #: src/modules/settings/billing/hooks/useHandleCheckoutSession.ts
 #: src/modules/settings/billing/hooks/useHandleCheckoutSession.ts
@@ -4064,6 +4116,11 @@ msgstr "Kínai — Hagyományos"
 #: src/modules/settings/billing/components/internal/ResourceCreditPackagePickerModal.tsx
 msgid "Choose {intervalAdjective} credits"
 msgstr "Válasszon {intervalAdjective} kreditet"
+
+#. js-lingui-id: 997x6T
+#: src/modules/local-first/components/PersonalToolHistory.tsx
+msgid "Choose a revision"
+msgstr ""
 
 #. js-lingui-id: NFfUic
 #: src/pages/auth/SignInUp.tsx
@@ -4308,6 +4365,11 @@ msgstr "Bezár"
 #: src/modules/information-banner/components/InformationBanner.tsx
 msgid "Close banner"
 msgstr "Banner bezárása"
+
+#. js-lingui-id: XsI/T8
+#: src/modules/local-first/components/PersonalWorkspace.tsx
+msgid "Close local workspace"
+msgstr ""
 
 #. js-lingui-id: vcpc5o
 #: src/modules/blocknote-editor/components/BlockEditor.tsx
@@ -4833,6 +4895,11 @@ msgstr "Erősítse meg a beállításait:"
 msgid "Confirming your payment"
 msgstr "Fizetésének megerősítése"
 
+#. js-lingui-id: IInnZo
+#: src/modules/local-first/components/LocalFirstChangesPanel.tsx
+msgid "Conflict"
+msgstr ""
+
 #. js-lingui-id: LOM1MR
 #: src/pages/auth/Authorize.tsx
 msgid "Connect {appName} to your account"
@@ -4978,6 +5045,7 @@ msgid "container"
 msgstr "konténer"
 
 #. js-lingui-id: /5mghO
+#: src/modules/local-first/components/PersonalToolDesigner.tsx
 #: src/modules/object-record/object-filter-dropdown/utils/getOperandLabel.ts
 msgid "Contains"
 msgstr "Tartalmazza"
@@ -5179,6 +5247,11 @@ msgstr ""
 #: src/pages/settings/developers/api-keys/SettingsDevelopersApiKeyDetail.tsx
 msgid "Copy this key as it will not be visible again"
 msgstr "Másolja le ezt a kulcsot, mert nem lesz újra látható"
+
+#. js-lingui-id: gajVsu
+#: src/modules/local-first/components/PersonalToolsLauncher.tsx
+msgid "Copy this record into a personal tool"
+msgstr ""
 
 #. js-lingui-id: /P/oME
 #: src/pages/settings/applications/tabs/SettingsApplicationRegistrationOAuthTab.tsx
@@ -5441,6 +5514,11 @@ msgstr "Hozzon létre egy új kapcsolattartót, és kapcsolja össze egy vállal
 #. js-lingui-id: j85EUk
 #: src/modules/ai/components/suggested-prompts/contextual-suggested-prompts.ts
 msgid "Create a new record in this view. Details: "
+msgstr ""
+
+#. js-lingui-id: NZ5qez
+#: src/modules/local-first/components/PersonalWorkspace.tsx
+msgid "Create a personal tool, add the fields you need, and arrange a view. You can also copy a viewed CRM record from the Local changes panel."
 msgstr ""
 
 #. js-lingui-id: n1Nbbe
@@ -5802,6 +5880,11 @@ msgstr "kreditek/időszak"
 #: src/modules/settings/data-model/fields/forms/select/components/SettingsDataModelFieldSelectFormOptionRow.tsx
 msgid "Crimson"
 msgstr "Karmazsin"
+
+#. js-lingui-id: a+8j+Q
+#: src/modules/local-first/components/PersonalToolTable.tsx
+msgid "CRM copy"
+msgstr ""
 
 #. js-lingui-id: 6Oaeoc
 #: src/modules/logic-functions/utils/getLogicFunctionTriggerLabel.ts
@@ -6806,6 +6889,7 @@ msgid "descending"
 msgstr "csökkenő sorrend"
 
 #. js-lingui-id: Cko536
+#: src/modules/local-first/components/PersonalToolDesigner.tsx
 #: src/modules/object-record/object-sort-dropdown/components/ObjectSortDropdownButton.tsx
 #: src/modules/object-record/object-sort-dropdown/components/ObjectSortDropdownButton.tsx
 #: src/modules/side-panel/pages/page-layout/components/record-table-settings/RecordTableSettingsSorts.tsx
@@ -6989,6 +7073,11 @@ msgstr "Felfedezhető"
 #: src/modules/settings/security/components/SettingsSecurityAuthProvidersOptionsList.tsx
 msgid "Discovery on {defaultDomain}"
 msgstr "Felfedezés a(z) {defaultDomain} tartományon"
+
+#. js-lingui-id: 1QfxQT
+#: src/modules/local-first/components/LocalFirstChangesPanel.tsx
+msgid "Dismiss"
+msgstr ""
 
 #. js-lingui-id: Xm/s+u
 #: src/modules/settings/accounts/components/SettingsAccountsCalendarChannelsGeneral.tsx
@@ -7262,6 +7351,16 @@ msgstr ""
 #: src/modules/workflow/workflow-steps/components/WorkflowStepOptionsMenuItems.tsx
 msgid "Duplicate node"
 msgstr "Másol node"
+
+#. js-lingui-id: /+HmNA
+#: src/modules/local-first/components/PersonalWorkspace.tsx
+msgid "Duplicate tool"
+msgstr ""
+
+#. js-lingui-id: VlZNPM
+#: src/modules/local-first/components/PersonalToolDesigner.tsx
+msgid "Duplicate view"
+msgstr ""
 
 #. js-lingui-id: mMsEuG
 #: src/modules/side-panel/pages/page-layout/components/WidgetSettingsFooter.tsx
@@ -7831,6 +7930,11 @@ msgstr "Megszemélyesítés engedélyezése"
 #: src/modules/ai/components/SettingsAgentModelCapabilities.tsx
 msgid "Enable model-specific features"
 msgstr "Model-specifikus funkciók engedélyezése"
+
+#. js-lingui-id: MMGZ5m
+#: src/modules/local-first/components/PersonalWorkspaceOfflineStatus.tsx
+msgid "Enable offline access"
+msgstr ""
 
 #. js-lingui-id: Iy8Gze
 #: src/modules/settings/billing/constants/SettingsBillingPlanComparisonRows.ts
@@ -8638,6 +8742,11 @@ msgstr "Tapasztalat"
 msgid "Experience - Settings"
 msgstr "Tapasztalat - Beállítások"
 
+#. js-lingui-id: 4RIuAw
+#: src/modules/local-first/components/LocalFirstChangesPanel.tsx
+msgid "Experimental. Text, number, checkbox and single-choice field edits are saved on this device before syncing. Other changes need a connection."
+msgstr ""
+
 #. js-lingui-id: LxRNPw
 #: src/modules/settings/developers/components/SettingsApiKeysTable.tsx
 #: src/pages/settings/developers/api-keys/SettingsDevelopersApiKeyDetail.tsx
@@ -8701,6 +8810,21 @@ msgstr "Exportálás ({percentageValue}%)"
 #: src/modules/settings/roles/role-permissions/permission-flags/hooks/useActionRolePermissionFlagConfig.ts
 msgid "Export CSV"
 msgstr "CSV exportálása"
+
+#. js-lingui-id: I1y3Ml
+#: src/modules/local-first/components/LocalFirstChangesPanel.tsx
+msgid "Export edit history"
+msgstr ""
+
+#. js-lingui-id: rTE2a8
+#: src/modules/local-first/components/PersonalWorkspace.tsx
+msgid "Export template"
+msgstr ""
+
+#. js-lingui-id: gLsRSD
+#: src/modules/local-first/components/PersonalWorkspace.tsx
+msgid "Export tool and history"
+msgstr ""
 
 #. js-lingui-id: leUV74
 #: src/modules/settings/logic-functions/components/triggers/SettingsLogicFunctionWorkflowActionTriggerSection.tsx
@@ -9225,6 +9349,11 @@ msgstr "Mező a célállomáson"
 msgid "field permission"
 msgstr "mező jogosultsága"
 
+#. js-lingui-id: zXgopL
+#: src/modules/local-first/components/PersonalToolFields.tsx
+msgid "Field type"
+msgstr ""
+
 #. js-lingui-id: lcNTiF
 #: src/modules/side-panel/hooks/useOpenWidgetSettingsInSidePanel.ts
 #: src/modules/side-panel/pages/page-layout/utils/getPageLayoutPageTitle.ts
@@ -9274,6 +9403,11 @@ msgstr "Mezők (nem kötelező)"
 #: src/pages/settings/applications/tabs/SettingsApplicationDetailContentTab.tsx
 msgid "Fields added to other objects"
 msgstr "Más objektumokhoz hozzáadott mezők"
+
+#. js-lingui-id: WWDAUG
+#: src/modules/local-first/components/PersonalToolFields.tsx
+msgid "Fields and columns"
+msgstr ""
 
 #. js-lingui-id: Tnz22x
 #: src/modules/object-record/record-merge/components/MergeSettingsTab.tsx
@@ -9392,6 +9526,11 @@ msgstr "Szűrés rekordazonosító szerint"
 #: src/modules/ai/components/AiChatThreadFilterDropdown.tsx
 msgid "Filter chats"
 msgstr "Beszélgetések szűrése"
+
+#. js-lingui-id: 5waeqc
+#: src/modules/local-first/components/PersonalToolDesigner.tsx
+msgid "Filter field"
+msgstr ""
 
 #. js-lingui-id: /VmB4B
 #: src/modules/object-record/advanced-filter/components/AdvancedFilterRecordFilterGroupOptionsDropdown.tsx
@@ -10247,6 +10386,11 @@ msgstr "Rendszerindexek elrejtése"
 msgid "Hire a partner to help you implement and customize Twenty."
 msgstr "Fogadj fel egy partnert, hogy segítsen a Twenty bevezetésében és testreszabásában."
 
+#. js-lingui-id: mZhga1
+#: src/modules/local-first/components/PersonalToolHistory.tsx
+msgid "History could not be read from this device."
+msgstr ""
+
 #. js-lingui-id: i0qMbr
 #: src/modules/navigation/components/MainNavigationDrawerModeSwitcher.tsx
 #: src/modules/navigation/hooks/useMobileNavigationBarItems.ts
@@ -10627,6 +10771,11 @@ msgstr "Megvalósítási partnerek"
 msgid "Import"
 msgstr "Importálás"
 
+#. js-lingui-id: BWYZvU
+#: src/modules/local-first/components/PersonalWorkspace.tsx
+msgid "Import a tool"
+msgstr ""
+
 #. js-lingui-id: sqOGcv
 #: src/modules/settings/accounts/components/SettingsAccountsMessageFolderCard.tsx
 msgid "Import all emails"
@@ -10667,6 +10816,11 @@ msgstr "Importálás folyamatban"
 #: src/modules/spreadsheet-import/steps/components/ImportDataStep.tsx
 msgid "Importing Data ..."
 msgstr "Adatok importálása ..."
+
+#. js-lingui-id: Iup6tT
+#: src/modules/local-first/components/PersonalWorkspace.tsx
+msgid "Imports create a new personal copy. Use Export tool to keep a backup; clearing browser storage removes local tools."
+msgstr ""
 
 #. js-lingui-id: HiyKEP
 #: src/modules/settings/developers/utils/formatExpiration.ts
@@ -11419,6 +11573,11 @@ msgstr ""
 msgid "Keep everyone separate"
 msgstr ""
 
+#. js-lingui-id: i6BVeA
+#: src/modules/local-first/components/LocalFirstChangesPanel.tsx
+msgid "Keep local changes"
+msgstr ""
+
 #. js-lingui-id: 4Hatax
 #: src/modules/person-duplicate-review/components/PersonDuplicateCard.tsx
 msgid "Keep this record"
@@ -12152,6 +12311,16 @@ msgstr "Szál betöltése"
 msgid "Loading..."
 msgstr "Betöltés..."
 
+#. js-lingui-id: 9hnPJk
+#: src/modules/local-first/components/LocalFirstChangesPanel.tsx
+msgid "Local changes"
+msgstr ""
+
+#. js-lingui-id: TbRE4k
+#: src/modules/local-first/components/LocalFirstChangesPanel.tsx
+msgid "Local storage could not be read. Your edits have not been discarded."
+msgstr ""
+
 #. js-lingui-id: 7VBQ2j
 #: src/modules/settings/billing/constants/SettingsBillingPlanComparisonRows.ts
 #: src/modules/settings/billing/constants/SettingsBillingPlanComparisonRows.ts
@@ -12304,6 +12473,11 @@ msgstr ""
 msgid "Make {email} primary"
 msgstr ""
 
+#. js-lingui-id: RZmXd6
+#: src/modules/local-first/components/PersonalWorkspace.tsx
+msgid "Make a tool"
+msgstr ""
+
 #. js-lingui-id: MOLprz
 #: src/modules/settings/roles/role-permissions/permission-flags/hooks/useActionRolePermissionFlagConfig.ts
 msgid "Make HTTP requests to external APIs"
@@ -12318,6 +12492,11 @@ msgstr ""
 #: src/pages/settings/applications/SettingsApplicationConnectionDetail.tsx
 msgid "Make private"
 msgstr "Legyen privát"
+
+#. js-lingui-id: 8tw6jM
+#: src/modules/local-first/components/PersonalWorkspace.tsx
+msgid "Make the CRM fit your work."
+msgstr ""
 
 #. js-lingui-id: wckWOP
 #: src/modules/settings/billing/components/internal/ResourceCreditPriceSelector.tsx
@@ -13165,6 +13344,11 @@ msgstr "Dátum mező szükséges"
 msgid "Needs a Select field"
 msgstr "Választó mező szükséges"
 
+#. js-lingui-id: fAUSZy
+#: src/modules/local-first/components/LocalFirstChangesPanel.tsx
+msgid "Needs attention"
+msgstr ""
+
 #. js-lingui-id: wW3b68
 #: src/modules/workflow/workflow-steps/workflow-actions/http-request-action/components/WorkflowRunStepLogsHttpRequestDetail.tsx
 msgid "Network error"
@@ -13284,6 +13468,7 @@ msgid "New favorite"
 msgstr "Új kedvenc"
 
 #. js-lingui-id: kV1LSq
+#: src/modules/local-first/components/PersonalToolFields.tsx
 #: src/pages/settings/data-model/new-field/SettingsObjectNewFieldConfigure.tsx
 #: src/pages/settings/data-model/new-field/SettingsObjectNewFieldSelect.tsx
 msgid "New field"
@@ -13998,6 +14183,11 @@ msgstr "Nincsenek paraméterek"
 msgid "No payment method found. Please update your billing details."
 msgstr "Nincs fizetési módszer található. Kérjük, frissítse a számlázási adatait."
 
+#. js-lingui-id: IDFLS6
+#: src/modules/local-first/components/LocalFirstChangesPanel.tsx
+msgid "No pending edits."
+msgstr ""
+
 #. js-lingui-id: orE/ux
 #: src/pages/settings/applications/SettingsApplicationDetails.tsx
 msgid "No permission defined for this application"
@@ -14057,6 +14247,11 @@ msgstr "Nincs bejegyzés kiválasztva"
 #: src/modules/object-record/record-table/empty-state/components/RecordTableEmptyStateReadOnly.tsx
 msgid "No records found"
 msgstr "Nincs találat"
+
+#. js-lingui-id: LXscZx
+#: src/modules/local-first/components/PersonalToolTable.tsx
+msgid "No records match this view."
+msgstr ""
 
 #. js-lingui-id: FwUgy3
 #: src/modules/object-record/record-list/components/RecordListEmptyState.tsx
@@ -14488,6 +14683,7 @@ msgstr "szám"
 
 #. js-lingui-id: HptUxX
 #: src/modules/ai/constants/OutputFieldTypeOptions.ts
+#: src/modules/local-first/components/PersonalToolFields.tsx
 #: src/modules/settings/data-model/fields/forms/number/constants/NumberDataModelSelectOptions.ts
 #: src/modules/ui/input/components/internal/date/components/RelativeDatePickerHeader.tsx
 msgid "Number"
@@ -14680,6 +14876,16 @@ msgstr "A járatlan úton"
 #: src/modules/settings/mcp-and-apis/utils/buildMcpSetupCategories.tsx
 msgid "Official app"
 msgstr "Hivatalos alkalmazás"
+
+#. js-lingui-id: Avjh8+
+#: src/modules/local-first/components/PersonalWorkspaceOfflineStatus.tsx
+msgid "Offline access could not be prepared. We will retry when your connection returns. Your tools are still saved on this device."
+msgstr ""
+
+#. js-lingui-id: fdH3r4
+#: src/modules/local-first/components/PersonalWorkspaceOfflineStatus.tsx
+msgid "Offline startup is tested in the built preview."
+msgstr ""
 
 #. js-lingui-id: Zd5vVt
 #: src/modules/workflow/workflow-steps/workflow-actions/find-records-action/components/WorkflowEditActionFindRecords.tsx
@@ -14941,6 +15147,16 @@ msgstr "Megnyitás a Szerepkörökben"
 msgid "Open Outlook"
 msgstr "Outlook megnyitása"
 
+#. js-lingui-id: ICec+5
+#: src/modules/local-first/components/PersonalToolsLauncher.tsx
+msgid "Open personal tools"
+msgstr ""
+
+#. js-lingui-id: m1069K
+#: src/local-workspace.tsx
+msgid "Open Personal tools from the experimental CRM to use this account's saved tools."
+msgstr ""
+
 #. js-lingui-id: VL5vJy
 #: src/modules/object-record/record-list/components/RecordListRow.tsx
 msgid "Open record"
@@ -14977,6 +15193,11 @@ msgstr "Nyissa meg a Twenty hivatalos ChatGPT integrációját a munkaterületé
 #: src/modules/navigation-menu-item/display/sections/components/NavigationDrawerOpenedSection.tsx
 msgid "Opened"
 msgstr "Megnyitva"
+
+#. js-lingui-id: qR6OlS
+#: src/local-workspace.tsx
+msgid "Opening local tools…"
+msgstr ""
 
 #. js-lingui-id: Fzfj4N
 #: src/pages/settings/layout/SettingsLayoutViewDetail.tsx
@@ -15088,6 +15309,11 @@ msgstr "Szervezeti csomag"
 #: src/modules/navigation-menu-item/edit/side-panel/components/SidePanelEditOrganizeActions.tsx
 msgid "Organize"
 msgstr "Rendszerezés"
+
+#. js-lingui-id: 1gMEbJ
+#: src/modules/local-first/components/PersonalToolDesigner.tsx
+msgid "Original order"
+msgstr ""
 
 #. js-lingui-id: /IX/7x
 #: src/modules/ai/components/internal/AiChatQuestionOtherOption.tsx
@@ -15517,6 +15743,26 @@ msgstr "Személy létrehozva"
 msgid "Person ID"
 msgstr "Személy azonosítója"
 
+#. js-lingui-id: ghtf4R
+#: src/modules/local-first/components/PersonalWorkspace.tsx
+msgid "PERSONAL · SAVED ON THIS DEVICE"
+msgstr ""
+
+#. js-lingui-id: hhzADK
+#: src/modules/local-first/components/PersonalWorkspace.tsx
+msgid "Personal tools"
+msgstr ""
+
+#. js-lingui-id: Z/8lBF
+#: src/local-workspace.tsx
+msgid "Personal workspace closed"
+msgstr ""
+
+#. js-lingui-id: VJpaT0
+#: src/modules/local-first/components/PersonalWorkspaceOfflineStatus.tsx
+msgid "Personal workspace ready for offline reopening"
+msgstr ""
+
 #. js-lingui-id: FaMom6
 #: src/modules/activities/emails/mass-email/components/MassEmailComposeCard.tsx
 msgid "Personalize for each recipient with placeholders:"
@@ -15798,6 +16044,11 @@ msgstr "A(z) <0>munkaterület adatai</0> előkészítése..."
 #: src/modules/side-panel/pages/page-layout/constants/settings/ChartConfigurationSettingLabels.ts
 msgid "Prefix"
 msgstr "Előtag"
+
+#. js-lingui-id: qNJZXJ
+#: src/modules/local-first/components/PersonalWorkspaceOfflineStatus.tsx
+msgid "Preparing offline access automatically…"
+msgstr ""
 
 #. js-lingui-id: dVCM1s
 #: src/modules/page-layout/widgets/call-recording/utils/getCallRecordingStatusDisplayConfiguration.ts
@@ -16303,6 +16554,7 @@ msgid "record"
 msgstr "rekord"
 
 #. js-lingui-id: w80YWM
+#: src/modules/local-first/components/PersonalToolTable.tsx
 #: src/modules/navigation-menu-item/display/object/components/NavigationDrawerItemForObjectMetadataItem.tsx
 #: src/modules/navigation-menu-item/edit/side-panel/components/SidePanelNewSidebarItemMainMenu.tsx
 #: src/modules/settings/applications/hooks/useComputeApplicationContentForLayoutAndLogic.ts
@@ -16403,6 +16655,11 @@ msgstr ""
 #. js-lingui-id: h9TBi+
 #: src/modules/page-layout/widgets/call-recording/utils/getCallRecordingStatusDisplayConfiguration.ts
 msgid "Recording Scheduled"
+msgstr ""
+
+#. js-lingui-id: ECgtG5
+#: src/modules/local-first/components/PersonalToolTable.tsx
+msgid "records"
 msgstr ""
 
 #. js-lingui-id: PWlTvh
@@ -16542,6 +16799,11 @@ msgstr "Feloldás és átruházás erre a szerverre"
 msgid "Reload"
 msgstr "Újratöltés"
 
+#. js-lingui-id: wiX5QD
+#: src/modules/local-first/components/PersonalWorkspace.tsx
+msgid "Reload from this device"
+msgstr ""
+
 #. js-lingui-id: qbM5In
 #: src/pages/settings/enterprise/SettingsEnterprise.tsx
 msgid "Reload validity token"
@@ -16652,6 +16914,11 @@ msgstr "Tag eltávolítása a munkaterületről"
 msgid "Remove model \"{0}\""
 msgstr "A \"{0}\" modell eltávolítása"
 
+#. js-lingui-id: bmLLSA
+#: src/modules/local-first/components/PersonalWorkspaceOfflineStatus.tsx
+msgid "Remove offline copy"
+msgstr ""
+
 #. js-lingui-id: 00Lxnh
 #: src/modules/settings/data-model/fields/forms/select/components/SettingsDataModelFieldSelectFormOptionRow.tsx
 msgid "Remove option"
@@ -16722,6 +16989,11 @@ msgstr "Beszélgetés átnevezése"
 #: src/modules/settings/data-model/object-details/components/SettingsUpdateDataModelObjectAboutForm.tsx
 msgid "Rename for all languages"
 msgstr "Átnevezés minden nyelven"
+
+#. js-lingui-id: 8OzklZ
+#: src/modules/local-first/components/PersonalWorkspace.tsx
+msgid "Rename tool"
+msgstr ""
 
 #. js-lingui-id: oQjB9l
 #: src/modules/settings/billing/components/SettingsBillingSubscriptionInfo.tsx
@@ -16945,10 +17217,30 @@ msgstr "Visszaállítás"
 msgid "Restore {objectLabel}"
 msgstr "A(z) {objectLabel} visszaállítása"
 
+#. js-lingui-id: o25Ay0
+#: src/modules/local-first/components/PersonalToolFields.tsx
+msgid "Restore field"
+msgstr ""
+
+#. js-lingui-id: fgxf+Q
+#: src/modules/local-first/components/PersonalWorkspace.tsx
+msgid "Restore previous revision"
+msgstr ""
+
 #. js-lingui-id: ZkHcxG
 #: src/pages/settings/applications/tabs/SettingsApplicationTimelineActivityTypeSettingsTab.tsx
 msgid "Restore the activity type settings defined by the application"
 msgstr "Az alkalmazás által meghatározott tevékenységtípus-beállítások visszaállítása"
+
+#. js-lingui-id: zXgnvH
+#: src/modules/local-first/components/PersonalToolHistory.tsx
+msgid "Restore this revision"
+msgstr ""
+
+#. js-lingui-id: /pdfap
+#: src/modules/local-first/components/PersonalToolHistory.tsx
+msgid "Restoring creates a new revision and keeps the existing history."
+msgstr ""
 
 #. js-lingui-id: hO3AfV
 #: src/pages/settings/ai/components/SettingsAiModelsTab.tsx
@@ -16987,6 +17279,16 @@ msgstr "Újrapróbálkozás"
 #: src/modules/settings/admin-panel/health-status/components/SettingsAdminQueueJobsTable.tsx
 msgid "Retry All Failed"
 msgstr "Az összes sikertelen újraindítása"
+
+#. js-lingui-id: OXx4n4
+#: src/modules/local-first/components/PersonalWorkspaceOfflineStatus.tsx
+msgid "Retry offline preparation"
+msgstr ""
+
+#. js-lingui-id: kms3+N
+#: src/modules/local-first/components/LocalFirstChangesPanel.tsx
+msgid "Retry this edit"
+msgstr ""
 
 #. js-lingui-id: ZbpKL+
 #: src/modules/settings/admin-panel/health-status/components/SettingsAdminJobDetailsExpandable.tsx
@@ -17293,6 +17595,16 @@ msgstr "Mentés új nézetként"
 #: src/modules/layout-customization/hooks/useEnterLayoutCustomizationMode.ts
 msgid "Save or cancel dashboard changes before editing the layout."
 msgstr "Mentse vagy vesse el az irányítópult módosításait, mielőtt szerkeszti az elrendezést."
+
+#. js-lingui-id: xADcr8
+#: src/modules/local-first/components/LocalFirstChangesPanel.tsx
+msgid "Saved on this device"
+msgstr ""
+
+#. js-lingui-id: E7VSxe
+#: src/modules/local-first/components/PersonalToolHistory.tsx
+msgid "Saved revision"
+msgstr ""
 
 #. js-lingui-id: K/F6pa
 #: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
@@ -18218,6 +18530,11 @@ msgstr "elválasztó"
 msgid "Serbian (Cyrillic)"
 msgstr "Szerb (Cirill)"
 
+#. js-lingui-id: sGH11W
+#: src/modules/local-first/components/LocalFirstChangesPanel.tsx
+msgid "Server"
+msgstr ""
+
 #. js-lingui-id: hjUUtd
 #: src/pages/settings/admin-panel/SettingsAdminUserDetail.tsx
 msgid "Server access"
@@ -18380,6 +18697,11 @@ msgstr "2FA beállítása"
 #: src/modules/object-record/record-merge/utils/getPositionWordLabel.ts
 msgid "Seventh"
 msgstr "Hetedik"
+
+#. js-lingui-id: 7b/6fg
+#: src/modules/local-first/components/PersonalToolDesigner.tsx
+msgid "Shape this tool"
+msgstr ""
 
 #. js-lingui-id: Z8lGw6
 #: src/modules/activities/emails/components/EmailThreadBottomBar.tsx
@@ -18819,6 +19141,11 @@ msgstr "Rendezés szerint"
 #: src/modules/side-panel/pages/page-layout/utils/__tests__/shouldHideChartSetting.test.ts
 msgid "Sort By Group"
 msgstr "Rendezés csoport szerint"
+
+#. js-lingui-id: 2QFwAr
+#: src/modules/local-first/components/PersonalToolDesigner.tsx
+msgid "Sort field"
+msgstr ""
 
 #. js-lingui-id: fLIwZB
 #: src/modules/object-record/record-index/utils/getNonReadableViewFieldSubTitle.ts
@@ -19622,6 +19949,7 @@ msgstr "szöveg"
 #: src/modules/advanced-text-editor/components/AdvancedTextEditorInsertRail.tsx
 #: src/modules/advanced-text-editor/extensions/slash-command/DefaultSlashCommands.ts
 #: src/modules/ai/constants/OutputFieldTypeOptions.ts
+#: src/modules/local-first/components/PersonalToolFields.tsx
 #: src/modules/side-panel/pages/email-block-settings/constants/EmailBodyThemeFields.ts
 #: src/modules/workflow/workflow-steps/workflow-actions/http-request-action/components/BodyInput.tsx
 msgid "Text"
@@ -19788,6 +20116,11 @@ msgstr "A befejezési dátumnak a kezdési dátum utáninak kell lennie."
 msgid "The end time must be after the start time."
 msgstr "A befejezési időnek a kezdési idő utáninak kell lennie."
 
+#. js-lingui-id: CIDrb5
+#: src/modules/local-first/components/PersonalWorkspace.tsx
+msgid "The file or history could not be read. Imports must be valid tool files under 10 MB."
+msgstr ""
+
 #. js-lingui-id: 21Xjwu
 #: src/pages/settings/legal/SettingsLegalDpaNew.tsx
 msgid "The full agreement with fields resolved for your deployment."
@@ -19846,6 +20179,11 @@ msgstr "Az a név, amelyet a címzettek a postafiókjukban az Ön címe mellett 
 msgid "The name recipients see next to your address. It is set when the channel is created."
 msgstr "Az a név, amelyet a címzettek az Ön címe mellett látnak. Ez a csatorna létrehozásakor kerül beállításra."
 
+#. js-lingui-id: 5sSlKN
+#: src/modules/local-first/components/PersonalWorkspaceOfflineStatus.tsx
+msgid "The offline copy could not be removed. Try again."
+msgstr ""
+
 #. js-lingui-id: L97sPr
 #: src/pages/not-found/NotFound.tsx
 msgid "The page you're seeking is either gone or never was. Let's get you back on track"
@@ -19859,6 +20197,11 @@ msgstr "A PDF-et a Twenty előre aláírta, és az Ön jogi entitásával és fe
 #. js-lingui-id: JD8guD
 #: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
 msgid "The people could not be merged."
+msgstr ""
+
+#. js-lingui-id: QI0lD1
+#: src/modules/local-first/components/PersonalToolsLauncher.tsx
+msgid "The record could not be copied. Open a loaded CRM record with readable text, number or checkbox fields and try again."
 msgstr ""
 
 #. js-lingui-id: Ir4tSJ
@@ -20136,6 +20479,11 @@ msgstr "Ez az adatbázis-érték felülírja a környezeti beállításokat. "
 #: src/modules/settings/profile/devices/components/SettingsDeviceSessionRowRightComponent.tsx
 msgid "This device"
 msgstr "Ez az eszköz"
+
+#. js-lingui-id: DJ5k6g
+#: src/modules/local-first/components/LocalFirstChangesPanel.tsx
+msgid "This edit could not be saved on this device. Check local storage and try again."
+msgstr ""
 
 #. js-lingui-id: VQvoBA
 #: src/pages/settings/enterprise/SettingsEnterprise.tsx
@@ -20607,6 +20955,11 @@ msgstr "Az eszköz futtatása sikertelen"
 msgid "Tool generation"
 msgstr "Eszköz generálása"
 
+#. js-lingui-id: S/vw4z
+#: src/modules/local-first/components/PersonalWorkspace.tsx
+msgid "Tool name"
+msgstr ""
+
 #. js-lingui-id: xdA/+p
 #: src/pages/settings/ai/components/SettingsAgentToolsTab.tsx
 #: src/pages/settings/ai/components/SettingsAiOverviewTab.tsx
@@ -20876,6 +21229,11 @@ msgstr ""
 #: src/modules/settings/data-model/fields/forms/select/components/SettingsDataModelFieldSelectFormOptionRow.tsx
 msgid "Turquoise"
 msgstr "Türkiz"
+
+#. js-lingui-id: gtHi/f
+#: src/modules/local-first/components/PersonalWorkspace.tsx
+msgid "TWENTY · EXPERIMENTAL"
+msgstr ""
 
 #. js-lingui-id: JnaRPe
 #: src/modules/spreadsheet-import/steps/components/MatchColumnsStep/components/ColumnGrid.tsx
@@ -21773,6 +22131,11 @@ msgstr "Csak betűket, számokat, aláhúzásjeleket, pontokat vagy kötőjeleke
 msgid "Use our API or add your first {objectLabel} manually"
 msgstr "Használja API-nkat vagy adja hozzá első {objectLabel} manuálisan"
 
+#. js-lingui-id: 1PW0sv
+#: src/modules/local-first/components/LocalFirstChangesPanel.tsx
+msgid "Use server values"
+msgstr ""
+
 #. js-lingui-id: z1f4Op
 #: src/modules/workflow/workflow-variables/utils/getWorkflowVariableSpecialItems.ts
 msgid "Use the whole item"
@@ -22042,6 +22405,7 @@ msgid "view"
 msgstr "nézet"
 
 #. js-lingui-id: jpctdh
+#: src/modules/local-first/components/PersonalToolDesigner.tsx
 #: src/modules/navigation-menu-item/edit/side-panel/components/SidePanelNewSidebarItemMainMenu.tsx
 #: src/modules/settings/applications/hooks/useComputeApplicationContentForLayoutAndLogic.ts
 #: src/modules/settings/data-model/object-details/components/SettingsObjectFieldDisabledActionDropdown.tsx
@@ -22136,6 +22500,11 @@ msgstr "Számlák megtekintése"
 msgid "View Jobs"
 msgstr "Állások megtekintése"
 
+#. js-lingui-id: oOljSE
+#: src/modules/local-first/components/PersonalToolDesigner.tsx
+msgid "View name"
+msgstr ""
+
 #. js-lingui-id: sAPirx
 #: src/modules/object-record/record-index/components/RecordIndexEmptyStateNotShared.tsx
 msgid "View not shared"
@@ -22209,6 +22578,7 @@ msgid "Visibility Restriction"
 msgstr "Láthatósági korlátozás"
 
 #. js-lingui-id: oh8+os
+#: src/modules/local-first/components/PersonalToolFields.tsx
 #: src/pages/settings/layout/SettingsLayoutViewDetail.tsx
 msgid "Visible"
 msgstr "Látható"
@@ -23215,6 +23585,11 @@ msgstr "A neve úgy, ahogy látható lesz"
 msgid "Your name, role, and anything else you want at the end of your emails"
 msgstr ""
 
+#. js-lingui-id: kr5em4
+#: src/modules/local-first/components/PersonalWorkspace.tsx
+msgid "Your own fields, views and working copies."
+msgstr ""
+
 #. js-lingui-id: 8mfOAZ
 #: src/modules/settings/billing/components/AddPaymentMethodForm.tsx
 #: src/modules/settings/billing/hooks/useSubmitSubscriptionPayment.ts
@@ -23260,6 +23635,11 @@ msgstr "Az előfizetés beállítása nem fejeződött be."
 #: src/pages/settings/enterprise/SettingsEnterprise.tsx
 msgid "Your subscription status is: {statusLabel}"
 msgstr "Előfizetésének állapota: {statusLabel}"
+
+#. js-lingui-id: 4n0SKu
+#: src/modules/local-first/components/PersonalWorkspaceOfflineStatus.tsx
+msgid "Your tools are saved on this device."
+msgstr ""
 
 #. js-lingui-id: oC6WBs
 #: src/modules/information-banner/components/billing/InformationBannerNoBillingSubscription.tsx

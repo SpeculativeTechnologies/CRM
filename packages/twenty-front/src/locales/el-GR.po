@@ -1385,6 +1385,11 @@ msgstr "Προσθέστε λεπτομέρειες για τους καλεσμ
 msgid "Add email channel"
 msgstr "Προσθήκη καναλιού email"
 
+#. js-lingui-id: Va3xJe
+#: src/modules/local-first/components/PersonalToolFields.tsx
+msgid "Add field"
+msgstr ""
+
 #. js-lingui-id: DpV70M
 #: src/modules/settings/data-model/object-details/components/tabs/ObjectFields.tsx
 #: src/modules/workflow/workflow-steps/workflow-actions/form-action/components/WorkflowEditActionFormBuilder.tsx
@@ -1541,6 +1546,11 @@ msgstr ""
 #: src/modules/workflow/workflow-steps/workflow-actions/ai-agent-action/components/WorkflowAiAgentPermissionsTab.tsx
 #: src/modules/workflow/workflow-steps/workflow-actions/ai-agent-action/components/WorkflowEditActionAiAgent.tsx
 msgid "Add permission"
+msgstr ""
+
+#. js-lingui-id: fKtnB/
+#: src/modules/local-first/components/PersonalToolTable.tsx
+msgid "Add record"
 msgstr ""
 
 #. js-lingui-id: AmiJYR
@@ -2167,6 +2177,11 @@ msgstr "Όλα τα αντικείμενα βρίσκονται ήδη στην 
 msgid "All reasons"
 msgstr "Όλες οι αιτίες"
 
+#. js-lingui-id: rAUKN+
+#: src/modules/local-first/components/PersonalToolDesigner.tsx
+msgid "All records"
+msgstr ""
+
 #. js-lingui-id: Hm90t3
 #: src/modules/settings/roles/components/SettingsRolesList.tsx
 msgid "All roles"
@@ -2699,6 +2714,11 @@ msgstr "Αραβικά"
 msgid "Archive"
 msgstr "Αρχειοθέτηση"
 
+#. js-lingui-id: fbs2GN
+#: src/modules/local-first/components/PersonalToolFields.tsx
+msgid "Archive field"
+msgstr ""
+
 #. js-lingui-id: i19Zro
 #: src/modules/activities/files/components/DocumentViewer.tsx
 msgid "Archive files cannot be previewed. Please download the file to access its contents."
@@ -2710,6 +2730,11 @@ msgstr "Τα συμπιεσμένα αρχεία δεν μπορούν να πρ
 #: src/modules/settings/admin-panel/chats/components/SettingsAdminChatsTableRow.tsx
 msgid "Archived"
 msgstr "Αρχειοθετημένο"
+
+#. js-lingui-id: 24KsMl
+#: src/modules/local-first/components/PersonalToolFields.tsx
+msgid "Archived fields keep their values and can be restored here."
+msgstr ""
 
 #. js-lingui-id: Faev6R
 #: src/pages/settings/communications/SettingsWorkspaceCommunicationGroupChannelDetail.tsx
@@ -2794,6 +2819,7 @@ msgid "ascending"
 msgstr "αύξουσα"
 
 #. js-lingui-id: nYD/Cq
+#: src/modules/local-first/components/PersonalToolDesigner.tsx
 #: src/modules/object-record/object-sort-dropdown/components/ObjectSortDropdownButton.tsx
 #: src/modules/object-record/object-sort-dropdown/components/ObjectSortDropdownButton.tsx
 #: src/modules/side-panel/pages/page-layout/components/record-table-settings/RecordTableSettingsSorts.tsx
@@ -3079,6 +3105,11 @@ msgstr ""
 msgid "Auto-upgrade"
 msgstr "Αυτόματη αναβάθμιση"
 
+#. js-lingui-id: Ml3WQP
+#: src/modules/local-first/components/PersonalWorkspaceOfflineStatus.tsx
+msgid "Automatic offline access is turned off."
+msgstr ""
+
 #. js-lingui-id: YRT7ZW
 #: src/modules/settings/accounts/components/SettingsAccountsCalendarChannelDetails.tsx
 msgid "Automatically create contacts for people you've participated in an event with."
@@ -3163,6 +3194,12 @@ msgstr "Πίσω στο {text}"
 #: src/pages/not-found/NotFound.tsx
 msgid "Back to content"
 msgstr "Επιστροφή στο περιεχόμενο"
+
+#. js-lingui-id: +eQGWj
+#: src/local-workspace.tsx
+#: src/modules/local-first/components/PersonalWorkspace.tsx
+msgid "Back to CRM"
+msgstr ""
 
 #. js-lingui-id: 9aZHfH
 #: src/modules/marketplace/components/SettingsApplicationInstallPermissionValidationModal.tsx
@@ -3423,6 +3460,11 @@ msgstr "Περιήγηση σε νήματα συνομιλιών AI σε όλο
 #: src/modules/settings/admin-panel/ai/components/SettingsAdminAI.tsx
 msgid "Browse AI chat threads across all workspaces, including onboarding chats"
 msgstr "Περιήγηση σε νήματα συνομιλιών AI σε όλους τους χώρους εργασίας, συμπεριλαμβανομένων των συνομιλιών έναρξης χρήσης"
+
+#. js-lingui-id: tdqx41
+#: src/modules/local-first/components/PersonalToolHistory.tsx
+msgid "Browse history"
+msgstr ""
 
 #. js-lingui-id: hKAV/O
 #: src/pages/settings/community/SettingsCommunity.tsx
@@ -3960,6 +4002,11 @@ msgstr "Αλλαγή σε ετήσια;"
 msgid "Change visibility?"
 msgstr "Αλλαγή ορατότητας;"
 
+#. js-lingui-id: evKMDY
+#: src/modules/local-first/components/PersonalWorkspace.tsx
+msgid "Changes here stay personal. CRM copies are snapshots; editing them does not update shared records."
+msgstr ""
+
 #. js-lingui-id: rnTfap
 #: src/pages/settings/applications/SettingsApplicationConnectionDetail.tsx
 msgid "Changing visibility requires reconnecting this OAuth connection. You will be redirected to authorize it again."
@@ -4044,6 +4091,11 @@ msgstr "Έλεγξε τα emails σου"
 msgid "Check your inbox to verify your new email address."
 msgstr "Ελέγξτε τα εισερχόμενά σας για να επαληθεύσετε τη νέα σας διεύθυνση email."
 
+#. js-lingui-id: G1XxbZ
+#: src/modules/local-first/components/PersonalToolFields.tsx
+msgid "Checkbox"
+msgstr ""
+
 #. js-lingui-id: SxwQE8
 #: src/modules/settings/billing/hooks/useHandleCheckoutSession.ts
 #: src/modules/settings/billing/hooks/useHandleCheckoutSession.ts
@@ -4064,6 +4116,11 @@ msgstr "Κινέζικα — Παραδοσιακά"
 #: src/modules/settings/billing/components/internal/ResourceCreditPackagePickerModal.tsx
 msgid "Choose {intervalAdjective} credits"
 msgstr "Επιλέξτε {intervalAdjective} πιστώσεις"
+
+#. js-lingui-id: 997x6T
+#: src/modules/local-first/components/PersonalToolHistory.tsx
+msgid "Choose a revision"
+msgstr ""
 
 #. js-lingui-id: NFfUic
 #: src/pages/auth/SignInUp.tsx
@@ -4308,6 +4365,11 @@ msgstr "Κλείσιμο"
 #: src/modules/information-banner/components/InformationBanner.tsx
 msgid "Close banner"
 msgstr "Κλείσιμο banner"
+
+#. js-lingui-id: XsI/T8
+#: src/modules/local-first/components/PersonalWorkspace.tsx
+msgid "Close local workspace"
+msgstr ""
 
 #. js-lingui-id: vcpc5o
 #: src/modules/blocknote-editor/components/BlockEditor.tsx
@@ -4833,6 +4895,11 @@ msgstr "Επιβεβαιώστε τις προτιμήσεις σας:"
 msgid "Confirming your payment"
 msgstr "Γίνεται επιβεβαίωση της πληρωμής σας"
 
+#. js-lingui-id: IInnZo
+#: src/modules/local-first/components/LocalFirstChangesPanel.tsx
+msgid "Conflict"
+msgstr ""
+
 #. js-lingui-id: LOM1MR
 #: src/pages/auth/Authorize.tsx
 msgid "Connect {appName} to your account"
@@ -4978,6 +5045,7 @@ msgid "container"
 msgstr "δοχείο"
 
 #. js-lingui-id: /5mghO
+#: src/modules/local-first/components/PersonalToolDesigner.tsx
 #: src/modules/object-record/object-filter-dropdown/utils/getOperandLabel.ts
 msgid "Contains"
 msgstr "Περιλαμβάνει"
@@ -5179,6 +5247,11 @@ msgstr ""
 #: src/pages/settings/developers/api-keys/SettingsDevelopersApiKeyDetail.tsx
 msgid "Copy this key as it will not be visible again"
 msgstr "Αντιγράψτε αυτό το κλειδί γιατί δεν θα είναι ξανά ορατό"
+
+#. js-lingui-id: gajVsu
+#: src/modules/local-first/components/PersonalToolsLauncher.tsx
+msgid "Copy this record into a personal tool"
+msgstr ""
 
 #. js-lingui-id: /P/oME
 #: src/pages/settings/applications/tabs/SettingsApplicationRegistrationOAuthTab.tsx
@@ -5441,6 +5514,11 @@ msgstr "Δημιουργήστε μια νέα επαφή και συνδέστ�
 #. js-lingui-id: j85EUk
 #: src/modules/ai/components/suggested-prompts/contextual-suggested-prompts.ts
 msgid "Create a new record in this view. Details: "
+msgstr ""
+
+#. js-lingui-id: NZ5qez
+#: src/modules/local-first/components/PersonalWorkspace.tsx
+msgid "Create a personal tool, add the fields you need, and arrange a view. You can also copy a viewed CRM record from the Local changes panel."
 msgstr ""
 
 #. js-lingui-id: n1Nbbe
@@ -5802,6 +5880,11 @@ msgstr "πιστώσεις ανά περίοδο"
 #: src/modules/settings/data-model/fields/forms/select/components/SettingsDataModelFieldSelectFormOptionRow.tsx
 msgid "Crimson"
 msgstr "Καρμινί"
+
+#. js-lingui-id: a+8j+Q
+#: src/modules/local-first/components/PersonalToolTable.tsx
+msgid "CRM copy"
+msgstr ""
 
 #. js-lingui-id: 6Oaeoc
 #: src/modules/logic-functions/utils/getLogicFunctionTriggerLabel.ts
@@ -6806,6 +6889,7 @@ msgid "descending"
 msgstr "φθίνουσα"
 
 #. js-lingui-id: Cko536
+#: src/modules/local-first/components/PersonalToolDesigner.tsx
 #: src/modules/object-record/object-sort-dropdown/components/ObjectSortDropdownButton.tsx
 #: src/modules/object-record/object-sort-dropdown/components/ObjectSortDropdownButton.tsx
 #: src/modules/side-panel/pages/page-layout/components/record-table-settings/RecordTableSettingsSorts.tsx
@@ -6989,6 +7073,11 @@ msgstr "Μπορεί να ανακαλυφθεί"
 #: src/modules/settings/security/components/SettingsSecurityAuthProvidersOptionsList.tsx
 msgid "Discovery on {defaultDomain}"
 msgstr "Εύρεση στο {defaultDomain}"
+
+#. js-lingui-id: 1QfxQT
+#: src/modules/local-first/components/LocalFirstChangesPanel.tsx
+msgid "Dismiss"
+msgstr ""
 
 #. js-lingui-id: Xm/s+u
 #: src/modules/settings/accounts/components/SettingsAccountsCalendarChannelsGeneral.tsx
@@ -7262,6 +7351,16 @@ msgstr ""
 #: src/modules/workflow/workflow-steps/components/WorkflowStepOptionsMenuItems.tsx
 msgid "Duplicate node"
 msgstr "Διπλότυπο κόμβο"
+
+#. js-lingui-id: /+HmNA
+#: src/modules/local-first/components/PersonalWorkspace.tsx
+msgid "Duplicate tool"
+msgstr ""
+
+#. js-lingui-id: VlZNPM
+#: src/modules/local-first/components/PersonalToolDesigner.tsx
+msgid "Duplicate view"
+msgstr ""
 
 #. js-lingui-id: mMsEuG
 #: src/modules/side-panel/pages/page-layout/components/WidgetSettingsFooter.tsx
@@ -7831,6 +7930,11 @@ msgstr "Ενεργοποίηση μίμησης"
 #: src/modules/ai/components/SettingsAgentModelCapabilities.tsx
 msgid "Enable model-specific features"
 msgstr "Ενεργοποιήστε τις λειτουργίες συγκεκριμένου μοντέλου"
+
+#. js-lingui-id: MMGZ5m
+#: src/modules/local-first/components/PersonalWorkspaceOfflineStatus.tsx
+msgid "Enable offline access"
+msgstr ""
 
 #. js-lingui-id: Iy8Gze
 #: src/modules/settings/billing/constants/SettingsBillingPlanComparisonRows.ts
@@ -8638,6 +8742,11 @@ msgstr "Εμπειρία"
 msgid "Experience - Settings"
 msgstr "Εμπειρία - Ρυθμίσεις"
 
+#. js-lingui-id: 4RIuAw
+#: src/modules/local-first/components/LocalFirstChangesPanel.tsx
+msgid "Experimental. Text, number, checkbox and single-choice field edits are saved on this device before syncing. Other changes need a connection."
+msgstr ""
+
 #. js-lingui-id: LxRNPw
 #: src/modules/settings/developers/components/SettingsApiKeysTable.tsx
 #: src/pages/settings/developers/api-keys/SettingsDevelopersApiKeyDetail.tsx
@@ -8701,6 +8810,21 @@ msgstr "Εξαγωγή ({percentageValue}%)"
 #: src/modules/settings/roles/role-permissions/permission-flags/hooks/useActionRolePermissionFlagConfig.ts
 msgid "Export CSV"
 msgstr "Εξαγωγή CSV"
+
+#. js-lingui-id: I1y3Ml
+#: src/modules/local-first/components/LocalFirstChangesPanel.tsx
+msgid "Export edit history"
+msgstr ""
+
+#. js-lingui-id: rTE2a8
+#: src/modules/local-first/components/PersonalWorkspace.tsx
+msgid "Export template"
+msgstr ""
+
+#. js-lingui-id: gLsRSD
+#: src/modules/local-first/components/PersonalWorkspace.tsx
+msgid "Export tool and history"
+msgstr ""
 
 #. js-lingui-id: leUV74
 #: src/modules/settings/logic-functions/components/triggers/SettingsLogicFunctionWorkflowActionTriggerSection.tsx
@@ -9225,6 +9349,11 @@ msgstr "Πεδίο στον προορισμό"
 msgid "field permission"
 msgstr "δικαίωμα πεδίου"
 
+#. js-lingui-id: zXgopL
+#: src/modules/local-first/components/PersonalToolFields.tsx
+msgid "Field type"
+msgstr ""
+
 #. js-lingui-id: lcNTiF
 #: src/modules/side-panel/hooks/useOpenWidgetSettingsInSidePanel.ts
 #: src/modules/side-panel/pages/page-layout/utils/getPageLayoutPageTitle.ts
@@ -9274,6 +9403,11 @@ msgstr "Πεδία (Προαιρετικό)"
 #: src/pages/settings/applications/tabs/SettingsApplicationDetailContentTab.tsx
 msgid "Fields added to other objects"
 msgstr "Πεδία που προστέθηκαν σε άλλα αντικείμενα"
+
+#. js-lingui-id: WWDAUG
+#: src/modules/local-first/components/PersonalToolFields.tsx
+msgid "Fields and columns"
+msgstr ""
 
 #. js-lingui-id: Tnz22x
 #: src/modules/object-record/record-merge/components/MergeSettingsTab.tsx
@@ -9392,6 +9526,11 @@ msgstr "Φιλτράρισμα κατά αναγνωριστικό εγγραφ�
 #: src/modules/ai/components/AiChatThreadFilterDropdown.tsx
 msgid "Filter chats"
 msgstr "Φιλτράρισμα συνομιλιών"
+
+#. js-lingui-id: 5waeqc
+#: src/modules/local-first/components/PersonalToolDesigner.tsx
+msgid "Filter field"
+msgstr ""
 
 #. js-lingui-id: /VmB4B
 #: src/modules/object-record/advanced-filter/components/AdvancedFilterRecordFilterGroupOptionsDropdown.tsx
@@ -10247,6 +10386,11 @@ msgstr "Απόκρυψη συστημικών ευρετηρίων"
 msgid "Hire a partner to help you implement and customize Twenty."
 msgstr "Προσλάβετε έναν συνεργάτη για να σας βοηθήσει να υλοποιήσετε και να προσαρμόσετε το Twenty."
 
+#. js-lingui-id: mZhga1
+#: src/modules/local-first/components/PersonalToolHistory.tsx
+msgid "History could not be read from this device."
+msgstr ""
+
 #. js-lingui-id: i0qMbr
 #: src/modules/navigation/components/MainNavigationDrawerModeSwitcher.tsx
 #: src/modules/navigation/hooks/useMobileNavigationBarItems.ts
@@ -10627,6 +10771,11 @@ msgstr "Συνεργάτες Εφαρμογής"
 msgid "Import"
 msgstr "Εισαγωγή"
 
+#. js-lingui-id: BWYZvU
+#: src/modules/local-first/components/PersonalWorkspace.tsx
+msgid "Import a tool"
+msgstr ""
+
 #. js-lingui-id: sqOGcv
 #: src/modules/settings/accounts/components/SettingsAccountsMessageFolderCard.tsx
 msgid "Import all emails"
@@ -10667,6 +10816,11 @@ msgstr "Εισαγωγή"
 #: src/modules/spreadsheet-import/steps/components/ImportDataStep.tsx
 msgid "Importing Data ..."
 msgstr "Εισαγωγή δεδομένων ..."
+
+#. js-lingui-id: Iup6tT
+#: src/modules/local-first/components/PersonalWorkspace.tsx
+msgid "Imports create a new personal copy. Use Export tool to keep a backup; clearing browser storage removes local tools."
+msgstr ""
 
 #. js-lingui-id: HiyKEP
 #: src/modules/settings/developers/utils/formatExpiration.ts
@@ -11419,6 +11573,11 @@ msgstr ""
 msgid "Keep everyone separate"
 msgstr ""
 
+#. js-lingui-id: i6BVeA
+#: src/modules/local-first/components/LocalFirstChangesPanel.tsx
+msgid "Keep local changes"
+msgstr ""
+
 #. js-lingui-id: 4Hatax
 #: src/modules/person-duplicate-review/components/PersonDuplicateCard.tsx
 msgid "Keep this record"
@@ -12152,6 +12311,16 @@ msgstr "Φόρτωση νήματος"
 msgid "Loading..."
 msgstr "Φόρτωση..."
 
+#. js-lingui-id: 9hnPJk
+#: src/modules/local-first/components/LocalFirstChangesPanel.tsx
+msgid "Local changes"
+msgstr ""
+
+#. js-lingui-id: TbRE4k
+#: src/modules/local-first/components/LocalFirstChangesPanel.tsx
+msgid "Local storage could not be read. Your edits have not been discarded."
+msgstr ""
+
 #. js-lingui-id: 7VBQ2j
 #: src/modules/settings/billing/constants/SettingsBillingPlanComparisonRows.ts
 #: src/modules/settings/billing/constants/SettingsBillingPlanComparisonRows.ts
@@ -12304,6 +12473,11 @@ msgstr ""
 msgid "Make {email} primary"
 msgstr ""
 
+#. js-lingui-id: RZmXd6
+#: src/modules/local-first/components/PersonalWorkspace.tsx
+msgid "Make a tool"
+msgstr ""
+
 #. js-lingui-id: MOLprz
 #: src/modules/settings/roles/role-permissions/permission-flags/hooks/useActionRolePermissionFlagConfig.ts
 msgid "Make HTTP requests to external APIs"
@@ -12318,6 +12492,11 @@ msgstr ""
 #: src/pages/settings/applications/SettingsApplicationConnectionDetail.tsx
 msgid "Make private"
 msgstr "Κάντε το ιδιωτικό"
+
+#. js-lingui-id: 8tw6jM
+#: src/modules/local-first/components/PersonalWorkspace.tsx
+msgid "Make the CRM fit your work."
+msgstr ""
 
 #. js-lingui-id: wckWOP
 #: src/modules/settings/billing/components/internal/ResourceCreditPriceSelector.tsx
@@ -13165,6 +13344,11 @@ msgstr "Χρειάζεται πεδίο Ημερομηνίας"
 msgid "Needs a Select field"
 msgstr "Χρειάζεται πεδίο Επιλογής"
 
+#. js-lingui-id: fAUSZy
+#: src/modules/local-first/components/LocalFirstChangesPanel.tsx
+msgid "Needs attention"
+msgstr ""
+
 #. js-lingui-id: wW3b68
 #: src/modules/workflow/workflow-steps/workflow-actions/http-request-action/components/WorkflowRunStepLogsHttpRequestDetail.tsx
 msgid "Network error"
@@ -13284,6 +13468,7 @@ msgid "New favorite"
 msgstr "Νέο αγαπημένο"
 
 #. js-lingui-id: kV1LSq
+#: src/modules/local-first/components/PersonalToolFields.tsx
 #: src/pages/settings/data-model/new-field/SettingsObjectNewFieldConfigure.tsx
 #: src/pages/settings/data-model/new-field/SettingsObjectNewFieldSelect.tsx
 msgid "New field"
@@ -13998,6 +14183,11 @@ msgstr "Χωρίς παραμέτρους"
 msgid "No payment method found. Please update your billing details."
 msgstr "Δεν βρέθηκε μέθοδος πληρωμής. Ενημερώστε τα στοιχεία χρέωσής σας."
 
+#. js-lingui-id: IDFLS6
+#: src/modules/local-first/components/LocalFirstChangesPanel.tsx
+msgid "No pending edits."
+msgstr ""
+
 #. js-lingui-id: orE/ux
 #: src/pages/settings/applications/SettingsApplicationDetails.tsx
 msgid "No permission defined for this application"
@@ -14057,6 +14247,11 @@ msgstr "Δεν έχει επιλεγεί εγγραφή"
 #: src/modules/object-record/record-table/empty-state/components/RecordTableEmptyStateReadOnly.tsx
 msgid "No records found"
 msgstr "Δεν βρέθηκαν εγγραφές"
+
+#. js-lingui-id: LXscZx
+#: src/modules/local-first/components/PersonalToolTable.tsx
+msgid "No records match this view."
+msgstr ""
 
 #. js-lingui-id: FwUgy3
 #: src/modules/object-record/record-list/components/RecordListEmptyState.tsx
@@ -14488,6 +14683,7 @@ msgstr "αριθμός"
 
 #. js-lingui-id: HptUxX
 #: src/modules/ai/constants/OutputFieldTypeOptions.ts
+#: src/modules/local-first/components/PersonalToolFields.tsx
 #: src/modules/settings/data-model/fields/forms/number/constants/NumberDataModelSelectOptions.ts
 #: src/modules/ui/input/components/internal/date/components/RelativeDatePickerHeader.tsx
 msgid "Number"
@@ -14680,6 +14876,16 @@ msgstr "Εκτός της συνηθισμένης πορείας"
 #: src/modules/settings/mcp-and-apis/utils/buildMcpSetupCategories.tsx
 msgid "Official app"
 msgstr "Επίσημη εφαρμογή"
+
+#. js-lingui-id: Avjh8+
+#: src/modules/local-first/components/PersonalWorkspaceOfflineStatus.tsx
+msgid "Offline access could not be prepared. We will retry when your connection returns. Your tools are still saved on this device."
+msgstr ""
+
+#. js-lingui-id: fdH3r4
+#: src/modules/local-first/components/PersonalWorkspaceOfflineStatus.tsx
+msgid "Offline startup is tested in the built preview."
+msgstr ""
 
 #. js-lingui-id: Zd5vVt
 #: src/modules/workflow/workflow-steps/workflow-actions/find-records-action/components/WorkflowEditActionFindRecords.tsx
@@ -14941,6 +15147,16 @@ msgstr "Άνοιγμα στους ρόλους"
 msgid "Open Outlook"
 msgstr "Άνοιγμα με Outlook"
 
+#. js-lingui-id: ICec+5
+#: src/modules/local-first/components/PersonalToolsLauncher.tsx
+msgid "Open personal tools"
+msgstr ""
+
+#. js-lingui-id: m1069K
+#: src/local-workspace.tsx
+msgid "Open Personal tools from the experimental CRM to use this account's saved tools."
+msgstr ""
+
 #. js-lingui-id: VL5vJy
 #: src/modules/object-record/record-list/components/RecordListRow.tsx
 msgid "Open record"
@@ -14977,6 +15193,11 @@ msgstr "Ανοίξτε την επίσημη ενσωμάτωση ChatGPT του
 #: src/modules/navigation-menu-item/display/sections/components/NavigationDrawerOpenedSection.tsx
 msgid "Opened"
 msgstr "Ανοίχτηκε"
+
+#. js-lingui-id: qR6OlS
+#: src/local-workspace.tsx
+msgid "Opening local tools…"
+msgstr ""
 
 #. js-lingui-id: Fzfj4N
 #: src/pages/settings/layout/SettingsLayoutViewDetail.tsx
@@ -15088,6 +15309,11 @@ msgstr "Πλάνο Οργανισμού"
 #: src/modules/navigation-menu-item/edit/side-panel/components/SidePanelEditOrganizeActions.tsx
 msgid "Organize"
 msgstr "Οργάνωση"
+
+#. js-lingui-id: 1gMEbJ
+#: src/modules/local-first/components/PersonalToolDesigner.tsx
+msgid "Original order"
+msgstr ""
 
 #. js-lingui-id: /IX/7x
 #: src/modules/ai/components/internal/AiChatQuestionOtherOption.tsx
@@ -15517,6 +15743,26 @@ msgstr "Το άτομο δημιουργήθηκε"
 msgid "Person ID"
 msgstr "ID ατόμου"
 
+#. js-lingui-id: ghtf4R
+#: src/modules/local-first/components/PersonalWorkspace.tsx
+msgid "PERSONAL · SAVED ON THIS DEVICE"
+msgstr ""
+
+#. js-lingui-id: hhzADK
+#: src/modules/local-first/components/PersonalWorkspace.tsx
+msgid "Personal tools"
+msgstr ""
+
+#. js-lingui-id: Z/8lBF
+#: src/local-workspace.tsx
+msgid "Personal workspace closed"
+msgstr ""
+
+#. js-lingui-id: VJpaT0
+#: src/modules/local-first/components/PersonalWorkspaceOfflineStatus.tsx
+msgid "Personal workspace ready for offline reopening"
+msgstr ""
+
 #. js-lingui-id: FaMom6
 #: src/modules/activities/emails/mass-email/components/MassEmailComposeCard.tsx
 msgid "Personalize for each recipient with placeholders:"
@@ -15798,6 +16044,11 @@ msgstr "Προ-συμπλήρωση των <0>δεδομένων χώρου ερ
 #: src/modules/side-panel/pages/page-layout/constants/settings/ChartConfigurationSettingLabels.ts
 msgid "Prefix"
 msgstr "Πρόθεμα"
+
+#. js-lingui-id: qNJZXJ
+#: src/modules/local-first/components/PersonalWorkspaceOfflineStatus.tsx
+msgid "Preparing offline access automatically…"
+msgstr ""
 
 #. js-lingui-id: dVCM1s
 #: src/modules/page-layout/widgets/call-recording/utils/getCallRecordingStatusDisplayConfiguration.ts
@@ -16303,6 +16554,7 @@ msgid "record"
 msgstr "εγγραφή"
 
 #. js-lingui-id: w80YWM
+#: src/modules/local-first/components/PersonalToolTable.tsx
 #: src/modules/navigation-menu-item/display/object/components/NavigationDrawerItemForObjectMetadataItem.tsx
 #: src/modules/navigation-menu-item/edit/side-panel/components/SidePanelNewSidebarItemMainMenu.tsx
 #: src/modules/settings/applications/hooks/useComputeApplicationContentForLayoutAndLogic.ts
@@ -16403,6 +16655,11 @@ msgstr ""
 #. js-lingui-id: h9TBi+
 #: src/modules/page-layout/widgets/call-recording/utils/getCallRecordingStatusDisplayConfiguration.ts
 msgid "Recording Scheduled"
+msgstr ""
+
+#. js-lingui-id: ECgtG5
+#: src/modules/local-first/components/PersonalToolTable.tsx
+msgid "records"
 msgstr ""
 
 #. js-lingui-id: PWlTvh
@@ -16542,6 +16799,11 @@ msgstr "Αποδέσμευση & μεταφορά σε αυτόν τον δια�
 msgid "Reload"
 msgstr "Ανανέωση"
 
+#. js-lingui-id: wiX5QD
+#: src/modules/local-first/components/PersonalWorkspace.tsx
+msgid "Reload from this device"
+msgstr ""
+
 #. js-lingui-id: qbM5In
 #: src/pages/settings/enterprise/SettingsEnterprise.tsx
 msgid "Reload validity token"
@@ -16652,6 +16914,11 @@ msgstr "Αφαίρεση μέλους από τον χώρο εργασίας"
 msgid "Remove model \"{0}\""
 msgstr "Αφαίρεση μοντέλου \"{0}\""
 
+#. js-lingui-id: bmLLSA
+#: src/modules/local-first/components/PersonalWorkspaceOfflineStatus.tsx
+msgid "Remove offline copy"
+msgstr ""
+
 #. js-lingui-id: 00Lxnh
 #: src/modules/settings/data-model/fields/forms/select/components/SettingsDataModelFieldSelectFormOptionRow.tsx
 msgid "Remove option"
@@ -16722,6 +16989,11 @@ msgstr "Μετονομασία συνομιλίας"
 #: src/modules/settings/data-model/object-details/components/SettingsUpdateDataModelObjectAboutForm.tsx
 msgid "Rename for all languages"
 msgstr "Μετονομασία για όλες τις γλώσσες"
+
+#. js-lingui-id: 8OzklZ
+#: src/modules/local-first/components/PersonalWorkspace.tsx
+msgid "Rename tool"
+msgstr ""
 
 #. js-lingui-id: oQjB9l
 #: src/modules/settings/billing/components/SettingsBillingSubscriptionInfo.tsx
@@ -16945,10 +17217,30 @@ msgstr "Επαναφορά"
 msgid "Restore {objectLabel}"
 msgstr "Επαναφορά {objectLabel}"
 
+#. js-lingui-id: o25Ay0
+#: src/modules/local-first/components/PersonalToolFields.tsx
+msgid "Restore field"
+msgstr ""
+
+#. js-lingui-id: fgxf+Q
+#: src/modules/local-first/components/PersonalWorkspace.tsx
+msgid "Restore previous revision"
+msgstr ""
+
 #. js-lingui-id: ZkHcxG
 #: src/pages/settings/applications/tabs/SettingsApplicationTimelineActivityTypeSettingsTab.tsx
 msgid "Restore the activity type settings defined by the application"
 msgstr "Επαναφορά των ρυθμίσεων τύπου δραστηριότητας που ορίζονται από την εφαρμογή"
+
+#. js-lingui-id: zXgnvH
+#: src/modules/local-first/components/PersonalToolHistory.tsx
+msgid "Restore this revision"
+msgstr ""
+
+#. js-lingui-id: /pdfap
+#: src/modules/local-first/components/PersonalToolHistory.tsx
+msgid "Restoring creates a new revision and keeps the existing history."
+msgstr ""
 
 #. js-lingui-id: hO3AfV
 #: src/pages/settings/ai/components/SettingsAiModelsTab.tsx
@@ -16987,6 +17279,16 @@ msgstr "Δοκιμή ξανά"
 #: src/modules/settings/admin-panel/health-status/components/SettingsAdminQueueJobsTable.tsx
 msgid "Retry All Failed"
 msgstr "Επανάληψη όλων των αποτυχημένων"
+
+#. js-lingui-id: OXx4n4
+#: src/modules/local-first/components/PersonalWorkspaceOfflineStatus.tsx
+msgid "Retry offline preparation"
+msgstr ""
+
+#. js-lingui-id: kms3+N
+#: src/modules/local-first/components/LocalFirstChangesPanel.tsx
+msgid "Retry this edit"
+msgstr ""
 
 #. js-lingui-id: ZbpKL+
 #: src/modules/settings/admin-panel/health-status/components/SettingsAdminJobDetailsExpandable.tsx
@@ -17293,6 +17595,16 @@ msgstr "Αποθήκευση ως νέα προβολή"
 #: src/modules/layout-customization/hooks/useEnterLayoutCustomizationMode.ts
 msgid "Save or cancel dashboard changes before editing the layout."
 msgstr "Αποθηκεύστε ή ακυρώστε τις αλλαγές του πίνακα ελέγχου πριν επεξεργαστείτε τη διάταξη."
+
+#. js-lingui-id: xADcr8
+#: src/modules/local-first/components/LocalFirstChangesPanel.tsx
+msgid "Saved on this device"
+msgstr ""
+
+#. js-lingui-id: E7VSxe
+#: src/modules/local-first/components/PersonalToolHistory.tsx
+msgid "Saved revision"
+msgstr ""
 
 #. js-lingui-id: K/F6pa
 #: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
@@ -18218,6 +18530,11 @@ msgstr "διαχωριστικό"
 msgid "Serbian (Cyrillic)"
 msgstr "Σερβικά (Κυριλλικά)"
 
+#. js-lingui-id: sGH11W
+#: src/modules/local-first/components/LocalFirstChangesPanel.tsx
+msgid "Server"
+msgstr ""
+
 #. js-lingui-id: hjUUtd
 #: src/pages/settings/admin-panel/SettingsAdminUserDetail.tsx
 msgid "Server access"
@@ -18380,6 +18697,11 @@ msgstr "Ρυθμίστε την 2FA σας"
 #: src/modules/object-record/record-merge/utils/getPositionWordLabel.ts
 msgid "Seventh"
 msgstr "Έβδομος"
+
+#. js-lingui-id: 7b/6fg
+#: src/modules/local-first/components/PersonalToolDesigner.tsx
+msgid "Shape this tool"
+msgstr ""
 
 #. js-lingui-id: Z8lGw6
 #: src/modules/activities/emails/components/EmailThreadBottomBar.tsx
@@ -18821,6 +19143,11 @@ msgstr "Ταξινόμηση κατά"
 #: src/modules/side-panel/pages/page-layout/utils/__tests__/shouldHideChartSetting.test.ts
 msgid "Sort By Group"
 msgstr "Ταξινόμηση ανά Ομάδα"
+
+#. js-lingui-id: 2QFwAr
+#: src/modules/local-first/components/PersonalToolDesigner.tsx
+msgid "Sort field"
+msgstr ""
 
 #. js-lingui-id: fLIwZB
 #: src/modules/object-record/record-index/utils/getNonReadableViewFieldSubTitle.ts
@@ -19624,6 +19951,7 @@ msgstr "κείμενο"
 #: src/modules/advanced-text-editor/components/AdvancedTextEditorInsertRail.tsx
 #: src/modules/advanced-text-editor/extensions/slash-command/DefaultSlashCommands.ts
 #: src/modules/ai/constants/OutputFieldTypeOptions.ts
+#: src/modules/local-first/components/PersonalToolFields.tsx
 #: src/modules/side-panel/pages/email-block-settings/constants/EmailBodyThemeFields.ts
 #: src/modules/workflow/workflow-steps/workflow-actions/http-request-action/components/BodyInput.tsx
 msgid "Text"
@@ -19790,6 +20118,11 @@ msgstr "Η ημερομηνία λήξης πρέπει να είναι μετά
 msgid "The end time must be after the start time."
 msgstr "Η ώρα λήξης πρέπει να είναι μετά την ώρα έναρξης."
 
+#. js-lingui-id: CIDrb5
+#: src/modules/local-first/components/PersonalWorkspace.tsx
+msgid "The file or history could not be read. Imports must be valid tool files under 10 MB."
+msgstr ""
+
 #. js-lingui-id: 21Xjwu
 #: src/pages/settings/legal/SettingsLegalDpaNew.tsx
 msgid "The full agreement with fields resolved for your deployment."
@@ -19848,6 +20181,11 @@ msgstr "Το όνομα που βλέπουν οι παραλήπτες δίπλ
 msgid "The name recipients see next to your address. It is set when the channel is created."
 msgstr "Το όνομα που βλέπουν οι παραλήπτες δίπλα από τη διεύθυνσή σας. Ορίζεται όταν δημιουργείται το κανάλι."
 
+#. js-lingui-id: 5sSlKN
+#: src/modules/local-first/components/PersonalWorkspaceOfflineStatus.tsx
+msgid "The offline copy could not be removed. Try again."
+msgstr ""
+
 #. js-lingui-id: L97sPr
 #: src/pages/not-found/NotFound.tsx
 msgid "The page you're seeking is either gone or never was. Let's get you back on track"
@@ -19861,6 +20199,11 @@ msgstr "Το PDF είναι προ-υπογεγραμμένο από την Twen
 #. js-lingui-id: JD8guD
 #: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
 msgid "The people could not be merged."
+msgstr ""
+
+#. js-lingui-id: QI0lD1
+#: src/modules/local-first/components/PersonalToolsLauncher.tsx
+msgid "The record could not be copied. Open a loaded CRM record with readable text, number or checkbox fields and try again."
 msgstr ""
 
 #. js-lingui-id: Ir4tSJ
@@ -20140,6 +20483,11 @@ msgstr "Αυτή η τιμή βάσης δεδομένων υπερισχύει 
 #: src/modules/settings/profile/devices/components/SettingsDeviceSessionRowRightComponent.tsx
 msgid "This device"
 msgstr "Αυτή η συσκευή"
+
+#. js-lingui-id: DJ5k6g
+#: src/modules/local-first/components/LocalFirstChangesPanel.tsx
+msgid "This edit could not be saved on this device. Check local storage and try again."
+msgstr ""
 
 #. js-lingui-id: VQvoBA
 #: src/pages/settings/enterprise/SettingsEnterprise.tsx
@@ -20611,6 +20959,11 @@ msgstr "Η εκτέλεση εργαλείου απέτυχε"
 msgid "Tool generation"
 msgstr "Δημιουργία εργαλείου"
 
+#. js-lingui-id: S/vw4z
+#: src/modules/local-first/components/PersonalWorkspace.tsx
+msgid "Tool name"
+msgstr ""
+
 #. js-lingui-id: xdA/+p
 #: src/pages/settings/ai/components/SettingsAgentToolsTab.tsx
 #: src/pages/settings/ai/components/SettingsAiOverviewTab.tsx
@@ -20880,6 +21233,11 @@ msgstr ""
 #: src/modules/settings/data-model/fields/forms/select/components/SettingsDataModelFieldSelectFormOptionRow.tsx
 msgid "Turquoise"
 msgstr "Τιρκουάζ"
+
+#. js-lingui-id: gtHi/f
+#: src/modules/local-first/components/PersonalWorkspace.tsx
+msgid "TWENTY · EXPERIMENTAL"
+msgstr ""
 
 #. js-lingui-id: JnaRPe
 #: src/modules/spreadsheet-import/steps/components/MatchColumnsStep/components/ColumnGrid.tsx
@@ -21777,6 +22135,11 @@ msgstr "Χρησιμοποιήστε μόνο γράμματα, αριθμούς
 msgid "Use our API or add your first {objectLabel} manually"
 msgstr "Χρησιμοποιήστε το API μας ή προσθέστε το πρώτο σας {objectLabel} χειροκίνητα"
 
+#. js-lingui-id: 1PW0sv
+#: src/modules/local-first/components/LocalFirstChangesPanel.tsx
+msgid "Use server values"
+msgstr ""
+
 #. js-lingui-id: z1f4Op
 #: src/modules/workflow/workflow-variables/utils/getWorkflowVariableSpecialItems.ts
 msgid "Use the whole item"
@@ -22046,6 +22409,7 @@ msgid "view"
 msgstr "προβολή"
 
 #. js-lingui-id: jpctdh
+#: src/modules/local-first/components/PersonalToolDesigner.tsx
 #: src/modules/navigation-menu-item/edit/side-panel/components/SidePanelNewSidebarItemMainMenu.tsx
 #: src/modules/settings/applications/hooks/useComputeApplicationContentForLayoutAndLogic.ts
 #: src/modules/settings/data-model/object-details/components/SettingsObjectFieldDisabledActionDropdown.tsx
@@ -22140,6 +22504,11 @@ msgstr "Προβολή τιμολογίων"
 msgid "View Jobs"
 msgstr "Προβολή Εργασιών"
 
+#. js-lingui-id: oOljSE
+#: src/modules/local-first/components/PersonalToolDesigner.tsx
+msgid "View name"
+msgstr ""
+
 #. js-lingui-id: sAPirx
 #: src/modules/object-record/record-index/components/RecordIndexEmptyStateNotShared.tsx
 msgid "View not shared"
@@ -22213,6 +22582,7 @@ msgid "Visibility Restriction"
 msgstr "Περιορισμός ορατότητας"
 
 #. js-lingui-id: oh8+os
+#: src/modules/local-first/components/PersonalToolFields.tsx
 #: src/pages/settings/layout/SettingsLayoutViewDetail.tsx
 msgid "Visible"
 msgstr "Ορατό"
@@ -23219,6 +23589,11 @@ msgstr "Το όνομά σας όπως θα εμφανίζεται"
 msgid "Your name, role, and anything else you want at the end of your emails"
 msgstr ""
 
+#. js-lingui-id: kr5em4
+#: src/modules/local-first/components/PersonalWorkspace.tsx
+msgid "Your own fields, views and working copies."
+msgstr ""
+
 #. js-lingui-id: 8mfOAZ
 #: src/modules/settings/billing/components/AddPaymentMethodForm.tsx
 #: src/modules/settings/billing/hooks/useSubmitSubscriptionPayment.ts
@@ -23264,6 +23639,11 @@ msgstr "Η ρύθμιση της συνδρομής σας δεν ολοκληρ
 #: src/pages/settings/enterprise/SettingsEnterprise.tsx
 msgid "Your subscription status is: {statusLabel}"
 msgstr "Η κατάσταση της συνδρομής σας είναι: {statusLabel}"
+
+#. js-lingui-id: 4n0SKu
+#: src/modules/local-first/components/PersonalWorkspaceOfflineStatus.tsx
+msgid "Your tools are saved on this device."
+msgstr ""
 
 #. js-lingui-id: oC6WBs
 #: src/modules/information-banner/components/billing/InformationBannerNoBillingSubscription.tsx

@@ -13,6 +13,19 @@ from runtime import (OWNER, ROOT, LocalStack, Processes, available, clean_enviro
 
 
 class LocalDevelopmentTest(unittest.TestCase):
+    def test_local_edits_require_owned_state_opt_in(self):
+        stack = LocalStack('/unused', {'name': 'twenty-migration-0123456789ab'})
+        state = {'api_port': 3200, 'front_port': 3201, 'app_secret': 'local-test-only', 'kind': 'mirror'}
+        with patch.object(stack, 'port', return_value=12345), patch.dict(os.environ, {
+                'IS_LOCAL_FIRST_WRITES_ENABLED': 'true',
+                'REACT_APP_IS_LOCAL_FIRST_WRITES_ENABLED': 'true'}):
+            environment = stack.host_environment(state)
+            self.assertNotIn('IS_LOCAL_FIRST_WRITES_ENABLED', environment)
+            environment = stack.host_environment(dict(state, local_first=True))
+            self.assertEqual(environment['IS_LOCAL_FIRST_WRITES_ENABLED'], 'true')
+            self.assertEqual(environment['REACT_APP_IS_LOCAL_FIRST_WRITES_ENABLED'], 'true')
+            self.assertNotIn('ELECTRIC_URL', environment)
+
     def test_development_requires_a_mirror_unless_fixture_is_explicit(self):
         require_development_dataset({'kind': 'mirror'}, False)
         require_development_dataset({'kind': 'fixture'}, True)

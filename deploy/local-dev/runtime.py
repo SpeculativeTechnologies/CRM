@@ -143,6 +143,10 @@ class LocalStack(Stack):
             REACT_APP_SERVER_BASE_URL=f'http://localhost:{state["front_port"]}',
             REACT_APP_ENVIRONMENT_LABEL=f'local {state["kind"]}',
             ENVIRONMENT_LABEL=f'local {state["kind"]}')
+        # Literal opt-in in owned state; never inherit shell URLs or credentials.
+        if state.get('local_first', False):
+            environment.update(IS_LOCAL_FIRST_WRITES_ENABLED='true',
+                               REACT_APP_IS_LOCAL_FIRST_WRITES_ENABLED='true')
         self.environment = environment
         return environment
 
@@ -237,11 +241,16 @@ def watch(stack, state, prepared):
         assert_status(stack.phase('upgrade-status', lambda: stack.command('upgrade:status')).stdout.decode())
         assert_plan(stack.phase('upgrade-plan', lambda: stack.command('upgrade', '--dry-run')).stdout.decode())
         prepared()
-        processes.start('front', [str(ROOT / 'node_modules/.bin/vite'), '--host', '127.0.0.1',
+        preview = ['preview'] if state.get('built_front', False) else []
+        processes.start('front', [str(ROOT / 'node_modules/.bin/vite'), *preview, '--host', '127.0.0.1',
                                  '--port', str(state['front_port']), '--strictPort'], FRONT)
         processes.wait_http(state['front_port'], '/')
         print(f'[local-dev] Ready: http://localhost:{state["front_port"]} ({state["kind"]})', flush=True)
-        print('[local-dev] Source edits reload automatically. Ctrl-C stops watchers and keeps your data.', flush=True)
+        if state.get('built_front', False):
+            print('[local-dev] Built frontend: restart with --built-front after edits. Backend source still reloads.', flush=True)
+        else:
+            print('[local-dev] Source edits reload automatically.', flush=True)
+        print('[local-dev] Ctrl-C stops watchers and keeps your data.', flush=True)
         print('[local-dev] To replay migrations: Ctrl-C, then bash deploy/local-dev.sh reset', flush=True)
         while True:
             processes.check()

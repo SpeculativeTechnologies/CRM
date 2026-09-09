@@ -21,6 +21,7 @@ import {
   API_PROXY_PATHS,
   buildApiProxyMatcher,
 } from './src/config/apiProxyPrefixes';
+import { personalWorkspaceOfflinePlugin } from './scripts/personal-workspace-offline-plugin';
 
 export default defineConfig(({ mode }) => {
   const disableDotenv = process.env.TWENTY_DISABLE_DOTENV === 'true';
@@ -81,6 +82,20 @@ export default defineConfig(({ mode }) => {
     ...(disableDotenv ? { envDir: false as const } : {}),
     cacheDir: '../../node_modules/.vite/packages/twenty-front',
 
+    worker: {
+      rollupOptions: {
+        output: {
+          // A dedicated worker's own requests use its URL's service-worker
+          // scope. Keep the local database worker beside the offline shell so
+          // its WASM/data requests are controlled on a cold offline start.
+          entryFileNames: (chunk) =>
+            chunk.name.startsWith('localFirstDatabase.worker')
+              ? 'local-workspace/[name]-[hash].js'
+              : 'assets/[name]-[hash].js',
+        },
+      },
+    },
+
     server: {
       port: port,
       proxy: apiProxy,
@@ -135,6 +150,9 @@ export default defineConfig(({ mode }) => {
     },
 
     plugins: [
+      ...(env.REACT_APP_IS_LOCAL_FIRST_WRITES_ENABLED === 'true'
+        ? [personalWorkspaceOfflinePlugin()]
+        : []),
       // In dev, Vite serves index.html with an empty window._env_ placeholder
       // (it is only populated by the server/inject script in prod), so the
       // frontend would fall back to its own origin. Inject the configured
@@ -250,6 +268,17 @@ export default defineConfig(({ mode }) => {
       sourcemap: VITE_BUILD_SOURCEMAP === 'true' ? 'hidden' : false,
       chunkSizeWarningLimit: CHUNK_SIZE_WARNING_LIMIT,
       rollupOptions: {
+        input: {
+          index: path.resolve(__dirname, 'index.html'),
+          ...(env.REACT_APP_IS_LOCAL_FIRST_WRITES_ENABLED === 'true'
+            ? {
+                personalWorkspace: path.resolve(
+                  __dirname,
+                  'local-workspace/index.html',
+                ),
+              }
+            : {}),
+        },
         //  Don't use manual chunks as it causes many issue
         // including this one we wasted a lot of time on:
         // https://github.com/rollup/rollup/issues/2793

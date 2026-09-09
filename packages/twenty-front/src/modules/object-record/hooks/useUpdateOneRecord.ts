@@ -1,5 +1,6 @@
 import { triggerUpdateRecordOptimisticEffect } from '@/apollo/optimistic-effect/utils/triggerUpdateRecordOptimisticEffect';
 import { currentWorkspaceMemberState } from '@/auth/states/currentWorkspaceMemberState';
+import { tryCommitLocalFirstRecordUpdate } from '@/local-first/services/tryCommitLocalFirstRecordUpdate';
 import { dispatchObjectRecordOperationBrowserEvent } from '@/browser-event/utils/dispatchObjectRecordOperationBrowserEvent';
 import { useApolloCoreClient } from '@/object-metadata/hooks/useApolloCoreClient';
 import { useObjectMetadataItems } from '@/object-metadata/hooks/useObjectMetadataItems';
@@ -119,6 +120,16 @@ export const useUpdateOneRecord = () => {
       isDefined(optimisticRecordWithConnection) &&
       isDefined(cachedRecordWithConnection);
 
+    const savedLocally = await tryCommitLocalFirstRecordUpdate({
+      objectMetadataItem,
+      recordId: idToUpdate,
+      input: updateOneRecordInput,
+      previous: cachedRecord,
+    }).catch((error: unknown) => {
+      window.dispatchEvent(new Event('twenty-local-save-failed'));
+      throw error;
+    });
+
     if (shouldHandleOptimisticCache) {
       const recordGqlFields = generateDepthRecordGqlFieldsFromRecord({
         objectMetadataItem,
@@ -149,6 +160,11 @@ export const useUpdateOneRecord = () => {
 
     const mutationResponseField =
       getUpdateOneRecordMutationResponseField(objectNameSingular);
+
+    if (savedLocally) {
+      upsertRecordsInStore({ partialRecords: [computedOptimisticRecord] });
+      return computedOptimisticRecord;
+    }
 
     const sanitizedInput = {
       ...sanitizeRecordInput({

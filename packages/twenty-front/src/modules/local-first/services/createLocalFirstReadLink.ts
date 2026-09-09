@@ -1,5 +1,10 @@
 import { ApolloLink, Observable } from '@apollo/client';
 
+import { createLocalFirstQueryLink } from '@/local-first/services/createLocalFirstQueryLink';
+
+import { assertLocalFirstScopeIsCurrent } from '@/local-first/services/getCurrentLocalFirstScope';
+import { readLocalFirstTableStates } from '@/local-first/services/localFirstReplicaState';
+
 import { IS_LOCAL_FIRST_READS_ENABLED } from '@/local-first/constants/IS_LOCAL_FIRST_READS_ENABLED';
 import {
   type LocalFirstShadowReport,
@@ -50,7 +55,7 @@ export const resolveLocalPeople = async (
   // Waiting for the mirror is safe because the caller races this against the
   // network: if booting PGlite takes seconds, the network answer simply wins
   // and this result is used only for the comparison.
-  const { pg, columnsByTable } = await getLocalFirstMirror();
+  const { pg, scope, columnsByTable } = await getLocalFirstMirror();
 
   const planResult = buildLocalReadPlan({
     table: PERSON_TABLE,
@@ -75,23 +80,50 @@ export const resolveLocalPeople = async (
     return { isSupported: false, reason: translation.reason };
   }
 
-  const nodes = await executeLocalReadPlan({
-    pg,
-    plan: planResult.plan,
-    sql: translation.sql,
-    params: translation.params,
+  return pg.transaction(async (transaction) => {
+    assertLocalFirstScopeIsCurrent(scope);
+    const completedTables = new Set(
+      (await readLocalFirstTableStates(transaction))
+        .filter((state) => state.complete)
+        .map((state) => state.tableName),
+    );
+    const pendingPlans = [planResult.plan];
+    while (pendingPlans.length > 0) {
+      const plan = pendingPlans.pop();
+      if (!plan) break;
+      if (!completedTables.has(plan.table)) {
+        return {
+          isSupported: false as const,
+          reason: `table "${plan.table}" has not finished syncing`,
+        };
+      }
+      pendingPlans.push(...plan.relations.map((relation) => relation.plan));
+    }
+    const nodes = await executeLocalReadPlan({
+      pg: transaction,
+      plan: planResult.plan,
+      sql: translation.sql,
+      params: translation.params,
+    });
+    const countResult = await transaction.query<{ count: number }>(
+      translation.countSql,
+    );
+    assertLocalFirstScopeIsCurrent(scope);
+    const totalCount = countResult.rows[0]?.count ?? 0;
+    // Until cursor encoding is implemented, a partial page must use the
+    // server's real cursors instead of incorrectly declaring the final page.
+    if (nodes.length !== totalCount) {
+      return {
+        isSupported: false as const,
+        reason: 'local cursor pagination is not supported',
+      };
+    }
+
+    return {
+      isSupported: true as const,
+      result: { nodes, totalCount },
+    };
   });
-
-  // totalCount is what the table's footer and paging rely on, so it has to be
-  // the count of the filtered set rather than the page.
-  const countResult = await pg.query<{ count: number }>(
-    'select count(*)::int as count from person where "deletedAt" is null',
-  );
-
-  return {
-    isSupported: true,
-    result: { nodes, totalCount: countResult.rows[0]?.count ?? 0 },
-  };
 };
 
 const toConnectionResponse = ({ nodes, totalCount }: LocalPeopleResult) => ({
@@ -115,18 +147,33 @@ const toConnectionResponse = ({ nodes, totalCount }: LocalPeopleResult) => ({
   },
 });
 
-// Races the local mirror against the network and renders whichever answers
-// first. Waiting for the mirror instead would make a cold page slower than
-// simply asking the server (booting PGlite takes seconds), while gating on
-// "is the mirror ready" meant a page load never used it at all. Racing gives
-// the local read every chance to win without ever costing latency when it
-// loses.
-//
-// The network request is always made: it keeps the cache fresh and provides
-// the answer to compare the local read against. Cutting it is a later
-// optimisation, and one that should only happen with evidence.
-export const createLocalFirstReadLink = () =>
-  new ApolloLink((operation, forward) => {
+// Serving reads from a complete replica works without a network request.
+// Shadow mode retains the server answer and compares it with the replica.
+export const createLocalFirstReadLink = () => {
+  if (IS_LOCAL_FIRST_READS_ENABLED) {
+    return createLocalFirstQueryLink({
+      operationName: PEOPLE_OPERATION_NAME,
+      resolve: async (operation) => {
+        const outcome = await resolveLocalPeople(operation);
+        if (!outcome.isSupported) {
+          recordReport({
+            operationName: PEOPLE_OPERATION_NAME,
+            outcome: 'unsupported',
+            detail: outcome.reason,
+          });
+          return null;
+        }
+        recordReport({
+          operationName: PEOPLE_OPERATION_NAME,
+          outcome: 'servedLocally',
+          detail: `${outcome.result.nodes.length} rows from local`,
+        });
+        return toConnectionResponse(outcome.result);
+      },
+    });
+  }
+
+  return new ApolloLink((operation, forward) => {
     if (operation.operationName !== PEOPLE_OPERATION_NAME) {
       return forward(operation);
     }
@@ -253,3 +300,4 @@ export const createLocalFirstReadLink = () =>
       };
     });
   });
+};

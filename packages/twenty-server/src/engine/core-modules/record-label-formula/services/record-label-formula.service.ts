@@ -15,6 +15,7 @@ import { type OrmFlatFieldMetadata } from 'src/engine/metadata-modules/flat-fiel
 import { computeMorphOrRelationFieldJoinColumnName } from 'src/engine/metadata-modules/field-metadata/utils/compute-morph-or-relation-field-join-column-name.util';
 import { type FlatObjectMetadata } from 'src/engine/metadata-modules/flat-object-metadata/types/flat-object-metadata.type';
 import { buildSystemAuthContext } from 'src/engine/twenty-orm/utils/build-system-auth-context.util';
+import { type WorkspaceTransactionScope } from 'src/engine/twenty-orm/types/workspace-transaction-scope.type';
 import { WorkspaceOrmManager } from 'src/engine/twenty-orm/workspace-orm.manager';
 import { WorkspaceCacheService } from 'src/engine/workspace-cache/services/workspace-cache.service';
 
@@ -25,6 +26,7 @@ type RecordLabelFormulaRecomputeArgs = {
   flatObjectMetadata: FlatObjectMetadata;
   flatObjectMetadataMaps: FlatEntityMaps<FlatObjectMetadata>;
   recordIds: string[];
+  transactionScope?: WorkspaceTransactionScope;
 };
 
 @Injectable()
@@ -40,6 +42,7 @@ export class RecordLabelFormulaService {
     flatObjectMetadata,
     flatObjectMetadataMaps,
     recordIds,
+    transactionScope,
   }: RecordLabelFormulaRecomputeArgs): Promise<Map<string, string>> {
     if (recordIds.length === 0) {
       return new Map();
@@ -88,6 +91,7 @@ export class RecordLabelFormulaService {
         flatObjectMetadata: next.flatObjectMetadata,
         flatObjectMetadataMaps,
         recordIds: unvisitedRecordIds,
+        transactionScope,
       });
 
       if (next.isStartingObject) {
@@ -99,6 +103,7 @@ export class RecordLabelFormulaService {
       const dependentRecords = await this.findDependentFormulaRecords({
         changedObjectMetadata: next.flatObjectMetadata,
         changedRecordIds: unvisitedRecordIds,
+        transactionScope,
         flatFieldMetadataMaps,
         flatObjectMetadataMaps,
       });
@@ -213,11 +218,13 @@ export class RecordLabelFormulaService {
     flatFieldMetadataMaps,
     flatObjectMetadata,
     flatObjectMetadataMaps,
+    transactionScope,
   }: Omit<RecordLabelFormulaRecomputeArgs, 'recordIds'>): Promise<void> {
-    const repository = this.workspaceOrmManager.getRepository(
-      flatObjectMetadata.nameSingular,
-      { shouldBypassPermissionChecks: true },
-    );
+    const repository = (
+      transactionScope ?? this.workspaceOrmManager
+    ).getRepository(flatObjectMetadata.nameSingular, {
+      shouldBypassPermissionChecks: true,
+    });
     let lastRecordId: string | undefined;
 
     while (true) {
@@ -239,6 +246,7 @@ export class RecordLabelFormulaService {
         flatObjectMetadata,
         flatObjectMetadataMaps,
         recordIds,
+        transactionScope,
       });
 
       lastRecordId = recordIds[recordIds.length - 1];
@@ -250,6 +258,7 @@ export class RecordLabelFormulaService {
     flatObjectMetadata,
     flatObjectMetadataMaps,
     recordIds,
+    transactionScope,
   }: RecordLabelFormulaRecomputeArgs): Promise<Map<string, string>> {
     const formulaDefinition = getRecordLabelFormulaDefinition({
       flatFieldMetadataMaps,
@@ -275,10 +284,11 @@ export class RecordLabelFormulaService {
           })
         : fieldMetadata.name,
     );
-    const repository = this.workspaceOrmManager.getRepository(
-      flatObjectMetadata.nameSingular,
-      { shouldBypassPermissionChecks: true },
-    );
+    const repository = (
+      transactionScope ?? this.workspaceOrmManager
+    ).getRepository(flatObjectMetadata.nameSingular, {
+      shouldBypassPermissionChecks: true,
+    });
     const records = (await repository.find({
       select: ['id', ...new Set(sourceFieldNames)],
       where: { id: In(recordIds) },
@@ -289,6 +299,7 @@ export class RecordLabelFormulaService {
         flatObjectMetadataMaps,
         records,
         relationFieldMetadatas,
+        transactionScope,
       });
     const updates: Array<{
       criteria: string;
@@ -323,11 +334,13 @@ export class RecordLabelFormulaService {
   private async findDependentFormulaRecords({
     changedObjectMetadata,
     changedRecordIds,
+    transactionScope,
     flatFieldMetadataMaps,
     flatObjectMetadataMaps,
   }: {
     changedObjectMetadata: FlatObjectMetadata;
     changedRecordIds: string[];
+    transactionScope?: WorkspaceTransactionScope;
     flatFieldMetadataMaps: FlatEntityMaps<OrmFlatFieldMetadata>;
     flatObjectMetadataMaps: FlatEntityMaps<FlatObjectMetadata>;
   }): Promise<
@@ -365,10 +378,11 @@ export class RecordLabelFormulaService {
         continue;
       }
 
-      const repository = this.workspaceOrmManager.getRepository(
-        candidateObjectMetadata.nameSingular,
-        { shouldBypassPermissionChecks: true },
-      );
+      const repository = (
+        transactionScope ?? this.workspaceOrmManager
+      ).getRepository(candidateObjectMetadata.nameSingular, {
+        shouldBypassPermissionChecks: true,
+      });
       const dependentRecordIds = new Set<string>();
 
       for (const relationFieldMetadata of referencingRelationFields) {

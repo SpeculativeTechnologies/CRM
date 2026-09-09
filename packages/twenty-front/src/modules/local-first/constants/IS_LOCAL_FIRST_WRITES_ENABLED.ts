@@ -1,0 +1,2 @@
+export const IS_LOCAL_FIRST_WRITES_ENABLED =
+  import.meta.env.REACT_APP_IS_LOCAL_FIRST_WRITES_ENABLED === 'true';

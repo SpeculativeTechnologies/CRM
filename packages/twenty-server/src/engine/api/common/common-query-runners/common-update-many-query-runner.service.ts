@@ -76,6 +76,7 @@ export class CommonUpdateManyQueryRunnerService extends CommonBaseQueryRunnerSer
         flatObjectMetadata,
         flatObjectMetadataMaps,
         recordIds: updatedRecords.map((record) => record.id),
+        transactionScope: queryRunnerContext.transactionScope,
       });
     const labelIdentifierFieldMetadataId =
       flatObjectMetadata.labelIdentifierFieldMetadataId;

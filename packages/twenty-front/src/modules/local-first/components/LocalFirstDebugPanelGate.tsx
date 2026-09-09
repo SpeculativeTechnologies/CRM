@@ -1,6 +1,11 @@
 import { lazy, Suspense } from 'react';
 
+import { currentUserState } from '@/auth/states/currentUserState';
+import { currentWorkspaceState } from '@/auth/states/currentWorkspaceState';
+import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
+
 import { IS_LOCAL_FIRST_ENABLED } from '@/local-first/constants/IS_LOCAL_FIRST_ENABLED';
+import { IS_LOCAL_FIRST_WRITES_ENABLED } from '@/local-first/constants/IS_LOCAL_FIRST_WRITES_ENABLED';
 
 // Everything local-first stays behind this gate and this lazy import: with
 // the flag off (the default, and every deployed build) none of the
@@ -11,26 +16,34 @@ const LocalFirstDebugPanel = lazy(() =>
     default: module.LocalFirstDebugPanel,
   })),
 );
-
-// Booting PGlite takes long enough that a list query issued during page load
-// beats it and falls back to the network. Starting the mirror as early as the
-// module graph allows, rather than waiting for the panel to mount, is what
-// lets the first query of a page actually be served locally.
-if (IS_LOCAL_FIRST_ENABLED) {
-  void import('@/local-first/services/getLocalFirstMirror').then(
-    ({ getLocalFirstMirror }) => {
-      // Failures are the sync loop's problem to report and retry.
-      void getLocalFirstMirror().catch(() => {});
-    },
-  );
-}
+const LocalFirstChangesPanel = lazy(() =>
+  import('@/local-first/components/LocalFirstChangesPanel').then((module) => ({
+    default: module.LocalFirstChangesPanel,
+  })),
+);
 
 export const LocalFirstDebugPanelGate = () => {
-  if (!IS_LOCAL_FIRST_ENABLED) return null;
+  const currentUser = useAtomStateValue(currentUserState);
+  const currentWorkspace = useAtomStateValue(currentWorkspaceState);
+  if (
+    (!IS_LOCAL_FIRST_ENABLED && !IS_LOCAL_FIRST_WRITES_ENABLED) ||
+    !currentUser ||
+    !currentWorkspace
+  )
+    return null;
 
   return (
     <Suspense fallback={null}>
-      <LocalFirstDebugPanel />
+      {IS_LOCAL_FIRST_ENABLED && (
+        <LocalFirstDebugPanel
+          key={`replica:${currentWorkspace.id}:${currentUser.id}`}
+        />
+      )}
+      {IS_LOCAL_FIRST_WRITES_ENABLED && (
+        <LocalFirstChangesPanel
+          key={`edits:${currentWorkspace.id}:${currentUser.id}`}
+        />
+      )}
     </Suspense>
   );
 };

@@ -1,4 +1,4 @@
-import { type PGlite } from '@electric-sql/pglite';
+import { type PGliteInterface } from '@electric-sql/pglite';
 import { isDefined } from 'twenty-shared/utils';
 
 import { LOCAL_FIRST_LIST_VALUED_SUBFIELDS } from '@/local-first/constants/LOCAL_FIRST_LIST_VALUED_SUBFIELDS';
@@ -48,7 +48,7 @@ const selectRowsByIds = async ({
   column,
   ids,
 }: {
-  pg: PGlite;
+  pg: Pick<PGliteInterface, 'query'>;
   plan: LocalReadPlan;
   column: string;
   ids: string[];
@@ -85,7 +85,7 @@ const attachRelations = async ({
   rows,
   nodes,
 }: {
-  pg: PGlite;
+  pg: Pick<PGliteInterface, 'query'>;
   plan: LocalReadPlan;
   rows: LocalRow[];
   nodes: LocalRow[];
@@ -189,7 +189,7 @@ export const executeLocalReadPlan = async ({
   sql,
   params,
 }: {
-  pg: PGlite;
+  pg: Pick<PGliteInterface, 'query'>;
   plan: LocalReadPlan;
   sql: string;
   params: unknown[];

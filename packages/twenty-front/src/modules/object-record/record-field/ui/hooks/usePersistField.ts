@@ -31,6 +31,7 @@ import { useObjectMetadataItemById } from '@/object-metadata/hooks/useObjectMeta
 import { useObjectMetadataItems } from '@/object-metadata/hooks/useObjectMetadataItems';
 import { getRecordFromRecordNode } from '@/object-record/cache/utils/getRecordFromRecordNode';
 import { useUpdateOneRecord } from '@/object-record/hooks/useUpdateOneRecord';
+import { IS_LOCAL_FIRST_WRITES_ENABLED } from '@/local-first/constants/IS_LOCAL_FIRST_WRITES_ENABLED';
 import { buildMorphRelationUpdateInput } from '@/object-record/record-field/ui/meta-types/input/utils/buildMorphRelationUpdateInput';
 import { isFieldArray } from '@/object-record/record-field/ui/types/guards/isFieldArray';
 import { isFieldArrayValue } from '@/object-record/record-field/ui/types/guards/isFieldArrayValue';
@@ -269,13 +270,23 @@ export const usePersistField = ({
           return;
         }
 
-        updateOneRecord({
+        const update = updateOneRecord({
           objectNameSingular: objectMetadataItem.nameSingular,
           idToUpdate: recordId,
           updateOneRecordInput: {
             [fieldName]: valueToPersist,
           },
         });
+
+        if (IS_LOCAL_FIRST_WRITES_ENABLED) {
+          try {
+            await update;
+          } catch {
+            // The mutation hook reports the failure. Keep the previous visible
+            // value when the device could not durably commit the edit.
+            return;
+          }
+        }
 
         store.set(
           recordStoreFamilySelector.selectorFamily({ recordId, fieldName }),

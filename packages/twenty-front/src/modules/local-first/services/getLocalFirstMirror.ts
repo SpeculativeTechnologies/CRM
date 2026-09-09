@@ -1,61 +1,61 @@
-import { type PGlite } from '@electric-sql/pglite';
+import { type PGliteInterface } from '@electric-sql/pglite';
 import { ApiPath } from 'twenty-shared/types';
-import { isDefined } from 'twenty-shared/utils';
 
 import { LOCAL_FIRST_MIRRORED_TABLES } from '@/local-first/constants/LOCAL_FIRST_MIRRORED_TABLES';
 import {
-  ensureLocalFirstTable,
+  assertLocalFirstScopeIsCurrent,
+  getCurrentLocalFirstScope,
+} from '@/local-first/services/getCurrentLocalFirstScope';
+import {
+  getLocalFirstDatabase,
   type LocalFirstColumn,
 } from '@/local-first/services/getLocalFirstDatabase';
-import { REACT_APP_SERVER_BASE_URL } from '~/config';
+import {
+  initializeLocalFirstReplicaState,
+  readLocalFirstTableStates,
+} from '@/local-first/services/localFirstReplicaState';
+import { type LocalFirstScope } from '@/local-first/types/LocalFirstScope';
+import { getLocalFirstScopeKey } from '@/local-first/utils/getLocalFirstScopeKey';
 
 export type LocalFirstMirror = {
-  pg: PGlite;
-  // Columns per mirrored table, with their source types: writes need the type
-  // to cast incoming values, reads only need the names. A table absent from
-  // this map is not mirrored, so nothing may be read from it.
+  pg: PGliteInterface;
+  scope: LocalFirstScope;
   tables: Record<string, LocalFirstColumn[]>;
   columnsByTable: Record<string, string[]>;
 };
 
-// Shared across module instances for the same reason the database handle is:
-// a second mirror would open a second PGlite on the same IndexedDB directory
-// and deadlock.
-const MIRROR_SINGLETON_KEY = '__twentyLocalFirstMirror';
+const MIRRORS_KEY = '__twentyScopedLocalFirstMirrors';
+type MirrorEntry = {
+  promise: Promise<LocalFirstMirror>;
+  resolved: LocalFirstMirror | null;
+};
+type MirrorHolder = { [MIRRORS_KEY]?: Map<string, MirrorEntry> };
+const getMirrors = () => {
+  const holder = globalThis as unknown as MirrorHolder;
+  holder[MIRRORS_KEY] ??= new Map();
 
-type MirrorSingletonHolder = {
-  [MIRROR_SINGLETON_KEY]?: {
-    promise: Promise<LocalFirstMirror> | null;
-    resolved: LocalFirstMirror | null;
-  };
+  return holder[MIRRORS_KEY];
 };
 
-const getMirrorHolder = () => {
-  const holder = globalThis as unknown as MirrorSingletonHolder;
-
-  holder[MIRROR_SINGLETON_KEY] ??= { promise: null, resolved: null };
-
-  return holder[MIRROR_SINGLETON_KEY];
-};
-
-const fetchTableColumns = async (
-  tableName: string,
-): Promise<LocalFirstColumn[] | null> => {
+export const fetchLocalFirstTableColumns = async ({
+  scope,
+  tableName,
+  signal,
+}: {
+  scope: LocalFirstScope;
+  tableName: string;
+  signal?: AbortSignal;
+}): Promise<LocalFirstColumn[] | null> => {
+  assertLocalFirstScopeIsCurrent(scope);
   const response = await fetch(
-    `${REACT_APP_SERVER_BASE_URL}/${ApiPath.LocalFirst}/schema/${tableName}`,
-    {
-      credentials: 'include',
-    },
+    `${scope.serverUrl}/${ApiPath.LocalFirst}/schema/${encodeURIComponent(tableName)}`,
+    { credentials: 'include', signal },
   );
+  assertLocalFirstScopeIsCurrent(scope);
 
-  // This workspace does not have the table (or it is not syncable): skip it
-  // rather than failing the whole mirror.
   if (response.status === 404) return null;
-
   if (!response.ok) {
-    throw new Error(
-      `Local-first schema for ${tableName} responded ${response.status}`,
-    );
+    throw new Error(`Local-first schema responded ${response.status}`);
   }
 
   const { columns } = (await response.json()) as {
@@ -65,61 +65,86 @@ const fetchTableColumns = async (
   return columns;
 };
 
-const createMirror = async (): Promise<LocalFirstMirror> => {
-  const schemas = await Promise.all(
-    LOCAL_FIRST_MIRRORED_TABLES.map(async (tableName) => ({
-      tableName,
-      columns: await fetchTableColumns(tableName),
-    })),
-  );
-
+const createMirror = async (
+  scope: LocalFirstScope,
+): Promise<LocalFirstMirror> => {
+  const pg = await getLocalFirstDatabase(scope);
+  await initializeLocalFirstReplicaState(pg);
+  const states = await readLocalFirstTableStates(pg);
   const tables: Record<string, LocalFirstColumn[]> = {};
-  const columnsByTable: Record<string, string[]> = {};
-  let pg: PGlite | null = null;
 
-  for (const { tableName, columns } of schemas) {
-    if (!isDefined(columns)) continue;
-
-    pg = await ensureLocalFirstTable({ tableName, columns });
-    tables[tableName] = columns;
-    columnsByTable[tableName] = columns.map((column) => column.name);
+  // Bootstrap from durable schema. Starting an already synced replica must
+  // not depend on a schema request succeeding while the device is offline.
+  for (const tableName of LOCAL_FIRST_MIRRORED_TABLES) {
+    const saved = states.find((state) => state.tableName === tableName);
+    if (saved) tables[tableName] = saved.columns;
   }
 
-  if (!isDefined(pg)) {
-    throw new Error('No local-first tables are available in this workspace');
-  }
+  assertLocalFirstScopeIsCurrent(scope);
 
-  return { pg, tables, columnsByTable };
+  return {
+    pg,
+    scope,
+    tables,
+    columnsByTable: Object.fromEntries(
+      Object.entries(tables).map(([tableName, columns]) => [
+        tableName,
+        columns.map((column) => column.name),
+      ]),
+    ),
+  };
 };
 
-// The local mirror as a single shared promise, so the sync loops and any
-// reader converge on one PGlite instance and one schema view instead of
-// racing. Everything that touches local data awaits this rather than reading
-// state that may not be populated yet.
-// The mirror if it is already built, or null. Reads use this rather than
-// awaiting: booting PGlite and fetching schemas takes seconds on a cold page,
-// and making a user wait on local infrastructure is strictly worse than going
-// to the network. Local serving is opportunistic by design.
-export const tryGetReadyLocalFirstMirror = (): LocalFirstMirror | null =>
-  getMirrorHolder().resolved;
+export const tryGetReadyLocalFirstMirror = (): LocalFirstMirror | null => {
+  const scope = getCurrentLocalFirstScope();
+
+  return scope
+    ? (getMirrors().get(getLocalFirstScopeKey(scope))?.resolved ?? null)
+    : null;
+};
+
+const refreshMirrorSchema = async (mirror: LocalFirstMirror) => {
+  const states = await readLocalFirstTableStates(mirror.pg);
+  assertLocalFirstScopeIsCurrent(mirror.scope);
+  const tables: Record<string, LocalFirstColumn[]> = {};
+  for (const tableName of LOCAL_FIRST_MIRRORED_TABLES) {
+    const saved = states.find((state) => state.tableName === tableName);
+    if (saved) tables[tableName] = saved.columns;
+  }
+  mirror.tables = tables;
+  mirror.columnsByTable = Object.fromEntries(
+    Object.entries(tables).map(([tableName, columns]) => [
+      tableName,
+      columns.map((column) => column.name),
+    ]),
+  );
+
+  return mirror;
+};
 
 export const getLocalFirstMirror = () => {
-  const holder = getMirrorHolder();
+  const scope = getCurrentLocalFirstScope();
+  if (!scope) return Promise.reject(new Error('No signed-in local workspace'));
 
-  if (!isDefined(holder.promise)) {
-    holder.promise = createMirror()
+  const key = getLocalFirstScopeKey(scope);
+  const mirrors = getMirrors();
+  const existing = mirrors.get(key);
+  if (existing) return existing.promise.then(refreshMirrorSchema);
+
+  const entry: MirrorEntry = {
+    resolved: null,
+    promise: createMirror(scope)
       .then((mirror) => {
-        holder.resolved = mirror;
+        entry.resolved = mirror;
 
         return mirror;
       })
-      .catch((error) => {
-        // A failed setup must not be cached, or one early failure (e.g. a
-        // request before auth is ready) would disable local reads for the tab.
-        holder.promise = null;
+      .catch((error: unknown) => {
+        mirrors.delete(key);
         throw error;
-      });
-  }
+      }),
+  };
+  mirrors.set(key, entry);
 
-  return holder.promise;
+  return entry.promise.then(refreshMirrorSchema);
 };
