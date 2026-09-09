@@ -45,7 +45,11 @@ export default defineConfig(({ command }) => {
 
   const checkersConfig: Checkers = {
     typescript: {
-      tsconfigPath: tsConfigPath,
+      // The build checker joins its arguments into a shell command. Keep the
+      // checkout's absolute path (which may contain spaces) out of that command.
+      tsconfigPath: isBuildCommand
+        ? path.relative(process.cwd(), tsConfigPath)
+        : tsConfigPath,
     },
   };
 

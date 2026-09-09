@@ -4,6 +4,8 @@ import { type FieldFullNameValue } from '@/object-record/record-field/ui/types/F
 
 import { useRecordFieldValue } from '@/object-record/record-store/hooks/useRecordFieldValue';
 import { FieldContext } from '@/object-record/record-field/ui/contexts/FieldContext';
+import { FieldMetadataType } from 'twenty-shared/types';
+import { getPreferredFirstName } from 'twenty-shared/utils';
 
 export const useFullNameFieldDisplay = () => {
   const { recordId, fieldDefinition } = useContext(FieldContext);
@@ -15,9 +17,33 @@ export const useFullNameFieldDisplay = () => {
     fieldName,
     fieldDefinition,
   );
+  const preferredName = useRecordFieldValue<unknown>(
+    recordId,
+    'preferredName',
+    {
+      type: FieldMetadataType.TEXT,
+      metadata: {
+        fieldName: 'preferredName',
+        placeHolder: '',
+        objectMetadataNameSingular:
+          fieldDefinition.metadata.objectMetadataNameSingular,
+      },
+    },
+  );
+  const isPersonName =
+    fieldName === 'name' &&
+    fieldDefinition.metadata.objectMetadataNameSingular === 'person';
 
   return {
     fieldDefinition,
-    fieldValue,
+    fieldValue: isPersonName
+      ? {
+          firstName: getPreferredFirstName(
+            fieldValue?.firstName,
+            preferredName,
+          ),
+          lastName: fieldValue?.lastName ?? '',
+        }
+      : fieldValue,
   };
 };

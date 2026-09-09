@@ -12,6 +12,7 @@ import {
 import {
   escapeForIlike,
   getLinkFaviconUrl,
+  getPreferredFirstName,
   isDefined,
 } from 'twenty-shared/utils';
 import { Brackets, type ObjectLiteral } from 'typeorm';
@@ -308,6 +309,10 @@ export class SearchService {
         flatFieldMetadataMaps,
       ),
       ...imageIdentifierColumns,
+      ...this.getPreferredNameColumns(
+        flatObjectMetadata,
+        flatFieldMetadataMaps,
+      ),
     ];
 
     const tsRankCDExpr = `ts_rank_cd("${SEARCH_VECTOR_FIELD.name}", to_tsquery('simple', public.unaccent_immutable(:searchTerms)))`;
@@ -439,6 +444,10 @@ export class SearchService {
               flatFieldMetadataMaps,
             ),
             ...imageIdentifierColumns,
+            ...this.getPreferredNameColumns(
+              flatObjectMetadata,
+              flatFieldMetadataMaps,
+            ),
           ];
 
           const [firstField, ...remainingFields] = fieldsToSelect;
@@ -590,7 +599,36 @@ export class SearchService {
       flatFieldMetadataMaps,
     );
 
+    if (
+      labelIdentifierFields.includes('nameFirstName') &&
+      this.getPreferredNameColumns(flatObjectMetadata, flatFieldMetadataMaps)
+        .length > 0
+    ) {
+      return `${getPreferredFirstName(record.nameFirstName, record.preferredName)} ${record.nameLastName ?? ''}`.trim();
+    }
+
     return labelIdentifierFields.map((field) => record[field]).join(' ');
+  }
+
+  getPreferredNameColumns(
+    flatObjectMetadata: FlatObjectMetadata,
+    flatFieldMetadataMaps: FlatEntityMaps<FlatFieldMetadata>,
+  ): string[] {
+    if (flatObjectMetadata.nameSingular !== 'person') {
+      return [];
+    }
+
+    const preferredNameField = Object.values(
+      flatFieldMetadataMaps.byUniversalIdentifier,
+    ).find(
+      (field) =>
+        field?.objectMetadataId === flatObjectMetadata.id &&
+        field.name === 'preferredName' &&
+        field.type === FieldMetadataType.TEXT &&
+        field.isActive,
+    );
+
+    return isDefined(preferredNameField) ? [preferredNameField.name] : [];
   }
 
   private getEffectiveImageIdentifierFieldMetadata(

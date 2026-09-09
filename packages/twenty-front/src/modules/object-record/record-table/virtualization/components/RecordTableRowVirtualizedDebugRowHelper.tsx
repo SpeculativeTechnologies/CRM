@@ -78,6 +78,7 @@ export const RecordTableRowVirtualizedDebugRowHelper = ({
     ? getLabelIdentifierFieldValue(
         recordStore,
         labelIdentifierFieldMetadataItem,
+        objectMetadataItem.nameSingular,
       )
     : '-';
 

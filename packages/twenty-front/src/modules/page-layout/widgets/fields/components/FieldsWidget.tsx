@@ -1,4 +1,6 @@
 import { useObjectMetadataItem } from '@/object-metadata/hooks/useObjectMetadataItem';
+import { getPersonPreferredNameField } from '@/object-metadata/utils/getPersonPreferredNameField';
+import { ensurePreferredNameFieldVisible } from '@/page-layout/widgets/fields/utils/ensurePreferredNameFieldVisible';
 import { RecordFieldsScopeContextProvider } from '@/object-record/record-field-list/contexts/RecordFieldsScopeContext';
 import { RecordFieldListComponentInstanceContext } from '@/object-record/record-field-list/states/contexts/RecordFieldListComponentInstanceContext';
 import { type PageLayoutWidget } from '@/page-layout/types/PageLayoutWidget';
@@ -63,11 +65,17 @@ export const FieldsWidget = ({ widget }: FieldsWidgetProps) => {
 
   const fieldsConfiguration = widget.configuration as FieldsConfiguration;
 
-  const { groups, displayMode } = useFieldsWidgetGroupsForDisplay({
-    widgetId: widget.id,
-    viewId: fieldsConfiguration.viewId ?? null,
-    objectNameSingular: targetRecord.targetObjectNameSingular,
-  });
+  const { groups: configuredGroups, displayMode } =
+    useFieldsWidgetGroupsForDisplay({
+      widgetId: widget.id,
+      viewId: fieldsConfiguration.viewId ?? null,
+      objectNameSingular: targetRecord.targetObjectNameSingular,
+    });
+
+  const groups = ensurePreferredNameFieldVisible(
+    configuredGroups,
+    getPersonPreferredNameField(objectMetadataItem),
+  );
 
   const { hiddenFields } = useFieldsWidgetHiddenFieldsForDisplay({
     widgetId: widget.id,
@@ -75,16 +83,22 @@ export const FieldsWidget = ({ widget }: FieldsWidgetProps) => {
     objectNameSingular: targetRecord.targetObjectNameSingular,
   });
 
+  const visibleFields = groups.flatMap((group) => group.fields);
+  const fieldsHiddenByLayout = hiddenFields.filter(
+    (field) =>
+      !visibleFields.some(
+        (visibleField) =>
+          visibleField.fieldMetadataItem.id === field.fieldMetadataItem.id,
+      ),
+  );
   const shouldShowHiddenFields =
     fieldsConfiguration.shouldAllowUserToSeeHiddenFields === true &&
-    hiddenFields.length > 0;
-
-  const visibleFields = groups.flatMap((group) => group.fields);
+    fieldsHiddenByLayout.length > 0;
 
   const hiddenFieldsWithOffsetGlobalIndex = shouldShowHiddenFields
-    ? hiddenFields.map((field) => ({
+    ? fieldsHiddenByLayout.map((field, index) => ({
         ...field,
-        globalIndex: field.globalIndex + visibleFields.length,
+        globalIndex: index + visibleFields.length,
       }))
     : [];
 

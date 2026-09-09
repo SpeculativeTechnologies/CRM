@@ -10,6 +10,7 @@ export type Person = {
     lastName: string;
   };
   avatarUrl?: string;
+  preferredName?: string | null;
   jobTitle: string;
   linkedinLink: {
     __typename?: 'Links';

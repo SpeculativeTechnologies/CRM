@@ -1,5 +1,5 @@
 import { isNonEmptyString } from '@sniptt/guards';
-import { isDefined } from 'twenty-shared/utils';
+import { getPreferredFirstName, isDefined } from 'twenty-shared/utils';
 
 import { type EmailThreadMessageParticipant } from '@/activities/emails/types/EmailThreadMessageParticipant';
 import { getEmailIdentityDisplayName } from '@/activities/emails/utils/getEmailIdentityDisplayName';
@@ -25,7 +25,13 @@ export const getDisplayNameFromParticipant = ({
 
   return getEmailIdentityDisplayName({
     personName: isDefined(participant.person)
-      ? buildName(participant.person.name)
+      ? buildName({
+          ...participant.person.name,
+          firstName: getPreferredFirstName(
+            participant.person.name?.firstName,
+            participant.person.preferredName,
+          ),
+        })
       : undefined,
     workspaceMemberName: isDefined(participant.workspaceMember)
       ? buildName(participant.workspaceMember.name)
