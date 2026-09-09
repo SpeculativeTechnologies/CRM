@@ -28,7 +28,7 @@ vi.mock('twenty-sdk/front-component', () => ({
   enqueueSnackbar: snackbar,
 }));
 
-import { LogContact } from 'src/front-components/log-contact.front-component';
+import { LogContact } from 'src/components/log-contact';
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -43,6 +43,41 @@ const fillContactDate = () =>
   });
 
 describe('Log contact form', () => {
+  it('should stay on the person tab and allow another contact after saving', async () => {
+    const user = userEvent.setup();
+    render(createElement(LogContact, { presentation: 'tab' }));
+    fillContactDate();
+    await user.type(
+      screen.getByLabelText('Notes (optional)'),
+      'First conversation',
+    );
+    await user.click(screen.getByRole('button', { name: 'Save contact' }));
+    await waitFor(() => expect(mutation).toHaveBeenCalledTimes(1));
+    expect(close).not.toHaveBeenCalled();
+    expect(
+      (screen.getByLabelText('Notes (optional)') as HTMLTextAreaElement).value,
+    ).toBe('');
+    fillContactDate();
+    await user.click(screen.getByRole('button', { name: 'Save contact' }));
+    await waitFor(() => expect(mutation).toHaveBeenCalledTimes(2));
+    expect(close).not.toHaveBeenCalled();
+  });
+
+  it('should clear the tab form without navigating or saving', async () => {
+    const user = userEvent.setup();
+    render(createElement(LogContact, { presentation: 'tab' }));
+    await user.type(
+      screen.getByLabelText('Notes (optional)'),
+      'Unfinished notes',
+    );
+    await user.click(screen.getByRole('button', { name: 'Clear' }));
+    expect(
+      (screen.getByLabelText('Notes (optional)') as HTMLTextAreaElement).value,
+    ).toBe('');
+    expect(close).not.toHaveBeenCalled();
+    expect(mutation).not.toHaveBeenCalled();
+  });
+
   it('should save a dated text message on the selected person with notes and direction', async () => {
     const user = userEvent.setup();
     render(createElement(LogContact));

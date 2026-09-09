@@ -12,7 +12,7 @@ export default defineCommandMenuItem({
   universalIdentifier: LOG_CONTACT_COMMAND_UNIVERSAL_IDENTIFIER,
   label: 'Log contact',
   shortLabel: 'Log contact',
-  isPinned: true,
+  isPinned: false,
   availabilityType: 'RECORD_SELECTION',
   availabilityObjectUniversalIdentifier:
     STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.person.universalIdentifier,

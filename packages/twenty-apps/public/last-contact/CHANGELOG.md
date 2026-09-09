@@ -7,6 +7,8 @@
 - Recalculate after edits, deletion, restoration, and reassignment, and guard recalculation against concurrent writes.
 - Guard inbound/outbound and email/meeting fallback updates so a slower sync cannot overwrite newer manual contact.
 - Allow the app form to create Contact logs through its restricted application token.
+- Add a Log contact tab beside Home, Timeline, and Tasks using an idempotent per-workspace setup command; keep the form open and ready for another entry after saving.
+- Document API-key access to contact logging through the REST API.
 
 ## 1.2.4
 
