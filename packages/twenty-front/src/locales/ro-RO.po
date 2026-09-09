@@ -3105,6 +3105,11 @@ msgstr ""
 msgid "Auto-upgrade"
 msgstr "Actualizare automată"
 
+#. js-lingui-id: Ml3WQP
+#: src/modules/local-first/components/PersonalWorkspaceOfflineStatus.tsx
+msgid "Automatic offline access is turned off."
+msgstr ""
+
 #. js-lingui-id: YRT7ZW
 #: src/modules/settings/accounts/components/SettingsAccountsCalendarChannelDetails.tsx
 msgid "Automatically create contacts for people you've participated in an event with."
@@ -7925,6 +7930,11 @@ msgstr "Activați impersonarea"
 #: src/modules/ai/components/SettingsAgentModelCapabilities.tsx
 msgid "Enable model-specific features"
 msgstr "Activează funcții specifice modelului"
+
+#. js-lingui-id: MMGZ5m
+#: src/modules/local-first/components/PersonalWorkspaceOfflineStatus.tsx
+msgid "Enable offline access"
+msgstr ""
 
 #. js-lingui-id: Iy8Gze
 #: src/modules/settings/billing/constants/SettingsBillingPlanComparisonRows.ts
@@ -14867,6 +14877,11 @@ msgstr "În afara cărărilor bătătorite"
 msgid "Official app"
 msgstr "Aplicație oficială"
 
+#. js-lingui-id: Avjh8+
+#: src/modules/local-first/components/PersonalWorkspaceOfflineStatus.tsx
+msgid "Offline access could not be prepared. We will retry when your connection returns. Your tools are still saved on this device."
+msgstr ""
+
 #. js-lingui-id: fdH3r4
 #: src/modules/local-first/components/PersonalWorkspaceOfflineStatus.tsx
 msgid "Offline startup is tested in the built preview."
@@ -15733,11 +15748,6 @@ msgstr "ID persoană"
 msgid "PERSONAL · SAVED ON THIS DEVICE"
 msgstr ""
 
-#. js-lingui-id: FhWvO9
-#: src/modules/local-first/components/PersonalWorkspaceOfflineStatus.tsx
-msgid "Personal data is saved locally. Prepare this page before reopening offline."
-msgstr ""
-
 #. js-lingui-id: hhzADK
 #: src/modules/local-first/components/PersonalWorkspace.tsx
 msgid "Personal tools"
@@ -16035,9 +16045,9 @@ msgstr "Se precompletează <0>datele spațiului tău de lucru</0>..."
 msgid "Prefix"
 msgstr "Prefix"
 
-#. js-lingui-id: M9zCAq
+#. js-lingui-id: qNJZXJ
 #: src/modules/local-first/components/PersonalWorkspaceOfflineStatus.tsx
-msgid "Prepare offline copy"
+msgid "Preparing offline access automatically…"
 msgstr ""
 
 #. js-lingui-id: dVCM1s
@@ -17269,6 +17279,11 @@ msgstr "Reîncercare"
 #: src/modules/settings/admin-panel/health-status/components/SettingsAdminQueueJobsTable.tsx
 msgid "Retry All Failed"
 msgstr "Reîncercare toate locurile eșuate"
+
+#. js-lingui-id: OXx4n4
+#: src/modules/local-first/components/PersonalWorkspaceOfflineStatus.tsx
+msgid "Retry offline preparation"
+msgstr ""
 
 #. js-lingui-id: kms3+N
 #: src/modules/local-first/components/LocalFirstChangesPanel.tsx
@@ -20164,9 +20179,9 @@ msgstr "Numele pe care destinatarii îl văd lângă adresa dvs. în inbox, în 
 msgid "The name recipients see next to your address. It is set when the channel is created."
 msgstr "Numele pe care destinatarii îl văd lângă adresa dvs. Este setat când canalul este creat."
 
-#. js-lingui-id: cChKqQ
+#. js-lingui-id: 5sSlKN
 #: src/modules/local-first/components/PersonalWorkspaceOfflineStatus.tsx
-msgid "The offline copy could not be prepared. Keep this page open and retry with a connection. Your tools are still saved on this device."
+msgid "The offline copy could not be removed. Try again."
 msgstr ""
 
 #. js-lingui-id: L97sPr
@@ -23620,6 +23635,11 @@ msgstr "Configurarea abonamentului dvs. nu a fost finalizată."
 #: src/pages/settings/enterprise/SettingsEnterprise.tsx
 msgid "Your subscription status is: {statusLabel}"
 msgstr "Starea abonamentului dvs. este: {statusLabel}"
+
+#. js-lingui-id: 4n0SKu
+#: src/modules/local-first/components/PersonalWorkspaceOfflineStatus.tsx
+msgid "Your tools are saved on this device."
+msgstr ""
 
 #. js-lingui-id: oC6WBs
 #: src/modules/information-banner/components/billing/InformationBannerNoBillingSubscription.tsx

@@ -3100,6 +3100,11 @@ msgstr "Auto-generated role for {agentDisplayName}"
 msgid "Auto-upgrade"
 msgstr "Auto-upgrade"
 
+#. js-lingui-id: Ml3WQP
+#: src/modules/local-first/components/PersonalWorkspaceOfflineStatus.tsx
+msgid "Automatic offline access is turned off."
+msgstr "Automatic offline access is turned off."
+
 #. js-lingui-id: YRT7ZW
 #: src/modules/settings/accounts/components/SettingsAccountsCalendarChannelDetails.tsx
 msgid "Automatically create contacts for people you've participated in an event with."
@@ -7920,6 +7925,11 @@ msgstr "Enable impersonation"
 #: src/modules/ai/components/SettingsAgentModelCapabilities.tsx
 msgid "Enable model-specific features"
 msgstr "Enable model-specific features"
+
+#. js-lingui-id: MMGZ5m
+#: src/modules/local-first/components/PersonalWorkspaceOfflineStatus.tsx
+msgid "Enable offline access"
+msgstr "Enable offline access"
 
 #. js-lingui-id: Iy8Gze
 #: src/modules/settings/billing/constants/SettingsBillingPlanComparisonRows.ts
@@ -14862,6 +14872,11 @@ msgstr "Off the beaten path"
 msgid "Official app"
 msgstr "Official app"
 
+#. js-lingui-id: Avjh8+
+#: src/modules/local-first/components/PersonalWorkspaceOfflineStatus.tsx
+msgid "Offline access could not be prepared. We will retry when your connection returns. Your tools are still saved on this device."
+msgstr "Offline access could not be prepared. We will retry when your connection returns. Your tools are still saved on this device."
+
 #. js-lingui-id: fdH3r4
 #: src/modules/local-first/components/PersonalWorkspaceOfflineStatus.tsx
 msgid "Offline startup is tested in the built preview."
@@ -15728,11 +15743,6 @@ msgstr "Person ID"
 msgid "PERSONAL · SAVED ON THIS DEVICE"
 msgstr "PERSONAL · SAVED ON THIS DEVICE"
 
-#. js-lingui-id: FhWvO9
-#: src/modules/local-first/components/PersonalWorkspaceOfflineStatus.tsx
-msgid "Personal data is saved locally. Prepare this page before reopening offline."
-msgstr "Personal data is saved locally. Prepare this page before reopening offline."
-
 #. js-lingui-id: hhzADK
 #: src/modules/local-first/components/PersonalWorkspace.tsx
 msgid "Personal tools"
@@ -16030,10 +16040,10 @@ msgstr "Prefilling your <0>workspace data</0>..."
 msgid "Prefix"
 msgstr "Prefix"
 
-#. js-lingui-id: M9zCAq
+#. js-lingui-id: qNJZXJ
 #: src/modules/local-first/components/PersonalWorkspaceOfflineStatus.tsx
-msgid "Prepare offline copy"
-msgstr "Prepare offline copy"
+msgid "Preparing offline access automatically…"
+msgstr "Preparing offline access automatically…"
 
 #. js-lingui-id: dVCM1s
 #: src/modules/page-layout/widgets/call-recording/utils/getCallRecordingStatusDisplayConfiguration.ts
@@ -17264,6 +17274,11 @@ msgstr "Retry"
 #: src/modules/settings/admin-panel/health-status/components/SettingsAdminQueueJobsTable.tsx
 msgid "Retry All Failed"
 msgstr "Retry All Failed"
+
+#. js-lingui-id: OXx4n4
+#: src/modules/local-first/components/PersonalWorkspaceOfflineStatus.tsx
+msgid "Retry offline preparation"
+msgstr "Retry offline preparation"
 
 #. js-lingui-id: kms3+N
 #: src/modules/local-first/components/LocalFirstChangesPanel.tsx
@@ -20159,10 +20174,10 @@ msgstr "The name recipients see next to your address in their inbox, instead of 
 msgid "The name recipients see next to your address. It is set when the channel is created."
 msgstr "The name recipients see next to your address. It is set when the channel is created."
 
-#. js-lingui-id: cChKqQ
+#. js-lingui-id: 5sSlKN
 #: src/modules/local-first/components/PersonalWorkspaceOfflineStatus.tsx
-msgid "The offline copy could not be prepared. Keep this page open and retry with a connection. Your tools are still saved on this device."
-msgstr "The offline copy could not be prepared. Keep this page open and retry with a connection. Your tools are still saved on this device."
+msgid "The offline copy could not be removed. Try again."
+msgstr "The offline copy could not be removed. Try again."
 
 #. js-lingui-id: L97sPr
 #: src/pages/not-found/NotFound.tsx
@@ -23617,6 +23632,11 @@ msgstr "Your subscription setup was not completed."
 #: src/pages/settings/enterprise/SettingsEnterprise.tsx
 msgid "Your subscription status is: {statusLabel}"
 msgstr "Your subscription status is: {statusLabel}"
+
+#. js-lingui-id: 4n0SKu
+#: src/modules/local-first/components/PersonalWorkspaceOfflineStatus.tsx
+msgid "Your tools are saved on this device."
+msgstr "Your tools are saved on this device."
 
 #. js-lingui-id: oC6WBs
 #: src/modules/information-banner/components/billing/InformationBannerNoBillingSubscription.tsx

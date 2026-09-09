@@ -156,7 +156,7 @@ export const PersonalWorkspace = ({
         </button>
       </aside>
       <article>
-        <PersonalWorkspaceOfflineStatus />
+        <PersonalWorkspaceOfflineStatus isBuilt={!import.meta.env.DEV} />
         {error && <p role="alert">{error}</p>}
         {exportError && (
           <p role="alert">

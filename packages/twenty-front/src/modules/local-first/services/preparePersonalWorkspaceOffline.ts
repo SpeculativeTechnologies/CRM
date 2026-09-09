@@ -15,6 +15,39 @@ export const isPersonalWorkspaceReadyOffline = async () => {
   });
 };
 
+const waitForOfflineController = () =>
+  new Promise<void>((resolve, reject) => {
+    let finished = false;
+    const cleanup = () => {
+      finished = true;
+      clearTimeout(timeout);
+      navigator.serviceWorker.removeEventListener('controllerchange', check);
+    };
+    const check = () => {
+      if (finished) return;
+      void isPersonalWorkspaceReadyOffline().then(
+        (ready) => {
+          if (!finished && ready) {
+            cleanup();
+            resolve();
+          }
+        },
+        (error: unknown) => {
+          if (!finished) {
+            cleanup();
+            reject(error);
+          }
+        },
+      );
+    };
+    const timeout = setTimeout(() => {
+      cleanup();
+      reject(new Error('Offline preparation timed out'));
+    }, 15000);
+    navigator.serviceWorker.addEventListener('controllerchange', check);
+    check();
+  });
+
 export const preparePersonalWorkspaceOffline = async () => {
   if (!('serviceWorker' in navigator))
     throw new Error('Offline startup is unavailable in this browser');
@@ -49,6 +82,8 @@ export const preparePersonalWorkspaceOffline = async () => {
       installing.addEventListener('statechange', finish);
       finish();
     });
+  // Installation can finish before clients.claim() controls this tab.
+  await waitForOfflineController();
 };
 
 export const removePersonalWorkspaceOffline = async () => {

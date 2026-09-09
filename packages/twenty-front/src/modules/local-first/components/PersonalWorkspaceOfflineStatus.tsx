@@ -8,29 +8,79 @@ import {
   removePersonalWorkspaceOffline,
 } from '@/local-first/services/preparePersonalWorkspaceOffline';
 
-export const PersonalWorkspaceOfflineStatus = () => {
-  const [ready, setReady] = useState(false);
+const OFFLINE_DISABLED_KEY = 'twenty-personal-offline-disabled';
+
+type PersonalWorkspaceOfflineStatusProps = { isBuilt: boolean };
+
+export const PersonalWorkspaceOfflineStatus = ({
+  isBuilt,
+}: PersonalWorkspaceOfflineStatusProps) => {
+  const [disabled, setDisabled] = useState(
+    () => localStorage.getItem(OFFLINE_DISABLED_KEY) === 'true',
+  );
+  const [status, setStatus] = useState<'preparing' | 'ready' | 'failed'>(
+    'preparing',
+  );
+  const [attempt, setAttempt] = useState(0);
   const [busy, setBusy] = useState(false);
-  const [failed, setFailed] = useState(false);
+  const [removeFailed, setRemoveFailed] = useState(false);
   useEffect(() => {
-    const refresh = () => {
-      void isPersonalWorkspaceReadyOffline()
-        .then(setReady)
-        .catch(() => setReady(false));
+    const refresh = (event: StorageEvent) => {
+      if (event.key === OFFLINE_DISABLED_KEY || event.key === null)
+        setDisabled(localStorage.getItem(OFFLINE_DISABLED_KEY) === 'true');
     };
-    navigator.serviceWorker?.addEventListener('controllerchange', refresh);
-    refresh();
-    return () =>
-      navigator.serviceWorker?.removeEventListener('controllerchange', refresh);
+    window.addEventListener('storage', refresh);
+    return () => window.removeEventListener('storage', refresh);
   }, []);
-  const prepare = async () => {
-    setBusy(true);
-    setFailed(false);
+  useEffect(() => {
+    if (!isBuilt || disabled) return;
+    let stopped = false;
+    let preparing = false;
+    const prepare = async () => {
+      if (preparing || stopped) return;
+      preparing = true;
+      try {
+        // An existing copy must stay usable when the server is unreachable.
+        const ready = await isPersonalWorkspaceReadyOffline();
+        if (stopped) return;
+        setStatus(ready ? 'ready' : 'preparing');
+        if (!ready) await preparePersonalWorkspaceOffline();
+        if (!stopped) setStatus('ready');
+      } catch {
+        if (!stopped) setStatus('failed');
+      } finally {
+        preparing = false;
+      }
+    };
+    const refresh = () => void prepare();
+    window.addEventListener('online', refresh);
+    refresh();
+    return () => {
+      stopped = true;
+      window.removeEventListener('online', refresh);
+    };
+  }, [isBuilt, disabled, attempt]);
+  const enable = () => {
     try {
-      await preparePersonalWorkspaceOffline();
-      setReady(await isPersonalWorkspaceReadyOffline());
+      localStorage.removeItem(OFFLINE_DISABLED_KEY);
+      setDisabled(false);
+      setStatus('preparing');
+      setRemoveFailed(false);
+      setAttempt((previous) => previous + 1);
     } catch {
-      setFailed(true);
+      setStatus('failed');
+    }
+  };
+  const remove = async () => {
+    setBusy(true);
+    setRemoveFailed(false);
+    try {
+      // Removal is an explicit opt-out, including on the next visit.
+      localStorage.setItem(OFFLINE_DISABLED_KEY, 'true');
+      setDisabled(true);
+      await removePersonalWorkspaceOffline();
+    } catch {
+      setRemoveFailed(true);
     } finally {
       setBusy(false);
     }
@@ -38,43 +88,46 @@ export const PersonalWorkspaceOfflineStatus = () => {
   return (
     <>
       <StyledPersonalToolActions>
-        <small>
-          {ready ? (
+        <small role="status">
+          {!isBuilt ? (
+            <Trans>Offline startup is tested in the built preview.</Trans>
+          ) : disabled ? (
+            <Trans>Automatic offline access is turned off.</Trans>
+          ) : status === 'ready' ? (
             <Trans>Personal workspace ready for offline reopening</Trans>
+          ) : status === 'preparing' ? (
+            <Trans>Preparing offline access automatically…</Trans>
           ) : (
-            <Trans>
-              Personal data is saved locally. Prepare this page before reopening
-              offline.
-            </Trans>
+            <Trans>Your tools are saved on this device.</Trans>
           )}
         </small>
-        {import.meta.env.DEV ? (
-          <small>
-            <Trans>Offline startup is tested in the built preview.</Trans>
-          </small>
-        ) : (
-          <button disabled={busy} onClick={() => void prepare()}>
-            <Trans>Prepare offline copy</Trans>
+        {isBuilt && disabled && (
+          <button disabled={busy} onClick={enable}>
+            <Trans>Enable offline access</Trans>
           </button>
         )}
-        {ready && (
-          <button
-            onClick={() =>
-              void removePersonalWorkspaceOffline()
-                .then(() => setReady(false))
-                .catch(() => setFailed(true))
-            }
-          >
+        {isBuilt && !disabled && status === 'failed' && (
+          <button onClick={enable}>
+            <Trans>Retry offline preparation</Trans>
+          </button>
+        )}
+        {isBuilt && ((!disabled && status === 'ready') || removeFailed) && (
+          <button disabled={busy} onClick={() => void remove()}>
             <Trans>Remove offline copy</Trans>
           </button>
         )}
       </StyledPersonalToolActions>
-      {failed && (
+      {isBuilt && !disabled && status === 'failed' && (
         <p role="alert">
           <Trans>
-            The offline copy could not be prepared. Keep this page open and
-            retry with a connection. Your tools are still saved on this device.
+            Offline access could not be prepared. We will retry when your
+            connection returns. Your tools are still saved on this device.
           </Trans>
+        </p>
+      )}
+      {removeFailed && (
+        <p role="alert">
+          <Trans>The offline copy could not be removed. Try again.</Trans>
         </p>
       )}
     </>

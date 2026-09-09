@@ -3105,6 +3105,11 @@ msgstr ""
 msgid "Auto-upgrade"
 msgstr "自動升級"
 
+#. js-lingui-id: Ml3WQP
+#: src/modules/local-first/components/PersonalWorkspaceOfflineStatus.tsx
+msgid "Automatic offline access is turned off."
+msgstr ""
+
 #. js-lingui-id: YRT7ZW
 #: src/modules/settings/accounts/components/SettingsAccountsCalendarChannelDetails.tsx
 msgid "Automatically create contacts for people you've participated in an event with."
@@ -7925,6 +7930,11 @@ msgstr "啟用模擬"
 #: src/modules/ai/components/SettingsAgentModelCapabilities.tsx
 msgid "Enable model-specific features"
 msgstr "啟用特定模型功能"
+
+#. js-lingui-id: MMGZ5m
+#: src/modules/local-first/components/PersonalWorkspaceOfflineStatus.tsx
+msgid "Enable offline access"
+msgstr ""
 
 #. js-lingui-id: Iy8Gze
 #: src/modules/settings/billing/constants/SettingsBillingPlanComparisonRows.ts
@@ -14844,6 +14854,11 @@ msgstr "偏離常規路線"
 msgid "Official app"
 msgstr "官方應用程式"
 
+#. js-lingui-id: Avjh8+
+#: src/modules/local-first/components/PersonalWorkspaceOfflineStatus.tsx
+msgid "Offline access could not be prepared. We will retry when your connection returns. Your tools are still saved on this device."
+msgstr ""
+
 #. js-lingui-id: fdH3r4
 #: src/modules/local-first/components/PersonalWorkspaceOfflineStatus.tsx
 msgid "Offline startup is tested in the built preview."
@@ -15710,11 +15725,6 @@ msgstr "人員 ID"
 msgid "PERSONAL · SAVED ON THIS DEVICE"
 msgstr ""
 
-#. js-lingui-id: FhWvO9
-#: src/modules/local-first/components/PersonalWorkspaceOfflineStatus.tsx
-msgid "Personal data is saved locally. Prepare this page before reopening offline."
-msgstr ""
-
 #. js-lingui-id: hhzADK
 #: src/modules/local-first/components/PersonalWorkspace.tsx
 msgid "Personal tools"
@@ -16012,9 +16022,9 @@ msgstr "正在預先填入您的<0>工作區資料</0>..."
 msgid "Prefix"
 msgstr "前綴"
 
-#. js-lingui-id: M9zCAq
+#. js-lingui-id: qNJZXJ
 #: src/modules/local-first/components/PersonalWorkspaceOfflineStatus.tsx
-msgid "Prepare offline copy"
+msgid "Preparing offline access automatically…"
 msgstr ""
 
 #. js-lingui-id: dVCM1s
@@ -17246,6 +17256,11 @@ msgstr "重試"
 #: src/modules/settings/admin-panel/health-status/components/SettingsAdminQueueJobsTable.tsx
 msgid "Retry All Failed"
 msgstr "重試所有失敗"
+
+#. js-lingui-id: OXx4n4
+#: src/modules/local-first/components/PersonalWorkspaceOfflineStatus.tsx
+msgid "Retry offline preparation"
+msgstr ""
 
 #. js-lingui-id: kms3+N
 #: src/modules/local-first/components/LocalFirstChangesPanel.tsx
@@ -20111,9 +20126,9 @@ msgstr "收件人在收件匣中於您的地址旁邊看到的名稱，而不只
 msgid "The name recipients see next to your address. It is set when the channel is created."
 msgstr "收件人在您的地址旁邊看到的名稱。此名稱會在建立頻道時設定。"
 
-#. js-lingui-id: cChKqQ
+#. js-lingui-id: 5sSlKN
 #: src/modules/local-first/components/PersonalWorkspaceOfflineStatus.tsx
-msgid "The offline copy could not be prepared. Keep this page open and retry with a connection. Your tools are still saved on this device."
+msgid "The offline copy could not be removed. Try again."
 msgstr ""
 
 #. js-lingui-id: L97sPr
@@ -23567,6 +23582,11 @@ msgstr "您的訂閱設定未完成。"
 #: src/pages/settings/enterprise/SettingsEnterprise.tsx
 msgid "Your subscription status is: {statusLabel}"
 msgstr "您的訂閱狀態為：{statusLabel}"
+
+#. js-lingui-id: 4n0SKu
+#: src/modules/local-first/components/PersonalWorkspaceOfflineStatus.tsx
+msgid "Your tools are saved on this device."
+msgstr ""
 
 #. js-lingui-id: oC6WBs
 #: src/modules/information-banner/components/billing/InformationBannerNoBillingSubscription.tsx

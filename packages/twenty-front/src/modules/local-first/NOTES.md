@@ -41,12 +41,17 @@ It does not overwrite another tool or replay the historical revisions. There is
 a 10 MB import limit; large histories can currently exceed it. There is no code
 evaluation or automatic publication to the shared CRM.
 
-**Prepare offline copy** caches the built personal workspace's static assets.
-Wait for its ready message before closing the page. `/local-workspace/` can then
+Opening Personal tools automatically caches the built workspace's static assets.
+The status shows preparation and then confirms offline readiness. A failed
+preparation offers a retry and retries when the connection returns. Wait for
+the ready message on the first visit before closing the page.
+`/local-workspace/` can then
 open in a fresh offline tab, read saved tools and accept edits. Its service
 worker only controls that path and only caches a build-generated static asset
 allowlist. It never caches API responses or CRM records. Removing the offline
 copy unregisters it and removes that static cache, while retaining tool data.
+This opts out of automatic preparation across visits; **Enable offline access**
+turns it back on. An existing ready copy opens without contacting the server.
 An installed old copy can remain usable after a server flag is disabled; remove
 it explicitly from that page. Updates activate when old personal tabs close.
 

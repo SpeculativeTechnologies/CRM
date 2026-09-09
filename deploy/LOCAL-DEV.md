@@ -224,10 +224,13 @@ keeps its usual owned database, service guards and private diagnostics. Frontend
 source edits need another build in this mode; omit `--built-front` to return to
 source hot reload. Backend source watching continues in both modes.
 
-In **Local changes**, open **Personal tools**. **Prepare offline copy** caches
-only that page's static build assets. Once it reports ready, personal tools can
+In **Local changes**, open **Personal tools**. It automatically prepares offline
+access by caching only that page's static build assets. Once it reports ready,
+personal tools can
 be reopened offline at `/local-workspace/`. Shared CRM record pages still need
 online startup. Tool edits remain personal; copied records are detached snapshots.
 Use its export controls for local backups and **Remove offline copy** to remove
-the service worker/cache without deleting tool data. This branch must remain
+the service worker/cache without deleting tool data. Removal opts out across
+visits; **Enable offline access** turns automatic preparation back on. This
+branch must remain
 experimental and must not be merged, staged or deployed.
