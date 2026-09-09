@@ -7064,6 +7064,11 @@ msgstr "Discoverable"
 msgid "Discovery on {defaultDomain}"
 msgstr "Discovery on {defaultDomain}"
 
+#. js-lingui-id: 1QfxQT
+#: src/modules/local-first/components/LocalFirstChangesPanel.tsx
+msgid "Dismiss"
+msgstr "Dismiss"
+
 #. js-lingui-id: Xm/s+u
 #: src/modules/settings/accounts/components/SettingsAccountsCalendarChannelsGeneral.tsx
 msgid "Display"
@@ -20458,7 +20463,7 @@ msgid "This device"
 msgstr "This device"
 
 #. js-lingui-id: DJ5k6g
-#: src/modules/object-record/hooks/useUpdateOneRecord.ts
+#: src/modules/local-first/components/LocalFirstChangesPanel.tsx
 msgid "This edit could not be saved on this device. Check local storage and try again."
 msgstr "This edit could not be saved on this device. Check local storage and try again."
 

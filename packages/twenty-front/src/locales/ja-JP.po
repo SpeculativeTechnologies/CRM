@@ -1385,6 +1385,11 @@ msgstr "ゲストの詳細を追加"
 msgid "Add email channel"
 msgstr "メールチャネルを追加"
 
+#. js-lingui-id: Va3xJe
+#: src/modules/local-first/components/PersonalToolFields.tsx
+msgid "Add field"
+msgstr ""
+
 #. js-lingui-id: DpV70M
 #: src/modules/settings/data-model/object-details/components/tabs/ObjectFields.tsx
 #: src/modules/workflow/workflow-steps/workflow-actions/form-action/components/WorkflowEditActionFormBuilder.tsx
@@ -1542,6 +1547,11 @@ msgstr ""
 #: src/modules/workflow/workflow-steps/workflow-actions/ai-agent-action/components/WorkflowEditActionAiAgent.tsx
 msgid "Add permission"
 msgstr "権限を追加"
+
+#. js-lingui-id: fKtnB/
+#: src/modules/local-first/components/PersonalToolTable.tsx
+msgid "Add record"
+msgstr ""
 
 #. js-lingui-id: AmiJYR
 #: src/modules/page-layout/widgets/field/components/FieldWidgetRelationEditAction.tsx
@@ -2167,6 +2177,11 @@ msgstr "すべてのオブジェクトはすでにサイドバーにあります
 msgid "All reasons"
 msgstr "すべての理由"
 
+#. js-lingui-id: rAUKN+
+#: src/modules/local-first/components/PersonalToolDesigner.tsx
+msgid "All records"
+msgstr ""
+
 #. js-lingui-id: Hm90t3
 #: src/modules/settings/roles/components/SettingsRolesList.tsx
 msgid "All roles"
@@ -2699,6 +2714,11 @@ msgstr "アラビア語"
 msgid "Archive"
 msgstr "アーカイブ"
 
+#. js-lingui-id: fbs2GN
+#: src/modules/local-first/components/PersonalToolFields.tsx
+msgid "Archive field"
+msgstr ""
+
 #. js-lingui-id: i19Zro
 #: src/modules/activities/files/components/DocumentViewer.tsx
 msgid "Archive files cannot be previewed. Please download the file to access its contents."
@@ -2710,6 +2730,11 @@ msgstr "アーカイブファイルはプレビューできません。内容に
 #: src/modules/settings/admin-panel/chats/components/SettingsAdminChatsTableRow.tsx
 msgid "Archived"
 msgstr "アーカイブ済み"
+
+#. js-lingui-id: 24KsMl
+#: src/modules/local-first/components/PersonalToolFields.tsx
+msgid "Archived fields keep their values and can be restored here."
+msgstr ""
 
 #. js-lingui-id: Faev6R
 #: src/pages/settings/communications/SettingsWorkspaceCommunicationGroupChannelDetail.tsx
@@ -2794,6 +2819,7 @@ msgid "ascending"
 msgstr "昇順"
 
 #. js-lingui-id: nYD/Cq
+#: src/modules/local-first/components/PersonalToolDesigner.tsx
 #: src/modules/object-record/object-sort-dropdown/components/ObjectSortDropdownButton.tsx
 #: src/modules/object-record/object-sort-dropdown/components/ObjectSortDropdownButton.tsx
 #: src/modules/side-panel/pages/page-layout/components/record-table-settings/RecordTableSettingsSorts.tsx
@@ -3164,6 +3190,12 @@ msgstr "{text} に戻る"
 msgid "Back to content"
 msgstr "コンテンツに戻る"
 
+#. js-lingui-id: +eQGWj
+#: src/local-workspace.tsx
+#: src/modules/local-first/components/PersonalWorkspace.tsx
+msgid "Back to CRM"
+msgstr ""
+
 #. js-lingui-id: 9aZHfH
 #: src/modules/marketplace/components/SettingsApplicationInstallPermissionValidationModal.tsx
 msgid "Back to settings"
@@ -3423,6 +3455,11 @@ msgstr "すべてのワークスペースの AI チャットスレッドを閲�
 #: src/modules/settings/admin-panel/ai/components/SettingsAdminAI.tsx
 msgid "Browse AI chat threads across all workspaces, including onboarding chats"
 msgstr "オンボーディングチャットを含む、すべてのワークスペースの AI チャットスレッドを閲覧する"
+
+#. js-lingui-id: tdqx41
+#: src/modules/local-first/components/PersonalToolHistory.tsx
+msgid "Browse history"
+msgstr ""
 
 #. js-lingui-id: hKAV/O
 #: src/pages/settings/community/SettingsCommunity.tsx
@@ -3960,6 +3997,11 @@ msgstr "年間に変更?"
 msgid "Change visibility?"
 msgstr "公開範囲を変更しますか？"
 
+#. js-lingui-id: evKMDY
+#: src/modules/local-first/components/PersonalWorkspace.tsx
+msgid "Changes here stay personal. CRM copies are snapshots; editing them does not update shared records."
+msgstr ""
+
 #. js-lingui-id: rnTfap
 #: src/pages/settings/applications/SettingsApplicationConnectionDetail.tsx
 msgid "Changing visibility requires reconnecting this OAuth connection. You will be redirected to authorize it again."
@@ -4044,6 +4086,11 @@ msgstr "メールを確認してください"
 msgid "Check your inbox to verify your new email address."
 msgstr "新しいメールアドレスを確認するため、受信トレイを確認してください。"
 
+#. js-lingui-id: G1XxbZ
+#: src/modules/local-first/components/PersonalToolFields.tsx
+msgid "Checkbox"
+msgstr ""
+
 #. js-lingui-id: SxwQE8
 #: src/modules/settings/billing/hooks/useHandleCheckoutSession.ts
 #: src/modules/settings/billing/hooks/useHandleCheckoutSession.ts
@@ -4064,6 +4111,11 @@ msgstr "中国語（繁体字）"
 #: src/modules/settings/billing/components/internal/ResourceCreditPackagePickerModal.tsx
 msgid "Choose {intervalAdjective} credits"
 msgstr "{intervalAdjective} クレジットを選択"
+
+#. js-lingui-id: 997x6T
+#: src/modules/local-first/components/PersonalToolHistory.tsx
+msgid "Choose a revision"
+msgstr ""
 
 #. js-lingui-id: NFfUic
 #: src/pages/auth/SignInUp.tsx
@@ -4308,6 +4360,11 @@ msgstr "閉じる"
 #: src/modules/information-banner/components/InformationBanner.tsx
 msgid "Close banner"
 msgstr "バナーを閉じる"
+
+#. js-lingui-id: XsI/T8
+#: src/modules/local-first/components/PersonalWorkspace.tsx
+msgid "Close local workspace"
+msgstr ""
 
 #. js-lingui-id: vcpc5o
 #: src/modules/blocknote-editor/components/BlockEditor.tsx
@@ -4833,6 +4890,11 @@ msgstr "設定内容を確認してください:"
 msgid "Confirming your payment"
 msgstr "お支払いを確認しています"
 
+#. js-lingui-id: IInnZo
+#: src/modules/local-first/components/LocalFirstChangesPanel.tsx
+msgid "Conflict"
+msgstr ""
+
 #. js-lingui-id: LOM1MR
 #: src/pages/auth/Authorize.tsx
 msgid "Connect {appName} to your account"
@@ -4978,6 +5040,7 @@ msgid "container"
 msgstr "コンテナ"
 
 #. js-lingui-id: /5mghO
+#: src/modules/local-first/components/PersonalToolDesigner.tsx
 #: src/modules/object-record/object-filter-dropdown/utils/getOperandLabel.ts
 msgid "Contains"
 msgstr "含む"
@@ -5179,6 +5242,11 @@ msgstr ""
 #: src/pages/settings/developers/api-keys/SettingsDevelopersApiKeyDetail.tsx
 msgid "Copy this key as it will not be visible again"
 msgstr "このキーは再表示されないため、コピーしてください"
+
+#. js-lingui-id: gajVsu
+#: src/modules/local-first/components/PersonalToolsLauncher.tsx
+msgid "Copy this record into a personal tool"
+msgstr ""
 
 #. js-lingui-id: /P/oME
 #: src/pages/settings/applications/tabs/SettingsApplicationRegistrationOAuthTab.tsx
@@ -5441,6 +5509,11 @@ msgstr "新しい連絡先を作成し、会社に関連付けます。詳細：
 #. js-lingui-id: j85EUk
 #: src/modules/ai/components/suggested-prompts/contextual-suggested-prompts.ts
 msgid "Create a new record in this view. Details: "
+msgstr ""
+
+#. js-lingui-id: NZ5qez
+#: src/modules/local-first/components/PersonalWorkspace.tsx
+msgid "Create a personal tool, add the fields you need, and arrange a view. You can also copy a viewed CRM record from the Local changes panel."
 msgstr ""
 
 #. js-lingui-id: n1Nbbe
@@ -5802,6 +5875,11 @@ msgstr "クレジット/期間"
 #: src/modules/settings/data-model/fields/forms/select/components/SettingsDataModelFieldSelectFormOptionRow.tsx
 msgid "Crimson"
 msgstr "クリムゾン"
+
+#. js-lingui-id: a+8j+Q
+#: src/modules/local-first/components/PersonalToolTable.tsx
+msgid "CRM copy"
+msgstr ""
 
 #. js-lingui-id: 6Oaeoc
 #: src/modules/logic-functions/utils/getLogicFunctionTriggerLabel.ts
@@ -6806,6 +6884,7 @@ msgid "descending"
 msgstr "降順"
 
 #. js-lingui-id: Cko536
+#: src/modules/local-first/components/PersonalToolDesigner.tsx
 #: src/modules/object-record/object-sort-dropdown/components/ObjectSortDropdownButton.tsx
 #: src/modules/object-record/object-sort-dropdown/components/ObjectSortDropdownButton.tsx
 #: src/modules/side-panel/pages/page-layout/components/record-table-settings/RecordTableSettingsSorts.tsx
@@ -6989,6 +7068,11 @@ msgstr "検索可能"
 #: src/modules/settings/security/components/SettingsSecurityAuthProvidersOptionsList.tsx
 msgid "Discovery on {defaultDomain}"
 msgstr "{defaultDomain} 上での検出"
+
+#. js-lingui-id: 1QfxQT
+#: src/modules/local-first/components/LocalFirstChangesPanel.tsx
+msgid "Dismiss"
+msgstr ""
 
 #. js-lingui-id: Xm/s+u
 #: src/modules/settings/accounts/components/SettingsAccountsCalendarChannelsGeneral.tsx
@@ -7262,6 +7346,16 @@ msgstr "複製"
 #: src/modules/workflow/workflow-steps/components/WorkflowStepOptionsMenuItems.tsx
 msgid "Duplicate node"
 msgstr "ノードを複製"
+
+#. js-lingui-id: /+HmNA
+#: src/modules/local-first/components/PersonalWorkspace.tsx
+msgid "Duplicate tool"
+msgstr ""
+
+#. js-lingui-id: VlZNPM
+#: src/modules/local-first/components/PersonalToolDesigner.tsx
+msgid "Duplicate view"
+msgstr ""
 
 #. js-lingui-id: mMsEuG
 #: src/modules/side-panel/pages/page-layout/components/WidgetSettingsFooter.tsx
@@ -8638,6 +8732,11 @@ msgstr "経験"
 msgid "Experience - Settings"
 msgstr "経験 - 設定"
 
+#. js-lingui-id: 4RIuAw
+#: src/modules/local-first/components/LocalFirstChangesPanel.tsx
+msgid "Experimental. Text, number, checkbox and single-choice field edits are saved on this device before syncing. Other changes need a connection."
+msgstr ""
+
 #. js-lingui-id: LxRNPw
 #: src/modules/settings/developers/components/SettingsApiKeysTable.tsx
 #: src/pages/settings/developers/api-keys/SettingsDevelopersApiKeyDetail.tsx
@@ -8701,6 +8800,21 @@ msgstr "エクスポート（{percentageValue}%）"
 #: src/modules/settings/roles/role-permissions/permission-flags/hooks/useActionRolePermissionFlagConfig.ts
 msgid "Export CSV"
 msgstr "CSVをエクスポート"
+
+#. js-lingui-id: I1y3Ml
+#: src/modules/local-first/components/LocalFirstChangesPanel.tsx
+msgid "Export edit history"
+msgstr ""
+
+#. js-lingui-id: rTE2a8
+#: src/modules/local-first/components/PersonalWorkspace.tsx
+msgid "Export template"
+msgstr ""
+
+#. js-lingui-id: gLsRSD
+#: src/modules/local-first/components/PersonalWorkspace.tsx
+msgid "Export tool and history"
+msgstr ""
 
 #. js-lingui-id: leUV74
 #: src/modules/settings/logic-functions/components/triggers/SettingsLogicFunctionWorkflowActionTriggerSection.tsx
@@ -9225,6 +9339,11 @@ msgstr "宛先のフィールド"
 msgid "field permission"
 msgstr "フィールドの権限"
 
+#. js-lingui-id: zXgopL
+#: src/modules/local-first/components/PersonalToolFields.tsx
+msgid "Field type"
+msgstr ""
+
 #. js-lingui-id: lcNTiF
 #: src/modules/side-panel/hooks/useOpenWidgetSettingsInSidePanel.ts
 #: src/modules/side-panel/pages/page-layout/utils/getPageLayoutPageTitle.ts
@@ -9274,6 +9393,11 @@ msgstr "フィールド（任意）"
 #: src/pages/settings/applications/tabs/SettingsApplicationDetailContentTab.tsx
 msgid "Fields added to other objects"
 msgstr "他のオブジェクトに追加されるフィールド"
+
+#. js-lingui-id: WWDAUG
+#: src/modules/local-first/components/PersonalToolFields.tsx
+msgid "Fields and columns"
+msgstr ""
 
 #. js-lingui-id: Tnz22x
 #: src/modules/object-record/record-merge/components/MergeSettingsTab.tsx
@@ -9392,6 +9516,11 @@ msgstr "レコード ID で絞り込む"
 #: src/modules/ai/components/AiChatThreadFilterDropdown.tsx
 msgid "Filter chats"
 msgstr "チャットを絞り込む"
+
+#. js-lingui-id: 5waeqc
+#: src/modules/local-first/components/PersonalToolDesigner.tsx
+msgid "Filter field"
+msgstr ""
 
 #. js-lingui-id: /VmB4B
 #: src/modules/object-record/advanced-filter/components/AdvancedFilterRecordFilterGroupOptionsDropdown.tsx
@@ -10247,6 +10376,11 @@ msgstr "システムインデックスを非表示"
 msgid "Hire a partner to help you implement and customize Twenty."
 msgstr "パートナーに依頼して、Twenty の導入とカスタマイズを支援してもらいましょう。"
 
+#. js-lingui-id: mZhga1
+#: src/modules/local-first/components/PersonalToolHistory.tsx
+msgid "History could not be read from this device."
+msgstr ""
+
 #. js-lingui-id: i0qMbr
 #: src/modules/navigation/components/MainNavigationDrawerModeSwitcher.tsx
 #: src/modules/navigation/hooks/useMobileNavigationBarItems.ts
@@ -10627,6 +10761,11 @@ msgstr "実装パートナー"
 msgid "Import"
 msgstr "インポート"
 
+#. js-lingui-id: BWYZvU
+#: src/modules/local-first/components/PersonalWorkspace.tsx
+msgid "Import a tool"
+msgstr ""
+
 #. js-lingui-id: sqOGcv
 #: src/modules/settings/accounts/components/SettingsAccountsMessageFolderCard.tsx
 msgid "Import all emails"
@@ -10667,6 +10806,11 @@ msgstr "インポート中"
 #: src/modules/spreadsheet-import/steps/components/ImportDataStep.tsx
 msgid "Importing Data ..."
 msgstr "データをインポート中 ..."
+
+#. js-lingui-id: Iup6tT
+#: src/modules/local-first/components/PersonalWorkspace.tsx
+msgid "Imports create a new personal copy. Use Export tool to keep a backup; clearing browser storage removes local tools."
+msgstr ""
 
 #. js-lingui-id: HiyKEP
 #: src/modules/settings/developers/utils/formatExpiration.ts
@@ -11419,6 +11563,11 @@ msgstr ""
 msgid "Keep everyone separate"
 msgstr ""
 
+#. js-lingui-id: i6BVeA
+#: src/modules/local-first/components/LocalFirstChangesPanel.tsx
+msgid "Keep local changes"
+msgstr ""
+
 #. js-lingui-id: 4Hatax
 #: src/modules/person-duplicate-review/components/PersonDuplicateCard.tsx
 msgid "Keep this record"
@@ -12152,6 +12301,16 @@ msgstr "スレッドを読み込み中"
 msgid "Loading..."
 msgstr "ロード中…"
 
+#. js-lingui-id: 9hnPJk
+#: src/modules/local-first/components/LocalFirstChangesPanel.tsx
+msgid "Local changes"
+msgstr ""
+
+#. js-lingui-id: TbRE4k
+#: src/modules/local-first/components/LocalFirstChangesPanel.tsx
+msgid "Local storage could not be read. Your edits have not been discarded."
+msgstr ""
+
 #. js-lingui-id: 7VBQ2j
 #: src/modules/settings/billing/constants/SettingsBillingPlanComparisonRows.ts
 #: src/modules/settings/billing/constants/SettingsBillingPlanComparisonRows.ts
@@ -12304,6 +12463,11 @@ msgstr ""
 msgid "Make {email} primary"
 msgstr ""
 
+#. js-lingui-id: RZmXd6
+#: src/modules/local-first/components/PersonalWorkspace.tsx
+msgid "Make a tool"
+msgstr ""
+
 #. js-lingui-id: MOLprz
 #: src/modules/settings/roles/role-permissions/permission-flags/hooks/useActionRolePermissionFlagConfig.ts
 msgid "Make HTTP requests to external APIs"
@@ -12318,6 +12482,11 @@ msgstr ""
 #: src/pages/settings/applications/SettingsApplicationConnectionDetail.tsx
 msgid "Make private"
 msgstr "非公開にする"
+
+#. js-lingui-id: 8tw6jM
+#: src/modules/local-first/components/PersonalWorkspace.tsx
+msgid "Make the CRM fit your work."
+msgstr ""
 
 #. js-lingui-id: wckWOP
 #: src/modules/settings/billing/components/internal/ResourceCreditPriceSelector.tsx
@@ -13165,6 +13334,11 @@ msgstr "日付フィールドが必要です"
 msgid "Needs a Select field"
 msgstr "選択フィールドが必要です"
 
+#. js-lingui-id: fAUSZy
+#: src/modules/local-first/components/LocalFirstChangesPanel.tsx
+msgid "Needs attention"
+msgstr ""
+
 #. js-lingui-id: wW3b68
 #: src/modules/workflow/workflow-steps/workflow-actions/http-request-action/components/WorkflowRunStepLogsHttpRequestDetail.tsx
 msgid "Network error"
@@ -13284,6 +13458,7 @@ msgid "New favorite"
 msgstr "新しいお気に入り"
 
 #. js-lingui-id: kV1LSq
+#: src/modules/local-first/components/PersonalToolFields.tsx
 #: src/pages/settings/data-model/new-field/SettingsObjectNewFieldConfigure.tsx
 #: src/pages/settings/data-model/new-field/SettingsObjectNewFieldSelect.tsx
 msgid "New field"
@@ -13998,6 +14173,11 @@ msgstr "パラメーターなし"
 msgid "No payment method found. Please update your billing details."
 msgstr "お支払い方法が見つかりません。請求先の詳細を更新してください。"
 
+#. js-lingui-id: IDFLS6
+#: src/modules/local-first/components/LocalFirstChangesPanel.tsx
+msgid "No pending edits."
+msgstr ""
+
 #. js-lingui-id: orE/ux
 #: src/pages/settings/applications/SettingsApplicationDetails.tsx
 msgid "No permission defined for this application"
@@ -14057,6 +14237,11 @@ msgstr "レコードが選択されていません"
 #: src/modules/object-record/record-table/empty-state/components/RecordTableEmptyStateReadOnly.tsx
 msgid "No records found"
 msgstr "レコードが見つかりません"
+
+#. js-lingui-id: LXscZx
+#: src/modules/local-first/components/PersonalToolTable.tsx
+msgid "No records match this view."
+msgstr ""
 
 #. js-lingui-id: FwUgy3
 #: src/modules/object-record/record-list/components/RecordListEmptyState.tsx
@@ -14488,6 +14673,7 @@ msgstr "数"
 
 #. js-lingui-id: HptUxX
 #: src/modules/ai/constants/OutputFieldTypeOptions.ts
+#: src/modules/local-first/components/PersonalToolFields.tsx
 #: src/modules/settings/data-model/fields/forms/number/constants/NumberDataModelSelectOptions.ts
 #: src/modules/ui/input/components/internal/date/components/RelativeDatePickerHeader.tsx
 msgid "Number"
@@ -14680,6 +14866,11 @@ msgstr "道を外れた"
 #: src/modules/settings/mcp-and-apis/utils/buildMcpSetupCategories.tsx
 msgid "Official app"
 msgstr "公式アプリ"
+
+#. js-lingui-id: fdH3r4
+#: src/modules/local-first/components/PersonalWorkspaceOfflineStatus.tsx
+msgid "Offline startup is tested in the built preview."
+msgstr ""
 
 #. js-lingui-id: Zd5vVt
 #: src/modules/workflow/workflow-steps/workflow-actions/find-records-action/components/WorkflowEditActionFindRecords.tsx
@@ -14941,6 +15132,16 @@ msgstr "役割で開く"
 msgid "Open Outlook"
 msgstr "Outlookで開く"
 
+#. js-lingui-id: ICec+5
+#: src/modules/local-first/components/PersonalToolsLauncher.tsx
+msgid "Open personal tools"
+msgstr ""
+
+#. js-lingui-id: m1069K
+#: src/local-workspace.tsx
+msgid "Open Personal tools from the experimental CRM to use this account's saved tools."
+msgstr ""
+
 #. js-lingui-id: VL5vJy
 #: src/modules/object-record/record-list/components/RecordListRow.tsx
 msgid "Open record"
@@ -14977,6 +15178,11 @@ msgstr "ワークスペース向けの Twenty 公式 ChatGPT 連携を開きま�
 #: src/modules/navigation-menu-item/display/sections/components/NavigationDrawerOpenedSection.tsx
 msgid "Opened"
 msgstr "開いた"
+
+#. js-lingui-id: qR6OlS
+#: src/local-workspace.tsx
+msgid "Opening local tools…"
+msgstr ""
 
 #. js-lingui-id: Fzfj4N
 #: src/pages/settings/layout/SettingsLayoutViewDetail.tsx
@@ -15088,6 +15294,11 @@ msgstr "組織プラン"
 #: src/modules/navigation-menu-item/edit/side-panel/components/SidePanelEditOrganizeActions.tsx
 msgid "Organize"
 msgstr "整理"
+
+#. js-lingui-id: 1gMEbJ
+#: src/modules/local-first/components/PersonalToolDesigner.tsx
+msgid "Original order"
+msgstr ""
 
 #. js-lingui-id: /IX/7x
 #: src/modules/ai/components/internal/AiChatQuestionOtherOption.tsx
@@ -15517,6 +15728,31 @@ msgstr "人物を作成しました"
 msgid "Person ID"
 msgstr "人物 ID"
 
+#. js-lingui-id: ghtf4R
+#: src/modules/local-first/components/PersonalWorkspace.tsx
+msgid "PERSONAL · SAVED ON THIS DEVICE"
+msgstr ""
+
+#. js-lingui-id: FhWvO9
+#: src/modules/local-first/components/PersonalWorkspaceOfflineStatus.tsx
+msgid "Personal data is saved locally. Prepare this page before reopening offline."
+msgstr ""
+
+#. js-lingui-id: hhzADK
+#: src/modules/local-first/components/PersonalWorkspace.tsx
+msgid "Personal tools"
+msgstr ""
+
+#. js-lingui-id: Z/8lBF
+#: src/local-workspace.tsx
+msgid "Personal workspace closed"
+msgstr ""
+
+#. js-lingui-id: VJpaT0
+#: src/modules/local-first/components/PersonalWorkspaceOfflineStatus.tsx
+msgid "Personal workspace ready for offline reopening"
+msgstr ""
+
 #. js-lingui-id: FaMom6
 #: src/modules/activities/emails/mass-email/components/MassEmailComposeCard.tsx
 msgid "Personalize for each recipient with placeholders:"
@@ -15798,6 +16034,11 @@ msgstr "<0>ワークスペースデータ</0>を事前入力しています..."
 #: src/modules/side-panel/pages/page-layout/constants/settings/ChartConfigurationSettingLabels.ts
 msgid "Prefix"
 msgstr "接頭辞"
+
+#. js-lingui-id: M9zCAq
+#: src/modules/local-first/components/PersonalWorkspaceOfflineStatus.tsx
+msgid "Prepare offline copy"
+msgstr ""
 
 #. js-lingui-id: dVCM1s
 #: src/modules/page-layout/widgets/call-recording/utils/getCallRecordingStatusDisplayConfiguration.ts
@@ -16303,6 +16544,7 @@ msgid "record"
 msgstr "レコード"
 
 #. js-lingui-id: w80YWM
+#: src/modules/local-first/components/PersonalToolTable.tsx
 #: src/modules/navigation-menu-item/display/object/components/NavigationDrawerItemForObjectMetadataItem.tsx
 #: src/modules/navigation-menu-item/edit/side-panel/components/SidePanelNewSidebarItemMainMenu.tsx
 #: src/modules/settings/applications/hooks/useComputeApplicationContentForLayoutAndLogic.ts
@@ -16403,6 +16645,11 @@ msgstr ""
 #. js-lingui-id: h9TBi+
 #: src/modules/page-layout/widgets/call-recording/utils/getCallRecordingStatusDisplayConfiguration.ts
 msgid "Recording Scheduled"
+msgstr ""
+
+#. js-lingui-id: ECgtG5
+#: src/modules/local-first/components/PersonalToolTable.tsx
+msgid "records"
 msgstr ""
 
 #. js-lingui-id: PWlTvh
@@ -16542,6 +16789,11 @@ msgstr "解放してこのサーバーに転送"
 msgid "Reload"
 msgstr "リロード"
 
+#. js-lingui-id: wiX5QD
+#: src/modules/local-first/components/PersonalWorkspace.tsx
+msgid "Reload from this device"
+msgstr ""
+
 #. js-lingui-id: qbM5In
 #: src/pages/settings/enterprise/SettingsEnterprise.tsx
 msgid "Reload validity token"
@@ -16652,6 +16904,11 @@ msgstr "ワークスペースからメンバーを削除"
 msgid "Remove model \"{0}\""
 msgstr "モデル \"{0}\" を削除"
 
+#. js-lingui-id: bmLLSA
+#: src/modules/local-first/components/PersonalWorkspaceOfflineStatus.tsx
+msgid "Remove offline copy"
+msgstr ""
+
 #. js-lingui-id: 00Lxnh
 #: src/modules/settings/data-model/fields/forms/select/components/SettingsDataModelFieldSelectFormOptionRow.tsx
 msgid "Remove option"
@@ -16722,6 +16979,11 @@ msgstr "チャット名を変更"
 #: src/modules/settings/data-model/object-details/components/SettingsUpdateDataModelObjectAboutForm.tsx
 msgid "Rename for all languages"
 msgstr "すべての言語で名前を変更"
+
+#. js-lingui-id: 8OzklZ
+#: src/modules/local-first/components/PersonalWorkspace.tsx
+msgid "Rename tool"
+msgstr ""
 
 #. js-lingui-id: oQjB9l
 #: src/modules/settings/billing/components/SettingsBillingSubscriptionInfo.tsx
@@ -16945,10 +17207,30 @@ msgstr "復元"
 msgid "Restore {objectLabel}"
 msgstr "{objectLabel}を復元"
 
+#. js-lingui-id: o25Ay0
+#: src/modules/local-first/components/PersonalToolFields.tsx
+msgid "Restore field"
+msgstr ""
+
+#. js-lingui-id: fgxf+Q
+#: src/modules/local-first/components/PersonalWorkspace.tsx
+msgid "Restore previous revision"
+msgstr ""
+
 #. js-lingui-id: ZkHcxG
 #: src/pages/settings/applications/tabs/SettingsApplicationTimelineActivityTypeSettingsTab.tsx
 msgid "Restore the activity type settings defined by the application"
 msgstr "アプリケーションで定義されたアクティビティタイプの設定を復元"
+
+#. js-lingui-id: zXgnvH
+#: src/modules/local-first/components/PersonalToolHistory.tsx
+msgid "Restore this revision"
+msgstr ""
+
+#. js-lingui-id: /pdfap
+#: src/modules/local-first/components/PersonalToolHistory.tsx
+msgid "Restoring creates a new revision and keeps the existing history."
+msgstr ""
 
 #. js-lingui-id: hO3AfV
 #: src/pages/settings/ai/components/SettingsAiModelsTab.tsx
@@ -16987,6 +17269,11 @@ msgstr "リトライ"
 #: src/modules/settings/admin-panel/health-status/components/SettingsAdminQueueJobsTable.tsx
 msgid "Retry All Failed"
 msgstr "すべての失敗を再試行"
+
+#. js-lingui-id: kms3+N
+#: src/modules/local-first/components/LocalFirstChangesPanel.tsx
+msgid "Retry this edit"
+msgstr ""
 
 #. js-lingui-id: ZbpKL+
 #: src/modules/settings/admin-panel/health-status/components/SettingsAdminJobDetailsExpandable.tsx
@@ -17293,6 +17580,16 @@ msgstr "新しいビューとして保存"
 #: src/modules/layout-customization/hooks/useEnterLayoutCustomizationMode.ts
 msgid "Save or cancel dashboard changes before editing the layout."
 msgstr "レイアウトを編集する前に、ダッシュボードの変更を保存するか取り消してください。"
+
+#. js-lingui-id: xADcr8
+#: src/modules/local-first/components/LocalFirstChangesPanel.tsx
+msgid "Saved on this device"
+msgstr ""
+
+#. js-lingui-id: E7VSxe
+#: src/modules/local-first/components/PersonalToolHistory.tsx
+msgid "Saved revision"
+msgstr ""
 
 #. js-lingui-id: K/F6pa
 #: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
@@ -18218,6 +18515,11 @@ msgstr "セパレーター"
 msgid "Serbian (Cyrillic)"
 msgstr "セルビア語（キリル文字）"
 
+#. js-lingui-id: sGH11W
+#: src/modules/local-first/components/LocalFirstChangesPanel.tsx
+msgid "Server"
+msgstr ""
+
 #. js-lingui-id: hjUUtd
 #: src/pages/settings/admin-panel/SettingsAdminUserDetail.tsx
 msgid "Server access"
@@ -18380,6 +18682,11 @@ msgstr "2FAをセットアップ"
 #: src/modules/object-record/record-merge/utils/getPositionWordLabel.ts
 msgid "Seventh"
 msgstr "第七"
+
+#. js-lingui-id: 7b/6fg
+#: src/modules/local-first/components/PersonalToolDesigner.tsx
+msgid "Shape this tool"
+msgstr ""
 
 #. js-lingui-id: Z8lGw6
 #: src/modules/activities/emails/components/EmailThreadBottomBar.tsx
@@ -18819,6 +19126,11 @@ msgstr "並び替え基準"
 #: src/modules/side-panel/pages/page-layout/utils/__tests__/shouldHideChartSetting.test.ts
 msgid "Sort By Group"
 msgstr "グループで並べ替え"
+
+#. js-lingui-id: 2QFwAr
+#: src/modules/local-first/components/PersonalToolDesigner.tsx
+msgid "Sort field"
+msgstr ""
 
 #. js-lingui-id: fLIwZB
 #: src/modules/object-record/record-index/utils/getNonReadableViewFieldSubTitle.ts
@@ -19622,6 +19934,7 @@ msgstr "テキスト"
 #: src/modules/advanced-text-editor/components/AdvancedTextEditorInsertRail.tsx
 #: src/modules/advanced-text-editor/extensions/slash-command/DefaultSlashCommands.ts
 #: src/modules/ai/constants/OutputFieldTypeOptions.ts
+#: src/modules/local-first/components/PersonalToolFields.tsx
 #: src/modules/side-panel/pages/email-block-settings/constants/EmailBodyThemeFields.ts
 #: src/modules/workflow/workflow-steps/workflow-actions/http-request-action/components/BodyInput.tsx
 msgid "Text"
@@ -19788,6 +20101,11 @@ msgstr "終了日は開始日より後である必要があります。"
 msgid "The end time must be after the start time."
 msgstr "終了時刻は開始時刻より後である必要があります。"
 
+#. js-lingui-id: CIDrb5
+#: src/modules/local-first/components/PersonalWorkspace.tsx
+msgid "The file or history could not be read. Imports must be valid tool files under 10 MB."
+msgstr ""
+
 #. js-lingui-id: 21Xjwu
 #: src/pages/settings/legal/SettingsLegalDpaNew.tsx
 msgid "The full agreement with fields resolved for your deployment."
@@ -19846,6 +20164,11 @@ msgstr "受信者の受信トレイで、アドレスだけでなく、その横
 msgid "The name recipients see next to your address. It is set when the channel is created."
 msgstr "受信者があなたのアドレスの横に表示される名前です。これはチャネル作成時に設定されます。"
 
+#. js-lingui-id: cChKqQ
+#: src/modules/local-first/components/PersonalWorkspaceOfflineStatus.tsx
+msgid "The offline copy could not be prepared. Keep this page open and retry with a connection. Your tools are still saved on this device."
+msgstr ""
+
 #. js-lingui-id: L97sPr
 #: src/pages/not-found/NotFound.tsx
 msgid "The page you're seeking is either gone or never was. Let's get you back on track"
@@ -19859,6 +20182,11 @@ msgstr "PDF は Twenty によって事前に署名され、お客様の法人お
 #. js-lingui-id: JD8guD
 #: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
 msgid "The people could not be merged."
+msgstr ""
+
+#. js-lingui-id: QI0lD1
+#: src/modules/local-first/components/PersonalToolsLauncher.tsx
+msgid "The record could not be copied. Open a loaded CRM record with readable text, number or checkbox fields and try again."
 msgstr ""
 
 #. js-lingui-id: Ir4tSJ
@@ -20136,6 +20464,11 @@ msgstr "このデータベース値は環境設定を上書きします。"
 #: src/modules/settings/profile/devices/components/SettingsDeviceSessionRowRightComponent.tsx
 msgid "This device"
 msgstr "このデバイス"
+
+#. js-lingui-id: DJ5k6g
+#: src/modules/local-first/components/LocalFirstChangesPanel.tsx
+msgid "This edit could not be saved on this device. Check local storage and try again."
+msgstr ""
 
 #. js-lingui-id: VQvoBA
 #: src/pages/settings/enterprise/SettingsEnterprise.tsx
@@ -20607,6 +20940,11 @@ msgstr "ツールの実行に失敗しました"
 msgid "Tool generation"
 msgstr "ツール生成"
 
+#. js-lingui-id: S/vw4z
+#: src/modules/local-first/components/PersonalWorkspace.tsx
+msgid "Tool name"
+msgstr ""
+
 #. js-lingui-id: xdA/+p
 #: src/pages/settings/ai/components/SettingsAgentToolsTab.tsx
 #: src/pages/settings/ai/components/SettingsAiOverviewTab.tsx
@@ -20876,6 +21214,11 @@ msgstr "ターンが見つかりません"
 #: src/modules/settings/data-model/fields/forms/select/components/SettingsDataModelFieldSelectFormOptionRow.tsx
 msgid "Turquoise"
 msgstr "ターコイズ"
+
+#. js-lingui-id: gtHi/f
+#: src/modules/local-first/components/PersonalWorkspace.tsx
+msgid "TWENTY · EXPERIMENTAL"
+msgstr ""
 
 #. js-lingui-id: JnaRPe
 #: src/modules/spreadsheet-import/steps/components/MatchColumnsStep/components/ColumnGrid.tsx
@@ -21773,6 +22116,11 @@ msgstr "英数字、アンダースコア、ドット、ハイフンのみを使
 msgid "Use our API or add your first {objectLabel} manually"
 msgstr "APIを使用するか、最初の{objectLabel}を手動で追加してください"
 
+#. js-lingui-id: 1PW0sv
+#: src/modules/local-first/components/LocalFirstChangesPanel.tsx
+msgid "Use server values"
+msgstr ""
+
 #. js-lingui-id: z1f4Op
 #: src/modules/workflow/workflow-variables/utils/getWorkflowVariableSpecialItems.ts
 msgid "Use the whole item"
@@ -22042,6 +22390,7 @@ msgid "view"
 msgstr "ビュー"
 
 #. js-lingui-id: jpctdh
+#: src/modules/local-first/components/PersonalToolDesigner.tsx
 #: src/modules/navigation-menu-item/edit/side-panel/components/SidePanelNewSidebarItemMainMenu.tsx
 #: src/modules/settings/applications/hooks/useComputeApplicationContentForLayoutAndLogic.ts
 #: src/modules/settings/data-model/object-details/components/SettingsObjectFieldDisabledActionDropdown.tsx
@@ -22136,6 +22485,11 @@ msgstr "請求書を表示"
 msgid "View Jobs"
 msgstr "ジョブを表示"
 
+#. js-lingui-id: oOljSE
+#: src/modules/local-first/components/PersonalToolDesigner.tsx
+msgid "View name"
+msgstr ""
+
 #. js-lingui-id: sAPirx
 #: src/modules/object-record/record-index/components/RecordIndexEmptyStateNotShared.tsx
 msgid "View not shared"
@@ -22209,6 +22563,7 @@ msgid "Visibility Restriction"
 msgstr "表示範囲の制限"
 
 #. js-lingui-id: oh8+os
+#: src/modules/local-first/components/PersonalToolFields.tsx
 #: src/pages/settings/layout/SettingsLayoutViewDetail.tsx
 msgid "Visible"
 msgstr "表示可能"
@@ -23213,6 +23568,11 @@ msgstr "表示名"
 #. js-lingui-id: ZV7dVk
 #: src/modules/settings/profile/components/SettingsProfileEmailSignature.tsx
 msgid "Your name, role, and anything else you want at the end of your emails"
+msgstr ""
+
+#. js-lingui-id: kr5em4
+#: src/modules/local-first/components/PersonalWorkspace.tsx
+msgid "Your own fields, views and working copies."
 msgstr ""
 
 #. js-lingui-id: 8mfOAZ
