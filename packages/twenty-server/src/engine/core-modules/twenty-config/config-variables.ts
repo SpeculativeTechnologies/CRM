@@ -1523,6 +1523,16 @@ export class ConfigVariables {
   @ConfigVariablesMetadata({
     group: ConfigVariablesGroup.SERVER_CONFIG,
     description:
+      'Enable experimental, idempotent local record edits. Keep disabled outside experimental development.',
+    type: ConfigVariableType.BOOLEAN,
+    isEnvOnly: true,
+  })
+  @IsOptional()
+  IS_LOCAL_FIRST_WRITES_ENABLED = false;
+
+  @ConfigVariablesMetadata({
+    group: ConfigVariablesGroup.SERVER_CONFIG,
+    description:
       'Express "trust proxy" setting. Controls whether X-Forwarded-* ' +
       'headers are honored — required for request.protocol to return ' +
       '"https" when TLS is terminated upstream (reverse proxy, ingress, ' +

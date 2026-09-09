@@ -12,6 +12,12 @@ import { messages as enMessages } from '~/locales/generated/en';
 i18n.load({ [SOURCE_LOCALE]: enMessages });
 i18n.activate(SOURCE_LOCALE);
 
+// CommonJS Jest cannot evaluate Vite's import.meta.env. Production defaults and
+// the ordinary CRM test suite both keep this experimental path disabled.
+jest.mock('@/local-first/constants/IS_LOCAL_FIRST_WRITES_ENABLED', () => ({
+  IS_LOCAL_FIRST_WRITES_ENABLED: false,
+}));
+
 const globalWithWebStreams = globalThis as Record<string, unknown>;
 
 if (globalWithWebStreams.TransformStream === undefined) {

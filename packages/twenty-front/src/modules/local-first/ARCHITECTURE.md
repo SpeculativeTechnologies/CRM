@@ -1,6 +1,6 @@
 # Proposed local-first CRM architecture
 
-This is an architectural refactor of the existing CRM. The current spike is not a local-first write path and must remain opt-in until the following contracts are implemented and verified.
+This is an architectural refactor of the existing CRM. The branch now implements durable scalar edits and personal tools, and must remain experimental and opt-in. The full contracts below are the target; NOTES.md distinguishes implemented behavior from remaining work.
 
 ## Observable outcome
 
@@ -26,11 +26,11 @@ Personal definitions and shared schema need distinct scopes. A personal experime
 
 ## Integration sequence
 
-1. Scoped storage, worker ownership, durable schema/checkpoints, cancellation and complete-snapshot reads. This branch implements that foundation; see NOTES.md for current limits.
-2. Versioned/idempotent server mutation contract and a durable local operation journal.
-3. Wire existing record editing to local commits, with reconnect/conflict UI and cross-tab tests.
-4. Persist startup metadata and serve the application shell offline; test offline reload and session expiry.
-5. Declarative local definitions and editing tools, then explicit sharing of schema changes.
+1. Scoped storage, worker ownership, durable schema/checkpoints, cancellation and complete-snapshot reads. Implemented; see NOTES.md for current limits.
+2. Idempotent server scalar mutation contract and a durable local operation journal. Implemented with field compare-and-set and atomic receipts.
+3. Wire existing scalar record editing to local commits, with reconnect/conflict UI and cross-tab tests. Implemented; broader record actions remain online.
+4. Serve an offline application shell. Implemented for the separate personal workspace; full CRM startup and session-expiry behavior remain.
+5. Declarative personal definitions, rows, history and portable exports. Implemented for detached tools; shared schema publication and cross-device collaboration remain.
 6. Replace the fixed object/relation allowlists with permission-aware metadata-driven replication.
 
 Each step requires focused behavior tests. Final acceptance must cover the full offline/edit/reload/reconnect interaction on the verified mirror, plus synthetic screenshots, static checks and exact-commit CI. No production or staging deployment is included.

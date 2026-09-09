@@ -81,10 +81,17 @@ def prepare(args, previous):
             raise RuntimeError('Restored database settings differ from the saved snapshot')
         if manifest['kind'] == 'mirror':
             stack.phase('verify-mirror', lambda: stack.sql((ROOT / 'deploy/devdata-verify.sql').read_text()))
+    state['local_first'] = state.get('local_first', False) if args.local_first is None else args.local_first
+    state['built_front'] = args.built_front
     stack.host_environment(state)
     state['ready'] = False
     save(state)
     stack.build()
+    if state['built_front']:
+        result = stack.phase('frontend-build', lambda: stack.source(str(ROOT / 'node_modules/.bin/nx'),
+                            'build', 'twenty-front', cwd=ROOT))
+        if result.returncode:
+            raise RuntimeError('Frontend build failed; inspect the private frontend-build log')
     for name, arguments in [('instance-upgrade', ['run-instance-commands', '--force', '--include-slow']),
                             ('workspace-upgrade', ['upgrade']), ('cache-flush', ['cache:flush'])]:
         result = stack.phase(name, lambda arguments=arguments: stack.command(*arguments))
@@ -103,6 +110,10 @@ def main():
         command.add_argument('--baseline', help='Frozen verified CRM mirror directory')
         command.add_argument('--fixture', action='store_true',
                              help='Explicit synthetic screenshot or clean-initialization session')
+        command.add_argument('--local-first', action=argparse.BooleanOptionalAction, default=None,
+                             help='Enable experimental local edits in this isolated worktree only')
+        command.add_argument('--built-front', action='store_true',
+                             help='Build and preview the frontend on its normal origin, for offline startup tests')
         command.add_argument('--port', dest='front_port', type=int, help='Frontend port (first start chooses a free port)')
         command.add_argument('--api-port', type=int, help='API port (first start chooses a free port)')
     commands.add_parser('status')

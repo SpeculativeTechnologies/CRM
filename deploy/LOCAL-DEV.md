@@ -1,5 +1,13 @@
 # Daily local development
 
+The experimental local-first branch can opt in with `start --local-first`.
+This enables durable scalar edits and their reconciliation endpoint only in
+that worktree's guarded environment. The option is retained on restart; it
+does not enable Electric replication, change other worktrees, or deploy
+anything. Keep this experiment on its feature branch and draft PR.
+Use `start --no-local-first` to disable the experiment again while preserving
+the local journal and receipt table.
+
 Use this when you want to edit the frontend or backend repeatedly without
 building a release image or deploying. Each worktree gets its own Postgres,
 Redis, local uploads, ports and signing secret. Your normal `twenty-dev`
@@ -206,3 +214,20 @@ rehearse the final image once the coherent change is ready. Consult private
 browser checks and the current branch/baseline/check status under the ignored
 `deploy/.local-dev/` directory so the next session can continue without
 rediscovering the environment. Never save mirror screenshots as test evidence.
+
+### Built preview for the experimental personal workspace
+
+Use `bash deploy/local-dev.sh start --local-first --built-front` to build and
+serve the frontend on this environment's normal origin. This exercises offline
+startup without moving authenticated requests to a second port. The supervisor
+keeps its usual owned database, service guards and private diagnostics. Frontend
+source edits need another build in this mode; omit `--built-front` to return to
+source hot reload. Backend source watching continues in both modes.
+
+In **Local changes**, open **Personal tools**. **Prepare offline copy** caches
+only that page's static build assets. Once it reports ready, personal tools can
+be reopened offline at `/local-workspace/`. Shared CRM record pages still need
+online startup. Tool edits remain personal; copied records are detached snapshots.
+Use its export controls for local backups and **Remove offline copy** to remove
+the service worker/cache without deleting tool data. This branch must remain
+experimental and must not be merged, staged or deployed.

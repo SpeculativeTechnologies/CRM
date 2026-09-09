@@ -5,6 +5,7 @@ import { currentWorkspaceState } from '@/auth/states/currentWorkspaceState';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
 
 import { IS_LOCAL_FIRST_ENABLED } from '@/local-first/constants/IS_LOCAL_FIRST_ENABLED';
+import { IS_LOCAL_FIRST_WRITES_ENABLED } from '@/local-first/constants/IS_LOCAL_FIRST_WRITES_ENABLED';
 
 // Everything local-first stays behind this gate and this lazy import: with
 // the flag off (the default, and every deployed build) none of the
@@ -15,15 +16,34 @@ const LocalFirstDebugPanel = lazy(() =>
     default: module.LocalFirstDebugPanel,
   })),
 );
+const LocalFirstChangesPanel = lazy(() =>
+  import('@/local-first/components/LocalFirstChangesPanel').then((module) => ({
+    default: module.LocalFirstChangesPanel,
+  })),
+);
 
 export const LocalFirstDebugPanelGate = () => {
   const currentUser = useAtomStateValue(currentUserState);
   const currentWorkspace = useAtomStateValue(currentWorkspaceState);
-  if (!IS_LOCAL_FIRST_ENABLED || !currentUser || !currentWorkspace) return null;
+  if (
+    (!IS_LOCAL_FIRST_ENABLED && !IS_LOCAL_FIRST_WRITES_ENABLED) ||
+    !currentUser ||
+    !currentWorkspace
+  )
+    return null;
 
   return (
     <Suspense fallback={null}>
-      <LocalFirstDebugPanel key={`${currentWorkspace.id}:${currentUser.id}`} />
+      {IS_LOCAL_FIRST_ENABLED && (
+        <LocalFirstDebugPanel
+          key={`replica:${currentWorkspace.id}:${currentUser.id}`}
+        />
+      )}
+      {IS_LOCAL_FIRST_WRITES_ENABLED && (
+        <LocalFirstChangesPanel
+          key={`edits:${currentWorkspace.id}:${currentUser.id}`}
+        />
+      )}
     </Suspense>
   );
 };

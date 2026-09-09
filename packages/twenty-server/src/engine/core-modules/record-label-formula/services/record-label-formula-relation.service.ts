@@ -12,6 +12,7 @@ import { type OrmFlatFieldMetadata } from 'src/engine/metadata-modules/flat-fiel
 import { type FlatFieldMetadata } from 'src/engine/metadata-modules/flat-field-metadata/types/flat-field-metadata.type';
 import { type FlatObjectMetadata } from 'src/engine/metadata-modules/flat-object-metadata/types/flat-object-metadata.type';
 import { getMinimalSelectForRecordIdentifier } from 'src/engine/metadata-modules/navigation-menu-item/utils/get-minimal-select-for-record-identifier.util';
+import { type WorkspaceTransactionScope } from 'src/engine/twenty-orm/types/workspace-transaction-scope.type';
 import { WorkspaceOrmManager } from 'src/engine/twenty-orm/workspace-orm.manager';
 
 @Injectable()
@@ -23,11 +24,13 @@ export class RecordLabelFormulaRelationService {
     flatObjectMetadataMaps,
     records,
     relationFieldMetadatas,
+    transactionScope,
   }: {
     flatFieldMetadataMaps: FlatEntityMaps<OrmFlatFieldMetadata>;
     flatObjectMetadataMaps: FlatEntityMaps<FlatObjectMetadata>;
     records: ObjectRecord[];
     relationFieldMetadatas: OrmFlatFieldMetadata[];
+    transactionScope?: WorkspaceTransactionScope;
   }): Promise<Map<string, string>> {
     const relationRecordLabels = new Map<string, string>();
     // Display-name helpers are typed on the full field metadata but only read
@@ -88,10 +91,11 @@ export class RecordLabelFormulaRelationService {
         continue;
       }
 
-      const targetRepository = this.workspaceOrmManager.getRepository(
-        targetObjectMetadata.nameSingular,
-        { shouldBypassPermissionChecks: true },
-      );
+      const targetRepository = (
+        transactionScope ?? this.workspaceOrmManager
+      ).getRepository(targetObjectMetadata.nameSingular, {
+        shouldBypassPermissionChecks: true,
+      });
       const targetRecords = (await targetRepository.find({
         select: getMinimalSelectForRecordIdentifier({
           flatObjectMetadata: targetObjectMetadata,
