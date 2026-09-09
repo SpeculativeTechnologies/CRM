@@ -1,8 +1,6 @@
 import { triggerUpdateRecordOptimisticEffect } from '@/apollo/optimistic-effect/utils/triggerUpdateRecordOptimisticEffect';
 import { currentWorkspaceMemberState } from '@/auth/states/currentWorkspaceMemberState';
 import { tryCommitLocalFirstRecordUpdate } from '@/local-first/services/tryCommitLocalFirstRecordUpdate';
-import { useSnackBar } from '@/ui/feedback/snack-bar-manager/hooks/useSnackBar';
-import { t } from '@lingui/core/macro';
 import { dispatchObjectRecordOperationBrowserEvent } from '@/browser-event/utils/dispatchObjectRecordOperationBrowserEvent';
 import { useApolloCoreClient } from '@/object-metadata/hooks/useApolloCoreClient';
 import { useObjectMetadataItems } from '@/object-metadata/hooks/useObjectMetadataItems';
@@ -39,7 +37,6 @@ type UpdateOneRecordArgs<UpdatedObjectRecord> = {
 export const useUpdateOneRecord = () => {
   const apolloCoreClient = useApolloCoreClient();
   const { upsertRecordsInStore } = useUpsertRecordsInStore();
-  const { enqueueErrorSnackBar } = useSnackBar();
 
   const currentWorkspaceMember = useAtomStateValue(currentWorkspaceMemberState);
 
@@ -129,9 +126,7 @@ export const useUpdateOneRecord = () => {
       input: updateOneRecordInput,
       previous: cachedRecord,
     }).catch((error: unknown) => {
-      enqueueErrorSnackBar({
-        message: t`This edit could not be saved on this device. Check local storage and try again.`,
-      });
+      window.dispatchEvent(new Event('twenty-local-save-failed'));
       throw error;
     });
 

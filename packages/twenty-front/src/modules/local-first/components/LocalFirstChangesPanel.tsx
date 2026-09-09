@@ -51,6 +51,7 @@ export const LocalFirstChangesPanel = () => {
   const [entries, setEntries] = useState<LocalFirstJournalEntry[]>([]);
   const [expanded, setExpanded] = useState(false);
   const [error, setError] = useState(false);
+  const [saveError, setSaveError] = useState(false);
   const refresh = useCallback(async () => {
     const scope = getCurrentLocalFirstScope();
     if (!scope) return;
@@ -66,11 +67,14 @@ export const LocalFirstChangesPanel = () => {
     }
   }, []);
   useEffect(() => {
+    const reportSaveFailure = () => setSaveError(true);
+    window.addEventListener('twenty-local-save-failed', reportSaveFailure);
     const stop = startLocalFirstJournalSync({ onChange: () => void refresh() });
     // Followers also observe edits made by the sync-owning tab.
     const timer = setInterval(() => void refresh(), 1500);
     void refresh();
     return () => {
+      window.removeEventListener('twenty-local-save-failed', reportSaveFailure);
       stop();
       clearInterval(timer);
     };
@@ -148,6 +152,19 @@ export const LocalFirstChangesPanel = () => {
             Local storage could not be read. Your edits have not been discarded.
           </Trans>
         </p>
+      )}
+      {saveError && (
+        <div role="alert">
+          <p>
+            <Trans>
+              This edit could not be saved on this device. Check local storage
+              and try again.
+            </Trans>
+          </p>
+          <button onClick={() => setSaveError(false)}>
+            <Trans>Dismiss</Trans>
+          </button>
+        </div>
       )}
       {expanded && (
         <>
