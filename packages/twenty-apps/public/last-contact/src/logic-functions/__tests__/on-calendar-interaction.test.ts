@@ -82,6 +82,7 @@ describe('on-calendar-interaction handler', () => {
       lastContactAt: PAST_EVENT_STARTS_AT,
       lastContactById: null,
       lastContactItemCalendarEventId: 'event-1',
+      lastContactItemContactLogId: null,
       lastContactItemMessageId: null,
       lastOutboundAt: PAST_EVENT_STARTS_AT,
       lastInboundAt: PAST_EVENT_STARTS_AT,

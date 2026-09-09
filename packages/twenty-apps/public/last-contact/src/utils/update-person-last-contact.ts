@@ -13,7 +13,7 @@ export type Interaction = {
 const isNewer = (
   candidate: string,
   current: string | null | undefined,
-): boolean => !current || current < candidate;
+): boolean => !current || Date.parse(current) < Date.parse(candidate);
 
 export const updatePersonForInteraction = async (
   client: CoreApiClient,
@@ -45,6 +45,7 @@ export const updatePersonForInteraction = async (
 
   if (isNewer(occurredAt, current.lastContactAt)) {
     data.lastContactAt = occurredAt;
+    data.lastContactItemContactLogId = null;
     data.lastContactById = workspaceMemberId ?? null;
     if (kind === 'email') {
       data.lastContactItemMessageId = itemId;
@@ -69,7 +70,10 @@ export const updatePersonForInteraction = async (
   if (kind === 'email' && isNewer(occurredAt, current.lastEmail?.receivedAt)) {
     data.lastEmailId = itemId;
   }
-  if (kind === 'meeting' && isNewer(occurredAt, current.lastMeeting?.startsAt)) {
+  if (
+    kind === 'meeting' &&
+    isNewer(occurredAt, current.lastMeeting?.startsAt)
+  ) {
     data.lastMeetingId = itemId;
   }
 
@@ -101,30 +105,46 @@ export const updatePersonForInteraction = async (
     if (Array.isArray(updatePeople) && updatePeople.length > 0) {
       return;
     }
+  }
 
-    const directionalData: Record<string, string | null> = { ...data };
-    delete directionalData.lastContactAt;
-    delete directionalData.lastContactById;
-    delete directionalData.lastContactItemMessageId;
-    delete directionalData.lastContactItemCalendarEventId;
-
-    if (Object.keys(directionalData).length === 0) {
-      return;
+  // A manual contact can win after the initial read. Guard each remaining date
+  // independently so a slower email/calendar import cannot move it backwards.
+  for (const field of ['lastOutboundAt', 'lastInboundAt'] as const) {
+    if (!(field in data)) {
+      continue;
     }
-
     await client.mutation({
-      updatePerson: {
-        __args: { id: personId, data: directionalData },
+      updatePeople: {
+        __args: {
+          data: { [field]: occurredAt },
+          filter: {
+            id: { eq: personId },
+            or: [{ [field]: { is: 'NULL' } }, { [field]: { lt: occurredAt } }],
+          },
+        },
         id: true,
       },
     });
-    return;
   }
 
-  await client.mutation({
-    updatePerson: {
-      __args: { id: personId, data },
-      id: true,
-    },
-  });
+  const relation = kind === 'email' ? 'lastEmail' : 'lastMeeting';
+  const relationId = kind === 'email' ? 'lastEmailId' : 'lastMeetingId';
+  const timestampField = kind === 'email' ? 'receivedAt' : 'startsAt';
+  if (relationId in data) {
+    await client.mutation({
+      updatePeople: {
+        __args: {
+          data: { [relationId]: itemId },
+          filter: {
+            id: { eq: personId },
+            or: [
+              { [relationId]: { is: 'NULL' } },
+              { [relation]: { [timestampField]: { lt: occurredAt } } },
+            ],
+          },
+        },
+        id: true,
+      },
+    });
+  }
 };

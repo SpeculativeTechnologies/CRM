@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.3.0
+
+- Add a Log contact action on People for LinkedIn, text, phone, WhatsApp, Signal, in-person, and other contact, with date, direction, and optional notes.
+- Include contact logs in live last-contact updates and every backfill, linking the latest interaction from People, Companies, and Opportunities.
+- Recalculate after edits, deletion, restoration, and reassignment, and guard recalculation against concurrent writes.
+- Guard inbound/outbound and email/meeting fallback updates so a slower sync cannot overwrite newer manual contact.
+
 ## 1.2.4
 
 - Limit the app role to reading synced messages, calendar events, and their participants, and to reading and updating people, companies, and opportunities. The app no longer requests read and edit access to every record type.

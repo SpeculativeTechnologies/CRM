@@ -44,6 +44,7 @@ describe('recomputeCompanyLastContact', () => {
       lastContactAt: OCCURRED_AT,
       lastContactItemMessageId: null,
       lastContactItemCalendarEventId: CALENDAR_EVENT_ID,
+      lastContactItemContactLogId: null,
     });
     expect(client.query.mock.calls[0][0].people.__args.filter).toEqual({
       companyId: { eq: COMPANY_ID },
@@ -60,6 +61,7 @@ describe('recomputeCompanyLastContact', () => {
       lastContactAt: null,
       lastContactItemMessageId: null,
       lastContactItemCalendarEventId: null,
+      lastContactItemContactLogId: null,
     });
   });
 });

@@ -124,6 +124,7 @@ describe('updatePersonLastContactAtFromCalendar', () => {
       lastContactAt: PAST_EVENT_STARTS_AT,
       lastContactById: MEMBER_ID,
       lastContactItemCalendarEventId: CALENDAR_EVENT_ID,
+      lastContactItemContactLogId: null,
       lastContactItemMessageId: null,
       lastOutboundAt: PAST_EVENT_STARTS_AT,
       lastInboundAt: PAST_EVENT_STARTS_AT,

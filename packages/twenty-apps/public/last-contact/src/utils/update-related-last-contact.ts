@@ -22,6 +22,7 @@ const buildData = ({
   kind,
 }: Omit<RelatedInteraction, 'personId'>): Record<string, string | null> => ({
   lastContactAt: occurredAt,
+  lastContactItemContactLogId: null,
   lastContactItemMessageId: kind === 'email' ? itemId : null,
   lastContactItemCalendarEventId: kind === 'meeting' ? itemId : null,
 });

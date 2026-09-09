@@ -4,12 +4,14 @@ type LastContactData = Record<string, string | null>;
 
 const EMPTY_LAST_CONTACT: LastContactData = {
   lastContactAt: null,
+  lastContactItemContactLogId: null,
   lastContactItemMessageId: null,
   lastContactItemCalendarEventId: null,
 };
 
 type PersonLastContact = {
   lastContactAt?: string | null;
+  lastContactItemContactLog?: { id: string } | null;
   lastContactItemMessage?: { id: string } | null;
   lastContactItemCalendarEvent?: { id: string } | null;
 };
@@ -41,6 +43,7 @@ export const recomputeOpportunityLastContact = async (
         __args: { filter: { id: { eq: pointOfContactId } } },
         id: true,
         lastContactAt: true,
+        lastContactItemContactLog: { id: true },
         lastContactItemMessage: { id: true },
         lastContactItemCalendarEvent: { id: true },
       },
@@ -50,6 +53,8 @@ export const recomputeOpportunityLastContact = async (
 
     data = {
       lastContactAt: current.lastContactAt ?? null,
+      lastContactItemContactLogId:
+        current.lastContactItemContactLog?.id ?? null,
       lastContactItemMessageId: current.lastContactItemMessage?.id ?? null,
       lastContactItemCalendarEventId:
         current.lastContactItemCalendarEvent?.id ?? null,

@@ -2,6 +2,7 @@ import { type CoreApiClient } from 'twenty-client-sdk/core';
 
 type PersonNode = {
   lastContactAt?: string | null;
+  lastContactItemContactLog?: { id: string } | null;
   lastContactItemMessage?: { id: string } | null;
   lastContactItemCalendarEvent?: { id: string } | null;
 };
@@ -26,6 +27,7 @@ export const recomputeCompanyLastContact = async (
       edges: {
         node: {
           lastContactAt: true,
+          lastContactItemContactLog: { id: true },
           lastContactItemMessage: { id: true },
           lastContactItemCalendarEvent: { id: true },
         },
@@ -41,7 +43,10 @@ export const recomputeCompanyLastContact = async (
         id: companyId,
         data: {
           lastContactAt: topPerson.lastContactAt ?? null,
-          lastContactItemMessageId: topPerson.lastContactItemMessage?.id ?? null,
+          lastContactItemContactLogId:
+            topPerson.lastContactItemContactLog?.id ?? null,
+          lastContactItemMessageId:
+            topPerson.lastContactItemMessage?.id ?? null,
           lastContactItemCalendarEventId:
             topPerson.lastContactItemCalendarEvent?.id ?? null,
         },

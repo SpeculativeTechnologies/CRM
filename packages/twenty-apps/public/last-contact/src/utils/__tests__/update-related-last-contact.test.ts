@@ -44,6 +44,7 @@ describe('updateRelatedLastContact', () => {
       lastContactAt: OCCURRED_AT,
       lastContactItemMessageId: MESSAGE_ID,
       lastContactItemCalendarEventId: null,
+      lastContactItemContactLogId: null,
     });
     expect(companyCall?.[0].updateCompanies.__args.filter.and[0]).toEqual({
       id: { eq: COMPANY_ID },
@@ -59,6 +60,7 @@ describe('updateRelatedLastContact', () => {
       lastContactAt: OCCURRED_AT,
       lastContactItemMessageId: MESSAGE_ID,
       lastContactItemCalendarEventId: null,
+      lastContactItemContactLogId: null,
     });
   });
 
@@ -81,6 +83,7 @@ describe('updateRelatedLastContact', () => {
       lastContactAt: OCCURRED_AT,
       lastContactItemMessageId: null,
       lastContactItemCalendarEventId: CALENDAR_EVENT_ID,
+      lastContactItemContactLogId: null,
     });
   });
 

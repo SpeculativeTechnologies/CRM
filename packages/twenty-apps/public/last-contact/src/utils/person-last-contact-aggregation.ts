@@ -1,5 +1,9 @@
 import { type CoreApiClient } from 'twenty-client-sdk/core';
 
+import {
+  collectContactLogInteractions,
+  type ContactLogInteraction,
+} from 'src/utils/collect-contact-log-interactions';
 import { executeWithRetry } from 'src/utils/execute-with-retry';
 
 const PAGE_SIZE = 200;
@@ -15,7 +19,7 @@ type MeetingInteraction = {
   startsAt: string;
 };
 type MessageMemberInfo = { ownerId: string; fromIsMember: boolean };
-type ContactItem = { kind: 'email' | 'meeting'; id: string };
+type ContactItem = { kind: 'email' | 'meeting' | 'manual'; id: string };
 
 export type LastContact = { at: string; item: ContactItem };
 export type PersonUpdateData = Record<string, string | null>;
@@ -297,8 +301,28 @@ const foldMeeting = (
   }
 };
 
-// Aggregates every email and meeting interaction of the given people into one
-// last-contact snapshot per person, resolving the owning team member and the
+const foldContactLog = (agg: PersonAgg, log: ContactLogInteraction): void => {
+  if (!agg.lastContactAt || log.occurredAt > agg.lastContactAt) {
+    agg.lastContactAt = log.occurredAt;
+    agg.lastContactById = log.workspaceMemberId;
+    agg.item = { kind: 'manual', id: log.id };
+  }
+  if (
+    log.direction !== 'INBOUND' &&
+    (!agg.lastOutboundAt || log.occurredAt > agg.lastOutboundAt)
+  ) {
+    agg.lastOutboundAt = log.occurredAt;
+  }
+  if (
+    log.direction !== 'OUTBOUND' &&
+    (!agg.lastInboundAt || log.occurredAt > agg.lastInboundAt)
+  ) {
+    agg.lastInboundAt = log.occurredAt;
+  }
+};
+
+// Aggregates email, meeting, and manual contact into one snapshot per person,
+// resolving the owning team member and the
 // inbound/outbound direction from the message and calendar participants.
 export const buildPersonAggregates = async (
   client: CoreApiClient,
@@ -310,9 +334,10 @@ export const buildPersonAggregates = async (
     return aggByPersonId;
   }
 
-  const [emails, meetings] = await Promise.all([
+  const [emails, meetings, contactLogs] = await Promise.all([
     collectEmailInteractions(client, personIds),
     collectMeetingInteractions(client, personIds),
+    collectContactLogInteractions(client, personIds),
   ]);
 
   const messageIds = [...new Set(emails.map((email) => email.messageId))];
@@ -352,6 +377,10 @@ export const buildPersonAggregates = async (
     );
   }
 
+  for (const log of contactLogs) {
+    foldContactLog(aggFor(log.personId), log);
+  }
+
   return aggByPersonId;
 };
 
@@ -366,8 +395,7 @@ export const pickLatestLastContact = (
   contacts: LastContact[],
 ): LastContact | undefined =>
   contacts.reduce<LastContact | undefined>(
-    (latest, contact) =>
-      !latest || contact.at > latest.at ? contact : latest,
+    (latest, contact) => (!latest || contact.at > latest.at ? contact : latest),
     undefined,
   );
 
@@ -382,17 +410,16 @@ export const buildPersonUpdateData = (agg: PersonAgg): PersonUpdateData => ({
   ...(agg.lastInboundAt ? { lastInboundAt: agg.lastInboundAt } : {}),
   ...(agg.lastEmail ? { lastEmailId: agg.lastEmail.id } : {}),
   ...(agg.lastMeeting ? { lastMeetingId: agg.lastMeeting.id } : {}),
-  ...(agg.item?.kind === 'email'
+  ...(agg.item
     ? {
-        lastContactItemMessageId: agg.item.id,
-        lastContactItemCalendarEventId: null,
+        lastContactItemMessageId:
+          agg.item.kind === 'email' ? agg.item.id : null,
+        lastContactItemCalendarEventId:
+          agg.item.kind === 'meeting' ? agg.item.id : null,
+        lastContactItemContactLogId:
+          agg.item.kind === 'manual' ? agg.item.id : null,
       }
-    : agg.item?.kind === 'meeting'
-      ? {
-          lastContactItemCalendarEventId: agg.item.id,
-          lastContactItemMessageId: null,
-        }
-      : {}),
+    : {}),
 });
 
 export const buildRelatedUpdateData = ({
@@ -402,4 +429,5 @@ export const buildRelatedUpdateData = ({
   lastContactAt: at,
   lastContactItemMessageId: item.kind === 'email' ? item.id : null,
   lastContactItemCalendarEventId: item.kind === 'meeting' ? item.id : null,
+  lastContactItemContactLogId: item.kind === 'manual' ? item.id : null,
 });

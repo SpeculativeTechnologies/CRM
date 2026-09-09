@@ -14,7 +14,7 @@ export default defineField({
   type: FieldType.DATE_TIME,
   label: 'Last contact',
   description:
-    'When the most recent contact (email or meeting) with a person from this company occurred, in either direction.',
+    'When the most recent contact (email, meeting, or contact log) with a person from this company occurred, in either direction.',
   icon: 'IconClock',
   isNullable: true,
   isUIEditable: false,

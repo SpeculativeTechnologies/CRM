@@ -5,6 +5,7 @@ import {
 
 import {
   APP_DISPLAY_NAME,
+  CONTACT_LOG_OBJECT_UNIVERSAL_IDENTIFIER,
   DEFAULT_ROLE_UNIVERSAL_IDENTIFIER,
 } from 'src/constants/universal-identifiers';
 
@@ -12,7 +13,7 @@ export default defineApplicationRole({
   universalIdentifier: DEFAULT_ROLE_UNIVERSAL_IDENTIFIER,
   label: `${APP_DISPLAY_NAME} function role`,
   description:
-    'Reads synced email and calendar interactions, then updates last-contact fields on people, companies, and opportunities.',
+    'Reads synced email, calendar, and manually logged interactions, then updates last-contact fields on people, companies, and opportunities.',
   canReadAllObjectRecords: false,
   canUpdateAllObjectRecords: false,
   canSoftDeleteAllObjectRecords: false,
@@ -34,6 +35,7 @@ export default defineApplicationRole({
       canDestroyObjectRecords: false,
     })),
     ...[
+      CONTACT_LOG_OBJECT_UNIVERSAL_IDENTIFIER,
       STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.message.universalIdentifier,
       STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.messageParticipant
         .universalIdentifier,

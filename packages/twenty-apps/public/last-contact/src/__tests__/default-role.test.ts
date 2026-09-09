@@ -1,6 +1,8 @@
 import { STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS } from 'twenty-sdk/define';
 import { describe, expect, it } from 'vitest';
 
+import { CONTACT_LOG_OBJECT_UNIVERSAL_IDENTIFIER } from 'src/constants/universal-identifiers';
+
 import defaultRole from 'src/default-role';
 
 const permissionFor = (objectUniversalIdentifier: string) =>
@@ -35,6 +37,7 @@ describe('default role', () => {
 
   it('keeps interaction source records read-only', () => {
     for (const objectUniversalIdentifier of [
+      CONTACT_LOG_OBJECT_UNIVERSAL_IDENTIFIER,
       STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.message.universalIdentifier,
       STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.messageParticipant
         .universalIdentifier,
@@ -50,6 +53,6 @@ describe('default role', () => {
       });
     }
 
-    expect(defaultRole.config?.objectPermissions).toHaveLength(7);
+    expect(defaultRole.config?.objectPermissions).toHaveLength(8);
   });
 });
