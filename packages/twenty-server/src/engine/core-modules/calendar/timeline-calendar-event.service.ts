@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 
 import omit from 'lodash.omit';
 import { FIELD_RESTRICTED_ADDITIONAL_PERMISSIONS_REQUIRED } from 'twenty-shared/constants';
-import { isDefined } from 'twenty-shared/utils';
+import { getPreferredFirstName, isDefined } from 'twenty-shared/utils';
 import { Any, In, type Repository } from 'typeorm';
 
 import { CalendarChannelVisibility } from 'twenty-shared/types';
@@ -245,6 +245,13 @@ export class TimelineCalendarEventService {
       const timelineCalendarEventPromises = orderedEvents.map(async (event) => {
         const participantPromises = event.calendarEventParticipants.map(
           async (participant) => {
+            const person = participant.person as typeof participant.person & {
+              preferredName?: string | null;
+            };
+            const personFirstName = getPreferredFirstName(
+              person?.name?.firstName,
+              person?.preferredName,
+            );
             const personAvatarFileUrl =
               await this.fileUrlService.signFirstFilesFieldFileUrl({
                 filesFieldValue: participant.person?.avatarFile,
@@ -256,7 +263,7 @@ export class TimelineCalendarEventService {
               personId: participant.personId ?? null,
               workspaceMemberId: participant.workspaceMemberId ?? null,
               firstName:
-                participant.person?.name?.firstName ||
+                personFirstName ||
                 participant.workspaceMember?.name.firstName ||
                 '',
               lastName:
@@ -264,7 +271,7 @@ export class TimelineCalendarEventService {
                 participant.workspaceMember?.name.lastName ||
                 '',
               displayName:
-                participant.person?.name?.firstName ||
+                personFirstName ||
                 participant.person?.name?.lastName ||
                 participant.workspaceMember?.name.firstName ||
                 participant.workspaceMember?.name.lastName ||

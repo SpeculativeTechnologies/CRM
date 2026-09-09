@@ -2,6 +2,8 @@ import { isNonEmptyString } from '@sniptt/guards';
 
 import { useGetObjectOrderByField } from '@/object-metadata/hooks/useGetObjectOrderByField';
 import { useMapToObjectRecordIdentifier } from '@/object-metadata/hooks/useMapToObjectRecordIdentifier';
+import { useObjectMetadataItem } from '@/object-metadata/hooks/useObjectMetadataItem';
+import { getPersonPreferredNameField } from '@/object-metadata/utils/getPersonPreferredNameField';
 
 import { DEFAULT_SEARCH_REQUEST_LIMIT } from '@/object-record/constants/DefaultSearchRequestLimit';
 import { useFindManyRecords } from '@/object-record/hooks/useFindManyRecords';
@@ -38,12 +40,19 @@ export const useRecordsForSelect = ({
     allowRequestsToTwentyIcons,
   });
 
-  const filters = [
-    {
-      fieldNames: getObjectFilterFields(objectNameSingular) ?? [],
-      filter: searchFilterText,
-    },
-  ];
+  const { objectMetadataItem } = useObjectMetadataItem({ objectNameSingular });
+  const searchTerms =
+    objectNameSingular === 'person'
+      ? searchFilterText.trim().split(/\s+/)
+      : [searchFilterText];
+  const filters = searchTerms.map((word) => ({
+    fieldNames:
+      getObjectFilterFields(
+        objectNameSingular,
+        Boolean(getPersonPreferredNameField(objectMetadataItem)),
+      ) ?? [],
+    filter: word,
+  }));
 
   const { getObjectOrderByField } = useGetObjectOrderByField({
     objectNameSingular,

@@ -66,6 +66,7 @@ export const useResolveRelatedPeople = ({
           label: getLabelIdentifierFieldValue(
             record,
             labelIdentifierFieldMetadataItem,
+            objectMetadataItem.nameSingular,
           ),
           relatedPersonId: record[joinColumnName] ?? null,
         })),
@@ -73,7 +74,11 @@ export const useResolveRelatedPeople = ({
 
       return { ...resolution, hasUnreadSourceRecords: hasNextPage };
     },
-    [findManyRecordsLazy, labelIdentifierFieldMetadataItem],
+    [
+      findManyRecordsLazy,
+      labelIdentifierFieldMetadataItem,
+      objectMetadataItem.nameSingular,
+    ],
   );
 
   return { relatedPersonFieldMetadataItems, resolveRelatedPeople };

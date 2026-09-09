@@ -2,7 +2,7 @@ import { CalendarEventCallRecorderAvatar } from '@/activities/calendar/component
 import { type CalendarEventCallRecording } from '@/activities/calendar/types/CalendarEventCallRecording';
 import { type CalendarEventParticipant } from '@/activities/calendar/types/CalendarEventParticipant';
 import { isTimelineCalendarEventParticipant } from '@/activities/calendar/types/guards/IsTimelineCalendarEventParticipant';
-import { isDefined } from 'twenty-shared/utils';
+import { getPreferredFirstName, isDefined } from 'twenty-shared/utils';
 import { Avatar, AvatarGroup } from 'twenty-ui/data-display';
 import { type TimelineCalendarEventParticipant } from '~/generated/graphql';
 import { getAbsoluteImageUrl } from '~/utils/image/getAbsoluteImageUrl';
@@ -21,11 +21,15 @@ export const CalendarEventParticipantsAvatarGroup = ({
       if (isTimelineCalendarEventParticipant(participant)) {
         return participant;
       } else {
+        const personFirstName = getPreferredFirstName(
+          participant.person?.name?.firstName,
+          participant.person?.preferredName,
+        );
         return {
           personId: participant.person?.id ?? null,
           workspaceMemberId: participant.workspaceMember?.id ?? null,
           firstName:
-            participant.person?.name?.firstName ||
+            personFirstName ||
             participant.workspaceMember?.name.firstName ||
             '',
           lastName:
@@ -33,7 +37,7 @@ export const CalendarEventParticipantsAvatarGroup = ({
             participant.workspaceMember?.name.lastName ||
             '',
           displayName:
-            participant.person?.name?.firstName ||
+            personFirstName ||
             participant.person?.name?.lastName ||
             participant.workspaceMember?.name.firstName ||
             participant.workspaceMember?.name.lastName ||

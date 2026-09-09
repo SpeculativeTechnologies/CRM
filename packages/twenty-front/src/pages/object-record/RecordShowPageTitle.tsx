@@ -27,6 +27,7 @@ export const RecordShowPageTitle = ({
     ? getLabelIdentifierFieldValue(
         recordStore,
         labelIdentifierFieldMetadataItem,
+        objectNameSingular,
       )
     : '';
 

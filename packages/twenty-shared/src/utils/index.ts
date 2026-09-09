@@ -185,6 +185,7 @@ export {
 export { formatToShortNumber } from './format/formatToShortNumber';
 export { fromArrayToUniqueKeyRecord } from './from-array-to-unique-key-record.util';
 export { fromArrayToValuesByKeyRecord } from './fromArrayToValuesByKeyRecord.util';
+export { getPreferredFirstName } from './getPreferredFirstName';
 export { getURLSafely } from './getURLSafely';
 export {
   getNodeTypename,

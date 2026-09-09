@@ -1,7 +1,6 @@
 import { useObjectMetadataItems } from '@/object-metadata/hooks/useObjectMetadataItems';
 import { type EnrichedObjectMetadataItem } from '@/object-metadata/types/EnrichedObjectMetadataItem';
-import { getImageIdentifierFieldMetadataItem } from '@/object-metadata/utils/getImageIdentifierFieldMetadataItem';
-import { getLabelIdentifierFieldMetadataItem } from '@/object-metadata/utils/getLabelIdentifierFieldMetadataItem';
+import { buildIdentifierGqlFields } from '@/object-record/graphql/record-gql-fields/utils/buildIdentifierGqlFields';
 import { hasObjectMetadataItemPositionField } from '@/object-metadata/utils/hasObjectMetadataItemPositionField';
 import { generateDepthRecordGqlFieldsFromFields } from '@/object-record/graphql/record-gql-fields/utils/generateDepthRecordGqlFieldsFromFields';
 import { getFieldRelations } from '@/object-record/record-field/ui/utils/junction/getFieldRelations';
@@ -109,21 +108,10 @@ export const useRelevantRecordsGqlFields = ({
     depth: 1,
   });
 
-  const labelIdentifierFieldMetadataItem =
-    getLabelIdentifierFieldMetadataItem(objectMetadataItem);
-  const imageIdentifierFieldMetadataItem =
-    getImageIdentifierFieldMetadataItem(objectMetadataItem);
-
   const hasPosition = hasObjectMetadataItemPositionField(objectMetadataItem);
 
   return {
-    id: true,
-    ...(isDefined(labelIdentifierFieldMetadataItem)
-      ? { [labelIdentifierFieldMetadataItem.name]: true }
-      : {}),
-    ...(isDefined(imageIdentifierFieldMetadataItem)
-      ? { [imageIdentifierFieldMetadataItem.name]: true }
-      : {}),
+    ...buildIdentifierGqlFields(objectMetadataItem),
     ...(hasPosition ? { position: true } : {}),
     ...allDepthOneGqlFields,
     ...junctionRelationGqlFields,

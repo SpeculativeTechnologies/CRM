@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { IndexPersonPreferredNamesCommand } from 'src/database/commands/upgrade-version-command/2-38/2-38-workspace-command-1788972000000-index-person-preferred-names.command';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { WorkspaceIteratorModule } from 'src/database/commands/command-runners/workspace-iterator.module';
@@ -54,6 +55,7 @@ import { ConnectionModule } from 'src/modules/connection/connection.module';
     WorkspaceMigrationRunnerModule,
   ],
   providers: [
+    IndexPersonPreferredNamesCommand,
     ProvisionMessageCampaignStandardMetadataCommand,
     ProvisionAndBackfillPersonOpenTaskCountCommand,
     SetConnectionJunctionTargetsCommand,

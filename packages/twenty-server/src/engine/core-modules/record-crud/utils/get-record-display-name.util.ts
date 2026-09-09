@@ -1,5 +1,5 @@
 import { FieldMetadataType } from 'twenty-shared/types';
-import { isDefined } from 'twenty-shared/utils';
+import { getPreferredFirstName, isDefined } from 'twenty-shared/utils';
 
 import { type FlatEntityMaps } from 'src/engine/metadata-modules/flat-entity/types/flat-entity-maps.type';
 import { findFlatEntityByIdInFlatEntityMaps } from 'src/engine/metadata-modules/flat-entity/utils/find-flat-entity-by-id-in-flat-entity-maps.util';
@@ -33,7 +33,11 @@ export const getRecordDisplayName = (
     const nameValue = fieldValue as
       | { firstName?: string; lastName?: string }
       | undefined;
-    const firstName = nameValue?.firstName ?? '';
+    const firstName =
+      flatObjectMetadata.nameSingular === 'person' &&
+      labelIdentifierField.name === 'name'
+        ? getPreferredFirstName(nameValue?.firstName, record.preferredName)
+        : (nameValue?.firstName ?? '');
     const lastName = nameValue?.lastName ?? '';
 
     return `${firstName} ${lastName}`.trim() || String(record.id) || 'Unknown';

@@ -16,6 +16,8 @@ import { useFindManyRecords } from '@/object-record/hooks/useFindManyRecords';
 import { useFindOneRecord } from '@/object-record/hooks/useFindOneRecord';
 import { useObjectRecordSearchRecords } from '@/object-record/hooks/useObjectRecordSearchRecords';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
+import { useObjectMetadataItem } from '@/object-metadata/hooks/useObjectMetadataItem';
+import { buildIdentifierGqlFields } from '@/object-record/graphql/record-gql-fields/utils/buildIdentifierGqlFields';
 
 export type EmailRecipientSuggestion = {
   suggestionId: string;
@@ -79,6 +81,15 @@ export const useEmailRecipientSuggestions = ({
   excludedRecipientKeys,
   contextRecord,
 }: UseEmailRecipientSuggestionsArgs) => {
+  const { objectMetadataItem: personMetadata } = useObjectMetadataItem({
+    objectNameSingular: CoreObjectNameSingular.Person,
+  });
+  const personGqlFields = {
+    ...buildIdentifierGqlFields(personMetadata),
+    name: true,
+    avatarUrl: true,
+    emails: true,
+  };
   const currentWorkspaceMembers = useAtomStateValue(
     currentWorkspaceMembersState,
   );
@@ -114,7 +125,7 @@ export const useEmailRecipientSuggestions = ({
   const { records: contextPeopleRecords } = useFindManyRecords({
     objectNameSingular: CoreObjectNameSingular.Person,
     filter: { companyId: { eq: contextCompanyId ?? '' } },
-    recordGqlFields: { id: true, name: true, avatarUrl: true, emails: true },
+    recordGqlFields: personGqlFields,
     limit: EMAIL_RECIPIENT_PEOPLE_SUGGESTIONS_LIMIT,
     skip: !isDefined(contextCompanyId),
   });
@@ -141,7 +152,7 @@ export const useEmailRecipientSuggestions = ({
   const { records: searchedPeopleRecords } = useFindManyRecords({
     objectNameSingular: CoreObjectNameSingular.Person,
     filter: { id: { in: searchedPersonIds } },
-    recordGqlFields: { id: true, name: true, avatarUrl: true, emails: true },
+    recordGqlFields: personGqlFields,
     limit: EMAIL_RECIPIENT_PEOPLE_SUGGESTIONS_LIMIT,
     skip: !hasSearchInput || searchedPersonIds.length === 0,
   });
