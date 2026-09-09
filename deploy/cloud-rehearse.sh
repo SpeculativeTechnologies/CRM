@@ -1,19 +1,19 @@
 #!/bin/bash
 # =============================================================================
-# Rehearse an upgrade on a cloud box without changing it.
+# Rehearse an upgrade without writing to the cloud database.
 # =============================================================================
-# Runs on the box, fed over IAP by cd-deploy-cloud before the real deploy:
+# Runs on the box, fed over IAP to the retention-aware host deploy script:
 #
-#   gcloud compute ssh <vm> --tunnel-through-iap --command 'bash -s' \
-#     < deploy/cloud-rehearse.sh   (with IMAGE_SHA in the environment via
-#                                   `IMAGE_SHA=<sha> bash -s`, see the workflow)
+#   cloud-deploy.sh <sha> <digest> --rehearse < deploy/cloud-rehearse.sh
 #
 # It pulls the target image and runs `upgrade --dry-run` from it against the
 # box's real database. Since fork PR #224 a dry run executes nothing: instance
 # steps, caught-up workspace steps and the segment ahead all print their plan.
 # That plan is what predicted every failure of the 2026-09-03 staging deploys;
 # nobody had run it. Exit code is non-zero when the dry run reports an error
-# or a failed workspace, so the deploy stops before touching anything.
+# or a failed workspace, so the deploy stops before applying the upgrade.
+# The host script performs storage maintenance before invoking this script and
+# holds one release lock through maintenance, rehearsal, deploy and rollback.
 #
 # Output: the filtered dry-run log on stdout, and a short summary at the end.
 # It prints command names and workspace ids only, never record data.
@@ -39,9 +39,17 @@ fail() { echo "[rehearse] FAIL: $*" >&2; exit 1; }
 cd "$COMPOSE_DIR"
 TARGET="${IMAGE_REF:-}"
 [[ "$TARGET" =~ ^ghcr.io/[a-z0-9/-]+@sha256:[0-9a-f]{64}$ ]] || fail "IMAGE_REF must include an immutable digest"
+[[ "$TARGET" == "$IMAGE_REPO"@sha256:* ]] || fail "image repository differs from the configured repository"
+
+# Refuse direct/uncoordinated invocation. flock on the inherited descriptor
+# shares the parent's lock; reopening the file here would deadlock against it.
+[[ /proc/self/fd/9 -ef "$COMPOSE_DIR/.release.lock" ]] || fail "retention-aware host release lock required"
+flock -n 9 || fail "another release owns the host lock"
 
 log "pulling $TARGET"
 docker pull --quiet "$TARGET" >/dev/null || fail "cannot pull $TARGET"
+REVISION="$(docker image inspect -f '{{index .Config.Labels "org.opencontainers.image.revision"}}' "$TARGET")"
+[ "$REVISION" = "$IMAGE_SHA" ] || fail "image revision does not match requested source SHA"
 
 log "dry-running upgrade from $TARGET against this box"
 OUTPUT="$(mktemp)"

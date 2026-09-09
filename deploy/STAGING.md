@@ -51,3 +51,11 @@ Digest protocol: staging now requires an artifact whose exact source SHA passed
 CI and whose immutable digest passed the release rehearsal. The cloud child run
 records its deployment ID; provide that ID when recording a staging check.
 See [TEAM-WORKFLOW.md](TEAM-WORKFLOW.md#immutable-artifact-promotion).
+
+The cloud workflow also requires `RELEASE_RETENTION_CONTRACT=1` on the host.
+The private host script performs image maintenance and the capacity gate before
+rehearsal's first pull, holding one release lock through rehearsal, deployment
+and rollback. Installation, protected rollback selection, storage-path validation
+and the read-only staging preview are owner operations described in the private
+[`IMAGE-RETENTION.md`](https://github.com/SpeculativeTechnologies/crm-ops/blob/main/deploy/IMAGE-RETENTION.md)
+runbook. The workflow refuses an old host contract; it never installs host files.
