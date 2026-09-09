@@ -37,7 +37,7 @@ export const LocalFirstDebugPanel = () => {
   const [tableSummary, setTableSummary] = useState('resolving schema');
 
   useEffect(() => {
-    startLocalFirstSync({
+    return startLocalFirstSync({
       onStatusChange: setStatus,
       onTablesResolved: (columnsByTable) => {
         setTableSummary(

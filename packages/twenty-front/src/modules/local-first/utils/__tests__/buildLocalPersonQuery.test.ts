@@ -50,6 +50,7 @@ describe('buildLocalPersonQuery', () => {
     expect(result).toMatchObject({ isSupported: true });
     if (!result.isSupported) return;
     expect(result.sql).not.toContain('where');
+    expect(result.countSql).not.toContain('where');
   });
 
   it('should translate the default view ordering', () => {
@@ -97,6 +98,9 @@ describe('buildLocalPersonQuery', () => {
     expect(result.sql).toContain('limit $1');
     expect(result.sql).toContain('offset $2');
     expect(result.params).toEqual([30, 60]);
+    expect(result.countSql).toBe(
+      'select count(*)::int as count from person where "deletedAt" is null',
+    );
   });
 
   // Everything below must refuse rather than answer approximately: a wrong
