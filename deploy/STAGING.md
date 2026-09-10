@@ -59,3 +59,5 @@ and rollback. Installation, protected rollback selection, storage-path validatio
 and the read-only staging preview are owner operations described in the private
 [`IMAGE-RETENTION.md`](https://github.com/SpeculativeTechnologies/crm-ops/blob/main/deploy/IMAGE-RETENTION.md)
 runbook. The workflow refuses an old host contract; it never installs host files.
+To rehearse by hand without deploying, feed the rehearsal script to the host
+script with `--rehearse-only`; see [RELEASE-AUTOMATION.md](RELEASE-AUTOMATION.md#reading-a-failed-run).

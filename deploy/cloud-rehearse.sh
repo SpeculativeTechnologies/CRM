@@ -6,6 +6,10 @@
 #
 #   cloud-deploy.sh <sha> <digest> --rehearse < deploy/cloud-rehearse.sh
 #
+# By hand, the same thing without the deploy that follows a clean rehearsal:
+#
+#   cloud-deploy.sh <sha> <digest> --rehearse-only < deploy/cloud-rehearse.sh
+#
 # It pulls the target image and runs `upgrade --dry-run` from it against the
 # box's real database. Since fork PR #224 a dry run executes nothing: instance
 # steps, caught-up workspace steps and the segment ahead all print their plan.
