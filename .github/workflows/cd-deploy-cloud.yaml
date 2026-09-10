@@ -181,33 +181,31 @@ jobs:
       # dry run from the target image lists every step it would run, including
       # commands caught up from behind the cursor, and fails on the errors that
       # cost six deploys on 2026-09-03/04. Read its output in the step summary.
-      - name: Require digest-aware host deploy contract
+      - name: Require digest and retention-aware host deploy contract
         run: |
           gcloud compute ssh "${{ steps.target.outputs.vm }}" \
             --zone "${{ steps.target.outputs.zone }}" --tunnel-through-iap --quiet \
-            --command 'sudo grep -qx "# RELEASE_ARTIFACT_CONTRACT=1" /opt/twenty/cloud-deploy.sh'
+            --command 'sudo grep -qx "# RELEASE_ARTIFACT_CONTRACT=1" /opt/twenty/cloud-deploy.sh && sudo grep -qx "# RELEASE_RETENTION_CONTRACT=1" /opt/twenty/cloud-deploy.sh && sudo test -r /opt/twenty/cloud-image-retention.py && sudo test -r /opt/twenty/image-retention.json'
 
-      - name: Rehearse the upgrade against the box
+      - name: Maintain images, rehearse and deploy under the host release lock
         run: |
           set -euo pipefail
           REHEARSAL=$(mktemp)
+          set +e
           gcloud compute ssh "${{ steps.target.outputs.vm }}" \
             --zone "${{ steps.target.outputs.zone }}" --tunnel-through-iap --quiet \
-            --command "sudo IMAGE_SHA=${{ steps.target.outputs.sha }} IMAGE_REF=${{ steps.target.outputs.image }} bash -s" \
-            < deploy/cloud-rehearse.sh | tee "$REHEARSAL"
+            --command "sudo /opt/twenty/cloud-deploy.sh ${{ steps.target.outputs.sha }} ${{ steps.target.outputs.image }} --rehearse" \
+            < deploy/cloud-rehearse.sh 2>&1 | tee "$REHEARSAL"
+          STATUS=$?
+          set -e
           {
-            echo "## Upgrade rehearsal (${{ steps.target.outputs.env_name }}, ${{ steps.target.outputs.sha }})"
+            echo "## Storage maintenance and release (${{ steps.target.outputs.env_name }}, ${{ steps.target.outputs.sha }})"
             echo
             echo '```'
-            grep -E '^\[rehearse\]|DRY RUN|catch-up|ERROR' "$REHEARSAL" | sed 's/.*\(LOG \|WARN \|ERROR \)//' | cut -c1-200 | head -120
+            grep -E '^\[retention\]|^\[deploy\]|^\[rehearse\]|DRY RUN|catch-up|ERROR' "$REHEARSAL" || true
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
-      - name: Deploy
-        run: |
-          set -euo pipefail
-          gcloud compute ssh "${{ steps.target.outputs.vm }}" \
-            --zone "${{ steps.target.outputs.zone }}" --tunnel-through-iap --quiet \
-            --command "sudo /opt/twenty/cloud-deploy.sh ${{ steps.target.outputs.sha }} ${{ steps.target.outputs.image }}"
+          exit "$STATUS"
       # Fork: a green health check is not a working CRM. These are the invariants
       # that were false while healthz answered ok this week. The image is already
       # live when this runs; a failure here fails the run so the promotion that

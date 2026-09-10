@@ -50,17 +50,24 @@ The fork's answer (PRs #219 to #222):
 
 ## What runs on every deploy
 
-`cd-deploy-cloud.yaml` does four things, in this order, for staging and
-production alike:
+`cd-deploy-cloud.yaml` does these things, in this order, for staging and
+production alike. Maintenance, rehearsal and deploy run in one ssh session
+under one host release lock:
 
-1. **Rehearse** (`deploy/cloud-rehearse.sh`). Pulls the target image and runs
-   `upgrade --dry-run` from it against the box's real database, with a long
-   query timeout. Fails on any error or failed workspace before anything
-   changes. Its filtered plan is in the run's step summary: every step that
-   would run, every catch-up, and the count left alone below the floor. On
-   2026-09-03 this plan predicted every remaining failure once run by hand.
-2. **Deploy** (`cloud-deploy.sh` on the box, from `crm-ops`).
-3. **Verify** (`deploy/cloud-verify.sh`). The image is live at this point.
+1. **Maintain** (`cloud-deploy.sh` on the box, from `crm-ops`). Reclaims old
+   CRM images from the box's cache and refuses to pull unless the disk has
+   room. Staging filled its disk during a rehearsal pull on 2026-09-09; the
+   registry is the archive, the box only keeps the serving, incoming and
+   rollback images plus a little history.
+2. **Rehearse** (`deploy/cloud-rehearse.sh`, fed on stdin to the host script).
+   Pulls the target image and runs `upgrade --dry-run` from it against the
+   box's real database, with a long query timeout. Fails on any error or
+   failed workspace before anything changes. Its filtered plan is in the
+   run's step summary: every step that would run, every catch-up, and the
+   count left alone below the floor. On 2026-09-03 this plan predicted every
+   remaining failure once run by hand.
+3. **Deploy** (the same `cloud-deploy.sh` invocation, under the same lock).
+4. **Verify** (`deploy/cloud-verify.sh`). The image is live at this point.
    Checks: both containers use the requested digest (a rollback fails here), containers
    running, healthz, `upgrade --dry-run` from the deployed image plans nothing
    more, every workspace cursor is completed, no object navigation item in the
@@ -143,10 +150,13 @@ is false. Then the box, read-only:
 gcloud compute ssh twenty-staging-e2 --zone=us-central1-a --tunnel-through-iap \
   --command 'sudo EXPECTED_SHA=<sha> EXPECTED_IMAGE=<image@sha256:digest> bash -s' < deploy/cloud-verify.sh
 gcloud compute ssh twenty-staging-e2 --zone=us-central1-a --tunnel-through-iap \
-  --command 'sudo IMAGE_SHA=<sha> IMAGE_REF=<image@sha256:digest> bash -s' < deploy/cloud-rehearse.sh
+  --command 'sudo /opt/twenty/cloud-deploy.sh <sha> <image@sha256:digest> --rehearse-only' < deploy/cloud-rehearse.sh
 ```
 
-Neither changes the box. A migration that has to run by hand (a timeout, a
+Neither touches the database or the serving image. The rehearsal reclaims old
+cached images first, because the script refuses to pull outside the host lock
+and its capacity gate; feeding it straight to `bash -s` no longer works. A
+migration that has to run by hand (a timeout, a
 command below the floor) is the production owner's action, as
 `deploy/TEAM-WORKFLOW.md` says; the twenty-gated-upgrade-command runbook has
 the recipe.
