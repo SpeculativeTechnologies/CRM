@@ -26,7 +26,7 @@ export class FindMessageSuppressionsInput {
 
   @Field(() => UUIDScalarType, { nullable: true })
   @IsOptional()
-  @IsUUID('4')
+  @IsUUID()
   unsubscribeTopicId?: string;
 
   @Field(() => Int, { defaultValue: 30 })

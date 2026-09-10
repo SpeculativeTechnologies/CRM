@@ -6,17 +6,17 @@ import { IsEmail, IsOptional, IsString, IsUUID, Length } from 'class-validator';
 export class SaveMessageCampaignDraftInput {
   @Field(() => String, { nullable: true })
   @IsOptional()
-  @IsUUID('4')
+  @IsUUID()
   campaignId?: string;
 
   @Field(() => String, { nullable: true })
   @IsOptional()
-  @IsUUID('4')
+  @IsUUID()
   listId?: string;
 
   @Field(() => String, { nullable: true })
   @IsOptional()
-  @IsUUID('4')
+  @IsUUID()
   unsubscribeTopicId?: string;
 
   @Field(() => String, { nullable: true })

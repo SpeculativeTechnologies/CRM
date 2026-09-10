@@ -13,7 +13,7 @@ import { UnsubscribeTopicVisibility } from 'src/engine/core-modules/emailing-dom
 @InputType()
 export class UpdateUnsubscribeTopicInput {
   @Field(() => String)
-  @IsUUID('4')
+  @IsUUID()
   id: string;
 
   @Field(() => String, { nullable: true })
