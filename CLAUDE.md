@@ -308,6 +308,70 @@ specific dependency and complete the unblocked work. Never claim an untested
 path passed. Stop after recording the staging result and provide the SHA,
 digest, deployment ID, tested behavior, and remaining production handoff.
 
+### When working on multiple issues at once
+
+Use parallel subagents when the issues can be implemented independently. Give
+each issue its own worktree, feature branch, acceptance checklist, focused
+tests, and pull request. Start the branches from current `origin/main` or an
+explicitly agreed common base, and keep each pull request independently
+reviewable and revertible. Subagents must not share a working tree or edit the
+same branch. The coordinating agent owns dependency decisions, integration
+testing, merge order, and the final release handoff.
+
+Follow `deploy/LOCAL-DEV.md` in every feature worktree. Its supervisor assigns
+separate Postgres, Redis, uploads, ports, and signing secrets. Run the focused
+behavior tests and required checks for every issue on its own branch; combined
+acceptance testing does not replace per-PR verification or exact-head CI. Avoid
+running several heavy builds concurrently, and use `yarn check:local --parallel
+1` when other worktrees are compiling.
+
+For one local CRM containing all of the changes, create a temporary integration
+worktree and branch from the agreed base, then merge the exact feature-branch
+heads into it in the intended order. Run that integration worktree against its
+own verified mirror and exercise every issue's acceptance checklist, normal CRM
+smoke paths, and interactions between the changes through one local URL. Keep
+the feature branches and pull requests separate. Apply fixes to the owning
+feature branch, repeat its focused verification, update its PR head, and rebuild
+the integration branch from the final heads. The integration branch is normally
+local-only and its combined test is additional evidence, not a substitute for
+the individual pull requests and their checks.
+
+Database or schema changes remain self-contained in their owning pull request,
+including generated instance commands and individual existing-database and
+clean-initialization tests. After those pass separately, rehearse the combined
+migration order in the integration worktree against a fixed verified mirror.
+Resolve migration ordering, GraphQL generation, shared-file conflicts, and
+cross-issue behavior before asking to merge the batch.
+
+A batch may move through staging together. Before requesting approval, present
+the complete batch: every PR number and reviewed head SHA, their merge order,
+required reviews and exact-head CI results, the expected final `main` contents,
+risks, and the combined staging test scope. One explicit user approval may cover
+merging all named heads in that order, the immutable artifact produced by the
+final merge, one staging deployment of that final SHA and digest, testing every
+included change plus normal smoke paths, and recording the observed staging
+result. Do not include an unnamed PR or later commit. If a PR head, merge order,
+final release contents, destination, or material test scope changes, prepare the
+updated batch and obtain approval for the affected action.
+
+After merging the approved PRs, wait for CI to publish and certify the final
+full `main` SHA. Deploy that exact SHA and digest to staging once, test the whole
+batch on its recorded deployment, and run one **Record a staging check** with
+the deployment ID, actual pass/fail result, and a concrete account of every
+issue and smoke path exercised. The staging check certifies the complete
+deployed release, not its individual pull requests. Any later merge or staging
+redeployment creates a different release and requires testing and recording the
+actual new deployment. If any included issue fails, do not record a pass or
+promote it; fix or revert through reviewed PRs, deploy the new final SHA, and
+retest the affected behavior and the batch's normal smoke paths.
+
+When local testing ends, stop only the source watchers and containers owned by
+each involved worktree, preserve their data unless asked to discard it, and do
+not stop another worktree's services. End the staging workflow with the final
+SHA, digest, deployment ID, the PRs included, behavior tested, failures or
+limitations, and the remaining production handoff. Production deployment and
+its environment approval remain outside this delegation.
+
 ### Hard safety rules
 
 - Work only in a developer checkout with developer-owned Postgres, Redis, and
