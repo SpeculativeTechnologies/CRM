@@ -63,7 +63,7 @@ describe('createHostFetchEnforcingPolicy', () => {
     );
   });
 
-  it('should forward allowlisted requests without ambient credentials', async () => {
+  it('should restrict ambient credentials to same-origin allowlisted requests', async () => {
     const fetchSpy = jest.fn(async () => createFakeResponse());
     globalThis.fetch = fetchSpy as unknown as typeof fetch;
 
@@ -80,7 +80,7 @@ describe('createHostFetchEnforcingPolicy', () => {
 
     expect(fetchSpy).toHaveBeenCalledWith(
       'https://api.twenty.test/graphql',
-      expect.objectContaining({ method: 'POST', credentials: 'omit' }),
+      expect.objectContaining({ method: 'POST', credentials: 'same-origin' }),
     );
     expect(result.status).toBe(200);
     expect(result.body).toBe('response-body');
