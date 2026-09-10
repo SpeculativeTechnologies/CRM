@@ -34,7 +34,9 @@ export const createHostFetchEnforcingPolicy = (
       method: requestMethod,
       headers: input.headers,
       body: input.body,
-      credentials: 'omit',
+      // Same-origin gateways such as Cloudflare Access need their session cookie.
+      // Cross-origin requests still exclude ambient credentials.
+      credentials: 'same-origin',
       redirect: resolveHostFetchRedirectMode(
         requestMethod,
         input.url,
