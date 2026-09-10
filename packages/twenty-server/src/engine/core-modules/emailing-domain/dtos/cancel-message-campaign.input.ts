@@ -5,6 +5,6 @@ import { IsUUID } from 'class-validator';
 @InputType()
 export class CancelMessageCampaignInput {
   @Field(() => String)
-  @IsUUID('4')
+  @IsUUID()
   campaignId: string;
 }

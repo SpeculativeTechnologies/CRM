@@ -17,7 +17,7 @@ export class SendMessageCampaignTestInput {
 
   @Field(() => String, { nullable: true })
   @IsOptional()
-  @IsUUID('4')
+  @IsUUID()
   unsubscribeTopicId?: string;
 
   @Field(() => String)

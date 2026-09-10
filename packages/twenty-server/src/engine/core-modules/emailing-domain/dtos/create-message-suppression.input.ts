@@ -12,6 +12,6 @@ export class CreateMessageSuppressionInput {
 
   @Field(() => UUIDScalarType, { nullable: true })
   @IsOptional()
-  @IsUUID('4')
+  @IsUUID()
   unsubscribeTopicId?: string;
 }

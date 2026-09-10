@@ -25,18 +25,18 @@ const MAX_CC_RECIPIENTS_PER_EMAIL = MAX_EMAIL_RECIPIENTS - 1;
 export class SaveMassEmailCampaignDraftInput {
   @Field(() => String, { nullable: true })
   @IsOptional()
-  @IsUUID('4')
+  @IsUUID()
   campaignId?: string;
 
   @Field(() => String)
-  @IsUUID('4')
+  @IsUUID()
   connectedAccountId: string;
 
   @Field(() => [String])
   @IsArray()
   @ArrayMinSize(1)
   @ArrayMaxSize(MAX_CAMPAIGN_RECIPIENTS)
-  @IsUUID('4', { each: true })
+  @IsUUID(undefined, { each: true })
   personIds: string[];
 
   @Field(() => String, { nullable: true })
@@ -64,7 +64,7 @@ export class SaveMassEmailCampaignDraftInput {
 @InputType()
 export class MassEmailCampaignRecipientInput {
   @Field(() => String)
-  @IsUUID('4')
+  @IsUUID()
   personId: string;
 
   @Field(() => String)
@@ -91,11 +91,11 @@ export class MassEmailCampaignRecipientInput {
 @InputType()
 export class SendMassEmailCampaignInput {
   @Field(() => String)
-  @IsUUID('4')
+  @IsUUID()
   campaignId: string;
 
   @Field(() => String)
-  @IsUUID('4')
+  @IsUUID()
   connectedAccountId: string;
 
   @Field(() => [MassEmailCampaignRecipientInput])
