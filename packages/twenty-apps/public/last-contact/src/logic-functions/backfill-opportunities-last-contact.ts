@@ -54,8 +54,17 @@ const handler = async ({ batchId }: BackfillBatchPayload): Promise<object> => {
 
     await executeWithRetry(() =>
       client.mutation({
-        updateOpportunity: {
-          __args: { id: node.id, data: buildRelatedUpdateData(lastContact) },
+        updateOpportunities: {
+          __args: {
+            data: buildRelatedUpdateData(lastContact),
+            filter: {
+              id: { eq: node.id },
+              or: [
+                { lastContactAt: { is: 'NULL' } },
+                { lastContactAt: { lte: lastContact.at } },
+              ],
+            },
+          },
           id: true,
         },
       }),

@@ -20,7 +20,7 @@ export default defineField({
   type: FieldType.MORPH_RELATION,
   name: 'lastContactItemCalendarEvent',
   label: 'Last contact item',
-  description: 'The email or meeting that was the most recent contact.',
+  description: 'The email, meeting, or contact log that was the most recent contact.',
   icon: 'IconCalendarEvent',
   isNullable: true,
   morphId: LAST_CONTACT_ITEM_MORPH_ID,

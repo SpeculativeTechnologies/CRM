@@ -21,7 +21,7 @@ export default defineField({
   name: 'lastContactItemCalendarEvent',
   label: 'Last contact item',
   description:
-    'The email or meeting that was the most recent contact with a person from this company.',
+    'The email, meeting, or contact log that was the most recent contact with a person from this company.',
   icon: 'IconCalendarEvent',
   isNullable: true,
   morphId: COMPANY_LAST_CONTACT_ITEM_MORPH_ID,

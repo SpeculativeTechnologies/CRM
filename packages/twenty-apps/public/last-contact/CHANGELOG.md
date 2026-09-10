@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.3.0
+
+- Add a Log contact action on People for LinkedIn, text, phone, WhatsApp, Signal, in-person, and other contact, with date, direction, and optional notes.
+- Include contact logs in live last-contact updates and every backfill, linking the latest interaction from People, Companies, and Opportunities.
+- Recalculate after edits, deletion, restoration, and reassignment, and guard recalculation against concurrent writes.
+- Guard inbound/outbound and email/meeting fallback updates so a slower sync cannot overwrite newer manual contact.
+- Allow the app form to create Contact logs through its restricted application token.
+- Add a Log contact tab beside Home, Timeline, and Tasks using an idempotent per-workspace setup command; keep the form open and ready for another entry after saving.
+- Document API-key access to contact logging through the REST API.
+
 ## 1.2.4
 
 - Limit the app role to reading synced messages, calendar events, and their participants, and to reading and updating people, companies, and opportunities. The app no longer requests read and edit access to every record type.

@@ -58,6 +58,7 @@ describe('on-opportunity-created', () => {
       lastContactAt: OCCURRED_AT,
       lastContactItemMessageId: MESSAGE_ID,
       lastContactItemCalendarEventId: null,
+      lastContactItemContactLogId: null,
     });
   });
 });
