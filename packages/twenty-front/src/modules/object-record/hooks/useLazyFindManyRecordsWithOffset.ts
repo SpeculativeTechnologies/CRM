@@ -62,6 +62,9 @@ export const useLazyFindManyRecordsWithOffset = ({
       const result =
         await apolloCoreClient.query<RecordGqlOperationFindManyResult>({
           query: findManyRecordsQuery,
+          // Virtualization tracks loaded pages. Once a page needs fetching again,
+          // its membership and order may have changed, including outside the viewport.
+          fetchPolicy: 'network-only',
           variables: {
             ...params,
             limit,

@@ -10,6 +10,13 @@ import { useAtomComponentStateValue } from '@/ui/utilities/state/jotai/hooks/use
 import { ViewFilterOperand } from 'twenty-shared/types';
 import { FieldMetadataType } from '~/generated-metadata/graphql';
 import { getJestMetadataAndApolloMocksWrapper } from '~/testing/jest/getJestMetadataAndApolloMocksWrapper';
+import { getMockFieldMetadataItemOrThrow } from '~/testing/utils/getMockFieldMetadataItemOrThrow';
+import { getMockObjectMetadataItemOrThrow } from '~/testing/utils/getMockObjectMetadataItemOrThrow';
+
+const mockField = getMockFieldMetadataItemOrThrow({
+  objectMetadataItem: getMockObjectMetadataItemOrThrow('company'),
+  fieldName: 'name',
+});
 
 const BaseWrapper = getJestMetadataAndApolloMocksWrapper({
   apolloMocks: [],
@@ -50,7 +57,7 @@ describe('useRemoveRecordFilter', () => {
 
     const mockRecordFilter: RecordFilter = {
       id: 'filter-1',
-      fieldMetadataId: 'field-1',
+      fieldMetadataId: mockField.id,
       value: 'test-value',
       operand: ViewFilterOperand.CONTAINS,
       displayValue: 'test-value',
@@ -96,7 +103,7 @@ describe('useRemoveRecordFilter', () => {
 
     const mockRecordFilter: RecordFilter = {
       id: 'filter-1',
-      fieldMetadataId: 'field-1',
+      fieldMetadataId: mockField.id,
       value: 'test-value',
       operand: ViewFilterOperand.CONTAINS,
       displayValue: 'test-value',
