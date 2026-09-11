@@ -219,7 +219,7 @@ describe('applyFindOptionsToQueryBuilder relation order', () => {
     expect(sql).toContain(
       `LEFT JOIN (SELECT DISTINCT ON ("threadId") * ` +
         `FROM "${SCHEMA_NAME}"."message" ` +
-        `WHERE "deletedAt" IS NULL ` +
+        `WHERE ("deletedAt" IS NULL) ` +
         `ORDER BY "threadId", "receivedAt" DESC, "id") AS "messages" ` +
         'ON ("messages"."threadId" = "thread"."id")',
     );
