@@ -91,6 +91,16 @@ describe('linked field queries', () => {
     expect(sql).not.toContain('"record"."personFirstName"');
   });
 
+  it('keeps deleted sources empty when a mutation response includes deleted destination records', () => {
+    const { query } = buildLinkedQuery();
+    const sql = query
+      .select(['id', 'personFirstName'])
+      .withDeleted()
+      .getQuery();
+    expect(sql).toContain('"__linked_0"."deletedAt" IS NULL');
+    expect(sql).not.toContain('"record"."deletedAt" IS NULL');
+  });
+
   it('checks source and relationship permissions for a filter-only reference', () => {
     const { query } = buildLinkedQuery({
       checkPermissions: (builder) => {

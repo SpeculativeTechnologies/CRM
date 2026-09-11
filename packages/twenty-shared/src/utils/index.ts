@@ -57,6 +57,7 @@ export { parseEmailAddressList } from './email/parseEmailAddressList';
 export { CustomError } from './errors/CustomError';
 export { evalFromContext } from './evalFromContext';
 export { extractAndSanitizeObjectStringFields } from './extractAndSanitizeObjectStringFields';
+export { getLinkedFieldReference } from './field-metadata/getLinkedFieldReference';
 export { computeMorphRelationGqlFieldName } from './fieldMetadata/compute-morph-relation-gql-field-name';
 export {
   computeRelationGqlFieldJoinColumnName,

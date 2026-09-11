@@ -452,8 +452,11 @@ export const buildJoinClause = (
         );
       }
 
+      // Linked values stay empty for deleted sources, including mutation
+      // response reads that include a deleted destination record.
       const softDeletePredicateApplies =
-        !state.includeDeleted && joinClause.targetTableShape.hasDeletedAtColumn;
+        (!state.includeDeleted || joinClause.isLinkedFieldJoin === true) &&
+        joinClause.targetTableShape.hasDeletedAtColumn;
 
       const toManyForeignKeyColumnName =
         joinClause.relationType === RelationType.ONE_TO_MANY
