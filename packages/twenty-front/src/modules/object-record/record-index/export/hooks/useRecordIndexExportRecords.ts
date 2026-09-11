@@ -184,7 +184,11 @@ export const useRecordIndexExportRecords = ({
         >[],
       ) => {
         const recordsProcessedForExport = processRecordsForCSVExport(
-          await completeLinkedRelations(records, objectMetadataItem),
+          await completeLinkedRelations(
+            records,
+            objectMetadataItem,
+            columns.map((column) => column.metadata.fieldName),
+          ),
         );
 
         csvDownloader(filename, { rows: recordsProcessedForExport, columns });

@@ -119,6 +119,18 @@ describe('linked relation CSV values', () => {
     expect(records[0]).not.toHaveProperty('linkedPeople');
   });
 
+  it('leaves ordinary exported values untouched and does not fetch hidden columns', async () => {
+    const rawJson = { edges: [{ node: { id: 'json-data' } }], arbitrary: true };
+    const { result } = renderHook(useExportLinkedRelationValues);
+    const exported = await result.current.completeLinkedRelations(
+      [{ ...records[0], rawJson }],
+      destination,
+      ['rawJson'],
+    );
+    expect(exported[0].rawJson).toBe(rawJson);
+    expect(query).not.toHaveBeenCalled();
+  });
+
   it('exports a to-one source label without querying a list or changing its ID', async () => {
     const person = getMockObjectMetadataItemOrThrow('person');
     const companyField = getMockFieldMetadataItemOrThrow({

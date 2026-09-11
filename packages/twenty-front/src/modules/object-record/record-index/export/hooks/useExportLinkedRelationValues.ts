@@ -30,11 +30,11 @@ export const useExportLinkedRelationValues = () => {
   const completeLinkedRelations = async (
     records: ObjectRecord[],
     object: EnrichedObjectMetadataItem,
+    fieldNames?: string[],
   ) => {
-    const result = records.map((record) =>
-      getRecordFromRecordNode({ recordNode: record }),
-    );
+    const result = records.map((record) => ({ ...record }));
     for (const field of object.readableFields) {
+      if (isDefined(fieldNames) && !fieldNames.includes(field.name)) continue;
       const reference = getLinkedFieldReference(field.settings);
       if (field.type !== FieldMetadataType.RELATION || !isDefined(reference))
         continue;

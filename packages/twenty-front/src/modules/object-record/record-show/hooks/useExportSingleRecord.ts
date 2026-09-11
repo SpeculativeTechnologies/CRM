@@ -37,7 +37,11 @@ export const useExportSingleRecord = ({
       ) => {
         const recordToArray = [record];
         const recordsProcessedForExport = processRecordsForCSVExport(
-          await completeLinkedRelations(recordToArray, objectMetadataItem),
+          await completeLinkedRelations(
+            recordToArray,
+            objectMetadataItem,
+            columns.map((column) => column.metadata.fieldName),
+          ),
         );
 
         csvDownloader(filename, { rows: recordsProcessedForExport, columns });
