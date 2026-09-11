@@ -43,6 +43,8 @@ export const validateLinkedFieldDependencies = ({
     after.type !== before.type ||
     after.relationTargetObjectMetadataUniversalIdentifier !==
       before.relationTargetObjectMetadataUniversalIdentifier ||
+    after.relationTargetFieldMetadataUniversalIdentifier !==
+      before.relationTargetFieldMetadataUniversalIdentifier ||
     (isDefined(after.universalSettings) &&
     'relationType' in after.universalSettings
       ? after.universalSettings.relationType

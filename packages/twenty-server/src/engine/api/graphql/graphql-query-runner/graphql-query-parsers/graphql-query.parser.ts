@@ -1,7 +1,7 @@
 import { isNonEmptyString } from '@sniptt/guards';
 import { isDefined } from 'class-validator';
 import { type OrderByWithGroupBy } from 'twenty-shared/types';
-import { type FindOptionsWhere, type ObjectLiteral } from 'typeorm';
+import { Brackets, type FindOptionsWhere, type ObjectLiteral } from 'typeorm';
 
 import {
   type ObjectRecordFilter,
@@ -74,6 +74,31 @@ export class GraphqlQueryParser {
     );
   }
 
+  public appendCursorFilterToBuilder(
+    queryBuilder: WorkspaceSelectQueryBuilder,
+    objectNameSingular: string,
+    recordFilter: Partial<ObjectRecordFilter>,
+  ): void {
+    const parser = new GraphqlQueryFilterConditionParser(
+      this.flatObjectMetadata,
+      this.flatFieldMetadataMaps,
+      this.flatObjectMetadataMaps,
+      0,
+      true,
+    );
+    // Cursor predicates compare the selected target, not any member of its list.
+    queryBuilder.andWhere(
+      new Brackets((inner) => {
+        parser.applyFilterEntriesToWhereBrackets(
+          inner,
+          queryBuilder,
+          objectNameSingular,
+          recordFilter,
+        );
+      }),
+    );
+  }
+
   public applyDeletedAtToBuilder(
     // oxlint-disable-next-line typescript/no-explicit-any
     queryBuilder: WorkspaceSelectQueryBuilder,
@@ -133,6 +158,18 @@ export class GraphqlQueryParser {
     );
 
     for (const joinInfo of parseResult.relationJoins) {
+      if (isDefined(joinInfo.toManyDedupOrder)) {
+        queryBuilder.leftJoin(
+          `${objectNameSingular}.${joinInfo.joinAlias}`,
+          joinInfo.joinAlias,
+          undefined,
+          {
+            allowToManyJoin: true,
+            toManyDedupOrder: joinInfo.toManyDedupOrder,
+          },
+        );
+        continue;
+      }
       addRelationJoinAliasToQueryBuilder({
         queryBuilder,
         parentAlias: objectNameSingular,

@@ -1,4 +1,5 @@
 import { FieldMetadataType, RelationType } from 'twenty-shared/types';
+import { getLinkedFieldReference, isDefined } from 'twenty-shared/utils';
 
 import { computeMorphOrRelationFieldJoinColumnName } from 'src/engine/metadata-modules/field-metadata/utils/compute-morph-or-relation-field-join-column-name.util';
 import { getFlatFieldsFromFlatObjectMetadata } from 'src/engine/api/graphql/workspace-schema-builder/utils/get-flat-fields-for-flat-object-metadata.util';
@@ -49,7 +50,8 @@ export const buildFieldMapsFromFlatObjectMetadata = <
     if (
       (isFlatFieldMetadataOfType(field, FieldMetadataType.RELATION) ||
         isFlatFieldMetadataOfType(field, FieldMetadataType.MORPH_RELATION)) &&
-      field.settings.relationType === RelationType.MANY_TO_ONE
+      (field.settings.relationType === RelationType.MANY_TO_ONE ||
+        isDefined(getLinkedFieldReference(field.settings)))
     ) {
       const joinColumnName = computeMorphOrRelationFieldJoinColumnName({
         name: field.name,

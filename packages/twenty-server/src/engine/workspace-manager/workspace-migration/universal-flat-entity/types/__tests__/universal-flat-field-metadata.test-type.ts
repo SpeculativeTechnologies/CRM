@@ -88,6 +88,7 @@ type NarrowedTestCase =
   UniversalFlatFieldMetadata<FieldMetadataType.RELATION>['universalSettings'];
 
 type NarrowedExpectedResult = {
+  linkedField?: LinkedFieldReference;
   relationType: RelationType;
   onDelete?: RelationOnDeleteAction | undefined;
   joinColumnName?: string | null | undefined;
@@ -104,6 +105,7 @@ type SettingsTestCase = UniversalFlatFieldMetadata<
 
 type SettingsExpectedResult =
   | {
+      linkedField?: LinkedFieldReference;
       relationType: RelationType;
       onDelete?: RelationOnDeleteAction | undefined;
       joinColumnName?: string | null | undefined;

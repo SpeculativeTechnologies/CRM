@@ -17,8 +17,7 @@ import { useSetAtomState } from '@/ui/utilities/state/jotai/hooks/useSetAtomStat
 import { useLingui } from '@lingui/react/macro';
 import { SettingsPath } from 'twenty-shared/types';
 import { getSettingsPath } from 'twenty-shared/utils';
-import { IconLink, IconSettings, useIcons } from 'twenty-ui/icon';
-import { FieldMetadataType, RelationType } from '~/generated-metadata/graphql';
+import { IconSettings, useIcons } from 'twenty-ui/icon';
 import { MenuItem, UndecoratedLink } from 'twenty-ui/navigation';
 
 export const RecordTableHeaderPlusButtonContent = () => {
@@ -118,29 +117,6 @@ export const RecordTableHeaderPlusButtonContent = () => {
       </DropdownMenuItemsContainer>
       <DropdownMenuSeparator />
       <DropdownMenuItemsContainer scrollable={false}>
-        {objectMetadataItem.nameSingular !== 'person' &&
-          objectMetadataItem.readableFields.some(
-            (field) =>
-              field.isActive &&
-              field.type === FieldMetadataType.RELATION &&
-              field.relation?.type === RelationType.MANY_TO_ONE &&
-              field.relation.targetObjectMetadata.nameSingular === 'person',
-          ) && (
-            <UndecoratedLink
-              fullWidth
-              to={getSettingsPath(
-                SettingsPath.ObjectNewFieldConfigure,
-                { objectNamePlural: objectMetadataItem.namePlural },
-                { linked: 'true' },
-              )}
-            >
-              <MenuItem
-                LeftIcon={IconLink}
-                text={t`Add linked field`}
-                onClick={() => closeDropdown()}
-              />
-            </UndecoratedLink>
-          )}
         <UndecoratedLink
           fullWidth
           to={getSettingsPath(SettingsPath.ObjectDetail, {

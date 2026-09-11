@@ -8,6 +8,7 @@ import {
   type FieldMetadataMultiItemSettings,
   type FileCategory,
   type LabelIdentifierFormula,
+  type LinkedFieldReference,
 } from 'twenty-shared/types';
 import { type ThemeColor } from 'twenty-ui/theme';
 import { z } from 'zod';
@@ -142,6 +143,7 @@ export type FieldPositionMetadata = BaseFieldMetadata & {
 };
 
 export type FieldRelationMetadataSettings = {
+  linkedField?: LinkedFieldReference;
   relationType?: RelationType;
   // Join column name for the foreign key (e.g., "petId" for a "pet" relation)
   joinColumnName?: string | null;

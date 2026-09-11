@@ -1,3 +1,4 @@
+import { getRelationTargetFieldMetadataId } from 'src/engine/metadata-modules/flat-field-metadata/utils/get-relation-target-field-metadata-id.util';
 import { msg } from '@lingui/core/macro';
 import { Brackets, type WhereExpressionBuilder } from 'typeorm';
 import {
@@ -66,6 +67,7 @@ export class GraphqlQueryFilterFieldParser {
     flatFieldMetadataMaps: FlatEntityMaps<OrmFlatFieldMetadata>,
     flatObjectMetadataMaps?: FlatEntityMaps<FlatObjectMetadata>,
     depth = 0,
+    private readonly useRelationJoins = false,
   ) {
     this.flatObjectMetadata = flatObjectMetadata;
     this.flatFieldMetadataMaps = flatFieldMetadataMaps;
@@ -216,7 +218,8 @@ export class GraphqlQueryFilterFieldParser {
 
     if (
       isFlatFieldMetadataOfType(fieldMetadata, FieldMetadataType.RELATION) &&
-      fieldMetadata.settings?.relationType === RelationType.ONE_TO_MANY
+      fieldMetadata.settings?.relationType === RelationType.ONE_TO_MANY &&
+      !this.useRelationJoins
     ) {
       return this.parseOneToManyRelationSubFilter(
         queryBuilder,
@@ -265,7 +268,11 @@ export class GraphqlQueryFilterFieldParser {
     filterValue: Partial<ObjectRecordFilter>,
     isFirst: boolean,
   ): void {
-    if (!isDefined(fieldMetadata.relationTargetFieldMetadataId)) {
+    const inverseFieldMetadataId = getRelationTargetFieldMetadataId(
+      fieldMetadata,
+      this.flatFieldMetadataMaps,
+    );
+    if (!isDefined(inverseFieldMetadataId)) {
       throw new GraphqlQueryRunnerException(
         `Relation filter on "${fieldMetadata.name}" is missing a target field`,
         GraphqlQueryRunnerExceptionCode.INVALID_QUERY_INPUT,
@@ -275,7 +282,7 @@ export class GraphqlQueryFilterFieldParser {
 
     const targetRelationFieldMetadata =
       findFlatEntityByIdInFlatEntityMaps<OrmFlatFieldMetadata>({
-        flatEntityId: fieldMetadata.relationTargetFieldMetadataId,
+        flatEntityId: inverseFieldMetadataId,
         flatEntityMaps: this.flatFieldMetadataMaps,
       });
 

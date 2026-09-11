@@ -1,3 +1,4 @@
+import { getRelationTargetFieldMetadataId } from 'src/engine/metadata-modules/flat-field-metadata/utils/get-relation-target-field-metadata-id.util';
 import { FieldMetadataType } from 'twenty-shared/types';
 import { pickMorphGroupSurvivorOrThrow } from 'twenty-shared/utils';
 
@@ -28,8 +29,13 @@ export const resolveRelationFromFlatFieldMetadata = ({
     flatEntityMaps: flatObjectMetadataMaps,
   });
 
+  const targetFieldMetadataId = getRelationTargetFieldMetadataId(
+    sourceFlatFieldMetadata,
+    flatFieldMetadataMaps,
+  );
+  if (!targetFieldMetadataId) return null;
   const targetFlatFieldMetadata = findFlatEntityByIdInFlatEntityMapsOrThrow({
-    flatEntityId: sourceFlatFieldMetadata.relationTargetFieldMetadataId,
+    flatEntityId: targetFieldMetadataId,
     flatEntityMaps: flatFieldMetadataMaps,
   });
 

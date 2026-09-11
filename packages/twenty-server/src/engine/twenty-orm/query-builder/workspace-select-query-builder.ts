@@ -103,6 +103,7 @@ export class WorkspaceSelectQueryBuilder implements WhereExpressionLike {
       sourceAlias: string;
       sourceColumnName: string;
       relationColumnName: string;
+      sourcePermissionFieldName?: string;
     }
   >();
 
@@ -117,7 +118,9 @@ export class WorkspaceSelectQueryBuilder implements WhereExpressionLike {
     return [
       ...this.joinClauses.map((joinClause) => ({
         name: joinClause.alias,
-        isToMany: joinClause.relationType === RelationType.ONE_TO_MANY,
+        isToMany:
+          joinClause.relationType === RelationType.ONE_TO_MANY &&
+          !isDefined(joinClause.toManyForeignKeyColumnName),
       })),
       ...this.existsFilterClauses.map((existsFilterClause) => ({
         name: existsFilterClause.alias,
@@ -451,6 +454,11 @@ export class WorkspaceSelectQueryBuilder implements WhereExpressionLike {
     );
 
     const joinColumnName = relationShape.joinColumnName;
+    const linkedJoinColumnName =
+      relationShape.parentJoinColumnName ?? joinColumnName;
+    if (isDefined(linkedJoinColumnName)) {
+      this.prepareLinkedColumn(parentAlias, linkedJoinColumnName);
+    }
 
     const toManyJoin = isDefined(joinColumnName)
       ? undefined
@@ -459,6 +467,7 @@ export class WorkspaceSelectQueryBuilder implements WhereExpressionLike {
           alias,
           targetTableShape,
           targetFieldMetadataId: relationShape.targetFieldMetadataId,
+          parentColumnName: relationShape.parentJoinColumnName,
         });
 
     const shouldJoinDedupedToMany = options?.allowToManyJoin === true;
@@ -475,6 +484,12 @@ export class WorkspaceSelectQueryBuilder implements WhereExpressionLike {
       relationFieldName,
       targetTableShape,
       relationType: relationShape.relationType,
+      isLinkedFieldJoin:
+        isDefined(linkedJoinColumnName) &&
+        isDefined(
+          parentTableShape.columnShapeByColumnName[linkedJoinColumnName]
+            ?.linkedColumn,
+        ),
       joinType,
       isSelected: options?.select === true,
       condition: isDefined(joinColumnName)
@@ -534,11 +549,13 @@ export class WorkspaceSelectQueryBuilder implements WhereExpressionLike {
     alias,
     targetTableShape,
     targetFieldMetadataId,
+    parentColumnName = 'id',
   }: {
     parentAlias: string;
     alias: string;
     targetTableShape: WorkspaceTableShape;
     targetFieldMetadataId: string | null;
+    parentColumnName?: string;
   }): { condition: string; foreignKeyColumnName: string } | undefined {
     if (!isDefined(targetFieldMetadataId)) {
       return undefined;
@@ -558,7 +575,7 @@ export class WorkspaceSelectQueryBuilder implements WhereExpressionLike {
     }
 
     return {
-      condition: `${this.quoteColumn(alias, foreignKeyColumnName)} = ${this.quoteColumn(parentAlias, 'id')}`,
+      condition: `${this.quoteColumn(alias, foreignKeyColumnName)} = ${this.quoteColumn(parentAlias, parentColumnName)}`,
       foreignKeyColumnName,
     };
   }
@@ -795,6 +812,9 @@ export class WorkspaceSelectQueryBuilder implements WhereExpressionLike {
             ...new Set([
               ...(referencedColumns[reference.sourceAlias] ?? []),
               reference.sourceColumnName,
+              ...(isDefined(reference.sourcePermissionFieldName)
+                ? [reference.sourcePermissionFieldName]
+                : []),
             ]),
           ];
         }
@@ -811,51 +831,53 @@ export class WorkspaceSelectQueryBuilder implements WhereExpressionLike {
     );
 
     mapQualifiedColumnReferences(sql, (alias, columnName) => {
-      const key = quoteColumn(alias, columnName);
-      if (this.linkedColumnReferences.has(key)) {
-        return undefined;
-      }
-      const tableShape = this.getTableShapeForAlias(alias);
-      const linkedColumn =
-        tableShape?.columnShapeByColumnName[columnName]?.linkedColumn;
-      if (!isDefined(linkedColumn) || !isDefined(tableShape)) {
-        return undefined;
-      }
-      let sourceAlias = this.joinClauses.find(
-        (join) =>
-          join.isLinkedFieldJoin &&
-          join.parentAlias === alias &&
-          join.relationFieldName === linkedColumn.relationFieldName,
-      )?.alias;
-      if (!isDefined(sourceAlias)) {
-        let index = this.joinClauses.length;
-        do {
-          sourceAlias = `__linked_${index++}`;
-        } while (
-          sourceAlias === this.alias ||
-          this.getJoinAliases().some((join) => join.name === sourceAlias)
-        );
-        this.leftJoin(
-          `${alias}.${linkedColumn.relationFieldName}`,
-          sourceAlias,
-        );
-        this.joinClauses[this.joinClauses.length - 1].isLinkedFieldJoin = true;
-      }
-      const relationColumnName =
-        tableShape.relationShapeByFieldName[linkedColumn.relationFieldName]
-          ?.joinColumnName;
-      if (!isDefined(relationColumnName)) {
-        throw new TwentyOrmException(
-          'Linked fields require a to-one relation',
-          TwentyOrmExceptionCode.UNKNOWN_RELATION,
-        );
-      }
-      this.linkedColumnReferences.set(key, {
-        sourceAlias,
-        sourceColumnName: linkedColumn.sourceColumnName,
-        relationColumnName,
-      });
+      this.prepareLinkedColumn(alias, columnName);
       return undefined;
+    });
+  }
+
+  private prepareLinkedColumn(alias: string, columnName: string): void {
+    const key = quoteColumn(alias, columnName);
+    if (this.linkedColumnReferences.has(key)) {
+      return undefined;
+    }
+    const tableShape = this.getTableShapeForAlias(alias);
+    const linkedColumn =
+      tableShape?.columnShapeByColumnName[columnName]?.linkedColumn;
+    if (!isDefined(linkedColumn) || !isDefined(tableShape)) {
+      return undefined;
+    }
+    let sourceAlias = this.joinClauses.find(
+      (join) =>
+        join.isLinkedFieldJoin &&
+        join.parentAlias === alias &&
+        join.relationFieldName === linkedColumn.relationFieldName,
+    )?.alias;
+    if (!isDefined(sourceAlias)) {
+      let index = this.joinClauses.length;
+      do {
+        sourceAlias = `__linked_${index++}`;
+      } while (
+        sourceAlias === this.alias ||
+        this.getJoinAliases().some((join) => join.name === sourceAlias)
+      );
+      this.leftJoin(`${alias}.${linkedColumn.relationFieldName}`, sourceAlias);
+      this.joinClauses[this.joinClauses.length - 1].isLinkedFieldJoin = true;
+    }
+    const relationColumnName =
+      tableShape.relationShapeByFieldName[linkedColumn.relationFieldName]
+        ?.joinColumnName;
+    if (!isDefined(relationColumnName)) {
+      throw new TwentyOrmException(
+        'Linked fields require a to-one relation',
+        TwentyOrmExceptionCode.UNKNOWN_RELATION,
+      );
+    }
+    this.linkedColumnReferences.set(key, {
+      sourceAlias,
+      sourceColumnName: linkedColumn.sourceColumnName,
+      relationColumnName,
+      sourcePermissionFieldName: linkedColumn.sourcePermissionFieldName,
     });
   }
 
@@ -894,6 +916,9 @@ export class WorkspaceSelectQueryBuilder implements WhereExpressionLike {
     kind: MutationKind,
   ): WorkspaceMutationQueryBuilder {
     const filteredQuery = this.clone().select(['id']);
+    if (kind === 'restore') {
+      filteredQuery.withDeleted();
+    }
     filteredQuery.prepareLinkedFields();
 
     if (filteredQuery.linkedColumnReferences.size > 0) {
@@ -1112,6 +1137,7 @@ export class WorkspaceSelectQueryBuilder implements WhereExpressionLike {
           alias,
           targetTableShape,
           targetFieldMetadataId: relationShape.targetFieldMetadataId,
+          parentColumnName: relationShape.parentJoinColumnName,
         })?.condition;
 
     if (!isDefined(correlationCondition)) {

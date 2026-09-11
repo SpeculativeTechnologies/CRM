@@ -87,7 +87,8 @@ type FieldMetadataTypeSpecificSettingsMapping = {
   [FieldMetadataType.DATE]: FieldMetadataDateSettings | null;
   [FieldMetadataType.DATE_TIME]: FieldMetadataDateTimeSettings | null;
   [FieldMetadataType.TEXT]: FieldMetadataTextSettings | null;
-  [FieldMetadataType.RELATION]: FieldMetadataRelationSettings;
+  [FieldMetadataType.RELATION]: FieldMetadataRelationSettings &
+    LinkedFieldMetadataSettings;
   [FieldMetadataType.ADDRESS]: FieldMetadataAddressSettings | null;
   [FieldMetadataType.MORPH_RELATION]: FieldMetadataRelationSettings;
   [FieldMetadataType.TS_VECTOR]: null;

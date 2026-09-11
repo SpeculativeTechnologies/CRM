@@ -52,6 +52,7 @@ export const validateLinkedFieldMetadata = ({
     !isDefined(source) ||
     !relation.isActive ||
     !source.isActive ||
+    isDefined(getLinkedFieldReference(relation.universalSettings)) ||
     relation.type !== FieldMetadataType.RELATION ||
     !isDefined(relation.universalSettings) ||
     !('relationType' in relation.universalSettings) ||
@@ -82,6 +83,37 @@ export const validateLinkedFieldMetadata = ({
     return invalidLinkedField(
       'The linked field must use the type of a direct Person data field',
     );
+  }
+
+  if (source.type === FieldMetadataType.RELATION) {
+    if (!isDefined(source.relationTargetObjectMetadataUniversalIdentifier)) {
+      return invalidLinkedField(
+        'The linked relation source has no target object',
+      );
+    }
+    const target = findFlatEntityByUniversalIdentifier({
+      universalIdentifier:
+        source.relationTargetObjectMetadataUniversalIdentifier,
+      flatEntityMaps: flatObjectMetadataMaps,
+    });
+    if (
+      field.type !== FieldMetadataType.RELATION ||
+      !isDefined(target) ||
+      !target.isActive ||
+      field.relationTargetObjectMetadataUniversalIdentifier !==
+        source.relationTargetObjectMetadataUniversalIdentifier ||
+      field.relationTargetFieldMetadataUniversalIdentifier !== null ||
+      !isDefined(field.universalSettings) ||
+      !('relationType' in field.universalSettings) ||
+      !isDefined(source.universalSettings) ||
+      !('relationType' in source.universalSettings) ||
+      field.universalSettings.relationType !==
+        source.universalSettings.relationType
+    ) {
+      return invalidLinkedField(
+        'A linked relation must retain the source target and cardinality',
+      );
+    }
   }
 
   if (

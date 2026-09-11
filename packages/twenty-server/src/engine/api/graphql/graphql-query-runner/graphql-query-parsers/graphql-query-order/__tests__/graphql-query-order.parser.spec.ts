@@ -117,6 +117,45 @@ describe('GraphqlQueryOrderFieldParser', () => {
     flatFieldMetadataMaps,
   );
 
+  it('keeps a linked list representative stable when paging backwards', () => {
+    const linkedCompany = {
+      ...companyField,
+      settings: {
+        relationType: 'ONE_TO_MANY',
+        linkedField: {
+          relationFieldMetadataUniversalIdentifier: 'person-path',
+          sourceFieldMetadataUniversalIdentifier: 'person-companies',
+        },
+      },
+    } as FlatFieldMetadata;
+    const linkedParser = new GraphqlQueryOrderFieldParser(
+      flatObjectMetadata,
+      flatObjectMetadataMaps,
+      {
+        ...flatFieldMetadataMaps,
+        byUniversalIdentifier: {
+          ...flatFieldMetadataMaps.byUniversalIdentifier,
+          [companyField.universalIdentifier]: linkedCompany,
+        },
+      },
+    );
+    const order = [{ company: { name: OrderByDirection.AscNullsLast } }];
+    const forward = linkedParser.parse(order, 'opportunity', true);
+    const backward = linkedParser.parse(order, 'opportunity', false);
+    expect(forward.relationJoins).toEqual(backward.relationJoins);
+    expect(forward.relationJoins[0].toManyDedupOrder).toEqual([
+      {
+        columnName: 'name',
+        direction: 'ASC',
+        nulls: 'NULLS LAST',
+        useLower: true,
+        castToText: false,
+      },
+    ]);
+    expect(forward.orderBy['company.name'].order).toBe('ASC');
+    expect(backward.orderBy['company.name'].order).toBe('DESC');
+  });
+
   it('should compile scalar, composite and relation leaves to their columns', () => {
     const result = parser.parse(
       [

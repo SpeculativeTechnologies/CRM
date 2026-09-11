@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { useExportLinkedRelationValues } from '@/object-record/record-index/export/hooks/useExportLinkedRelationValues';
 
 import { type EnrichedObjectMetadataItem } from '@/object-metadata/types/EnrichedObjectMetadataItem';
 import { formatFieldMetadataItemAsColumnDefinition } from '@/object-metadata/utils/formatFieldMetadataItemAsColumnDefinition';
@@ -20,13 +21,14 @@ export const useExportSingleRecord = ({
   objectMetadataItem,
   recordId,
 }: UseSingleExportTableDataOptions) => {
+  const { completeLinkedRelations } = useExportLinkedRelationValues();
   const { processRecordsForCSVExport } = useExportProcessRecordsForCSV(
     objectMetadataItem.nameSingular,
   );
 
   const downloadCsv = useMemo(
     () =>
-      (
+      async (
         record: ObjectRecord,
         columns: Pick<
           ColumnDefinition<FieldMetadata>,
@@ -34,12 +36,18 @@ export const useExportSingleRecord = ({
         >[],
       ) => {
         const recordToArray = [record];
-        const recordsProcessedForExport =
-          processRecordsForCSVExport(recordToArray);
+        const recordsProcessedForExport = processRecordsForCSVExport(
+          await completeLinkedRelations(recordToArray, objectMetadataItem),
+        );
 
         csvDownloader(filename, { rows: recordsProcessedForExport, columns });
       },
-    [filename, processRecordsForCSVExport],
+    [
+      filename,
+      processRecordsForCSVExport,
+      completeLinkedRelations,
+      objectMetadataItem,
+    ],
   );
 
   const columns: Pick<
@@ -59,11 +67,11 @@ export const useExportSingleRecord = ({
     objectRecordId: recordId,
     withSoftDeleted: true,
   });
-  const download = () => {
+  const download = async () => {
     if (isDefined(error) || !isDefined(record)) {
       return;
     }
-    downloadCsv(record, columns);
+    await downloadCsv(record, columns);
   };
   return { download };
 };

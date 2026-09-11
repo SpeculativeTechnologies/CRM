@@ -1,3 +1,4 @@
+import { getRelationTargetFieldMetadataId } from 'src/engine/metadata-modules/flat-field-metadata/utils/get-relation-target-field-metadata-id.util';
 import { compositeTypeDefinitions } from 'twenty-shared/types';
 import { getLinkedFieldReference, isDefined } from 'twenty-shared/utils';
 
@@ -69,6 +70,11 @@ export const buildWorkspaceTableShape = ({
       }
 
       const isOwningSide = relationType === RelationType.MANY_TO_ONE;
+      const linkedJoinColumnName = isDefined(linkedField)
+        ? computeMorphOrRelationFieldJoinColumnName({
+            name: flatFieldMetadata.name,
+          })
+        : undefined;
       const joinColumnName = isOwningSide
         ? computeMorphOrRelationFieldJoinColumnName({
             name: flatFieldMetadata.name,
@@ -81,17 +87,36 @@ export const buildWorkspaceTableShape = ({
         relationType,
         targetObjectMetadataId:
           flatFieldMetadata.relationTargetObjectMetadataId,
-        targetFieldMetadataId:
-          flatFieldMetadata.relationTargetFieldMetadataId ?? null,
+        targetFieldMetadataId: getRelationTargetFieldMetadataId(
+          flatFieldMetadata,
+          flatFieldMetadataMaps,
+        ),
         joinColumnName,
+        ...(!isOwningSide && isDefined(linkedJoinColumnName)
+          ? { parentJoinColumnName: linkedJoinColumnName }
+          : {}),
       };
 
-      if (isDefined(joinColumnName)) {
-        columnShapeByColumnName[joinColumnName] = {
-          columnName: joinColumnName,
+      const columnName = joinColumnName ?? linkedJoinColumnName;
+      if (isDefined(columnName)) {
+        columnShapeByColumnName[columnName] = {
+          columnName,
           fieldMetadataId: flatFieldMetadata.id,
           fieldName: flatFieldMetadata.name,
           fieldMetadataType: flatFieldMetadata.type,
+          ...(isDefined(linkedRelation) && isDefined(linkedSource)
+            ? {
+                linkedColumn: {
+                  relationFieldName: linkedRelation.name,
+                  sourceColumnName: isOwningSide
+                    ? computeMorphOrRelationFieldJoinColumnName({
+                        name: linkedSource.name,
+                      })
+                    : 'id',
+                  sourcePermissionFieldName: linkedSource.name,
+                },
+              }
+            : {}),
         };
       }
 

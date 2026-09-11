@@ -303,7 +303,8 @@ export class ObjectRecordEventPublisher {
         !isDefined(source) ||
         !isDefined(relation) ||
         (source.objectMetadataId !== changedObjectMetadataId &&
-          field.objectMetadataId !== changedObjectMetadataId)
+          field.objectMetadataId !== changedObjectMetadataId &&
+          source.relationTargetObjectMetadataId !== changedObjectMetadataId)
       ) {
         continue;
       }

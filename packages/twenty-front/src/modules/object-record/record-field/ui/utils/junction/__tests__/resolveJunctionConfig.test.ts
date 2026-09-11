@@ -30,6 +30,31 @@ describe('resolveJunctionConfig', () => {
     });
   };
 
+  it('resolves a linked list using its source object rather than the destination', () => {
+    const task = getMockObjectMetadataItemOrThrow('task');
+    const source = getMockFieldMetadataItemOrThrow({
+      objectMetadataItem: task,
+      fieldName: 'taskTargets',
+    });
+    const linkedSettings = {
+      ...source.settings,
+      linkedField: {
+        relationFieldMetadataUniversalIdentifier: 'person-path',
+        sourceFieldMetadataUniversalIdentifier: source.universalIdentifier,
+      },
+    };
+    expect(
+      resolveJunctionConfig({
+        settings: linkedSettings,
+        relationObjectMetadataId:
+          source.relation?.targetObjectMetadata.id ?? '',
+        relationTargetFieldMetadataId: source.relation?.targetFieldMetadata.id,
+        sourceObjectMetadataId: 'different-destination',
+        objectMetadataItems,
+      }),
+    ).toEqual(resolveField(task, 'taskTargets'));
+  });
+
   it('keeps the configured owning side as forward', () => {
     const taskMetadata = getMockObjectMetadataItemOrThrow('task');
 

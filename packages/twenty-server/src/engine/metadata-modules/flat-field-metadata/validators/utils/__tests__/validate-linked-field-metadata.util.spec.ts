@@ -8,6 +8,7 @@ import { validateLinkedFieldMetadata } from 'src/engine/metadata-modules/flat-fi
 import { validateLinkedFieldDependencies } from 'src/engine/metadata-modules/flat-field-metadata/validators/utils/validate-linked-field-dependencies.util';
 import { type UniversalFlatFieldMetadata } from 'src/engine/workspace-manager/workspace-migration/universal-flat-entity/types/universal-flat-field-metadata.type';
 import { generateColumnDefinitions } from 'src/engine/workspace-manager/workspace-migration/workspace-migration-runner/utils/generate-column-definitions.util';
+import { computeFlatFieldMetadataRelatedFlatFieldMetadata } from 'src/engine/metadata-modules/flat-field-metadata/utils/compute-flat-field-metadata-related-flat-field-metadata.util';
 import {
   collectEnumOperationsForField,
   EnumOperation,
@@ -75,6 +76,88 @@ const setup = () => {
 };
 
 describe('linked field metadata invariants', () => {
+  it.each([RelationType.ONE_TO_MANY, RelationType.MANY_TO_ONE])(
+    'creates a read-only %s lookup without an inverse field, index, or column',
+    async (relationType) => {
+      const { linked, fields, objects, destination, args } = setup();
+      const source = getFlatFieldMetadataMock({
+        ...fields.byUniversalIdentifier.source,
+        type: FieldMetadataType.RELATION,
+        settings: { relationType },
+        universalSettings: { relationType },
+        relationTargetObjectMetadataUniversalIdentifier: 'recruitment',
+        relationTargetFieldMetadataUniversalIdentifier: 'source-inverse',
+      });
+      const fieldMaps = {
+        ...fields,
+        byUniversalIdentifier: { ...fields.byUniversalIdentifier, source },
+      };
+      const result = await fromCreateFieldInputToFlatFieldMetadatasToCreate({
+        createFieldInput: {
+          objectMetadataId: 'recruitment',
+          name: 'recommendations',
+          label: 'Recommendations',
+          type: FieldMetadataType.RELATION,
+          settings: linked.settings,
+        },
+        flatApplication: {
+          universalIdentifier: 'application',
+        } as FlatApplication,
+        flatFieldMetadataMaps: fieldMaps,
+        flatObjectMetadataMaps: {
+          ...objects,
+          universalIdentifierById: {
+            recruitment: 'recruitment',
+            person: 'person',
+          },
+        },
+      });
+      expect(result.status).toBe('success');
+      if (result.status !== 'success')
+        throw new Error('Expected linked relation creation');
+      expect(result.result.flatFieldMetadatas).toHaveLength(1);
+      expect(result.result.indexMetadatas).toEqual([]);
+      const field = result.result.flatFieldMetadatas[0];
+      expect(field).toMatchObject({
+        type: FieldMetadataType.RELATION,
+        isUIEditable: false,
+        relationTargetObjectMetadataUniversalIdentifier: 'recruitment',
+        relationTargetFieldMetadataUniversalIdentifier: null,
+        universalSettings: { relationType, ...linked.universalSettings },
+      });
+      expect(
+        validateLinkedFieldMetadata({
+          ...args,
+          flatEntityToValidate: field,
+          optimisticFlatEntityMapsAndRelatedFlatEntityMaps: {
+            ...args.optimisticFlatEntityMapsAndRelatedFlatEntityMaps,
+            flatFieldMetadataMaps: fieldMaps,
+          },
+        }),
+      ).toEqual([]);
+      const flatLookup = getFlatFieldMetadataMock({
+        ...field,
+        objectMetadataId: destination.id,
+        type: FieldMetadataType.RELATION,
+        settings: { relationType, ...linked.settings },
+      });
+      expect(
+        generateColumnDefinitions({
+          flatFieldMetadata: flatLookup,
+          flatObjectMetadata: destination,
+          workspaceId: destination.workspaceId,
+        }),
+      ).toEqual([]);
+      expect(
+        computeFlatFieldMetadataRelatedFlatFieldMetadata({
+          flatFieldMetadata: flatLookup,
+          flatObjectMetadata: destination,
+          flatFieldMetadataMaps: fieldMaps,
+        }),
+      ).toEqual([]);
+      expect(source.universalSettings).toEqual({ relationType });
+    },
+  );
   it.each([
     FieldMetadataType.SELECT,
     FieldMetadataType.MULTI_SELECT,
@@ -143,6 +226,7 @@ describe('linked field metadata invariants', () => {
     'wrong-object',
     'inactive',
     'recursive',
+    'linked-traversal',
   ])('rejects a %s source path', (scenario) => {
     const { args, fields } = setup();
     if (scenario === 'missing-source') {
@@ -163,6 +247,12 @@ describe('linked field metadata invariants', () => {
     if (scenario === 'recursive') {
       fields.byUniversalIdentifier.source.universalSettings =
         fields.byUniversalIdentifier.linked.universalSettings;
+    }
+    if (scenario === 'linked-traversal') {
+      fields.byUniversalIdentifier.relation.universalSettings = {
+        relationType: RelationType.MANY_TO_ONE,
+        ...fields.byUniversalIdentifier.linked.universalSettings,
+      };
     }
     expect(validateLinkedFieldMetadata(args)).not.toEqual([]);
   });

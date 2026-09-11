@@ -18,12 +18,14 @@ export class GraphqlQueryFilterConditionParser {
     flatFieldMetadataMaps: FlatEntityMaps<OrmFlatFieldMetadata>,
     flatObjectMetadataMaps?: FlatEntityMaps<FlatObjectMetadata>,
     depth = 0,
+    useRelationJoins = false,
   ) {
     this.queryFilterFieldParser = new GraphqlQueryFilterFieldParser(
       flatObjectMetadata,
       flatFieldMetadataMaps,
       flatObjectMetadataMaps,
       depth,
+      useRelationJoins,
     );
   }
 

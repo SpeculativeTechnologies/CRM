@@ -11,6 +11,7 @@ export type WorkspaceColumnShape = {
   linkedColumn?: {
     relationFieldName: string;
     sourceColumnName: string;
+    sourcePermissionFieldName?: string;
   };
 };
 
@@ -21,6 +22,7 @@ export type WorkspaceRelationShape = {
   targetObjectMetadataId: string;
   targetFieldMetadataId: string | null;
   joinColumnName?: string;
+  parentJoinColumnName?: string;
 };
 
 export type WorkspaceTableShape = {

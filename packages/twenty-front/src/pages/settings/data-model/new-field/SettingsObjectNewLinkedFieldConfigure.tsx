@@ -41,6 +41,7 @@ export const SettingsObjectNewLinkedFieldConfigure = () => {
       (field) =>
         destination.nameSingular !== 'person' &&
         field.isActive &&
+        !isDefined(getLinkedFieldReference(field.settings)) &&
         field.type === FieldMetadataType.RELATION &&
         field.relation?.type === RelationType.MANY_TO_ONE &&
         field.relation.targetObjectMetadata.id === person?.id,

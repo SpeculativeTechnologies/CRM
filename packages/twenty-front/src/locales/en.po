@@ -1460,11 +1460,6 @@ msgstr "Add Item"
 msgid "Add item to folder"
 msgstr "Add item to folder"
 
-#. js-lingui-id: /Xt1eb
-#: src/modules/object-record/record-table/record-table-header/components/RecordTableHeaderPlusButtonContent.tsx
-msgid "Add linked field"
-msgstr "Add linked field"
-
 #. js-lingui-id: gaZXkv
 #: src/modules/navigation-menu-item/display/folder/components/NavigationMenuItemFolderDnd.tsx
 #: src/modules/navigation-menu-item/edit/components/WorkspaceSectionAddMenuItemButton.tsx

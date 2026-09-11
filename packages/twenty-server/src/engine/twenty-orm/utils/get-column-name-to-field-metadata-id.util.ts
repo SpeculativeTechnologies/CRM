@@ -1,9 +1,14 @@
-import { type CompositeType } from 'twenty-shared/types';
-import { isDefined } from 'twenty-shared/utils';
+import {
+  type CompositeType,
+  FieldMetadataType,
+  RelationType,
+} from 'twenty-shared/types';
+import { getLinkedFieldReference, isDefined } from 'twenty-shared/utils';
 
 import { computeCompositeColumnName } from 'src/engine/metadata-modules/field-metadata/utils/compute-column-name.util';
 import { type FlatEntityMaps } from 'src/engine/metadata-modules/flat-entity/types/flat-entity-maps.type';
 import { type OrmFlatFieldMetadata } from 'src/engine/metadata-modules/flat-field-metadata/types/orm-flat-field-metadata.type';
+import { isFlatFieldMetadataOfType } from 'src/engine/metadata-modules/flat-field-metadata/utils/is-flat-field-metadata-of-type.util';
 import { type FlatObjectMetadata } from 'src/engine/metadata-modules/flat-object-metadata/types/flat-object-metadata.type';
 import {
   type ColumnNameProcessor,
@@ -65,6 +70,24 @@ export function getColumnNameToFieldMetadataIdMap(
     flatFieldMetadataMaps,
     processor,
   );
+
+  for (const field of Object.values(
+    flatFieldMetadataMaps.byUniversalIdentifier,
+  )) {
+    if (
+      !isDefined(field) ||
+      field.objectMetadataId !== flatObjectMetadata.id ||
+      !isFlatFieldMetadataOfType(field, FieldMetadataType.RELATION) ||
+      field.settings.relationType !== RelationType.ONE_TO_MANY
+    ) {
+      continue;
+    }
+    // A to-many lookup reads a relation even though its Person key is virtual.
+    columnNameToFieldMetadataIdMap[field.name] = field.id;
+    if (isDefined(getLinkedFieldReference(field.settings))) {
+      columnNameToFieldMetadataIdMap[`${field.name}Id`] = field.id;
+    }
+  }
 
   return columnNameToFieldMetadataIdMap;
 }

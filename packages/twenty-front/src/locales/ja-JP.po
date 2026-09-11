@@ -1465,11 +1465,6 @@ msgstr "アイテムを追加"
 msgid "Add item to folder"
 msgstr "フォルダーに項目を追加"
 
-#. js-lingui-id: /Xt1eb
-#: src/modules/object-record/record-table/record-table-header/components/RecordTableHeaderPlusButtonContent.tsx
-msgid "Add linked field"
-msgstr ""
-
 #. js-lingui-id: gaZXkv
 #: src/modules/navigation-menu-item/display/folder/components/NavigationMenuItemFolderDnd.tsx
 #: src/modules/navigation-menu-item/edit/components/WorkspaceSectionAddMenuItemButton.tsx

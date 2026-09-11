@@ -36,6 +36,8 @@ export type JoinClause = {
 
 export type ToManyDedupOrder = {
   columnName: string;
+  useLower?: boolean;
+  castToText?: boolean;
   direction: 'ASC' | 'DESC';
   nulls?: 'NULLS FIRST' | 'NULLS LAST';
 };
@@ -407,29 +409,37 @@ const buildToManyDedupedJoinSource = ({
   foreignKeyColumnName,
   includeSoftDeleteFilter,
   dedupOrder = [],
+  alias,
+  conditions = [],
 }: {
   tableExpression: string;
   foreignKeyColumnName: string;
   includeSoftDeleteFilter: boolean;
   dedupOrder?: ToManyDedupOrder[];
+  alias?: string;
+  conditions?: string[];
 }): string => {
   const foreignKey = escapeIdentifier(foreignKeyColumnName);
-  const whereClause = includeSoftDeleteFilter
-    ? ` WHERE ${escapeIdentifier('deletedAt')} IS NULL`
-    : '';
+  const predicates = [...conditions];
+  if (includeSoftDeleteFilter)
+    predicates.push(`${escapeIdentifier('deletedAt')} IS NULL`);
+  const whereClause =
+    predicates.length > 0
+      ? ` WHERE ${predicates.map((condition) => `(${condition})`).join(' AND ')}`
+      : '';
 
   const orderExpressions = [
     foreignKey,
-    ...dedupOrder.map(
-      (order) =>
-        `${escapeIdentifier(order.columnName)} ${order.direction}${
-          isDefined(order.nulls) ? ` ${order.nulls}` : ''
-        }`,
-    ),
+    ...dedupOrder.map((order) => {
+      let expression = escapeIdentifier(order.columnName);
+      if (order.castToText) expression = `CAST(${expression} AS TEXT)`;
+      if (order.useLower) expression = `LOWER(${expression})`;
+      return `${expression} ${order.direction}${isDefined(order.nulls) ? ` ${order.nulls}` : ''}`;
+    }),
     escapeIdentifier('id'),
   ];
 
-  return `(SELECT DISTINCT ON (${foreignKey}) * FROM ${tableExpression}${whereClause} ORDER BY ${orderExpressions.join(', ')})`;
+  return `(SELECT DISTINCT ON (${foreignKey}) * FROM ${tableExpression}${isDefined(alias) ? ` AS ${escapeIdentifier(alias)}` : ''}${whereClause} ORDER BY ${orderExpressions.join(', ')})`;
 };
 
 export const buildJoinClause = (
@@ -463,7 +473,13 @@ export const buildJoinClause = (
           ? joinClause.toManyForeignKeyColumnName
           : undefined;
 
-      const onConditions = [condition, ...joinClause.additionalOnConditions];
+      const isLinkedList =
+        isDefined(toManyForeignKeyColumnName) &&
+        joinClause.isLinkedFieldJoin === true;
+      const onConditions = [
+        condition,
+        ...(isLinkedList ? [] : joinClause.additionalOnConditions),
+      ];
 
       if (
         softDeletePredicateApplies &&
@@ -484,10 +500,12 @@ export const buildJoinClause = (
             foreignKeyColumnName: toManyForeignKeyColumnName,
             includeSoftDeleteFilter: softDeletePredicateApplies,
             dedupOrder: joinClause.toManyDedupOrder,
+            alias: isLinkedList ? joinClause.alias : undefined,
+            conditions: isLinkedList ? joinClause.additionalOnConditions : [],
           })
         : tableExpression;
 
-      return `${joinClause.joinType} JOIN ${joinSource} AS ${escapeIdentifier(
+      return `${joinClause.joinType} JOIN ${isLinkedList ? 'LATERAL ' : ''}${joinSource} AS ${escapeIdentifier(
         joinClause.alias,
       )} ON ${onConditions.map((condition) => `(${condition})`).join(' AND ')}`;
     })

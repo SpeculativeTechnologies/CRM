@@ -279,7 +279,7 @@ describe('getColumnNameToFieldMetadataIdMap', () => {
       expect(Object.keys(result)).toHaveLength(3);
     });
 
-    it('should skip ONE_TO_MANY relation field types', () => {
+    it('maps a ONE_TO_MANY field for permissions without mapping a physical foreign key', () => {
       const fields = [
         createMockFlatFieldMetadata(
           'field-1',
@@ -304,7 +304,29 @@ describe('getColumnNameToFieldMetadataIdMap', () => {
 
       expect(result['name']).toBe('field-2');
       expect(result['companyId']).toBeUndefined();
-      expect(Object.keys(result)).toHaveLength(1);
+      expect(result['employees']).toBe('field-1');
+      expect(Object.keys(result)).toHaveLength(2);
+    });
+
+    it('maps the virtual parent key of a linked relation to the lookup permission', () => {
+      const field = createMockFlatFieldMetadata(
+        'lookup',
+        'recommendedRecruitments',
+        FieldMetadataType.RELATION,
+        {
+          relationType: 'ONE_TO_MANY',
+          linkedField: {
+            relationFieldMetadataUniversalIdentifier: 'person',
+            sourceFieldMetadataUniversalIdentifier: 'recommendations',
+          },
+        },
+      );
+      const result = getColumnNameToFieldMetadataIdMap(
+        createMockFlatObjectMetadata(['lookup']),
+        buildFlatFieldMetadataMaps([field]),
+      );
+      expect(result.recommendedRecruitmentsId).toBe('lookup');
+      expect(result.recommendedRecruitments).toBe('lookup');
     });
   });
 });

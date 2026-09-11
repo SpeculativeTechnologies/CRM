@@ -1,7 +1,7 @@
 import { FieldMetadataType } from '@/types/FieldMetadataType';
 
-// A linked column follows one Person relationship, so relation traversal and
-// file ownership cannot be inferred from its displayed value.
+// Relation sources retain their cardinality and target; files require separate
+// ownership rules and are not supported as linked values.
 export const LINKED_FIELD_SUPPORTED_TYPES: readonly FieldMetadataType[] = [
   FieldMetadataType.ACTOR,
   FieldMetadataType.ADDRESS,
@@ -18,6 +18,7 @@ export const LINKED_FIELD_SUPPORTED_TYPES: readonly FieldMetadataType[] = [
   FieldMetadataType.NUMERIC,
   FieldMetadataType.PHONES,
   FieldMetadataType.RATING,
+  FieldMetadataType.RELATION,
   FieldMetadataType.RAW_JSON,
   FieldMetadataType.RICH_TEXT,
   FieldMetadataType.SELECT,

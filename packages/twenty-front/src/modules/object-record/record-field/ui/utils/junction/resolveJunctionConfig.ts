@@ -4,7 +4,7 @@ import { type JunctionObjectMetadataItem } from '@/object-record/record-field/ui
 import { type ValidJunctionConfig } from '@/object-record/record-field/ui/utils/junction/types/ValidJunctionConfig';
 import { type ValidResolvedJunctionConfig } from '@/object-record/record-field/ui/utils/junction/types/ValidResolvedJunctionConfig';
 import { hasJunctionTargetFieldId } from '@/object-record/record-field/ui/utils/junction/hasJunctionTargetFieldId';
-import { isDefined } from 'twenty-shared/utils';
+import { getLinkedFieldReference, isDefined } from 'twenty-shared/utils';
 
 type JunctionDirection = 'forward' | 'reverse';
 
@@ -64,6 +64,16 @@ export const resolveJunctionConfig = ({
   sourceObjectMetadataId,
   objectMetadataItems,
 }: ResolveJunctionConfigArgs): ResolvedJunctionConfig | null => {
+  const linkedField = getLinkedFieldReference(settings);
+  if (isDefined(linkedField)) {
+    sourceObjectMetadataId = objectMetadataItems.find((object) =>
+      object.fields.some(
+        (field) =>
+          field.universalIdentifier ===
+          linkedField.sourceFieldMetadataUniversalIdentifier,
+      ),
+    )?.id;
+  }
   const forwardJunctionConfig = getJunctionConfig({
     settings,
     relationObjectMetadataId,
