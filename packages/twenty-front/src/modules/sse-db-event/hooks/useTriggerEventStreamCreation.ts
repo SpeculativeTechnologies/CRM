@@ -1,3 +1,4 @@
+import { dispatchQueryInvalidations } from '@/sse-db-event/utils/dispatchQueryInvalidations';
 import { dispatchBrowserEvent } from '@/browser-event/utils/dispatchBrowserEvent';
 import { SSE_CLIENT_RECONNECTED_EVENT_NAME } from '@/sse-db-event/constants/SseClientReconnectedEventName';
 import { ON_EVENT_SUBSCRIPTION } from '@/sse-db-event/graphql/subscriptions/OnEventSubscription';
@@ -129,6 +130,9 @@ export const useTriggerEventStreamCreation = () => {
           handleFirstEventReceived();
 
           const eventSubscription = value?.data?.onEventSubscription;
+          dispatchQueryInvalidations(
+            eventSubscription?.queryIdsToRefetch ?? [],
+          );
 
           const objectRecordEventsWithQueryIds =
             eventSubscription?.objectRecordEventsWithQueryIds ?? [];
@@ -186,6 +190,10 @@ export const useTriggerEventStreamCreation = () => {
                 store.set(shouldDestroyEventStreamState.atom, true);
               } else {
                 handleFirstEventReceived();
+
+                dispatchQueryInvalidations(
+                  result?.data?.onEventSubscription?.queryIdsToRefetch ?? [],
+                );
 
                 const objectRecordEventsWithQueryIds =
                   result?.data?.onEventSubscription

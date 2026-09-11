@@ -1,7 +1,12 @@
+import { getRelationTargetFieldMetadataId } from 'src/engine/metadata-modules/flat-field-metadata/utils/get-relation-target-field-metadata-id.util';
 import { Injectable } from '@nestjs/common';
 
 import { FieldMetadataType, type ObjectRecord } from 'twenty-shared/types';
-import { isDefined, isValidUuid } from 'twenty-shared/utils';
+import {
+  getLinkedFieldReference,
+  isDefined,
+  isValidUuid,
+} from 'twenty-shared/utils';
 import { type FindOptionsRelations, type ObjectLiteral } from 'typeorm';
 
 import { computeMorphOrRelationFieldJoinColumnName } from 'src/engine/metadata-modules/field-metadata/utils/compute-morph-or-relation-field-join-column-name.util';
@@ -188,6 +193,9 @@ export class ProcessNestedRelationsHelper {
     }
 
     const relationType = sourceFieldMetadata.settings.relationType;
+    const isLinkedRelation = isDefined(
+      getLinkedFieldReference(sourceFieldMetadata.settings),
+    );
     const { targetRelationName, targetObjectMetadata, targetRelation } =
       this.getTargetObjectMetadata({
         flatObjectMetadataMaps,
@@ -219,7 +227,7 @@ export class ProcessNestedRelationsHelper {
       flatFieldMetadataMaps,
     });
 
-    if (relationType === RelationType.MANY_TO_ONE) {
+    if (relationType === RelationType.MANY_TO_ONE && !isLinkedRelation) {
       columnsToSelect.deletedAt = true;
       targetObjectQueryBuilder = targetObjectQueryBuilder.withDeleted();
     }
@@ -235,7 +243,9 @@ export class ProcessNestedRelationsHelper {
     const relationIds = getUniqueRelationIds({
       records: parentObjectRecords,
       idField:
-        relationType === RelationType.ONE_TO_MANY ? 'id' : joinColumnName,
+        relationType === RelationType.ONE_TO_MANY && !isLinkedRelation
+          ? 'id'
+          : joinColumnName,
     });
 
     if (
@@ -291,6 +301,7 @@ export class ProcessNestedRelationsHelper {
           ? `${fieldMetadataTargetRelationColumnName}`
           : 'id',
       joinColumnName,
+      parentIdFieldName: isLinkedRelation ? joinColumnName : 'id',
       relationType,
       selectedFields,
     });
@@ -351,9 +362,13 @@ export class ProcessNestedRelationsHelper {
       flatObjectMetadataMaps,
     );
 
+    const inverseFieldMetadataId = getRelationTargetFieldMetadataId(
+      targetFieldMetadata,
+      flatFieldMetadataMaps,
+    );
     if (
       !targetFieldMetadata.relationTargetObjectMetadataId ||
-      !targetFieldMetadata.relationTargetFieldMetadataId
+      !inverseFieldMetadataId
     ) {
       throw new GraphqlQueryRunnerException(
         `Relation target object metadata id or field metadata id not found for field ${sourceFieldName}`,
@@ -363,7 +378,7 @@ export class ProcessNestedRelationsHelper {
     }
 
     const targetRelation = findFlatEntityByIdInFlatEntityMaps({
-      flatEntityId: targetFieldMetadata.relationTargetFieldMetadataId,
+      flatEntityId: inverseFieldMetadataId,
       flatEntityMaps: flatFieldMetadataMaps,
     });
 
@@ -526,6 +541,7 @@ export class ProcessNestedRelationsHelper {
     sourceFieldName,
     joinField,
     joinColumnName,
+    parentIdFieldName,
     relationType,
     selectedFields,
   }: {
@@ -539,13 +555,14 @@ export class ProcessNestedRelationsHelper {
     sourceFieldName: string;
     joinField: string;
     joinColumnName: string;
+    parentIdFieldName: string;
     relationType: RelationType;
     selectedFields: Record<string, unknown>;
   }): void {
     parentRecords.forEach((item) => {
       if (relationType === RelationType.ONE_TO_MANY) {
         item[sourceFieldName] = relationResults.filter(
-          (rel) => rel[joinField] === item.id,
+          (rel) => rel[joinField] === item[parentIdFieldName],
         );
       } else {
         const matchedRelation = relationResults.find(

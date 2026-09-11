@@ -1,3 +1,4 @@
+import { isFlatFieldMetadataOfType } from 'src/engine/metadata-modules/flat-field-metadata/utils/is-flat-field-metadata-of-type.util';
 import { Injectable } from '@nestjs/common';
 
 import { msg } from '@lingui/core/macro';
@@ -6,8 +7,13 @@ import {
   QUERY_MAX_RECORDS,
   QUERY_MAX_RECORDS_FROM_RELATION,
 } from 'twenty-shared/constants';
-import { ObjectRecord, OrderByDirection } from 'twenty-shared/types';
-import { isDefined } from 'twenty-shared/utils';
+import {
+  FieldMetadataType,
+  RelationType,
+  ObjectRecord,
+  OrderByDirection,
+} from 'twenty-shared/types';
+import { getLinkedFieldReference, isDefined } from 'twenty-shared/utils';
 import { FindOptionsRelations, ObjectLiteral } from 'typeorm';
 
 import {
@@ -106,9 +112,22 @@ export class CommonFindManyQueryRunnerService extends CommonBaseQueryRunnerServi
     });
     const orderByWithIdCondition = buildOrderByFromLeaves(orderByLeaves);
 
-    const isForwardPagination = !isDefined(args.before);
+    const isForwardPagination =
+      !isDefined(args.before) && !isDefined(args.last);
 
     const cursor = getCursor(args);
+    const hasLinkedListOrder = orderByLeaves.some(
+      (leaf) =>
+        leaf.kind === 'relation' &&
+        isFlatFieldMetadataOfType(
+          leaf.fieldMetadata,
+          FieldMetadataType.RELATION,
+        ) &&
+        leaf.fieldMetadata.settings?.relationType ===
+          RelationType.ONE_TO_MANY &&
+        isDefined(getLinkedFieldReference(leaf.fieldMetadata.settings)),
+    );
+    let linkedListCursorFilter: Partial<ObjectRecordFilter> | undefined;
 
     if (cursor) {
       const cursorArgFilter = computeCursorArgFilter({
@@ -120,7 +139,11 @@ export class CommonFindManyQueryRunnerService extends CommonBaseQueryRunnerServi
         isForwardPagination,
       });
 
-      if (cursorArgFilter.length > 0) {
+      if (cursorArgFilter.length > 0 && hasLinkedListOrder) {
+        linkedListCursorFilter = {
+          or: cursorArgFilter,
+        } as Partial<ObjectRecordFilter>;
+      } else if (cursorArgFilter.length > 0) {
         appliedFilters = (args.filter && Object.keys(args.filter).length > 0
           ? {
               and: [args.filter, { or: cursorArgFilter }],
@@ -141,6 +164,14 @@ export class CommonFindManyQueryRunnerService extends CommonBaseQueryRunnerServi
       flatObjectMetadata.nameSingular,
       isForwardPagination,
     );
+
+    if (isDefined(linkedListCursorFilter)) {
+      commonQueryParser.appendCursorFilterToBuilder(
+        queryBuilder,
+        flatObjectMetadata.nameSingular,
+        linkedListCursorFilter,
+      );
+    }
 
     commonQueryParser.applyDeletedAtToBuilder(queryBuilder, appliedFilters);
 

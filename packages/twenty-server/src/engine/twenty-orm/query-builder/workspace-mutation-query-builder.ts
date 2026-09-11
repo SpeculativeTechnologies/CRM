@@ -156,6 +156,17 @@ export class WorkspaceMutationQueryBuilder {
     for (const [columnName, value] of Object.entries(this.setRecord)) {
       this.assertColumnExists(columnName);
 
+      if (
+        isDefined(
+          this.tableShape.columnShapeByColumnName[columnName].linkedColumn,
+        )
+      ) {
+        throw new TwentyOrmException(
+          `Linked field "${columnName}" is read-only`,
+          TwentyOrmExceptionCode.INVALID_INPUT,
+        );
+      }
+
       if (typeof value === 'function') {
         throw new TwentyOrmException(
           `Function-valued updates are not supported on "${columnName}"`,

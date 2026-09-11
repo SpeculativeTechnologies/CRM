@@ -2078,6 +2078,22 @@ msgstr "Chattråd hittades inte."
 msgid "Chat thread title cannot be empty."
 msgstr "Chattrådens titel får inte vara tom."
 
+#. js-lingui-id: Mn4LAL
+#: src/engine/metadata-modules/flat-object-metadata/validators/utils/validate-flat-object-metadata-identifiers.util.ts
+msgid "Choose a stored field as the object identifier."
+msgstr ""
+
+#. js-lingui-id: /OeBJg
+#: src/engine/workspace-manager/workspace-migration/workspace-migration-builder/validators/services/flat-row-level-permission-predicate-validator.service.ts
+#: src/engine/workspace-manager/workspace-migration/workspace-migration-builder/validators/services/flat-row-level-permission-predicate-validator.service.ts
+msgid "Choose a stored field for this permission rule. Linked values already respect the source record's permissions."
+msgstr ""
+
+#. js-lingui-id: gd7GgR
+#: src/engine/metadata-modules/flat-field-metadata/validators/utils/validate-linked-field-metadata.util.ts
+msgid "Choose an active field through a single Person relation. Linked fields are read-only and cannot have a default value or a unique constraint."
+msgstr ""
+
 #. js-lingui-id: 8kN7d7
 #: src/engine/workspace-manager/workspace-migration/workspace-migration-builder/validators/services/flat-timeline-activity-type-validator.service.ts
 msgid "Choose an existing timeline activity type to override"
@@ -2623,6 +2639,11 @@ msgstr "Det gick inte att hitta det befintliga objektet för att avstämma dess 
 #: src/engine/core-modules/tool-provider/utils/get-crud-tool-label.util.ts
 msgid "Create"
 msgstr "Skapa"
+
+#. js-lingui-id: hnTJsu
+#: src/engine/metadata-modules/flat-field-metadata/validators/utils/validate-linked-field-dependencies.util.ts
+msgid "Create a new linked field to choose a different source. Existing fields cannot be converted to or from linked fields."
+msgstr ""
 
 #. js-lingui-id: fbe2ik
 #: src/engine/core-modules/tool-provider/constants/action-tool-label.constant.ts
@@ -3393,6 +3414,11 @@ msgstr "Redigera layout"
 msgctxt "commandMenuItem.shortLabel"
 msgid "Edit Layout"
 msgstr "Redigera layout"
+
+#. js-lingui-id: t6kY9m
+#: src/engine/twenty-orm/repository/workspace-repository.ts
+msgid "Edit this value on the linked Person record."
+msgstr ""
 
 #. js-lingui-id: Csg2MU
 #: src/engine/workspace-manager/workspace-migration/workspace-migration-builder/validators/services/flat-command-menu-item-validator.service.ts
@@ -6094,6 +6120,11 @@ msgstr "länkade en relaterad uppgift"
 msgid "Linked and unlinked timeline activity emitters require a target relation"
 msgstr "Länkade och olänkade tidslinjeaktivitetsutlösare kräver en målrelation."
 
+#. js-lingui-id: 1RhCl6
+#: src/engine/workspace-manager/workspace-migration/workspace-migration-builder/validators/services/flat-index-metadata-validator.service.ts
+msgid "Linked fields cannot be indexed. Index the source field instead."
+msgstr ""
+
 #. js-lingui-id: TUocGa
 #: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-timeline-activity-standard-flat-field-metadata.util.ts
 msgctxt "fieldMetadata.description"
@@ -8667,6 +8698,11 @@ msgstr "Fjärrobjekt stöds ännu inte"
 msgctxt "commandMenuItem.label"
 msgid "Remove from Favorites"
 msgstr "Ta bort från favoriter"
+
+#. js-lingui-id: QDpjsg
+#: src/engine/metadata-modules/flat-field-metadata/validators/utils/validate-linked-field-dependencies.util.ts
+msgid "Remove the linked fields that depend on this field before deleting, deactivating, or changing its type or relation."
+msgstr ""
 
 #. js-lingui-id: yFLhnq
 #: src/engine/metadata-modules/flat-permission-flag/validators/utils/validate-permission-flag-not-in-use-cross-entity.util.ts
@@ -11663,6 +11699,11 @@ msgstr "Använd som utkast"
 msgctxt "commandMenuItem.shortLabel"
 msgid "Use as Draft"
 msgstr "Använd som utkast"
+
+#. js-lingui-id: ESr2sV
+#: src/engine/workspace-manager/workspace-migration/workspace-migration-builder/validators/services/flat-search-field-metadata-validator.service.ts
+msgid "Use filters to search linked fields. They cannot be included in a stored search index."
+msgstr ""
 
 #. js-lingui-id: GkcfmO
 #: src/engine/core-modules/auth/services/sign-in-up.service.ts

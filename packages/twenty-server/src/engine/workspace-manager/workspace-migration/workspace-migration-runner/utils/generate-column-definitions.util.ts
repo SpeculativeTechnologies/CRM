@@ -1,3 +1,4 @@
+import { getLinkedFieldReference, isDefined } from 'twenty-shared/utils';
 import {
   type CompositeProperty,
   FieldMetadataType,
@@ -185,6 +186,10 @@ export const generateColumnDefinitions = ({
   workspaceId: string;
   searchVectorAsExpression?: string;
 }): WorkspaceSchemaColumnDefinition[] => {
+  if (isDefined(getLinkedFieldReference(flatFieldMetadata.settings))) {
+    return [];
+  }
+
   const { tableName, schemaName } = getWorkspaceSchemaContextForMigration({
     workspaceId,
     objectMetadata: flatObjectMetadata,

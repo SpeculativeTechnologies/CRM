@@ -157,6 +157,10 @@ export type { IsExactly } from './IsExactly';
 export type { IsGreaterOrEqual } from './IsGreaterOrEqual.type';
 export type { IsNever } from './IsNever.type';
 export type { IsSerializedRelation } from './IsSerializedRelation.type';
+export type {
+  LinkedFieldReference,
+  LinkedFieldMetadataSettings,
+} from './LinkedFieldReference';
 export type { LogicFunctionEvent } from './LogicFunctionEvent';
 export type { LogicFunctionHttpResponse } from './LogicFunctionResponse';
 export {

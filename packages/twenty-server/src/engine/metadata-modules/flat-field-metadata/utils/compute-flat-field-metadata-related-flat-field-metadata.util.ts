@@ -1,4 +1,5 @@
 import { FieldMetadataType } from 'twenty-shared/types';
+import { getLinkedFieldReference, isDefined } from 'twenty-shared/utils';
 
 import { type FlatEntityMaps } from 'src/engine/metadata-modules/flat-entity/types/flat-entity-maps.type';
 import { type FlatFieldMetadata } from 'src/engine/metadata-modules/flat-field-metadata/types/flat-field-metadata.type';
@@ -16,6 +17,9 @@ export const computeFlatFieldMetadataRelatedFlatFieldMetadata = ({
   flatFieldMetadata: FlatFieldMetadata;
   flatFieldMetadataMaps: FlatEntityMaps<FlatFieldMetadata>;
 }): FlatFieldMetadata[] => {
+  if (isDefined(getLinkedFieldReference(flatFieldMetadata.settings))) {
+    return [];
+  }
   if (
     isFlatFieldMetadataOfType(flatFieldMetadata, FieldMetadataType.RELATION)
   ) {

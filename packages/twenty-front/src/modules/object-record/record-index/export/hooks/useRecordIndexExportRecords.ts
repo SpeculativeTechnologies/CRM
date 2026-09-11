@@ -16,7 +16,8 @@ import { formatValueForCSV } from '@/spreadsheet-import/utils/formatValueForCSV'
 import { sanitizeValueForCSVExport } from '@/spreadsheet-import/utils/sanitizeValueForCSVExport';
 import { t } from '@lingui/core/macro';
 import { saveAs } from 'file-saver';
-import { isDefined } from 'twenty-shared/utils';
+import { getLinkedFieldReference, isDefined } from 'twenty-shared/utils';
+import { useExportLinkedRelationValues } from '@/object-record/record-index/export/hooks/useExportLinkedRelationValues';
 import { FieldMetadataType, RelationType } from '~/generated-metadata/graphql';
 import { isUndefinedOrNull } from '~/utils/isUndefinedOrNull';
 
@@ -43,7 +44,8 @@ export const generateCsv: GenerateExport = ({
   const columnsToExport = columns.filter(
     (col) =>
       !('relationType' in col.metadata && col.metadata.relationType) ||
-      col.metadata.relationType === RelationType.MANY_TO_ONE,
+      col.metadata.relationType === RelationType.MANY_TO_ONE ||
+      isDefined(getLinkedFieldReference(col.metadata.settings)),
   );
 
   const objectIdColumn: ColumnDefinition<FieldMetadata> = {
@@ -61,9 +63,12 @@ export const generateCsv: GenerateExport = ({
   const columnsToExportWithIdColumn = [objectIdColumn, ...columnsToExport];
 
   const keys = columnsToExportWithIdColumn.flatMap((col) => {
-    const headerLabel = `${col.label}${col.type === 'RELATION' ? ' Id' : ''}`;
+    const isStoredRelation =
+      col.type === 'RELATION' &&
+      !isDefined(getLinkedFieldReference(col.metadata.settings));
+    const headerLabel = `${col.label}${isStoredRelation ? ' Id' : ''}`;
     const column = {
-      field: `${col.metadata.fieldName}${col.type === 'RELATION' ? 'Id' : ''}`,
+      field: `${col.metadata.fieldName}${isStoredRelation ? 'Id' : ''}`,
       title: formatValueForCSV(sanitizeValueForCSVExport(headerLabel)),
     };
 
@@ -164,24 +169,36 @@ export const useRecordIndexExportRecords = ({
   recordIndexId,
   viewType,
 }: UseExportTableDataOptions) => {
+  const { completeLinkedRelations } = useExportLinkedRelationValues();
   const { processRecordsForCSVExport } = useExportProcessRecordsForCSV(
     objectMetadataItem.nameSingular,
   );
 
   const downloadCsv = useMemo(
     () =>
-      (
+      async (
         records: ObjectRecord[],
         columns: Pick<
           ColumnDefinition<FieldMetadata>,
           'label' | 'type' | 'metadata'
         >[],
       ) => {
-        const recordsProcessedForExport = processRecordsForCSVExport(records);
+        const recordsProcessedForExport = processRecordsForCSVExport(
+          await completeLinkedRelations(
+            records,
+            objectMetadataItem,
+            columns.map((column) => column.metadata.fieldName),
+          ),
+        );
 
         csvDownloader(filename, { rows: recordsProcessedForExport, columns });
       },
-    [filename, processRecordsForCSVExport],
+    [
+      filename,
+      processRecordsForCSVExport,
+      completeLinkedRelations,
+      objectMetadataItem,
+    ],
   );
 
   const { getTableData: download, progress } = useRecordIndexLazyFetchRecords({

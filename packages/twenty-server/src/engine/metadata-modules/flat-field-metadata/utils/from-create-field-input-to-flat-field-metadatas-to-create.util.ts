@@ -5,6 +5,7 @@ import {
 } from 'twenty-shared/types';
 import {
   assertUnreachable,
+  getLinkedFieldReference,
   isDefined,
   trimAndRemoveDuplicatedWhitespacesFromObjectStringProperties,
 } from 'twenty-shared/utils';
@@ -19,6 +20,7 @@ import { findFlatEntityByIdInFlatEntityMaps } from 'src/engine/metadata-modules/
 import { type FieldInputTranspilationResult } from 'src/engine/metadata-modules/flat-field-metadata/types/field-input-transpilation-result.type';
 import { fromMorphRelationCreateFieldInputToFlatFieldMetadatas } from 'src/engine/metadata-modules/flat-field-metadata/utils/from-morph-relation-create-field-input-to-flat-field-metadatas.util';
 import { fromRelationCreateFieldInputToFlatFieldMetadatas } from 'src/engine/metadata-modules/flat-field-metadata/utils/from-relation-create-field-input-to-flat-field-metadatas.util';
+import { fromLinkedRelationCreateFieldInputToFlatFieldMetadata } from 'src/engine/metadata-modules/flat-field-metadata/utils/from-linked-relation-create-field-input-to-flat-field-metadata.util';
 import { getDefaultFlatFieldMetadata } from 'src/engine/metadata-modules/flat-field-metadata/utils/get-default-flat-field-metadata-from-create-field-input.util';
 import { type UniversalFlatFieldMetadata } from 'src/engine/workspace-manager/workspace-migration/universal-flat-entity/types/universal-flat-field-metadata.type';
 import { type UniversalFlatIndexMetadata } from 'src/engine/workspace-manager/workspace-migration/universal-flat-entity/types/universal-flat-index-metadata.type';
@@ -80,6 +82,9 @@ export const fromCreateFieldInputToFlatFieldMetadatasToCreate = async ({
     objectMetadataUniversalIdentifier:
       parentFlatObjectMetadata.universalIdentifier,
   });
+  const linkedField = getLinkedFieldReference(
+    commonFlatFieldMetadata.universalSettings,
+  );
 
   switch (createFieldInput.type) {
     case FieldMetadataType.MORPH_RELATION: {
@@ -95,6 +100,13 @@ export const fromCreateFieldInputToFlatFieldMetadatasToCreate = async ({
       });
     }
     case FieldMetadataType.RELATION: {
+      if (isDefined(linkedField)) {
+        return fromLinkedRelationCreateFieldInputToFlatFieldMetadata({
+          commonFlatFieldMetadata,
+          linkedField,
+          flatFieldMetadataMaps: existingFlatFieldMetadataMaps,
+        });
+      }
       return await fromRelationCreateFieldInputToFlatFieldMetadatas({
         existingFlatObjectMetadataMaps,
         existingFlatFieldMetadataMaps,
@@ -116,7 +128,9 @@ export const fromCreateFieldInputToFlatFieldMetadatasToCreate = async ({
               type: createFieldInput.type,
               defaultValue: commonFlatFieldMetadata.defaultValue as string, // Could this be improved ?
               options: generateRatingOptions(),
-              universalSettings: null,
+              universalSettings: isDefined(linkedField)
+                ? { linkedField }
+                : null,
             } satisfies UniversalFlatFieldMetadata<
               typeof createFieldInput.type
             >,
@@ -146,7 +160,9 @@ export const fromCreateFieldInputToFlatFieldMetadatasToCreate = async ({
               type: createFieldInput.type,
               options,
               defaultValue: commonFlatFieldMetadata.defaultValue as string, // Could this be improved ?
-              universalSettings: null,
+              universalSettings: isDefined(linkedField)
+                ? { linkedField }
+                : null,
             } satisfies UniversalFlatFieldMetadata<
               typeof createFieldInput.type
             >,

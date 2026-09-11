@@ -844,6 +844,11 @@ msgstr "2 Columns"
 msgid "2. Configure field"
 msgstr "2. Configure field"
 
+#. js-lingui-id: 8chvhj
+#: src/pages/settings/data-model/new-field/SettingsObjectNewLinkedFieldConfigure.tsx
+msgid "2. Configure linked field"
+msgstr "2. Configure linked field"
+
 #. js-lingui-id: 0Tx9MD
 #: src/modules/settings/roles/role-permissions/object-level-permissions/object-form/components/SettingsRolePermissionsObjectLevelObjectForm.tsx
 msgid "2. Set {objectLabelPlural} permissions"
@@ -924,6 +929,11 @@ msgstr "A draft already exists"
 #: src/modules/command-menu-item/engine-command/record/single-record/workflow-versions/components/UseAsDraftWorkflowVersionSingleRecordCommand.tsx
 msgid "A draft already exists for this workflow. Are you sure you want to erase it?"
 msgstr "A draft already exists for this workflow. Are you sure you want to erase it?"
+
+#. js-lingui-id: GR4ua/
+#: src/pages/settings/data-model/new-field/SettingsObjectNewLinkedFieldConfigure.tsx
+msgid "A field with this name already exists. Choose another name."
+msgstr "A field with this name already exists. Choose another name."
 
 #. js-lingui-id: oO3ZQX
 #: src/modules/page-layout/widgets/call-recording/utils/getCallRecordingStatusDisplayConfiguration.ts
@@ -1246,6 +1256,11 @@ msgstr "Add a record"
 #: src/modules/activities/calendar/components/CalendarEventComposerTargetsInput.tsx
 msgid "Add a related record"
 msgstr "Add a related record"
+
+#. js-lingui-id: 3S873C
+#: src/pages/settings/data-model/new-field/SettingsObjectNewLinkedFieldConfigure.tsx
+msgid "Add a relation to one Person before creating a linked field."
+msgstr "Add a relation to one Person before creating a linked field."
 
 #. js-lingui-id: eMc2xs
 #: src/modules/ai/components/suggested-prompts/contextual-suggested-prompts.ts
@@ -3120,6 +3135,11 @@ msgstr "Available"
 msgid "Available fields:"
 msgstr "Available fields:"
 
+#. js-lingui-id: Q280ER
+#: src/pages/settings/data-model/new-field/SettingsObjectNewLinkedFieldConfigure.tsx
+msgid "Available in this object's views and record pages. Supports sorting, filtering, and CSV export."
+msgstr "Available in this object's views and record pages. Supports sorting, filtering, and CSV export."
+
 #. js-lingui-id: STA+22
 #: src/pages/settings/ai/components/SettingsAiModelsTab.tsx
 msgid "Available models"
@@ -4059,6 +4079,16 @@ msgstr "Chinese — Traditional"
 #: src/modules/settings/billing/components/internal/ResourceCreditPackagePickerModal.tsx
 msgid "Choose {intervalAdjective} credits"
 msgstr "Choose {intervalAdjective} credits"
+
+#. js-lingui-id: 2Tr92Z
+#: src/pages/settings/data-model/new-field/SettingsObjectNewLinkedFieldConfigure.tsx
+msgid "Choose a field"
+msgstr "Choose a field"
+
+#. js-lingui-id: 3Nyb8y
+#: src/pages/settings/data-model/new-field/SettingsObjectNewLinkedFieldConfigure.tsx
+msgid "Choose a relation"
+msgstr "Choose a relation"
 
 #. js-lingui-id: NFfUic
 #: src/pages/auth/SignInUp.tsx
@@ -7000,6 +7030,11 @@ msgstr "Display \"More fields\" button"
 msgid "Display a button in the top navbar to trigger this workflow"
 msgstr "Display a button in the top navbar to trigger this workflow"
 
+#. js-lingui-id: L/scHE
+#: src/modules/settings/data-model/fields/forms/components/SettingsObjectNewFieldSelector.tsx
+msgid "Display a current value from a related Person. Editable only at its source."
+msgstr "Display a current value from a related Person. Editable only at its source."
+
 #. js-lingui-id: 8Vg8H7
 #: src/modules/settings/data-model/fields/forms/number/components/SettingsDataModelFieldNumberForm.tsx
 msgid "Display as a plain number or a percentage"
@@ -9207,6 +9242,7 @@ msgstr "Field deleted"
 
 #. js-lingui-id: nrXDdR
 #: src/modules/settings/data-model/fields/forms/morph-relation/components/SettingsDataModelFieldRelationForm.tsx
+#: src/pages/settings/data-model/new-field/SettingsObjectNewLinkedFieldConfigure.tsx
 msgid "Field name"
 msgstr "Field name"
 
@@ -11992,6 +12028,20 @@ msgstr "Link URL"
 msgid "linked a {objectLabel}"
 msgstr "linked a {objectLabel}"
 
+#. js-lingui-id: n1wrj7
+#: src/modules/settings/data-model/fields/forms/components/SettingsObjectNewFieldSelector.tsx
+#: src/modules/settings/data-model/fields/forms/components/SettingsObjectNewFieldSelector.tsx
+#: src/modules/settings/data-model/fields/forms/components/SettingsObjectNewFieldSelector.tsx
+#: src/pages/settings/data-model/new-field/SettingsObjectNewLinkedFieldConfigure.tsx
+#: src/pages/settings/data-model/new-field/SettingsObjectNewLinkedFieldConfigure.tsx
+msgid "Linked field"
+msgstr "Linked field"
+
+#. js-lingui-id: EfGzVk
+#: src/modules/object-record/record-field/ui/components/LinkedFieldSourceIndicator.tsx
+msgid "Linked to {sourcePath}. Edit this value on the Person record."
+msgstr "Linked to {sourcePath}. Edit this value on the Person record."
+
 #. js-lingui-id: gggTBm
 #: src/modules/person-duplicate-review/components/PersonDuplicateCard.tsx
 #: src/modules/person-duplicate-review/components/PersonDuplicateMergePreview.tsx
@@ -13083,6 +13133,7 @@ msgstr "N/A"
 #: src/pages/settings/communications/SettingsWorkspaceUnsubscribeTopicDetail.tsx
 #: src/pages/settings/communications/SettingsWorkspaceUnsubscribeTopicDetail.tsx
 #: src/pages/settings/data-model/constants/SettingsObjectTableMetadata.ts
+#: src/pages/settings/data-model/new-field/SettingsObjectNewLinkedFieldConfigure.tsx
 #: src/pages/settings/data-model/SettingsObjectFieldTable.tsx
 #: src/pages/settings/developers/api-keys/SettingsDevelopersApiKeyDetail.tsx
 #: src/pages/settings/developers/api-keys/SettingsDevelopersApiKeysNew.tsx
@@ -14641,6 +14692,7 @@ msgstr "objects"
 #: src/pages/settings/applications/tabs/SettingsApplicationDetailContentTab.tsx
 #: src/pages/settings/data-model/new-field/SettingsObjectNewFieldConfigure.tsx
 #: src/pages/settings/data-model/new-field/SettingsObjectNewFieldSelect.tsx
+#: src/pages/settings/data-model/new-field/SettingsObjectNewLinkedFieldConfigure.tsx
 #: src/pages/settings/data-model/new-index/SettingsObjectNewIndex.tsx
 #: src/pages/settings/data-model/SettingsNewObject.tsx
 #: src/pages/settings/data-model/SettingsObjectDetailPage.tsx
@@ -15502,15 +15554,30 @@ msgstr "Permissions"
 msgid "Permissions · {objectLabelSingular}"
 msgstr "Permissions · {objectLabelSingular}"
 
+#. js-lingui-id: OZdaTZ
+#: src/modules/object-record/record-field/ui/components/LinkedFieldSourceIndicator.tsx
+msgid "Person"
+msgstr "Person"
+
 #. js-lingui-id: qrGMTi
 #: src/modules/activities/emails/recipients/components/EmailRecipientChipMenuContent.tsx
 msgid "Person created"
 msgstr "Person created"
 
+#. js-lingui-id: 6G5zze
+#: src/pages/settings/data-model/new-field/SettingsObjectNewLinkedFieldConfigure.tsx
+msgid "Person field"
+msgstr "Person field"
+
 #. js-lingui-id: 9Ch1Ry
 #: src/modules/activities/emails/hooks/useCampaignEmailEditorVariables.ts
 msgid "Person ID"
 msgstr "Person ID"
+
+#. js-lingui-id: rnAcxS
+#: src/pages/settings/data-model/new-field/SettingsObjectNewLinkedFieldConfigure.tsx
+msgid "Person relation"
+msgstr "Person relation"
 
 #. js-lingui-id: FaMom6
 #: src/modules/activities/emails/mass-email/components/MassEmailComposeCard.tsx
@@ -17271,6 +17338,7 @@ msgstr "Saturday"
 #. js-lingui-id: tfDRzk
 #: src/modules/settings/components/SaveAndCancelButtons/SaveButton.tsx
 #: src/pages/settings/data-model/new-field/SettingsObjectNewFieldConfigure.tsx
+#: src/pages/settings/data-model/new-field/SettingsObjectNewLinkedFieldConfigure.tsx
 msgid "Save"
 msgstr "Save"
 
@@ -18432,6 +18500,11 @@ msgstr "Should changing an object's label also change the API?"
 msgid "Should changing the label also change the API name?"
 msgstr "Should changing the label also change the API name?"
 
+#. js-lingui-id: DgY8YB
+#: src/pages/settings/data-model/new-field/SettingsObjectNewLinkedFieldConfigure.tsx
+msgid "Show a field from the related Person. Values stay current and can only be edited on that Person record."
+msgstr "Show a field from the related Person. Values stay current and can only be edited on that Person record."
+
 #. js-lingui-id: vbXZ3k
 #: src/pages/settings/applications/tabs/SettingsApplicationsAvailableTab.tsx
 msgid "show all"
@@ -18837,6 +18910,7 @@ msgstr "Sorts"
 #: src/pages/settings/applications/components/SettingsApplicationRegistrationGeneralInfo.tsx
 #: src/pages/settings/applications/components/SettingsApplicationRegistrationGeneralInfo.tsx
 #: src/pages/settings/applications/components/SettingsApplicationRegistrationGeneralInfo.tsx
+#: src/pages/settings/data-model/new-field/SettingsObjectNewLinkedFieldConfigure.tsx
 msgid "Source"
 msgstr "Source"
 
@@ -18844,6 +18918,11 @@ msgstr "Source"
 #: src/modules/settings/accounts/components/SettingsAccountsNewEmailGroupChannel.tsx
 msgid "Source Email Address"
 msgstr "Source Email Address"
+
+#. js-lingui-id: vXtrVc
+#: src/modules/object-record/record-field/ui/components/LinkedFieldSourceIndicator.tsx
+msgid "Source field"
+msgstr "Source field"
 
 #. js-lingui-id: MEXVHu
 #: src/modules/settings/translations/components/SidePanelSettingsMetadataTranslationsPage.tsx

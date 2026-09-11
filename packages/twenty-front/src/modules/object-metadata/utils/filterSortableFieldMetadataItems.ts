@@ -1,10 +1,8 @@
 import { SORTABLE_FIELD_METADATA_TYPES } from '@/object-metadata/constants/SortableFieldMetadataTypes';
 import { isHiddenSystemField } from '@/object-metadata/utils/isHiddenSystemField';
 import { isManyToOneRelationField } from '@/object-metadata/utils/isManyToOneRelationField';
-import {
-  type FieldMetadataType,
-  type RelationType,
-} from '~/generated-metadata/graphql';
+import { FieldMetadataType, RelationType } from '~/generated-metadata/graphql';
+import { getLinkedFieldReference, isDefined } from 'twenty-shared/utils';
 
 type SortableFieldInput = {
   isSystem?: boolean | null;
@@ -12,6 +10,7 @@ type SortableFieldInput = {
   name: string;
   type: FieldMetadataType;
   relation?: { type: RelationType } | null;
+  settings?: unknown;
 };
 
 export const filterSortableFieldMetadataItems = (field: SortableFieldInput) => {
@@ -20,10 +19,16 @@ export const filterSortableFieldMetadataItems = (field: SortableFieldInput) => {
   const isFieldTypeSortable = SORTABLE_FIELD_METADATA_TYPES.includes(
     field.type,
   );
+  const isLinkedListRelation =
+    field.type === FieldMetadataType.RELATION &&
+    field.relation?.type === RelationType.ONE_TO_MANY &&
+    isDefined(getLinkedFieldReference(field.settings));
 
   return (
     !isHiddenSystemField(field) &&
     isFieldActive &&
-    (isFieldTypeSortable || isManyToOneRelationField(field))
+    (isFieldTypeSortable ||
+      isManyToOneRelationField(field) ||
+      isLinkedListRelation)
   );
 };

@@ -12,7 +12,7 @@ import {
   ObjectRecord,
   RelationType,
 } from 'twenty-shared/types';
-import { isDefined } from 'twenty-shared/utils';
+import { getLinkedFieldReference, isDefined } from 'twenty-shared/utils';
 import { FindOptionsRelations, In, ObjectLiteral } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -417,7 +417,10 @@ export class CommonMergeManyQueryRunnerService extends CommonBaseQueryRunnerServ
       flatEntityMaps: flatFieldMetadataMaps,
     });
 
-    return fieldMetadata?.isSystem ?? false;
+    return (
+      (fieldMetadata?.isSystem ?? false) ||
+      isDefined(getLinkedFieldReference(fieldMetadata?.settings))
+    );
   }
 
   private createDryRunResponse(

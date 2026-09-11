@@ -13,6 +13,7 @@ import {
 import {
   convertViewFilterValueToString,
   getFilterTypeFromFieldType,
+  getLinkedFieldReference,
   getFilterValueValidationIssue,
   isDefined,
   isRecordFilterOperandExpectingValue,
@@ -77,6 +78,14 @@ export class FlatRowLevelPermissionPredicateValidatorService {
         code: RowLevelPermissionPredicateExceptionCode.FIELD_METADATA_NOT_FOUND,
         message: t`Field metadata not found`,
         userFriendlyMessage: msg`Field metadata not found`,
+      });
+    } else if (
+      isDefined(getLinkedFieldReference(fieldMetadata.universalSettings))
+    ) {
+      validationResult.errors.push({
+        code: RowLevelPermissionPredicateExceptionCode.INVALID_ROW_LEVEL_PERMISSION_PREDICATE_DATA,
+        message: 'Row-level permission rules require stored fields',
+        userFriendlyMessage: msg`Choose a stored field for this permission rule. Linked values already respect the source record's permissions.`,
       });
     } else {
       const invalidValueError = this.getInvalidValueError({
@@ -266,6 +275,14 @@ export class FlatRowLevelPermissionPredicateValidatorService {
         code: RowLevelPermissionPredicateExceptionCode.FIELD_METADATA_NOT_FOUND,
         message: t`Field metadata not found`,
         userFriendlyMessage: msg`Field metadata not found`,
+      });
+    } else if (
+      isDefined(getLinkedFieldReference(fieldMetadata.universalSettings))
+    ) {
+      validationResult.errors.push({
+        code: RowLevelPermissionPredicateExceptionCode.INVALID_ROW_LEVEL_PERMISSION_PREDICATE_DATA,
+        message: 'Row-level permission rules require stored fields',
+        userFriendlyMessage: msg`Choose a stored field for this permission rule. Linked values already respect the source record's permissions.`,
       });
     } else if (
       'value' in flatEntityUpdate ||

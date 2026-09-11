@@ -79,6 +79,7 @@ export const getRelationsSelectFields = ({
     }
 
     const relationFieldSelectFields = getAllSelectableFields({
+      objectsPermissions,
       restrictedFields:
         objectsPermissions[relationTargetObjectMetadata.id].restrictedFields,
       flatObjectMetadata: relationTargetObjectMetadata,

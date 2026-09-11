@@ -5,7 +5,7 @@ import {
   FieldMetadataType,
   RelationType,
 } from 'twenty-shared/types';
-import { isDefined } from 'twenty-shared/utils';
+import { getLinkedFieldReference, isDefined } from 'twenty-shared/utils';
 
 import { FieldMetadataExceptionCode } from 'src/engine/metadata-modules/field-metadata/field-metadata.exception';
 import { type FlatFieldMetadataValidationError } from 'src/engine/metadata-modules/flat-field-metadata/types/flat-field-metadata-validation-error.type';
@@ -163,6 +163,9 @@ export const validateTextFlatFieldMetadata = (
       if (
         !SUPPORTED_LABEL_IDENTIFIER_FORMULA_FIELD_TYPES.has(
           referencedFieldMetadata.type,
+        ) ||
+        isDefined(
+          getLinkedFieldReference(referencedFieldMetadata.universalSettings),
         )
       ) {
         return [

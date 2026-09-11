@@ -14,6 +14,9 @@ export class ObjectRecordEventWithQueryIdsDTO {
 
 @ObjectType('EventSubscription')
 export class EventSubscriptionDTO {
+  @Field(() => [String], { nullable: true })
+  queryIdsToRefetch?: string[];
+
   @Field(() => String)
   eventStreamId: string;
 

@@ -161,6 +161,7 @@ describe('ObjectRecordEventPublisher', () => {
   });
 
   type PermissionsContextOverrides = {
+    flatObjectMetadataMaps?: FlatEntityMaps<FlatObjectMetadata>;
     flatFieldMetadataMaps?: FlatEntityMaps<FlatFieldMetadata>;
     userWorkspaceRoleMap?: Record<string, string>;
     rolesPermissions?: ObjectsPermissionsByRoleId;
@@ -184,6 +185,7 @@ describe('ObjectRecordEventPublisher', () => {
   const createPermissionsContext = (
     overrides: PermissionsContextOverrides = {},
   ) => ({
+    flatObjectMetadataMaps: overrides.flatObjectMetadataMaps,
     flatRowLevelPermissionPredicateMaps: {
       byId: {},
       idByUniversalIdentifier: {},
@@ -311,6 +313,131 @@ describe('ObjectRecordEventPublisher', () => {
   });
 
   describe('publish', () => {
+    it.each([false, true])(
+      'refreshes dependent queries without source rows (restricted source: %s)',
+      async (restrictedSource) => {
+        const person = {
+          ...companyObjectMetadata,
+          id: 'person-object',
+          universalIdentifier: 'person-object',
+          nameSingular: 'person',
+        };
+        const source = {
+          ...companyNameField,
+          id: 'source-field',
+          universalIdentifier: 'source-field',
+          objectMetadataId: person.id,
+        };
+        const relation = getFlatFieldMetadataMock({
+          universalIdentifier: 'relation-field',
+          id: 'relation-field',
+          objectMetadataId: companyObjectMetadata.id,
+          type: FieldMetadataType.RELATION,
+        });
+        const linked = getFlatFieldMetadataMock({
+          universalIdentifier: 'linked-field',
+          id: 'linked-field',
+          objectMetadataId: companyObjectMetadata.id,
+          type: FieldMetadataType.TEXT,
+          settings: {
+            linkedField: {
+              relationFieldMetadataUniversalIdentifier:
+                relation.universalIdentifier,
+              sourceFieldMetadataUniversalIdentifier:
+                source.universalIdentifier,
+            },
+          },
+        });
+        const objectMaps = addFlatEntityToFlatEntityMapsOrThrow({
+          flatEntity: companyObjectMetadata,
+          flatEntityMaps: addFlatEntityToFlatEntityMapsOrThrow({
+            flatEntity: person,
+            flatEntityMaps:
+              createEmptyFlatEntityMaps() as FlatEntityMaps<FlatObjectMetadata>,
+          }),
+        });
+        mockWorkspaceCacheService.getOrRecompute.mockImplementation(
+          createCacheMock({
+            flatFieldMetadataMaps: buildFlatFieldMetadataMaps([
+              companyNameField,
+              source,
+              relation,
+              linked,
+            ]),
+            flatObjectMetadataMaps: objectMaps,
+            rolesPermissions: {
+              [roleId]: {
+                ...mockRolesPermissions[roleId],
+                [person.id]: {
+                  ...mockRolesPermissions[roleId][companyObjectMetadata.id],
+                  restrictedFields: restrictedSource
+                    ? { [source.id]: { canRead: false } }
+                    : {},
+                },
+              },
+            },
+          }),
+        );
+        mockEventStreamService.getStreamsData.mockResolvedValue(
+          new Map([
+            [
+              streamChannelId,
+              {
+                ...mockStreamData,
+                queries: {
+                  ...mockStreamData.queries,
+                  'source-query': {
+                    objectNameSingular: 'person',
+                    variables: {},
+                  },
+                },
+              },
+            ],
+          ]),
+        );
+        (buildRowLevelPermissionRecordFilter as jest.Mock).mockReturnValue({
+          id: { eq: 'allowed-source' },
+        });
+        (
+          isRecordMatchingRLSRowLevelPermissionPredicate as jest.Mock
+        ).mockReturnValue(false);
+        await service.publish({
+          workspaceId,
+          objectMetadata: person,
+          name: 'person.updated',
+          events: [
+            createMockEvent({
+              recordId: 'not-for-delivery',
+              properties: {
+                after: {
+                  id: 'not-for-delivery',
+                  name: 'Synthetic hidden source',
+                },
+                updatedFields: ['name'],
+              },
+            }),
+          ],
+        } as WorkspaceEventBatch<never>);
+        if (restrictedSource) {
+          expect(
+            mockSubscriptionService.publishToEventStream,
+          ).not.toHaveBeenCalled();
+        } else {
+          expect(
+            mockSubscriptionService.publishToEventStream,
+          ).toHaveBeenCalledWith(
+            expect.objectContaining({
+              payload: {
+                queryIdsToRefetch: ['query-1'],
+                objectRecordEventsWithQueryIds: [],
+                metadataEvents: [],
+              },
+            }),
+          );
+        }
+      },
+    );
+
     it('should skip publishing to event streams when no active streams exist', async () => {
       mockEventStreamService.getActiveStreamIds.mockResolvedValue([]);
 

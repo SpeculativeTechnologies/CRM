@@ -2,6 +2,28 @@ import { filterSortableFieldMetadataItems } from '@/object-metadata/utils/filter
 import { FieldMetadataType, RelationType } from '~/generated-metadata/graphql';
 
 describe('filterSortableFieldMetadataItems', () => {
+  it('allows an active linked list in the sort picker', () => {
+    const field = {
+      type: FieldMetadataType.RELATION,
+      name: 'recommendations',
+      isActive: true,
+      relation: { type: RelationType.ONE_TO_MANY },
+      settings: {
+        linkedField: {
+          relationFieldMetadataUniversalIdentifier: 'person',
+          sourceFieldMetadataUniversalIdentifier: 'recommendations',
+        },
+      },
+    };
+    expect(filterSortableFieldMetadataItems(field)).toBe(true);
+    expect(
+      filterSortableFieldMetadataItems({ ...field, isActive: false }),
+    ).toBe(false);
+    expect(filterSortableFieldMetadataItems({ ...field, settings: null })).toBe(
+      false,
+    );
+  });
+
   it('should allow TEXT field type', () => {
     const field = {
       type: FieldMetadataType.TEXT,

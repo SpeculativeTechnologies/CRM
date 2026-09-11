@@ -2,6 +2,7 @@ import {
   type CompositeType,
   compositeTypeDefinitions,
 } from 'twenty-shared/types';
+import { getLinkedFieldReference, isDefined } from 'twenty-shared/utils';
 
 import { RelationType } from 'src/engine/metadata-modules/field-metadata/interfaces/relation-type.interface';
 
@@ -80,7 +81,10 @@ export function processFieldMetadataForColumnNameMapping(
       if (isMorphOrRelationFlatFieldMetadata(fieldMetadata)) {
         const fieldMetadataSettings = fieldMetadata.settings;
 
-        if (fieldMetadataSettings?.relationType === RelationType.ONE_TO_MANY) {
+        if (
+          fieldMetadataSettings?.relationType === RelationType.ONE_TO_MANY &&
+          !isDefined(getLinkedFieldReference(fieldMetadata.settings))
+        ) {
           continue;
         }
 

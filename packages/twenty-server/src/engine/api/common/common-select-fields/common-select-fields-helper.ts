@@ -44,6 +44,7 @@ export class CommonSelectFieldsHelper {
 
     const selectableFields = getAllSelectableFields({
       restrictedFields,
+      objectsPermissions,
       flatObjectMetadata,
       flatFieldMetadataMaps,
     });

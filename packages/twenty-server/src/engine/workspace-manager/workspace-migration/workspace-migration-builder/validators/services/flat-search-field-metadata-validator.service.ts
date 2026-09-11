@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { msg, t } from '@lingui/core/macro';
 import { ALL_METADATA_NAME } from 'twenty-shared/metadata';
 import { FieldMetadataType } from 'twenty-shared/types';
-import { isDefined } from 'twenty-shared/utils';
+import { getLinkedFieldReference, isDefined } from 'twenty-shared/utils';
 
 import { findFlatEntityByUniversalIdentifier } from 'src/engine/metadata-modules/flat-entity/utils/find-flat-entity-by-universal-identifier.util';
 import { findManyFlatEntityByUniversalIdentifierInUniversalFlatEntityMapsOrThrow } from 'src/engine/metadata-modules/flat-entity/utils/find-many-flat-entity-by-universal-identifier-in-universal-flat-entity-maps-or-throw.util';
@@ -68,6 +68,16 @@ export class FlatSearchFieldMetadataValidatorService {
         code: SearchFieldMetadataExceptionCode.FIELD_METADATA_NOT_FOUND,
         message: t`Field metadata not found`,
         userFriendlyMessage: msg`Field metadata not found`,
+      });
+    }
+
+    if (
+      isDefined(getLinkedFieldReference(flatFieldMetadata?.universalSettings))
+    ) {
+      validationResult.errors.push({
+        code: SearchFieldMetadataExceptionCode.INVALID_SEARCH_FIELD_METADATA_DATA,
+        message: 'Linked fields cannot be stored in search vectors',
+        userFriendlyMessage: msg`Use filters to search linked fields. They cannot be included in a stored search index.`,
       });
     }
 

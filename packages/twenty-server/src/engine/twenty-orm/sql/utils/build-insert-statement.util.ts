@@ -30,6 +30,16 @@ const buildReturningClause = (returningColumns: string[]): string => {
 };
 
 export const buildInsertStatement = (state: InsertStatementState): string => {
+  if (
+    state.columnNames.some(
+      (name) => state.tableShape.columnShapeByColumnName[name]?.linkedColumn,
+    )
+  ) {
+    throw new TwentyOrmException(
+      'Linked fields are read-only',
+      TwentyOrmExceptionCode.INVALID_INPUT,
+    );
+  }
   if (state.columnNames.length === 0 || state.rows.length === 0) {
     throw new TwentyOrmException(
       `An INSERT on "${state.tableShape.nameSingular}" needs at least one column and one row`,
@@ -58,7 +68,11 @@ export const buildInsertStatement = (state: InsertStatementState): string => {
     )} (${columnList})`,
     `VALUES ${valuesList}`,
     state.onConflictDoNothing ? 'ON CONFLICT DO NOTHING' : '',
-    buildReturningClause(state.returningColumns),
+    buildReturningClause(
+      state.returningColumns.filter(
+        (name) => !state.tableShape.columnShapeByColumnName[name]?.linkedColumn,
+      ),
+    ),
   ]
     .filter((part) => part.length > 0)
     .join(' ');

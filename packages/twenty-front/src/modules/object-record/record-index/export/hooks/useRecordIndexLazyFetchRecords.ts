@@ -141,6 +141,7 @@ export const useRecordIndexLazyFetchRecords = ({
           type: fieldMetadataItem.type,
           metadata: {
             fieldName: fieldMetadataItem.name,
+            settings: fieldMetadataItem.settings,
             relationType: fieldMetadataItem.relation?.type,
           },
         };
@@ -162,7 +163,7 @@ export const useRecordIndexLazyFetchRecords = ({
   const getTableData = async () => {
     const result = await fetchAllRecords();
     if (result.length > 0) {
-      callback(result, finalColumns);
+      await callback(result, finalColumns);
     }
   };
 

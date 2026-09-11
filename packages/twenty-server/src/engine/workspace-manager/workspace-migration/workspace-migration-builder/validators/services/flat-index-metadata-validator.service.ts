@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { msg, t } from '@lingui/core/macro';
 import { ALL_METADATA_NAME } from 'twenty-shared/metadata';
 import { RelationType, compositeTypeDefinitions } from 'twenty-shared/types';
-import { isDefined } from 'twenty-shared/utils';
+import { getLinkedFieldReference, isDefined } from 'twenty-shared/utils';
 
 import { FlatEntityMapsExceptionCode } from 'src/engine/metadata-modules/flat-entity/exceptions/flat-entity-maps.exception';
 import { findFlatEntityByUniversalIdentifier } from 'src/engine/metadata-modules/flat-entity/utils/find-flat-entity-by-universal-identifier.util';
@@ -135,6 +135,17 @@ export class FlatIndexValidatorService {
               userFriendlyMessage: msg`Field referenced in index does not exist`,
             });
           } else {
+            if (
+              isDefined(
+                getLinkedFieldReference(relatedFlatField.universalSettings),
+              )
+            ) {
+              validationResult.errors.push({
+                code: IndexExceptionCode.INDEX_FIELD_INVALID_REFERENCE,
+                message: 'Linked fields have no stored column to index',
+                userFriendlyMessage: msg`Linked fields cannot be indexed. Index the source field instead.`,
+              });
+            }
             if (
               relatedFlatField.objectMetadataUniversalIdentifier !==
               flatIndexToValidate.objectMetadataUniversalIdentifier

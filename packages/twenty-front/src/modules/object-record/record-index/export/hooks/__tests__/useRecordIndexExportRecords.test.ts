@@ -17,6 +17,50 @@ jest.mock('file-saver', () => ({
 jest.useFakeTimers();
 
 describe('generateCsv', () => {
+  it('exports linked list labels safely while preserving stored relation IDs', () => {
+    const csv = generateCsv({
+      columns: [
+        {
+          label: 'Company',
+          type: FieldMetadataType.RELATION,
+          metadata: {
+            fieldName: 'company',
+            relationType: RelationType.MANY_TO_ONE,
+          },
+        },
+        {
+          label: 'Recommendations',
+          type: FieldMetadataType.RELATION,
+          metadata: {
+            fieldName: 'recommendations',
+            relationFieldMetadataId: 'inverse',
+            relationObjectMetadataId: 'target',
+            relationObjectMetadataNameSingular: 'recruitment',
+            relationObjectMetadataNamePlural: 'recruitments',
+            relationType: RelationType.ONE_TO_MANY,
+            settings: {
+              linkedField: {
+                relationFieldMetadataUniversalIdentifier: 'path',
+                sourceFieldMetadataUniversalIdentifier: 'source',
+              },
+            },
+          },
+        },
+      ],
+      rows: [
+        {
+          id: 'root',
+          companyId: 'company',
+          recommendations: '=unsafe; Synthetic recommendation',
+        },
+      ],
+    });
+    expect(csv).toContain('Id,Company Id,Recommendations');
+    expect(csv).toContain(
+      `root,company,${CSV_INJECTION_PREVENTION_ZWJ}=unsafe; Synthetic recommendation`,
+    );
+  });
+
   it('generates a csv with formatted headers', async () => {
     const columns: Pick<
       ColumnDefinition<FieldMetadata>,

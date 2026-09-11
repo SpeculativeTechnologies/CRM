@@ -1,5 +1,5 @@
 import { FieldMetadataType } from 'twenty-shared/types';
-import { isDefined } from 'twenty-shared/utils';
+import { getLinkedFieldReference, isDefined } from 'twenty-shared/utils';
 
 import { computeMorphOrRelationFieldJoinColumnName } from 'src/engine/metadata-modules/field-metadata/utils/compute-morph-or-relation-field-join-column-name.util';
 import { RelationType } from 'src/engine/metadata-modules/field-metadata/interfaces/relation-type.interface';
@@ -65,7 +65,8 @@ const getRequiredRelationColumns = (
 
       if (
         !isDefined(relationValue) ||
-        fieldMetadata.settings?.relationType !== RelationType.MANY_TO_ONE
+        (fieldMetadata.settings?.relationType !== RelationType.MANY_TO_ONE &&
+          !isDefined(getLinkedFieldReference(fieldMetadata.settings)))
       ) {
         continue;
       }

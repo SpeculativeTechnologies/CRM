@@ -46,6 +46,7 @@ export { IANA_TIME_ZONES } from './IanaTimeZones';
 export { IMAGE_IDENTIFIER_FIELD_METADATA_TYPES } from './ImageIdentifierFieldMetadataTypes';
 export { LABEL_IDENTIFIER_FIELD_METADATA_TYPES } from './LabelIdentifierFieldMetadataTypes';
 export { LABEL_IDENTIFIER_FORMULA_FIELD_METADATA_TYPES } from './LabelIdentifierFormulaFieldMetadataTypes';
+export { LINKED_FIELD_SUPPORTED_TYPES } from './LinkedFieldSupportedTypes';
 export { MAX_CORE_WORKFLOW_FILTER_RULES } from './MaxCoreWorkflowFilterRules';
 export { MAX_CUSTOM_INDEXES_PER_OBJECT } from './MaxCustomIndexesPerObject';
 export { MAX_EMAIL_RECIPIENTS } from './MaxEmailRecipients';

@@ -73,6 +73,23 @@ describe('isRecordFieldReadOnly', () => {
     expect(result).toBe(false);
   });
 
+  it('locks linked values even if older metadata still reports UI editability', () => {
+    expect(
+      isRecordFieldReadOnly({
+        ...mockParams,
+        fieldMetadataItem: {
+          ...mockParams.fieldMetadataItem,
+          settings: {
+            linkedField: {
+              relationFieldMetadataUniversalIdentifier: 'person-relation',
+              sourceFieldMetadataUniversalIdentifier: 'job-title',
+            },
+          },
+        },
+      }),
+    ).toBe(true);
+  });
+
   it('should return true when the field is computed by a record label formula', () => {
     const result = isRecordFieldReadOnly({
       ...mockParams,

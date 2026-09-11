@@ -5,6 +5,7 @@ import { FormProvider, useForm } from 'react-hook-form';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
 import { WorkspaceRouteUnavailable } from '@/app/routing/components/WorkspaceRouteUnavailable';
+import { LinkedFieldSourceIndicator } from '@/object-record/record-field/ui/components/LinkedFieldSourceIndicator';
 import { useFieldMetadataItem } from '@/object-metadata/hooks/useFieldMetadataItem';
 import { useFilteredObjectMetadataItems } from '@/object-metadata/hooks/useFilteredObjectMetadataItems';
 import { useGetIsMetadataItemCustom } from '@/object-metadata/hooks/useGetIsMetadataItemCustom';
@@ -34,7 +35,11 @@ import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomState
 import { styled } from '@linaria/react';
 import { useLingui } from '@lingui/react/macro';
 import { AppPath, SettingsPath } from 'twenty-shared/types';
-import { getSettingsPath, isDefined } from 'twenty-shared/utils';
+import {
+  getLinkedFieldReference,
+  getSettingsPath,
+  isDefined,
+} from 'twenty-shared/utils';
 import { IconArchive, IconArchiveOff, IconTrash } from 'twenty-ui/icon';
 import { H2Title } from 'twenty-ui/typography';
 import { Button } from 'twenty-ui/input';
@@ -388,12 +393,21 @@ export const SettingsObjectFieldEdit = () => {
                     description={t`The values of this field`}
                   />
                 )}
-                <SettingsDataModelFieldSettingsFormCard
-                  fieldType={fieldMetadataItem.type}
-                  existingFieldMetadataId={fieldMetadataItem.id}
-                  objectNameSingular={objectMetadataItem.nameSingular}
-                  disabled={readonly}
-                />
+                {isDefined(
+                  getLinkedFieldReference(fieldMetadataItem.settings),
+                ) ? (
+                  <LinkedFieldSourceIndicator
+                    fieldMetadataId={fieldMetadataItem.id}
+                    showSource
+                  />
+                ) : (
+                  <SettingsDataModelFieldSettingsFormCard
+                    fieldType={fieldMetadataItem.type}
+                    existingFieldMetadataId={fieldMetadataItem.id}
+                    objectNameSingular={objectMetadataItem.nameSingular}
+                    disabled={readonly}
+                  />
+                )}
               </Section>
             )}
             <Section>

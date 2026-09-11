@@ -1,5 +1,10 @@
-import { type ObjectsPermissions } from 'twenty-shared/types';
-import { isDefined } from 'twenty-shared/utils';
+import { isFlatFieldMetadataOfType } from 'src/engine/metadata-modules/flat-field-metadata/utils/is-flat-field-metadata-of-type.util';
+import {
+  FieldMetadataType,
+  RelationType,
+  type ObjectsPermissions,
+} from 'twenty-shared/types';
+import { getLinkedFieldReference, isDefined } from 'twenty-shared/utils';
 
 import { type ObjectRecordOrderBy } from 'src/engine/api/graphql/workspace-query-builder/interfaces/object-record.interface';
 
@@ -76,6 +81,35 @@ export class GraphqlQueryOrderFieldParser {
       ) {
         relationJoins.push({ joinAlias: leafColumn.tableAlias });
         addedJoinAliases.add(leafColumn.tableAlias);
+      }
+
+      if (
+        orderByLeaf.kind === 'relation' &&
+        isFlatFieldMetadataOfType(
+          orderByLeaf.fieldMetadata,
+          FieldMetadataType.RELATION,
+        ) &&
+        orderByLeaf.fieldMetadata.settings?.relationType ===
+          RelationType.ONE_TO_MANY &&
+        isDefined(getLinkedFieldReference(orderByLeaf.fieldMetadata.settings))
+      ) {
+        const join = relationJoins.find(
+          (candidate) => candidate.joinAlias === leafColumn.tableAlias,
+        );
+        if (isDefined(join)) {
+          // Keep the representative target stable when paging backwards.
+          const targetOrder = convertOrderByToFindOptionsOrder(
+            orderByLeaf.direction,
+          );
+          join.toManyDedupOrder ??= [];
+          join.toManyDedupOrder.push({
+            columnName: leafColumn.columnName,
+            direction: targetOrder.order,
+            nulls: targetOrder.nulls,
+            useLower: shouldUseCaseInsensitiveOrder(leafColumn.columnType),
+            castToText: shouldCastToText(leafColumn.columnType),
+          });
+        }
       }
 
       orderByConditions[

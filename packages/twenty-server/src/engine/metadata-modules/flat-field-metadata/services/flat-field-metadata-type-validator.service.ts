@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 
 import { msg } from '@lingui/core/macro';
-import { isDefined } from 'class-validator';
 import { FieldMetadataType } from 'twenty-shared/types';
+import { isDefined } from 'twenty-shared/utils';
 
 import { FieldMetadataExceptionCode } from 'src/engine/metadata-modules/field-metadata/field-metadata.exception';
 import {
@@ -13,6 +13,7 @@ import { FlatFieldMetadataValidationError } from 'src/engine/metadata-modules/fl
 import { validateEnumSelectFlatFieldMetadata } from 'src/engine/metadata-modules/flat-field-metadata/validators/utils/validate-enum-flat-field-metadata.util';
 import { validateFilesFlatFieldMetadata } from 'src/engine/metadata-modules/flat-field-metadata/validators/utils/validate-files-flat-field-metadata.util';
 import { validateLinksFlatFieldMetadata } from 'src/engine/metadata-modules/flat-field-metadata/validators/utils/validate-links-flat-field-metadata.util';
+import { validateLinkedFieldMetadata } from 'src/engine/metadata-modules/flat-field-metadata/validators/utils/validate-linked-field-metadata.util';
 import { validateMorphOrRelationFlatFieldMetadata } from 'src/engine/metadata-modules/flat-field-metadata/validators/utils/validate-morph-or-relation-flat-field-metadata.util';
 import { validateMorphRelationFlatFieldMetadata } from 'src/engine/metadata-modules/flat-field-metadata/validators/utils/validate-morph-relation-flat-field-metadata.util';
 import { validatePositionFlatFieldMetadata } from 'src/engine/metadata-modules/flat-field-metadata/validators/utils/validate-position-flat-field-metadata.util';
@@ -91,6 +92,11 @@ export class FlatFieldMetadataTypeValidatorService {
     args: FlatFieldMetadataTypeValidationArgs<FieldMetadataType>,
   ): FlatFieldMetadataValidationError[] {
     const { flatEntityToValidate } = args;
+    const settings = flatEntityToValidate.universalSettings;
+    if (isDefined(settings) && 'linkedField' in settings) {
+      return validateLinkedFieldMetadata(args);
+    }
+
     const fieldType = flatEntityToValidate.type;
     const fieldMetadataTypeValidator =
       this.FIELD_METADATA_TYPE_VALIDATOR_HASHMAP[fieldType];

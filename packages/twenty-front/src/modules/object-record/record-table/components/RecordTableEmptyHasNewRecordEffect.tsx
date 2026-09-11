@@ -81,9 +81,21 @@ export const RecordTableEmptyHasNewRecordEffect = () => {
     ],
   );
 
+  const refreshEmptyTable = useCallback(() => {
+    if (!isRecordTableInitialLoading && !recordTableHasRecords) {
+      store.set(recordTableWentFromEmptyToNotEmptyCallbackState, true);
+    }
+  }, [
+    isRecordTableInitialLoading,
+    recordTableHasRecords,
+    store,
+    recordTableWentFromEmptyToNotEmptyCallbackState,
+  ]);
+
   useListenToEventsForQuery({
     queryId,
     operationSignature,
+    onSseReconnected: refreshEmptyTable,
   });
 
   const handleObjectRecordOperation = useCallback(
@@ -96,17 +108,10 @@ export const RecordTableEmptyHasNewRecordEffect = () => {
         objectRecordOperation.type.includes('update') ||
         objectRecordOperation.type.includes('create')
       ) {
-        if (!isRecordTableInitialLoading && !recordTableHasRecords) {
-          store.set(recordTableWentFromEmptyToNotEmptyCallbackState, true);
-        }
+        refreshEmptyTable();
       }
     },
-    [
-      recordTableHasRecords,
-      isRecordTableInitialLoading,
-      store,
-      recordTableWentFromEmptyToNotEmptyCallbackState,
-    ],
+    [refreshEmptyTable],
   );
 
   useListenToObjectRecordOperationBrowserEvent({

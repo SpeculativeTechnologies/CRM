@@ -11,6 +11,7 @@ import {
   type RelationOnDeleteAction,
   type RelationType,
   type SerializedRelation,
+  type LinkedFieldReference,
 } from 'twenty-shared/types';
 
 import { type UniversalFlatFieldMetadata } from 'src/engine/workspace-manager/workspace-migration/universal-flat-entity/types/universal-flat-field-metadata.type';
@@ -87,6 +88,7 @@ type NarrowedTestCase =
   UniversalFlatFieldMetadata<FieldMetadataType.RELATION>['universalSettings'];
 
 type NarrowedExpectedResult = {
+  linkedField?: LinkedFieldReference;
   relationType: RelationType;
   onDelete?: RelationOnDeleteAction | undefined;
   joinColumnName?: string | null | undefined;
@@ -103,6 +105,7 @@ type SettingsTestCase = UniversalFlatFieldMetadata<
 
 type SettingsExpectedResult =
   | {
+      linkedField?: LinkedFieldReference;
       relationType: RelationType;
       onDelete?: RelationOnDeleteAction | undefined;
       joinColumnName?: string | null | undefined;
@@ -114,12 +117,14 @@ type SettingsExpectedResult =
     }
   | {
       dataType?: NumberDataType | undefined;
+      linkedField?: LinkedFieldReference;
       decimals?: number | undefined;
       type?: FieldNumberVariant | undefined;
       __JsonbPropertyBrand__?: undefined;
     }
   | {
       displayedMaxRows?: number | undefined;
+      linkedField?: LinkedFieldReference;
       labelIdentifierFormula?:
         | {
             template: string;

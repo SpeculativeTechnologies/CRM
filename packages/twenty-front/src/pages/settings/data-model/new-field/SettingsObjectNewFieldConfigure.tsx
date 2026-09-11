@@ -1,4 +1,5 @@
 import { WorkspaceRouteUnavailable } from '@/app/routing/components/WorkspaceRouteUnavailable';
+import { SettingsObjectNewLinkedFieldConfigure } from '~/pages/settings/data-model/new-field/SettingsObjectNewLinkedFieldConfigure';
 import { isDDLLockedState } from '@/client-config/states/isDDLLockedState';
 import { useFieldMetadataItem } from '@/object-metadata/hooks/useFieldMetadataItem';
 import { useFilteredObjectMetadataItems } from '@/object-metadata/hooks/useFilteredObjectMetadataItems';
@@ -42,6 +43,15 @@ type SettingsDataModelNewFieldFormValues = z.infer<
 const DEFAULT_ICON_FOR_NEW_FIELD = 'IconUsers';
 
 export const SettingsObjectNewFieldConfigure = () => {
+  const [searchParams] = useSearchParams();
+  return searchParams.get('linked') === 'true' ? (
+    <SettingsObjectNewLinkedFieldConfigure />
+  ) : (
+    <SettingsObjectNewStoredFieldConfigure />
+  );
+};
+
+const SettingsObjectNewStoredFieldConfigure = () => {
   const { t } = useLingui();
 
   const navigateApp = useNavigateApp();

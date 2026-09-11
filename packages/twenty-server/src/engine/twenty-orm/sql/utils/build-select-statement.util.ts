@@ -18,6 +18,8 @@ export type WhereClause = {
 };
 
 export type JoinClause = {
+  isLinkedFieldJoin?: boolean;
+  existsScopeAlias?: string;
   alias: string;
   parentAlias: string;
   relationFieldName: string;
@@ -34,6 +36,8 @@ export type JoinClause = {
 
 export type ToManyDedupOrder = {
   columnName: string;
+  useLower?: boolean;
+  castToText?: boolean;
   direction: 'ASC' | 'DESC';
   nulls?: 'NULLS FIRST' | 'NULLS LAST';
 };
@@ -302,6 +306,7 @@ export const renderUserWhereExpression = (
 const renderExistsFilter = (
   existsFilterClause: ExistsFilterClause,
   includeDeleted: boolean,
+  state?: SelectStatementState,
 ): string => {
   const conditions = [
     existsFilterClause.correlationCondition,
@@ -324,26 +329,31 @@ const renderExistsFilter = (
   const tableExpression = `${escapeIdentifier(
     existsFilterClause.targetTableShape.schemaName,
   )}.${escapeIdentifier(existsFilterClause.targetTableShape.tableName)}`;
+  const joins = isDefined(state)
+    ? buildJoinClause(state, existsFilterClause.alias)
+    : '';
 
   return `EXISTS (SELECT 1 FROM ${tableExpression} AS ${escapeIdentifier(
     existsFilterClause.alias,
-  )} WHERE ${conditions.join(' AND ')})`;
+  )}${joins.length > 0 ? ' ' + joins : ''} WHERE ${conditions.join(' AND ')})`;
 };
 
 export const substituteExistsFilterTokens = ({
   expression,
   existsFilterClauses,
   includeDeleted,
+  state,
 }: {
   expression: string;
   existsFilterClauses: ExistsFilterClause[];
   includeDeleted: boolean;
+  state?: SelectStatementState;
 }): string =>
   existsFilterClauses.reduce(
     (substituted, existsFilterClause) =>
       substituted
         .split(existsFilterClause.token)
-        .join(renderExistsFilter(existsFilterClause, includeDeleted)),
+        .join(renderExistsFilter(existsFilterClause, includeDeleted, state)),
     expression,
   );
 
@@ -367,6 +377,7 @@ export const buildWhereExpression = (
         expression: renderedWhereClauses,
         existsFilterClauses: state.existsFilterClauses,
         includeDeleted: state.includeDeleted,
+        state,
       })
     : renderedWhereClauses;
 
@@ -398,33 +409,45 @@ const buildToManyDedupedJoinSource = ({
   foreignKeyColumnName,
   includeSoftDeleteFilter,
   dedupOrder = [],
+  alias,
+  conditions = [],
 }: {
   tableExpression: string;
   foreignKeyColumnName: string;
   includeSoftDeleteFilter: boolean;
   dedupOrder?: ToManyDedupOrder[];
+  alias?: string;
+  conditions?: string[];
 }): string => {
   const foreignKey = escapeIdentifier(foreignKeyColumnName);
-  const whereClause = includeSoftDeleteFilter
-    ? ` WHERE ${escapeIdentifier('deletedAt')} IS NULL`
-    : '';
+  const predicates = [...conditions];
+  if (includeSoftDeleteFilter)
+    predicates.push(`${escapeIdentifier('deletedAt')} IS NULL`);
+  const whereClause =
+    predicates.length > 0
+      ? ` WHERE ${predicates.map((condition) => `(${condition})`).join(' AND ')}`
+      : '';
 
   const orderExpressions = [
     foreignKey,
-    ...dedupOrder.map(
-      (order) =>
-        `${escapeIdentifier(order.columnName)} ${order.direction}${
-          isDefined(order.nulls) ? ` ${order.nulls}` : ''
-        }`,
-    ),
+    ...dedupOrder.map((order) => {
+      let expression = escapeIdentifier(order.columnName);
+      if (order.castToText) expression = `CAST(${expression} AS TEXT)`;
+      if (order.useLower) expression = `LOWER(${expression})`;
+      return `${expression} ${order.direction}${isDefined(order.nulls) ? ` ${order.nulls}` : ''}`;
+    }),
     escapeIdentifier('id'),
   ];
 
-  return `(SELECT DISTINCT ON (${foreignKey}) * FROM ${tableExpression}${whereClause} ORDER BY ${orderExpressions.join(', ')})`;
+  return `(SELECT DISTINCT ON (${foreignKey}) * FROM ${tableExpression}${isDefined(alias) ? ` AS ${escapeIdentifier(alias)}` : ''}${whereClause} ORDER BY ${orderExpressions.join(', ')})`;
 };
 
-export const buildJoinClause = (state: SelectStatementState): string =>
+export const buildJoinClause = (
+  state: SelectStatementState,
+  existsScopeAlias?: string,
+): string =>
   state.joinClauses
+    .filter((joinClause) => joinClause.existsScopeAlias === existsScopeAlias)
     .map((joinClause) => {
       const condition =
         joinClause.condition ??
@@ -439,15 +462,24 @@ export const buildJoinClause = (state: SelectStatementState): string =>
         );
       }
 
+      // Linked values stay empty for deleted sources, including mutation
+      // response reads that include a deleted destination record.
       const softDeletePredicateApplies =
-        !state.includeDeleted && joinClause.targetTableShape.hasDeletedAtColumn;
+        (!state.includeDeleted || joinClause.isLinkedFieldJoin === true) &&
+        joinClause.targetTableShape.hasDeletedAtColumn;
 
       const toManyForeignKeyColumnName =
         joinClause.relationType === RelationType.ONE_TO_MANY
           ? joinClause.toManyForeignKeyColumnName
           : undefined;
 
-      const onConditions = [condition, ...joinClause.additionalOnConditions];
+      const isLinkedList =
+        isDefined(toManyForeignKeyColumnName) &&
+        joinClause.isLinkedFieldJoin === true;
+      const onConditions = [
+        condition,
+        ...(isLinkedList ? [] : joinClause.additionalOnConditions),
+      ];
 
       if (
         softDeletePredicateApplies &&
@@ -468,10 +500,12 @@ export const buildJoinClause = (state: SelectStatementState): string =>
             foreignKeyColumnName: toManyForeignKeyColumnName,
             includeSoftDeleteFilter: softDeletePredicateApplies,
             dedupOrder: joinClause.toManyDedupOrder,
+            alias: isLinkedList ? joinClause.alias : undefined,
+            conditions: isLinkedList ? joinClause.additionalOnConditions : [],
           })
         : tableExpression;
 
-      return `${joinClause.joinType} JOIN ${joinSource} AS ${escapeIdentifier(
+      return `${joinClause.joinType} JOIN ${isLinkedList ? 'LATERAL ' : ''}${joinSource} AS ${escapeIdentifier(
         joinClause.alias,
       )} ON ${onConditions.map((condition) => `(${condition})`).join(' AND ')}`;
     })

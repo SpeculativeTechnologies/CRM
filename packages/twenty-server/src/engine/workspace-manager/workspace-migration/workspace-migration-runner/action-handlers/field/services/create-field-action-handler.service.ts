@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 
 import { FieldMetadataType, RelationType } from 'twenty-shared/types';
-import { isDefined } from 'twenty-shared/utils';
+import { getLinkedFieldReference, isDefined } from 'twenty-shared/utils';
 import { type QueryRunner } from 'typeorm';
 import { v4 } from 'uuid';
 
@@ -217,6 +217,10 @@ export class CreateFieldActionHandlerService extends WorkspaceMigrationRunnerAct
     tableName: string;
     workspaceId: string;
   }): Promise<void> {
+    if (isDefined(getLinkedFieldReference(flatFieldMetadata.settings))) {
+      return;
+    }
+
     const enumOperations = collectEnumOperationsForField({
       flatFieldMetadata,
       tableName,

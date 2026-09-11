@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { getLinkedFieldReference, isDefined } from 'twenty-shared/utils';
 
 import { WorkspaceMigrationRunnerActionHandler } from 'src/engine/workspace-manager/workspace-migration/workspace-migration-runner/interfaces/workspace-migration-runner-action-handler-service.interface';
 
@@ -68,6 +69,10 @@ export class DeleteFieldActionHandlerService extends WorkspaceMigrationRunnerAct
       flatEntityMaps: flatFieldMetadataMaps,
       flatEntityId: flatAction.entityId,
     });
+
+    if (isDefined(getLinkedFieldReference(flatFieldMetadata.settings))) {
+      return;
+    }
 
     const flatObjectMetadata = findFlatEntityByIdInFlatEntityMapsOrThrow({
       flatEntityMaps: flatObjectMetadataMaps,

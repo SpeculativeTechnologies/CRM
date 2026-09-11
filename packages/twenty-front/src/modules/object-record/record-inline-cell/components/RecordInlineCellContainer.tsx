@@ -1,3 +1,4 @@
+import { LinkedFieldSourceIndicator } from '@/object-record/record-field/ui/components/LinkedFieldSourceIndicator';
 import { styled } from '@linaria/react';
 import { useContext } from 'react';
 import { ThemeContext, themeCssVariables } from 'twenty-ui/theme-constants';
@@ -121,6 +122,9 @@ export const RecordInlineCellContainer = () => {
               <OverflowingTextWithTooltip text={label} displayedMaxRows={1} />
             </StyledLabelContainer>
           )}
+          <LinkedFieldSourceIndicator
+            fieldMetadataId={fieldDefinition.fieldMetadataId}
+          />
           {/* TODO: Displaying Tooltips on the board is causing performance issues https://react-tooltip.com/docs/examples/render */}
           {!showLabel && (
             <AppTooltip

@@ -8,6 +8,11 @@ export type WorkspaceColumnShape = {
   fieldName: string;
   fieldMetadataType: FieldMetadataType;
   compositeParentFieldName?: string;
+  linkedColumn?: {
+    relationFieldName: string;
+    sourceColumnName: string;
+    sourcePermissionFieldName?: string;
+  };
 };
 
 export type WorkspaceRelationShape = {
@@ -17,6 +22,7 @@ export type WorkspaceRelationShape = {
   targetObjectMetadataId: string;
   targetFieldMetadataId: string | null;
   joinColumnName?: string;
+  parentJoinColumnName?: string;
 };
 
 export type WorkspaceTableShape = {

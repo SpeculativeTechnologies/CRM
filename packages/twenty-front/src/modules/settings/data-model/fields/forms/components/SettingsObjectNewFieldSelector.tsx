@@ -1,4 +1,5 @@
 import { type FieldMetadataItem } from '@/object-metadata/types/FieldMetadataItem';
+import { useFilteredObjectMetadataItems } from '@/object-metadata/hooks/useFilteredObjectMetadataItems';
 import { SettingsCard } from '@/settings/components/SettingsCard';
 import { SETTINGS_FIELD_TYPE_CATEGORIES } from '@/settings/data-model/constants/SettingsFieldTypeCategories';
 import { SETTINGS_FIELD_TYPE_CATEGORY_DESCRIPTIONS } from '@/settings/data-model/constants/SettingsFieldTypeCategoryDescriptions';
@@ -17,11 +18,11 @@ import { useContext, useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { SettingsPath } from 'twenty-shared/types';
 import { getSettingsPath } from 'twenty-shared/utils';
-import { IconSearch } from 'twenty-ui/icon';
+import { IconLink, IconSearch } from 'twenty-ui/icon';
 import { H2Title } from 'twenty-ui/typography';
 import { UndecoratedLink } from 'twenty-ui/navigation';
 import { ThemeContext, themeCssVariables } from 'twenty-ui/theme-constants';
-import { FieldMetadataType } from '~/generated-metadata/graphql';
+import { FieldMetadataType, RelationType } from '~/generated-metadata/graphql';
 import { type SettingsDataModelFieldTypeFormValues } from '~/pages/settings/data-model/new-field/SettingsObjectNewFieldSelect';
 
 type SettingsObjectNewFieldSelectorProps = {
@@ -74,6 +75,18 @@ export const SettingsObjectNewFieldSelector = ({
   const { control, setValue } =
     useFormContext<SettingsDataModelFieldTypeFormValues>();
   const [searchQuery, setSearchQuery] = useState('');
+  const { findObjectMetadataItemByNamePlural } =
+    useFilteredObjectMetadataItems();
+  const destination = findObjectMetadataItemByNamePlural(objectNamePlural);
+  const canCreateLinkedField =
+    destination?.nameSingular !== 'person' &&
+    destination?.readableFields.some(
+      (field) =>
+        field.isActive &&
+        field.type === FieldMetadataType.RELATION &&
+        field.relation?.type === RelationType.MANY_TO_ONE &&
+        field.relation.targetObjectMetadata.nameSingular === 'person',
+    );
   const fieldTypeConfigs = Object.entries<SettingsFieldTypeConfig<any>>(
     SETTINGS_FIELD_TYPE_CONFIGS,
   ).filter(
@@ -124,6 +137,28 @@ export const SettingsObjectNewFieldSelector = ({
           />
         </StyledSearchInputContainer>
       </Section>
+      {canCreateLinkedField &&
+        t`Linked field`.toLowerCase().includes(searchQuery.toLowerCase()) && (
+          <Section>
+            <H2Title
+              title={t`Linked field`}
+              description={t`Display a current value from a related Person. Editable only at its source.`}
+            />
+            <UndecoratedLink
+              to={getSettingsPath(
+                SettingsPath.ObjectNewFieldConfigure,
+                { objectNamePlural },
+                { linked: 'true' },
+              )}
+              fullWidth
+            >
+              <SettingsCard
+                Icon={<IconLink size={theme.icon.size.xl} />}
+                title={t`Linked field`}
+              />
+            </UndecoratedLink>
+          </Section>
+        )}
       <Controller
         name="type"
         control={control}

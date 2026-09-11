@@ -1,4 +1,5 @@
 import { useListenToBrowserEvent } from '@/browser-event/hooks/useListenToBrowserEvent';
+import { getQueryInvalidationEventName } from '@/sse-db-event/utils/dispatchQueryInvalidations';
 import { SSE_CLIENT_RECONNECTED_EVENT_NAME } from '@/sse-db-event/constants/SseClientReconnectedEventName';
 import { SSE_RESYNC_DEBOUNCE_TIME_IN_MS } from '@/sse-db-event/constants/SseResyncDebounceTimeInMs';
 import { useChangeQueryListenState } from '@/sse-db-event/hooks/useChangeQueryListenState';
@@ -66,6 +67,11 @@ export const useListenToEventsForQuery = ({
 
   useListenToBrowserEvent({
     eventName: SSE_CLIENT_RECONNECTED_EVENT_NAME,
+    onBrowserEvent: debouncedHandleSseReconnected,
+  });
+
+  useListenToBrowserEvent({
+    eventName: getQueryInvalidationEventName(queryId),
     onBrowserEvent: debouncedHandleSseReconnected,
   });
 };
