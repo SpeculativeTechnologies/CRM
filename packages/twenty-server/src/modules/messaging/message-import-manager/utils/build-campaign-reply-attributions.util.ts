@@ -10,8 +10,13 @@ import { isAutoReplyMessage } from 'src/modules/messaging/message-import-manager
 // Outgoing messages are excluded because the campaign message itself is saved
 // through the same choke point, and an out-of-office answers a campaign's
 // In-Reply-To just as a human would, which would inflate the reply rate.
+//
+// Reply headers stay required even though the thread can locate the campaign
+// message on its own: they are what makes an autoresponder detectable, and
+// attributing a header-less message by thread alone would count one.
 export const buildCampaignReplyAttributions = (
   messages: MessageWithParticipants[],
+  messageThreadIdByMessageExternalId?: Map<string, string>,
 ): CampaignReplyAttribution[] =>
   messages.flatMap((message) => {
     if (message.direction !== MessageDirection.INCOMING || message.isDraft) {
@@ -32,5 +37,18 @@ export const buildCampaignReplyAttributions = (
       return [];
     }
 
-    return [{ replyHeaderMessageIds, senderHandle }];
+    const messageThreadId = messageThreadIdByMessageExternalId?.get(
+      message.externalId,
+    );
+
+    return [
+      {
+        replyHeaderMessageIds,
+        senderHandle,
+        ...(isNonEmptyString(messageThreadId) ? { messageThreadId } : {}),
+        ...(message.receivedAt instanceof Date
+          ? { receivedAt: message.receivedAt.toISOString() }
+          : {}),
+      },
+    ];
   });

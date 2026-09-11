@@ -217,7 +217,11 @@ export class MessagingSaveMessagesAndEnqueueContactCreationService {
       ],
       workspaceId,
     });
-    await this.enqueueCampaignReplyAttribution(messagesToSave, workspaceId);
+    await this.enqueueCampaignReplyAttribution(
+      messagesToSave,
+      savedMessagesResult.messageExternalIdToMessageThreadIdMap,
+      workspaceId,
+    );
 
     return {
       messageExternalIdsAndIdsMap:
@@ -231,15 +235,22 @@ export class MessagingSaveMessagesAndEnqueueContactCreationService {
   // is unrelated to importing the message, and must not fail the import.
   private async enqueueCampaignReplyAttribution(
     messagesToSave: MessageWithParticipants[],
+    messageExternalIdToMessageThreadIdMap: Map<string, string>,
     workspaceId: string,
   ): Promise<void> {
-    const replies = buildCampaignReplyAttributions(messagesToSave);
-
-    if (replies.length === 0) {
-      return;
-    }
-
+    // Building the payload sits inside the boundary with the enqueue: this runs
+    // on every imported message of every mailbox sync, and campaign bookkeeping
+    // is unrelated to importing the message, so nothing here may fail it.
     try {
+      const replies = buildCampaignReplyAttributions(
+        messagesToSave,
+        messageExternalIdToMessageThreadIdMap,
+      );
+
+      if (replies.length === 0) {
+        return;
+      }
+
       await this.emailMessageQueueService.add<AttributeCampaignReplyJobData>(
         ATTRIBUTE_CAMPAIGN_REPLY_JOB,
         { workspaceId, replies },

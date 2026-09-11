@@ -21,6 +21,8 @@ export class AttributeCampaignReplyJob {
         workspaceId: data.workspaceId,
         replyHeaderMessageIds: reply.replyHeaderMessageIds,
         senderHandle: reply.senderHandle,
+        messageThreadId: reply.messageThreadId,
+        receivedAt: reply.receivedAt,
       });
     }
   }
