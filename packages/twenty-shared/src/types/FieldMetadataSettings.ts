@@ -2,6 +2,7 @@ import { type AllowedAddressSubField } from '@/types/AddressFieldsType';
 import { type FieldMetadataMultiItemSettings } from '@/types/FieldMetadataMultiItemSettings';
 import { type FieldMetadataType } from '@/types/FieldMetadataType';
 import { type IsExactly } from '@/types/IsExactly';
+import { type LinkedFieldMetadataSettings } from '@/types/LinkedFieldReference';
 import { type RelationOnDeleteAction } from '@/types/RelationOnDeleteAction.type';
 import { type RelationType } from '@/types/RelationType';
 import { type SerializedRelation } from '@/types/SerializedRelation.type';
@@ -80,7 +81,7 @@ type FieldMetadataFilesSettings = {
   maxNumberOfValues: number;
 };
 
-export type FieldMetadataSettingsMapping = {
+type FieldMetadataTypeSpecificSettingsMapping = {
   [FieldMetadataType.NUMBER]: FieldMetadataNumberSettings | null;
   [FieldMetadataType.CURRENCY]: FieldMetadataCurrencySettings | null;
   [FieldMetadataType.DATE]: FieldMetadataDateSettings | null;
@@ -95,6 +96,35 @@ export type FieldMetadataSettingsMapping = {
   [FieldMetadataType.LINKS]: FieldMetadataLinksSettings | null;
   [FieldMetadataType.ARRAY]: FieldMetadataMultiItemSettings | null;
   [FieldMetadataType.FILES]: FieldMetadataFilesSettings;
+};
+
+export type FieldMetadataSettingsMapping = {
+  [TFieldType in FieldMetadataType]: TFieldType extends
+    | FieldMetadataType.RELATION
+    | FieldMetadataType.MORPH_RELATION
+    | FieldMetadataType.FILES
+    | FieldMetadataType.TS_VECTOR
+    ? FieldMetadataTypeSpecificSettingsMapping[TFieldType]
+    : TFieldType extends FieldMetadataType.POSITION
+      ? null
+      : TFieldType extends keyof FieldMetadataTypeSpecificSettingsMapping
+        ?
+            | ([
+                Exclude<
+                  FieldMetadataTypeSpecificSettingsMapping[TFieldType],
+                  null
+                >,
+              ] extends [never]
+                ? LinkedFieldMetadataSettings
+                : Exclude<
+                    FieldMetadataTypeSpecificSettingsMapping[TFieldType],
+                    null
+                  > &
+                    LinkedFieldMetadataSettings)
+            | (null extends FieldMetadataTypeSpecificSettingsMapping[TFieldType]
+                ? null
+                : never)
+        : LinkedFieldMetadataSettings | null;
 };
 
 export type AllFieldMetadataSettings =

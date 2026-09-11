@@ -1,6 +1,7 @@
 import { MetadataWritability } from 'twenty-shared/types';
 import {
   extractAndSanitizeObjectStringFields,
+  getLinkedFieldReference,
   isDefined,
 } from 'twenty-shared/utils';
 import { v4 } from 'uuid';
@@ -30,6 +31,7 @@ export const getDefaultFlatFieldMetadata = ({
   );
 
   const createdAt = new Date().toISOString();
+  const isLinkedField = isDefined(getLinkedFieldReference(settings));
   const resolvedDefaultValue =
     defaultValue ?? generateDefaultValue(createFieldInput.type);
 
@@ -38,34 +40,39 @@ export const getDefaultFlatFieldMetadata = ({
     icon: createFieldInput.icon ?? null,
     isActive: true,
     isLabelSyncedWithName: createFieldInput.isLabelSyncedWithName ?? false,
-    isNullable: generateNullable(
-      createFieldInput.isNullable,
-      createFieldInput.isRemoteCreation,
-    ),
+    isNullable:
+      isLinkedField ||
+      generateNullable(
+        createFieldInput.isNullable,
+        createFieldInput.isRemoteCreation,
+      ),
     isSystem: createFieldInput.isSystem ?? false,
     isSystemSideEffect,
-    isUnique: createFieldInput.isUnique ?? false,
+    isUnique: isLinkedField ? false : (createFieldInput.isUnique ?? false),
     label: createFieldInput.label,
     name: createFieldInput.name,
     overrides: null,
     type: createFieldInput.type,
     universalIdentifier: createFieldInput.universalIdentifier ?? v4(),
     options: createFieldInput.options ?? null,
-    defaultValue: isCompositeFieldMetadataType(createFieldInput.type)
-      ? nullifyEmptyCompositeDefaultValue({
-          defaultValue: resolvedDefaultValue,
-          fieldType: createFieldInput.type,
-        })
-      : resolvedDefaultValue,
+    defaultValue: isLinkedField
+      ? null
+      : isCompositeFieldMetadataType(createFieldInput.type)
+        ? nullifyEmptyCompositeDefaultValue({
+            defaultValue: resolvedDefaultValue,
+            fieldType: createFieldInput.type,
+          })
+        : resolvedDefaultValue,
     createdAt,
     updatedAt: createdAt,
     // isUIReadOnly is the deprecated alias of isUIEditable (inverted
     // polarity), kept for one release; isUIEditable wins when both are set.
-    isUIEditable:
-      createFieldInput.isUIEditable ??
-      (isDefined(createFieldInput.isUIReadOnly)
-        ? !createFieldInput.isUIReadOnly
-        : true),
+    isUIEditable: isLinkedField
+      ? false
+      : (createFieldInput.isUIEditable ??
+        (isDefined(createFieldInput.isUIReadOnly)
+          ? !createFieldInput.isUIReadOnly
+          : true)),
     writability: MetadataWritability.OPEN,
     morphId: null,
     applicationUniversalIdentifier,

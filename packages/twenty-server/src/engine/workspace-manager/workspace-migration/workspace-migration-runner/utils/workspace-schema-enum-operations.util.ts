@@ -1,5 +1,9 @@
 import { type FieldMetadataType } from 'twenty-shared/types';
-import { assertUnreachable } from 'twenty-shared/utils';
+import {
+  assertUnreachable,
+  getLinkedFieldReference,
+  isDefined,
+} from 'twenty-shared/utils';
 import { type QueryRunner } from 'typeorm';
 
 import { type CompositeFieldMetadataType } from 'src/engine/metadata-modules/field-metadata/types/composite-field-metadata-type.type';
@@ -59,6 +63,10 @@ const collectEnumOperationsForBasicEnumField = ({
   operation: EnumOperation;
   options?: { newTableName?: string; newFieldName?: string };
 }): EnumOperationSpec[] => {
+  if (isDefined(getLinkedFieldReference(flatFieldMetadata.settings))) {
+    return [];
+  }
+
   const enumName = computePostgresEnumName({
     tableName,
     columnName: flatFieldMetadata.name,
@@ -160,6 +168,10 @@ export const collectEnumOperationsForField = ({
   operation: EnumOperation;
   options?: { newTableName?: string; newFieldName?: string };
 }): EnumOperationSpec[] => {
+  if (isDefined(getLinkedFieldReference(flatFieldMetadata.settings))) {
+    return [];
+  }
+
   if (isCompositeFlatFieldMetadata(flatFieldMetadata)) {
     return collectEnumOperationsForCompositeField({
       flatFieldMetadata,

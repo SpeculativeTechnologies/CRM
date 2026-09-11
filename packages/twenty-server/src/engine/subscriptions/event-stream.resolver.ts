@@ -60,6 +60,7 @@ export class EventStreamResolver {
     ) => {
       return {
         eventStreamId: variables.eventStreamId,
+        queryIdsToRefetch: payload.queryIdsToRefetch,
         objectRecordEventsWithQueryIds: payload.objectRecordEventsWithQueryIds,
         metadataEvents: payload.metadataEvents,
       };

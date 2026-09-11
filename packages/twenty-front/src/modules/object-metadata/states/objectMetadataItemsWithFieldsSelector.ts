@@ -8,7 +8,7 @@ import { getNonUpdatableFieldMetadataIdsFromObjectPermissions } from '@/object-m
 import { getObjectPermissionsFromMapByObjectMetadataId } from '@/settings/roles/role-permissions/objects-permissions/utils/getObjectPermissionsFromMapByObjectMetadataId';
 import { createAtomSelector } from '@/ui/utilities/state/jotai/utils/createAtomSelector';
 import { type ObjectPermissions } from 'twenty-shared/types';
-import { isDefined } from 'twenty-shared/utils';
+import { getLinkedFieldReference, isDefined } from 'twenty-shared/utils';
 
 export const objectMetadataItemsWithFieldsSelector = createAtomSelector<
   EnrichedObjectMetadataItem[]
@@ -19,13 +19,30 @@ export const objectMetadataItemsWithFieldsSelector = createAtomSelector<
     const allFlatFields = get(fieldMetadataItemsSelector);
     const allFlatIndexes = get(indexMetadataItemsSelector);
     const currentUserWorkspace = get(currentUserWorkspaceState);
+    const fieldByUniversalIdentifier = new Map(
+      allFlatFields.map((field) => [field.universalIdentifier, field]),
+    );
 
     const fieldsByObjectId = new Map<
       string,
       (typeof allFlatFields)[number][]
     >();
 
-    for (const field of allFlatFields) {
+    for (const rawField of allFlatFields) {
+      const linkedField = getLinkedFieldReference(rawField.settings);
+      const source = isDefined(linkedField)
+        ? fieldByUniversalIdentifier.get(
+            linkedField.sourceFieldMetadataUniversalIdentifier,
+          )
+        : undefined;
+      const field = isDefined(source)
+        ? {
+            ...rawField,
+            options: source.options,
+            settings: { ...source.settings, linkedField },
+            isUIEditable: false,
+          }
+        : rawField;
       const existing = fieldsByObjectId.get(field.objectMetadataId);
 
       if (isDefined(existing)) {
@@ -79,16 +96,47 @@ export const objectMetadataItemsWithFieldsSelector = createAtomSelector<
           objectPermissions,
         });
 
+      const canReadLinkedSource = (field: (typeof fields)[number]) => {
+        const reference = getLinkedFieldReference(field.settings);
+        if (!isDefined(reference)) {
+          return true;
+        }
+        return [
+          reference.relationFieldMetadataUniversalIdentifier,
+          reference.sourceFieldMetadataUniversalIdentifier,
+        ].every((identifier) => {
+          const source = fieldByUniversalIdentifier.get(identifier);
+          if (!isDefined(source) || !source.isActive) {
+            return false;
+          }
+          const sourcePermissions =
+            getObjectPermissionsFromMapByObjectMetadataId({
+              objectPermissionsByObjectMetadataId,
+              objectMetadataId: source.objectMetadataId,
+            });
+          return (
+            sourcePermissions.canReadObjectRecords &&
+            !getNonReadableFieldMetadataIdsFromObjectPermissions({
+              objectPermissions: sourcePermissions,
+            }).includes(source.id)
+          );
+        });
+      };
+
       return {
         ...flatObject,
         fields,
         indexMetadatas,
         searchFieldMetadatas: flatObject.searchFieldMetadatas ?? [],
         readableFields: fields.filter(
-          (field) => !nonReadableFieldMetadataIds.includes(field.id),
+          (field) =>
+            !nonReadableFieldMetadataIds.includes(field.id) &&
+            canReadLinkedSource(field),
         ),
         updatableFields: fields.filter(
-          (field) => !nonUpdatableFieldMetadataIds.includes(field.id),
+          (field) =>
+            !nonUpdatableFieldMetadataIds.includes(field.id) &&
+            !isDefined(getLinkedFieldReference(field.settings)),
         ),
       } satisfies EnrichedObjectMetadataItem;
     });

@@ -28,11 +28,14 @@ export type MutationStatementState = {
 };
 
 const buildReturningClause = (state: MutationStatementState): string => {
-  if (state.returningColumns.length === 0) {
+  const returningColumns = state.returningColumns.filter(
+    (name) => !state.tableShape.columnShapeByColumnName[name]?.linkedColumn,
+  );
+  if (returningColumns.length === 0) {
     return '';
   }
 
-  const expressions = state.returningColumns.map(
+  const expressions = returningColumns.map(
     (columnName) =>
       `${quoteColumn(state.alias, columnName)} AS ${escapeIdentifier(
         buildColumnResultAlias(state.alias, columnName),

@@ -185,6 +185,23 @@ export class WorkspaceRepository<TEntity extends ObjectLiteral = ObjectRecord> {
       Object.entries(data).filter(([, value]) => value !== undefined),
     );
 
+    for (const column of Object.values(
+      this.options.tableShape.columnShapeByColumnName,
+    )) {
+      if (
+        isDefined(column.linkedColumn) &&
+        Object.prototype.hasOwnProperty.call(definedData, column.fieldName)
+      ) {
+        throw new TwentyOrmException(
+          `Linked field "${column.fieldName}" is read-only`,
+          TwentyOrmExceptionCode.INVALID_INPUT,
+          {
+            userFriendlyMessage: msg`Edit this value on the linked Person record.`,
+          },
+        );
+      }
+    }
+
     return formatData(
       definedData,
       this.options.flatObjectMetadata,
@@ -950,7 +967,10 @@ export class WorkspaceRepository<TEntity extends ObjectLiteral = ObjectRecord> {
       await this.filesFieldSync.updateFileEntityRecords(filesFieldFileIds);
     }
 
-    const generatedMaps = this.formatResult<ObjectRecord[]>(rawRows);
+    const generatedMaps = await this.completeLinkedReturnValues(
+      this.formatResult<ObjectRecord[]>(rawRows),
+      columnsToReturn,
+    );
     const insertedIds = rawRows.map((row) => row.id).filter(isNonEmptyString);
 
     await this.emitCreateEvents(insertedIds);
@@ -1087,10 +1107,14 @@ export class WorkspaceRepository<TEntity extends ObjectLiteral = ObjectRecord> {
 
     this.emitMutationEvent({ kind: 'update', recordsBefore, recordsAfter });
 
+    const completeRecords = await this.completeLinkedReturnValues(
+      generatedMaps,
+      columnsToReturn,
+    );
     return {
       identifiers: generatedMaps.map((record) => ({ id: String(record.id) })),
-      generatedMaps,
-      raw: generatedMaps,
+      generatedMaps: completeRecords,
+      raw: completeRecords,
     };
   }
 
@@ -1198,7 +1222,15 @@ export class WorkspaceRepository<TEntity extends ObjectLiteral = ObjectRecord> {
       tableShapeByObjectMetadataId: this.options.tableShapeByObjectMetadataId,
       onBeforeExecute: () => undefined,
       formatResult: (records) => this.formatResult(records),
-    });
+    }).select(
+      this.options.tableShape.columnNames.filter(
+        (columnName) =>
+          !isDefined(
+            this.options.tableShape.columnShapeByColumnName[columnName]
+              .linkedColumn,
+          ),
+      ),
+    );
   }
 
   private buildIdsEventSnapshotQueryBuilder(
@@ -1300,6 +1332,14 @@ export class WorkspaceRepository<TEntity extends ObjectLiteral = ObjectRecord> {
       );
     }
 
+    const linkedValuesBeforeDelete =
+      kind === 'delete'
+        ? await this.completeLinkedReturnValues(
+            recordsBefore.map((record) => ({ id: record.id })),
+            columnsToReturn,
+          )
+        : [];
+
     const mutationResult = await this.morphAndExecute({
       selectQueryBuilder,
       kind,
@@ -1337,7 +1377,43 @@ export class WorkspaceRepository<TEntity extends ObjectLiteral = ObjectRecord> {
 
     this.emitMutationEvent({ kind, recordsBefore, recordsAfter });
 
-    return mutationResult.generatedMaps;
+    return kind === 'delete'
+      ? mutationResult.generatedMaps.map((record) => ({
+          ...record,
+          ...linkedValuesBeforeDelete.find((before) => before.id === record.id),
+        }))
+      : this.completeLinkedReturnValues(
+          mutationResult.generatedMaps,
+          columnsToReturn,
+        );
+  }
+
+  private getLinkedColumns(columns: string[]): string[] {
+    return columns.filter((column) =>
+      isDefined(
+        this.options.tableShape.columnShapeByColumnName[column]?.linkedColumn,
+      ),
+    );
+  }
+
+  private async completeLinkedReturnValues(
+    records: ObjectRecord[],
+    columnsToReturn: string[],
+  ): Promise<ObjectRecord[]> {
+    const linkedColumns = this.getLinkedColumns(columnsToReturn);
+    if (linkedColumns.length === 0 || records.length === 0) {
+      return records;
+    }
+    const values = await this.createQueryBuilder()
+      .select(['id', ...linkedColumns])
+      .where({ id: In(records.map((record) => record.id)) })
+      .withDeleted()
+      .getMany<ObjectRecord>();
+    const valuesById = new Map(values.map((record) => [record.id, record]));
+    return records.map((record) => ({
+      ...record,
+      ...valuesById.get(record.id),
+    }));
   }
 
   private async morphAndExecute({
@@ -1404,6 +1480,12 @@ export class WorkspaceRepository<TEntity extends ObjectLiteral = ObjectRecord> {
       updatedColumns,
       authContext: this.options.authContext,
     });
+    const linkedColumns = this.getLinkedColumns(columnsToReturn);
+    if (linkedColumns.length > 0) {
+      this.createQueryBuilder()
+        .select(['id', ...linkedColumns])
+        .applyRowLevelPermissions();
+    }
   }
 
   private validateRLSPredicatesForWrittenRecords(
@@ -1513,6 +1595,9 @@ export class WorkspaceRepository<TEntity extends ObjectLiteral = ObjectRecord> {
       alias: queryBuilder.alias,
       flatObjectMetadata: this.options.flatObjectMetadata,
     });
+
+    // RLS filters themselves can reference linked fields.
+    queryBuilder.prepareLinkedFields();
 
     for (const joinAlias of queryBuilder.getJoinAliases()) {
       const joinedTableShape = queryBuilder.getJoinedTableShape(joinAlias.name);

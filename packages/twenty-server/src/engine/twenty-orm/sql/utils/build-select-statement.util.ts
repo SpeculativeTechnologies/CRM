@@ -18,6 +18,8 @@ export type WhereClause = {
 };
 
 export type JoinClause = {
+  isLinkedFieldJoin?: boolean;
+  existsScopeAlias?: string;
   alias: string;
   parentAlias: string;
   relationFieldName: string;
@@ -302,6 +304,7 @@ export const renderUserWhereExpression = (
 const renderExistsFilter = (
   existsFilterClause: ExistsFilterClause,
   includeDeleted: boolean,
+  state?: SelectStatementState,
 ): string => {
   const conditions = [
     existsFilterClause.correlationCondition,
@@ -324,26 +327,31 @@ const renderExistsFilter = (
   const tableExpression = `${escapeIdentifier(
     existsFilterClause.targetTableShape.schemaName,
   )}.${escapeIdentifier(existsFilterClause.targetTableShape.tableName)}`;
+  const joins = isDefined(state)
+    ? buildJoinClause(state, existsFilterClause.alias)
+    : '';
 
   return `EXISTS (SELECT 1 FROM ${tableExpression} AS ${escapeIdentifier(
     existsFilterClause.alias,
-  )} WHERE ${conditions.join(' AND ')})`;
+  )}${joins.length > 0 ? ' ' + joins : ''} WHERE ${conditions.join(' AND ')})`;
 };
 
 export const substituteExistsFilterTokens = ({
   expression,
   existsFilterClauses,
   includeDeleted,
+  state,
 }: {
   expression: string;
   existsFilterClauses: ExistsFilterClause[];
   includeDeleted: boolean;
+  state?: SelectStatementState;
 }): string =>
   existsFilterClauses.reduce(
     (substituted, existsFilterClause) =>
       substituted
         .split(existsFilterClause.token)
-        .join(renderExistsFilter(existsFilterClause, includeDeleted)),
+        .join(renderExistsFilter(existsFilterClause, includeDeleted, state)),
     expression,
   );
 
@@ -367,6 +375,7 @@ export const buildWhereExpression = (
         expression: renderedWhereClauses,
         existsFilterClauses: state.existsFilterClauses,
         includeDeleted: state.includeDeleted,
+        state,
       })
     : renderedWhereClauses;
 
@@ -423,8 +432,12 @@ const buildToManyDedupedJoinSource = ({
   return `(SELECT DISTINCT ON (${foreignKey}) * FROM ${tableExpression}${whereClause} ORDER BY ${orderExpressions.join(', ')})`;
 };
 
-export const buildJoinClause = (state: SelectStatementState): string =>
+export const buildJoinClause = (
+  state: SelectStatementState,
+  existsScopeAlias?: string,
+): string =>
   state.joinClauses
+    .filter((joinClause) => joinClause.existsScopeAlias === existsScopeAlias)
     .map((joinClause) => {
       const condition =
         joinClause.condition ??

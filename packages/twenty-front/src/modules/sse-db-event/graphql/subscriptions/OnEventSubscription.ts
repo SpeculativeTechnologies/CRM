@@ -4,6 +4,7 @@ export const ON_EVENT_SUBSCRIPTION = gql`
   subscription OnEventSubscription($eventStreamId: String!) {
     onEventSubscription(eventStreamId: $eventStreamId) {
       eventStreamId
+      queryIdsToRefetch
       objectRecordEventsWithQueryIds {
         objectRecordEvent {
           action

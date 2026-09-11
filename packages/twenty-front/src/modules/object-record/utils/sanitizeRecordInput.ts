@@ -8,6 +8,7 @@ import { removeTypenamesFromCompositeFieldValue } from '@/object-record/utils/re
 import {
   computeMorphRelationGqlFieldName,
   computeRelationGqlFieldJoinColumnName,
+  getLinkedFieldReference,
   isDefined,
 } from 'twenty-shared/utils';
 import { FieldMetadataType, RelationType } from '~/generated-metadata/graphql';
@@ -29,6 +30,9 @@ export const sanitizeRecordInput = ({
         const fieldMetadataItem = objectMetadataItem.fields.find(
           (field) => field.name === fieldName,
         );
+        if (isDefined(getLinkedFieldReference(fieldMetadataItem?.settings))) {
+          return undefined;
+        }
         const potentialJoinColumnNameFieldMetadataItem =
           objectMetadataItem.fields.find(
             (field) =>

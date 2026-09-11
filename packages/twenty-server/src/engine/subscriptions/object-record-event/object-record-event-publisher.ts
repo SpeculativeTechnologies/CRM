@@ -12,6 +12,7 @@ import {
   type RestrictedFieldsPermissions,
 } from 'twenty-shared/types';
 import {
+  getLinkedFieldReference,
   isDefined,
   isNonEmptyArray,
   isRecordGqlOperationSignature,
@@ -53,6 +54,7 @@ import { WorkspaceEventBatch } from 'src/engine/workspace-event-emitter/types/wo
 import { parseEventNameOrThrow } from 'src/engine/workspace-event-emitter/utils/parse-event-name';
 
 type StreamPermissionsContext = {
+  flatObjectMetadataMaps: FlatEntityMaps<FlatObjectMetadata>;
   flatRowLevelPermissionPredicateMaps: FlatRowLevelPermissionPredicateMaps;
   flatRowLevelPermissionPredicateGroupMaps: FlatRowLevelPermissionPredicateGroupMaps;
   flatFieldMetadataMaps: FlatEntityMaps<FlatFieldMetadata>;
@@ -175,6 +177,12 @@ export class ObjectRecordEventPublisher {
     }[] = [];
 
     const objectNameSingular = workspaceEventBatch.objectMetadata.nameSingular;
+    const queryIdsToRefetch = this.getLinkedFieldQueryIdsToRefetch({
+      streamData,
+      changedObjectMetadataId: workspaceEventBatch.objectMetadata.id,
+      permissionsContext,
+      objectsPermissions,
+    });
 
     const subscriberRLSFilter = this.buildSubscriberRLSFilter(
       streamData.authContext,
@@ -230,7 +238,7 @@ export class ObjectRecordEventPublisher {
       });
     }
 
-    if (matchedEvents.length > 0) {
+    if (matchedEvents.length > 0 || queryIdsToRefetch.length > 0) {
       try {
         await this.enrichEventBatchWithNestedRelations({
           objectMetadata: workspaceEventBatch.objectMetadata,
@@ -252,6 +260,7 @@ export class ObjectRecordEventPublisher {
       }
 
       const payload: EventStreamPayload = {
+        ...(queryIdsToRefetch.length > 0 ? { queryIdsToRefetch } : {}),
         objectRecordEventsWithQueryIds: matchedEvents,
         metadataEvents: [],
       };
@@ -262,6 +271,70 @@ export class ObjectRecordEventPublisher {
         payload,
       });
     }
+  }
+
+  private getLinkedFieldQueryIdsToRefetch({
+    streamData,
+    changedObjectMetadataId,
+    permissionsContext,
+    objectsPermissions,
+  }: {
+    streamData: EventStreamData;
+    changedObjectMetadataId: string;
+    permissionsContext: StreamPermissionsContext;
+    objectsPermissions: ObjectsPermissions;
+  }): string[] {
+    const affectedObjectNames = new Set<string>();
+    const fields = permissionsContext.flatFieldMetadataMaps;
+    for (const field of Object.values(fields.byUniversalIdentifier)) {
+      const reference = getLinkedFieldReference(field?.settings);
+      if (!isDefined(field) || !field.isActive || !isDefined(reference)) {
+        continue;
+      }
+      const source =
+        fields.byUniversalIdentifier[
+          reference.sourceFieldMetadataUniversalIdentifier
+        ];
+      const relation =
+        fields.byUniversalIdentifier[
+          reference.relationFieldMetadataUniversalIdentifier
+        ];
+      if (
+        !isDefined(source) ||
+        !isDefined(relation) ||
+        (source.objectMetadataId !== changedObjectMetadataId &&
+          field.objectMetadataId !== changedObjectMetadataId)
+      ) {
+        continue;
+      }
+      const canReadFields = [field, source, relation].every((item) => {
+        const permission = objectsPermissions[item.objectMetadataId];
+        return (
+          permission?.canReadObjectRecords &&
+          permission.restrictedFields?.[item.id]?.canRead !== false
+        );
+      });
+      if (!canReadFields) {
+        continue;
+      }
+      const destination = findFlatEntityByIdInFlatEntityMaps({
+        flatEntityId: field.objectMetadataId,
+        flatEntityMaps: permissionsContext.flatObjectMetadataMaps,
+      });
+      if (isDefined(destination)) {
+        affectedObjectNames.add(destination.nameSingular);
+      }
+    }
+
+    // Invalidate without sending source record data, including when a source row
+    // no longer passes RLS. Refetching applies the current permissions and filters.
+    return Object.entries(streamData.queries)
+      .filter(
+        ([, signature]) =>
+          isRecordGqlOperationSignature(signature) &&
+          affectedObjectNames.has(signature.objectNameSingular),
+      )
+      .map(([queryId]) => queryId);
   }
 
   private async enrichEventBatchWithNestedRelations({
@@ -590,6 +663,7 @@ export class ObjectRecordEventPublisher {
     workspaceId: string,
   ): Promise<StreamPermissionsContext> {
     const {
+      flatObjectMetadataMaps,
       flatRowLevelPermissionPredicateMaps,
       flatRowLevelPermissionPredicateGroupMaps,
       flatFieldMetadataMaps,
@@ -597,6 +671,7 @@ export class ObjectRecordEventPublisher {
       rolesPermissions,
       flatApplicationMaps,
     } = await this.workspaceCacheService.getOrRecompute(workspaceId, [
+      'flatObjectMetadataMaps',
       'flatRowLevelPermissionPredicateMaps',
       'flatRowLevelPermissionPredicateGroupMaps',
       'flatFieldMetadataMaps',
@@ -606,6 +681,7 @@ export class ObjectRecordEventPublisher {
     ]);
 
     return {
+      flatObjectMetadataMaps,
       flatRowLevelPermissionPredicateMaps,
       flatRowLevelPermissionPredicateGroupMaps,
       flatFieldMetadataMaps,

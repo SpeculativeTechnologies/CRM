@@ -5,6 +5,7 @@ import {
 } from 'twenty-shared/types';
 import {
   assertUnreachable,
+  getLinkedFieldReference,
   isDefined,
   trimAndRemoveDuplicatedWhitespacesFromObjectStringProperties,
 } from 'twenty-shared/utils';
@@ -80,6 +81,9 @@ export const fromCreateFieldInputToFlatFieldMetadatasToCreate = async ({
     objectMetadataUniversalIdentifier:
       parentFlatObjectMetadata.universalIdentifier,
   });
+  const linkedField = getLinkedFieldReference(
+    commonFlatFieldMetadata.universalSettings,
+  );
 
   switch (createFieldInput.type) {
     case FieldMetadataType.MORPH_RELATION: {
@@ -116,7 +120,9 @@ export const fromCreateFieldInputToFlatFieldMetadatasToCreate = async ({
               type: createFieldInput.type,
               defaultValue: commonFlatFieldMetadata.defaultValue as string, // Could this be improved ?
               options: generateRatingOptions(),
-              universalSettings: null,
+              universalSettings: isDefined(linkedField)
+                ? { linkedField }
+                : null,
             } satisfies UniversalFlatFieldMetadata<
               typeof createFieldInput.type
             >,
@@ -146,7 +152,9 @@ export const fromCreateFieldInputToFlatFieldMetadatasToCreate = async ({
               type: createFieldInput.type,
               options,
               defaultValue: commonFlatFieldMetadata.defaultValue as string, // Could this be improved ?
-              universalSettings: null,
+              universalSettings: isDefined(linkedField)
+                ? { linkedField }
+                : null,
             } satisfies UniversalFlatFieldMetadata<
               typeof createFieldInput.type
             >,

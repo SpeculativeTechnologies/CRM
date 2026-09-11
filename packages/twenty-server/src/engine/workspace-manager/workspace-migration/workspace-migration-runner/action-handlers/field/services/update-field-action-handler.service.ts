@@ -5,7 +5,7 @@ import {
   FieldMetadataType,
   RelationType,
 } from 'twenty-shared/types';
-import { isDefined } from 'twenty-shared/utils';
+import { getLinkedFieldReference, isDefined } from 'twenty-shared/utils';
 import { ColumnType, type QueryRunner } from 'typeorm';
 
 import { computeMorphOrRelationFieldJoinColumnName } from 'src/engine/metadata-modules/field-metadata/utils/compute-morph-or-relation-field-join-column-name.util';
@@ -188,6 +188,10 @@ export class UpdateFieldActionHandlerService extends WorkspaceMigrationRunnerAct
       flatEntityId: entityId,
       flatEntityMaps: flatFieldMetadataMaps,
     });
+
+    if (isDefined(getLinkedFieldReference(currentFlatFieldMetadata.settings))) {
+      return;
+    }
 
     const flatObjectMetadata = findFlatEntityByIdInFlatEntityMapsOrThrow({
       flatEntityMaps: flatObjectMetadataMaps,

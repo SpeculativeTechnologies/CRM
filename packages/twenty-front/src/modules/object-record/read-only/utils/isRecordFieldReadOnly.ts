@@ -12,7 +12,7 @@ import {
   type ObjectPermission,
 } from '~/generated-metadata/graphql';
 import { type ObjectPermissions } from 'twenty-shared/types';
-import { isDefined } from 'twenty-shared/utils';
+import { getLinkedFieldReference, isDefined } from 'twenty-shared/utils';
 
 type ObjectPermissionsByObjectMetadataId = Record<
   string,
@@ -77,6 +77,7 @@ export const isRecordFieldReadOnly = ({
     );
 
   return (
+    isDefined(getLinkedFieldReference(fieldMetadataItem.settings)) ||
     isRecordReadOnly ||
     isLabelIdentifierComputedByFormula ||
     isReadOnlyStandardFieldOnSystemObject ||

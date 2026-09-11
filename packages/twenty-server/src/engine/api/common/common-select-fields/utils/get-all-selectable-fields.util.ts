@@ -6,8 +6,10 @@ import {
   FieldMetadataType,
   RelationType,
   type RestrictedFieldsPermissions,
+  type ObjectsPermissions,
   compositeTypeDefinitions,
 } from 'twenty-shared/types';
+import { getLinkedFieldReference, isDefined } from 'twenty-shared/utils';
 
 import { computeMorphOrRelationFieldJoinColumnName } from 'src/engine/metadata-modules/field-metadata/utils/compute-morph-or-relation-field-join-column-name.util';
 import { isCompositeFieldMetadataType } from 'src/engine/metadata-modules/field-metadata/utils/is-composite-field-metadata-type.util';
@@ -24,11 +26,13 @@ type SelectableFieldsStructured = Record<
 
 export const getAllSelectableFields = ({
   restrictedFields,
+  objectsPermissions,
   flatObjectMetadata,
   flatFieldMetadataMaps,
   onlyUseLabelIdentifierFieldsInRelations = false,
 }: {
   restrictedFields: RestrictedFieldsPermissions;
+  objectsPermissions?: ObjectsPermissions;
   flatObjectMetadata: FlatObjectMetadata;
   flatFieldMetadataMaps: FlatEntityMaps<OrmFlatFieldMetadata>;
   onlyUseLabelIdentifierFieldsInRelations?: boolean;
@@ -42,6 +46,27 @@ export const getAllSelectableFields = ({
     });
 
     if (restrictedFields[flatField.id]?.canRead === false) continue;
+
+    const reference = getLinkedFieldReference(flatField.settings);
+    if (
+      isDefined(reference) &&
+      ![
+        reference.relationFieldMetadataUniversalIdentifier,
+        reference.sourceFieldMetadataUniversalIdentifier,
+      ].every((identifier) => {
+        const source = flatFieldMetadataMaps.byUniversalIdentifier[identifier];
+        if (!isDefined(source)) {
+          return false;
+        }
+        const permissions = objectsPermissions?.[source.objectMetadataId];
+        return (
+          permissions?.canReadObjectRecords &&
+          permissions.restrictedFields?.[source.id]?.canRead !== false
+        );
+      })
+    ) {
+      continue;
+    }
 
     if (onlyUseLabelIdentifierFieldsInRelations) {
       const fieldIsLabelIdentifier = checkIfFieldIsLabelIdentifier(

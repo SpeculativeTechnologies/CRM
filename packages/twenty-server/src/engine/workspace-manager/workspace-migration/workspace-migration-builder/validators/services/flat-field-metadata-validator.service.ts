@@ -15,6 +15,7 @@ import { isFlatFieldMetadataNameSyncedWithLabel } from 'src/engine/metadata-modu
 import { isMorphOrRelationUniversalFlatFieldMetadata } from 'src/engine/metadata-modules/flat-field-metadata/utils/is-morph-or-relation-flat-field-metadata.util';
 import { validateFlatFieldMetadataNameAvailability } from 'src/engine/metadata-modules/flat-field-metadata/validators/utils/validate-flat-field-metadata-name-availability.util';
 import { validateFlatFieldMetadataName } from 'src/engine/metadata-modules/flat-field-metadata/validators/utils/validate-flat-field-metadata-name.util';
+import { validateLinkedFieldDependencies } from 'src/engine/metadata-modules/flat-field-metadata/validators/utils/validate-linked-field-dependencies.util';
 import { UniversalFlatFieldMetadata } from 'src/engine/workspace-manager/workspace-migration/universal-flat-entity/types/universal-flat-field-metadata.type';
 import { FailedFlatEntityValidation } from 'src/engine/workspace-manager/workspace-migration/workspace-migration-builder/builders/types/failed-flat-entity-validation.type';
 import { getEmptyFlatEntityValidationError } from 'src/engine/workspace-manager/workspace-migration/workspace-migration-builder/builders/utils/get-flat-entity-validation-error.util';
@@ -68,6 +69,15 @@ export class FlatFieldMetadataValidatorService {
       ...existingFlatFieldMetadataToUpdate,
       ...flatEntityUpdate,
     };
+
+    validationResult.errors.push(
+      ...validateLinkedFieldDependencies({
+        before: existingFlatFieldMetadataToUpdate,
+        after: flatFieldMetadataToValidate,
+        fields: optimisticFlatFieldMetadataMaps,
+        objects: flatObjectMetadataMaps,
+      }),
+    );
 
     validationResult.flatEntityMinimalInformation = {
       ...validationResult.flatEntityMinimalInformation,
@@ -273,6 +283,14 @@ export class FlatFieldMetadataValidatorService {
 
     const parentObjectMetadataHasBeenDeleted = !isDefined(
       relatedFlatObjectMetadata,
+    );
+
+    validationResult.errors.push(
+      ...validateLinkedFieldDependencies({
+        before: flatFieldMetadataToDelete,
+        fields: optimisticFlatFieldMetadataMaps,
+        objects: flatObjectMetadataMaps,
+      }),
     );
 
     if (

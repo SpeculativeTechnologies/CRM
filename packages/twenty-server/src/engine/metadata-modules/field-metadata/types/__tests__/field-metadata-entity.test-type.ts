@@ -7,6 +7,7 @@ import {
   type FieldMetadataSettingsMapping,
   type FieldMetadataType,
   type NullablePartial,
+  type LinkedFieldMetadataSettings,
 } from 'twenty-shared/types';
 import { type Relation as TypeOrmRelation } from 'typeorm';
 
@@ -109,7 +110,7 @@ type RelationAssertions = [
 ];
 
 type NotDefinedSettings = {
-  settings: never | null;
+  settings: JsonbProperty<LinkedFieldMetadataSettings> | null;
 };
 
 // oxlint-disable-next-line unused-imports/no-unused-vars
@@ -118,7 +119,7 @@ type SettingsAssertions = [
   Expect<HasAllProperties<RatingFieldMetadata, NotDefinedSettings>>,
   Expect<HasAllProperties<SelectFieldMetadata, NotDefinedSettings>>,
   Expect<HasAllProperties<MultiSelectFieldMetadata, NotDefinedSettings>>,
-  Expect<HasAllProperties<PositionFieldMetadata, NotDefinedSettings>>,
+  Expect<HasAllProperties<PositionFieldMetadata, { settings: null }>>,
   Expect<HasAllProperties<RawJsonFieldMetadata, NotDefinedSettings>>,
   Expect<HasAllProperties<ActorFieldMetadata, NotDefinedSettings>>,
   Expect<HasAllProperties<UUIDFieldMetadata, NotDefinedSettings>>,

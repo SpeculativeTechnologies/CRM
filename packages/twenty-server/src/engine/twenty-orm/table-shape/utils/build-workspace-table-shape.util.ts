@@ -1,5 +1,5 @@
 import { compositeTypeDefinitions } from 'twenty-shared/types';
-import { isDefined } from 'twenty-shared/utils';
+import { getLinkedFieldReference, isDefined } from 'twenty-shared/utils';
 
 import { getFlatFieldsFromFlatObjectMetadata } from 'src/engine/api/graphql/workspace-schema-builder/utils/get-flat-fields-for-flat-object-metadata.util';
 import { RelationType } from 'src/engine/metadata-modules/field-metadata/interfaces/relation-type.interface';
@@ -40,6 +40,27 @@ export const buildWorkspaceTableShape = ({
   const relationShapeByFieldName: Record<string, WorkspaceRelationShape> = {};
 
   for (const flatFieldMetadata of flatFieldMetadatas) {
+    const linkedField = getLinkedFieldReference(flatFieldMetadata.settings);
+    const linkedRelation = isDefined(linkedField)
+      ? flatFieldMetadataMaps.byUniversalIdentifier[
+          linkedField.relationFieldMetadataUniversalIdentifier
+        ]
+      : undefined;
+    const linkedSource = isDefined(linkedField)
+      ? flatFieldMetadataMaps.byUniversalIdentifier[
+          linkedField.sourceFieldMetadataUniversalIdentifier
+        ]
+      : undefined;
+
+    if (
+      isDefined(linkedField) &&
+      (!isDefined(linkedRelation) || !isDefined(linkedSource))
+    ) {
+      throw new TwentyOrmException(
+        'Linked field source is missing',
+        TwentyOrmExceptionCode.UNKNOWN_COLUMN,
+      );
+    }
     if (isMorphOrRelationFlatFieldMetadata(flatFieldMetadata)) {
       const relationType = flatFieldMetadata.settings?.relationType;
 
@@ -101,6 +122,17 @@ export const buildWorkspaceTableShape = ({
           fieldName: flatFieldMetadata.name,
           fieldMetadataType: compositeProperty.type,
           compositeParentFieldName: flatFieldMetadata.name,
+          ...(isDefined(linkedRelation) && isDefined(linkedSource)
+            ? {
+                linkedColumn: {
+                  relationFieldName: linkedRelation.name,
+                  sourceColumnName: computeCompositeColumnName(
+                    linkedSource.name,
+                    compositeProperty,
+                  ),
+                },
+              }
+            : {}),
         };
       }
 
@@ -112,6 +144,14 @@ export const buildWorkspaceTableShape = ({
       fieldMetadataId: flatFieldMetadata.id,
       fieldName: flatFieldMetadata.name,
       fieldMetadataType: flatFieldMetadata.type,
+      ...(isDefined(linkedRelation) && isDefined(linkedSource)
+        ? {
+            linkedColumn: {
+              relationFieldName: linkedRelation.name,
+              sourceColumnName: linkedSource.name,
+            },
+          }
+        : {}),
     };
   }
 

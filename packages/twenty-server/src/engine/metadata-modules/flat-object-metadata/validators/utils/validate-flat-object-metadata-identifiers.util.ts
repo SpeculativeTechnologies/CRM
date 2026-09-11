@@ -1,5 +1,6 @@
 import { msg } from '@lingui/core/macro';
 import {
+  getLinkedFieldReference,
   isDefined,
   isLabelIdentifierFieldMetadataTypes,
   isSearchableFieldType,
@@ -45,7 +46,10 @@ export const validateFlatObjectMetadataIdentifiers = ({
         userFriendlyMessage: msg`Field declared as label identifier not found`,
       });
     } else if (
-      !isLabelIdentifierFieldMetadataTypes(universalFlatFieldMetadata.type)
+      !isLabelIdentifierFieldMetadataTypes(universalFlatFieldMetadata.type) ||
+      isDefined(
+        getLinkedFieldReference(universalFlatFieldMetadata.universalSettings),
+      )
     ) {
       errors.push({
         code: ObjectMetadataExceptionCode.INVALID_OBJECT_INPUT,
@@ -76,6 +80,19 @@ export const validateFlatObjectMetadataIdentifiers = ({
         message:
           'imageIdentifierFieldMetadataUniversalIdentifier validation failed: related field metadata not found',
         userFriendlyMessage: msg`Field declared as image identifier not found`,
+      });
+    }
+    if (
+      isDefined(
+        getLinkedFieldReference(
+          relatedUniversalFlatFieldMetadata?.universalSettings,
+        ),
+      )
+    ) {
+      errors.push({
+        code: ObjectMetadataExceptionCode.INVALID_OBJECT_INPUT,
+        message: 'Linked fields cannot be object identifiers',
+        userFriendlyMessage: msg`Choose a stored field as the object identifier.`,
       });
     }
   }

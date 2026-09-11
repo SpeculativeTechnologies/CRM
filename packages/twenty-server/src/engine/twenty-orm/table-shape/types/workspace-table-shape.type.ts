@@ -8,6 +8,10 @@ export type WorkspaceColumnShape = {
   fieldName: string;
   fieldMetadataType: FieldMetadataType;
   compositeParentFieldName?: string;
+  linkedColumn?: {
+    relationFieldName: string;
+    sourceColumnName: string;
+  };
 };
 
 export type WorkspaceRelationShape = {

@@ -24,6 +24,7 @@ import { type MutationKind } from 'src/engine/twenty-orm/sql/utils/build-mutatio
 import { buildOrderByClauses } from 'src/engine/twenty-orm/sql/utils/build-order-by-clauses.util';
 import { collectReferencedColumnNames } from 'src/engine/twenty-orm/sql/utils/collect-referenced-column-names.util';
 import { compileNamedParameters } from 'src/engine/twenty-orm/sql/utils/compile-named-parameters.util';
+import { mapQualifiedColumnReferences } from 'src/engine/twenty-orm/sql/utils/map-qualified-column-references.util';
 import {
   RESERVED_PARAMETER_NAMES,
   buildCountStatement,
@@ -96,6 +97,14 @@ export class WorkspaceSelectQueryBuilder implements WhereExpressionLike {
   private includeDeleted = false;
   private explicitSelection?: string[];
   private readonly aliasesWithRowLevelPermissionApplied = new Set<string>();
+  private readonly linkedColumnReferences = new Map<
+    string,
+    {
+      sourceAlias: string;
+      sourceColumnName: string;
+      relationColumnName: string;
+    }
+  >();
 
   constructor(alias: string, context: QueryBuilderContext) {
     this.alias = alias;
@@ -140,6 +149,9 @@ export class WorkspaceSelectQueryBuilder implements WhereExpressionLike {
     cloned.distinctOnExpressions = [...this.distinctOnExpressions];
     cloned.parameters = { ...this.parameters };
     cloned.findOptions = { ...this.findOptions };
+    for (const [key, reference] of this.linkedColumnReferences) {
+      cloned.linkedColumnReferences.set(key, { ...reference });
+    }
     cloned.limitValue = this.limitValue;
     cloned.offsetValue = this.offsetValue;
     cloned.includeDeleted = this.includeDeleted;
@@ -454,6 +466,12 @@ export class WorkspaceSelectQueryBuilder implements WhereExpressionLike {
     this.joinClauses.push({
       alias,
       parentAlias,
+      existsScopeAlias: this.existsFilterClauses.some(
+        (filter) => filter.alias === parentAlias,
+      )
+        ? parentAlias
+        : this.joinClauses.find((join) => join.alias === parentAlias)
+            ?.existsScopeAlias,
       relationFieldName,
       targetTableShape,
       relationType: relationShape.relationType,
@@ -485,8 +503,7 @@ export class WorkspaceSelectQueryBuilder implements WhereExpressionLike {
       return this.tableShape;
     }
 
-    return this.joinClauses.find((joinClause) => joinClause.alias === alias)
-      ?.targetTableShape;
+    return this.getJoinedTableShape(alias);
   }
 
   private resolveColumnSelections(): ColumnSelection[] {
@@ -573,10 +590,12 @@ export class WorkspaceSelectQueryBuilder implements WhereExpressionLike {
   }
 
   getQuery(): string {
+    this.applyRowLevelPermissions();
     return this.buildSelectStatement().sql;
   }
 
   getQueryAndParameters(): [string, unknown[]] {
+    this.applyRowLevelPermissions();
     const { sql, parameters } = this.buildSelectStatement();
     const compiled = compileNamedParameters(sql, parameters);
 
@@ -664,18 +683,22 @@ export class WorkspaceSelectQueryBuilder implements WhereExpressionLike {
   }
 
   applyRowLevelPermissions(): this {
+    this.prepareLinkedFields();
     this.context.onBeforeExecute(this);
 
     return this;
   }
 
   async getCount(): Promise<number> {
-    this.context.onBeforeExecute(this);
+    const countQuery = this.clone().select([]);
+    countQuery.applyRowLevelPermissions();
 
-    const sql = buildCountStatement(
-      this.toSelectStatementState({ allowPlainToManyJoins: true }),
+    const sql = countQuery.resolveLinkedColumns(
+      buildCountStatement(
+        countQuery.toSelectStatementState({ allowPlainToManyJoins: true }),
+      ),
     );
-    const compiled = compileNamedParameters(sql, this.parameters);
+    const compiled = compileNamedParameters(sql, countQuery.parameters);
     const rows = await this.context.executor.execute(compiled);
 
     return Number(rows[0]?.count ?? 0);
@@ -723,7 +746,7 @@ export class WorkspaceSelectQueryBuilder implements WhereExpressionLike {
     const state = this.toSelectStatementState();
     const aliases = collectStatementAliases(state);
 
-    return collectReferencedColumnNames({
+    const referencedColumns = collectReferencedColumnNames({
       mainAlias: this.alias,
       mainAliasColumnNames: this.buildProjection().mainAliasColumnNames,
       extraSelectClauses: this.extraSelectClauses.map((selectClause) => ({
@@ -751,6 +774,100 @@ export class WorkspaceSelectQueryBuilder implements WhereExpressionLike {
         })),
       distinctOnExpressions: this.distinctOnExpressions,
     });
+
+    // A linked field requires access to the destination field, its relationship,
+    // and the source field, even when used only in a filter or aggregate.
+    mapQualifiedColumnReferences(
+      buildSelectStatement({ ...state, allowPlainToManyJoins: true }),
+      (alias, columnName) => {
+        const reference = this.linkedColumnReferences.get(
+          quoteColumn(alias, columnName),
+        );
+        if (isDefined(reference)) {
+          referencedColumns[alias] = [
+            ...new Set([
+              ...(referencedColumns[alias] ?? []),
+              columnName,
+              reference.relationColumnName,
+            ]),
+          ];
+          referencedColumns[reference.sourceAlias] = [
+            ...new Set([
+              ...(referencedColumns[reference.sourceAlias] ?? []),
+              reference.sourceColumnName,
+            ]),
+          ];
+        }
+        return undefined;
+      },
+    );
+
+    return referencedColumns;
+  }
+
+  prepareLinkedFields(): void {
+    const sql = buildSelectStatement(
+      this.toSelectStatementState({ allowPlainToManyJoins: true }),
+    );
+
+    mapQualifiedColumnReferences(sql, (alias, columnName) => {
+      const key = quoteColumn(alias, columnName);
+      if (this.linkedColumnReferences.has(key)) {
+        return undefined;
+      }
+      const tableShape = this.getTableShapeForAlias(alias);
+      const linkedColumn =
+        tableShape?.columnShapeByColumnName[columnName]?.linkedColumn;
+      if (!isDefined(linkedColumn) || !isDefined(tableShape)) {
+        return undefined;
+      }
+      let sourceAlias = this.joinClauses.find(
+        (join) =>
+          join.isLinkedFieldJoin &&
+          join.parentAlias === alias &&
+          join.relationFieldName === linkedColumn.relationFieldName,
+      )?.alias;
+      if (!isDefined(sourceAlias)) {
+        let index = this.joinClauses.length;
+        do {
+          sourceAlias = `__linked_${index++}`;
+        } while (
+          sourceAlias === this.alias ||
+          this.getJoinAliases().some((join) => join.name === sourceAlias)
+        );
+        this.leftJoin(
+          `${alias}.${linkedColumn.relationFieldName}`,
+          sourceAlias,
+        );
+        this.joinClauses[this.joinClauses.length - 1].isLinkedFieldJoin = true;
+      }
+      const relationColumnName =
+        tableShape.relationShapeByFieldName[linkedColumn.relationFieldName]
+          ?.joinColumnName;
+      if (!isDefined(relationColumnName)) {
+        throw new TwentyOrmException(
+          'Linked fields require a to-one relation',
+          TwentyOrmExceptionCode.UNKNOWN_RELATION,
+        );
+      }
+      this.linkedColumnReferences.set(key, {
+        sourceAlias,
+        sourceColumnName: linkedColumn.sourceColumnName,
+        relationColumnName,
+      });
+      return undefined;
+    });
+  }
+
+  private resolveLinkedColumns(sql: string): string {
+    return mapQualifiedColumnReferences(sql, (alias, columnName) => {
+      const reference = this.linkedColumnReferences.get(
+        quoteColumn(alias, columnName),
+      );
+      return isDefined(reference)
+        ? quoteColumn(reference.sourceAlias, reference.sourceColumnName)
+        : undefined;
+    });
   }
 
   getSelectedColumnNames(): string[] {
@@ -776,7 +893,30 @@ export class WorkspaceSelectQueryBuilder implements WhereExpressionLike {
   private toMutationQueryBuilder(
     kind: MutationKind,
   ): WorkspaceMutationQueryBuilder {
-    if (this.joinClauses.length > 0) {
+    const filteredQuery = this.clone().select(['id']);
+    filteredQuery.prepareLinkedFields();
+
+    if (filteredQuery.linkedColumnReferences.size > 0) {
+      const sql = filteredQuery.getQuery();
+      return new WorkspaceMutationQueryBuilder({
+        alias: this.alias,
+        kind,
+        context: {
+          tableShape: this.tableShape,
+          executor: this.context.executor,
+          formatResult: this.context.formatResult,
+        },
+        whereClauses: [
+          {
+            operator: 'and',
+            sql: `${quoteColumn(this.alias, 'id')} IN (${sql})`,
+          },
+        ],
+        parameters: filteredQuery.getParameters(),
+      });
+    }
+
+    if (this.joinClauses.some((join) => !join.isLinkedFieldJoin)) {
       throw new TwentyOrmException(
         `A mutation cannot carry a relation join; rewrite the filter as an "id IN (subquery)" predicate first`,
         TwentyOrmExceptionCode.UNSUPPORTED_OPERATION,
@@ -1174,7 +1314,7 @@ export class WorkspaceSelectQueryBuilder implements WhereExpressionLike {
   private async executeSelect(options?: {
     allowPlainToManyJoins?: boolean;
   }): Promise<Record<string, unknown>[]> {
-    this.context.onBeforeExecute(this);
+    this.applyRowLevelPermissions();
 
     const { sql, parameters } = this.buildSelectStatement(options);
     const compiled = compileNamedParameters(sql, parameters);
@@ -1189,7 +1329,7 @@ export class WorkspaceSelectQueryBuilder implements WhereExpressionLike {
     const state = this.toSelectStatementState(options);
 
     return {
-      sql: buildSelectStatement(state),
+      sql: this.resolveLinkedColumns(buildSelectStatement(state)),
       parameters: { ...this.parameters, ...buildPaginationParameters(state) },
     };
   }

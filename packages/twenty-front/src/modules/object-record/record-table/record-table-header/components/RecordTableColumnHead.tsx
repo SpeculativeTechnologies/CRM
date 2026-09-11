@@ -3,6 +3,7 @@ import { type MouseEvent, useContext } from 'react';
 
 import { fieldMetadataItemByIdSelector } from '@/object-metadata/states/fieldMetadataItemByIdSelector';
 import { type RecordField } from '@/object-record/record-field/types/RecordField';
+import { LinkedFieldSourceIndicator } from '@/object-record/record-field/ui/components/LinkedFieldSourceIndicator';
 import { RECORD_TABLE_CELL_CONTENT_CLASS_NAME } from '@/object-record/record-table/constants/RecordTableCellContentClassName';
 import { useAtomFamilySelectorValue } from '@/ui/utilities/state/jotai/hooks/useAtomFamilySelectorValue';
 import { useIcons } from 'twenty-ui/icon';
@@ -67,6 +68,9 @@ export const RecordTableColumnHead = ({
       <StyledText>
         {correspondingFieldMetadataItem.foundFieldMetadataItem?.label}
       </StyledText>
+      <LinkedFieldSourceIndicator
+        fieldMetadataId={recordField.fieldMetadataItemId}
+      />
     </StyledTitle>
   );
 };
