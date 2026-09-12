@@ -233,10 +233,11 @@ export class MessagingSaveMessagesAndEnqueueContactCreationService {
 
   // Attribution runs on the email queue rather than inline: the campaign lookup
   // is unrelated to importing the message, and must not fail the import.
-  private async enqueueCampaignReplyAttribution(
+  async enqueueCampaignReplyAttribution(
     messagesToSave: MessageWithParticipants[],
     messageExternalIdToMessageThreadIdMap: Map<string, string>,
     workspaceId: string,
+    messageChannelId?: string,
   ): Promise<void> {
     // Building the payload sits inside the boundary with the enqueue: this runs
     // on every imported message of every mailbox sync, and campaign bookkeeping
@@ -245,6 +246,7 @@ export class MessagingSaveMessagesAndEnqueueContactCreationService {
       const replies = buildCampaignReplyAttributions(
         messagesToSave,
         messageExternalIdToMessageThreadIdMap,
+        messageChannelId,
       );
 
       if (replies.length === 0) {

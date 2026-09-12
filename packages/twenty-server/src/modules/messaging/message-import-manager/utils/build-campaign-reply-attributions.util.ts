@@ -17,6 +17,7 @@ import { isAutoReplyMessage } from 'src/modules/messaging/message-import-manager
 export const buildCampaignReplyAttributions = (
   messages: MessageWithParticipants[],
   messageThreadIdByMessageExternalId?: Map<string, string>,
+  messageChannelId?: string,
 ): CampaignReplyAttribution[] =>
   messages.flatMap((message) => {
     if (message.direction !== MessageDirection.INCOMING || message.isDraft) {
@@ -46,6 +47,13 @@ export const buildCampaignReplyAttributions = (
         replyHeaderMessageIds,
         senderHandle,
         ...(isNonEmptyString(messageThreadId) ? { messageThreadId } : {}),
+        ...(isNonEmptyString(messageChannelId) &&
+        isNonEmptyString(message.messageThreadExternalId)
+          ? {
+              messageChannelId,
+              messageThreadExternalId: message.messageThreadExternalId,
+            }
+          : {}),
         ...(message.receivedAt instanceof Date
           ? { receivedAt: message.receivedAt.toISOString() }
           : {}),

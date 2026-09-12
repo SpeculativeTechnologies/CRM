@@ -7,6 +7,10 @@ export type CampaignReplyAttribution = {
   // into is what still connects the two. Serialized as ISO because job payloads
   // are JSON.
   messageThreadId?: string;
+  // Internal replies may be excluded from storage. Resolve their thread through
+  // the sent message's association, scoped to the mailbox that fetched them.
+  messageChannelId?: string;
+  messageThreadExternalId?: string;
   receivedAt?: string;
 };
 

@@ -209,6 +209,30 @@ export class MessagingMessagesImportService {
             );
           }
 
+          // Internal conversations can stay private while a reply to an
+          // explicitly sent campaign still contributes to its reply count.
+          // Apply every other import exclusion, including the user's blocklist.
+          if (!workspace?.isInternalMessagesImportEnabled) {
+            const savedExternalIds = new Set(
+              messagesToSave.map(({ externalId }) => externalId),
+            );
+            const internalMessages = filterEmails(
+              messageChannel.handle,
+              [...connectedAccount.handleAliases],
+              allMessages,
+              blocklist.map(({ handle }) => handle).filter(isDefined),
+              messageChannel.excludeGroupEmails,
+              true,
+            ).filter(({ externalId }) => !savedExternalIds.has(externalId));
+
+            await this.saveMessagesAndEnqueueContactCreationService.enqueueCampaignReplyAttribution(
+              internalMessages,
+              new Map(),
+              workspaceId,
+              messageChannel.id,
+            );
+          }
+
           if (messageIdsToFetch.length < messagesGetBatchSize) {
             await this.messageChannelSyncStatusService.markAsMessageSyncCompleted(
               [messageChannel.id],

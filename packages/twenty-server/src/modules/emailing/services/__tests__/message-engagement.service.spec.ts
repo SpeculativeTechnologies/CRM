@@ -2,6 +2,7 @@ import { MessageParticipantRole } from 'twenty-shared/types';
 import { In, IsNull, Not } from 'typeorm';
 
 import { MessageParticipantWorkspaceEntity } from 'src/modules/messaging/common/standard-objects/message-participant.workspace-entity';
+import { MessageChannelMessageAssociationWorkspaceEntity } from 'src/modules/messaging/common/standard-objects/message-channel-message-association.workspace-entity';
 
 import { type WorkspaceOrmManager } from 'src/engine/twenty-orm/workspace-orm.manager';
 import { type MessageCampaignStatisticsService } from 'src/modules/emailing/services/message-campaign-statistics.service';
@@ -21,6 +22,7 @@ describe('MessageEngagementService', () => {
   let findParticipantsMock: jest.Mock;
   let findOneParticipantMock: jest.Mock;
   let scheduleMock: jest.Mock;
+  let findAssociationsMock: jest.Mock;
 
   beforeEach(() => {
     findOneMock = jest
@@ -31,17 +33,20 @@ describe('MessageEngagementService', () => {
     findOneParticipantMock = jest.fn().mockResolvedValue(null);
     updateMock = jest.fn().mockResolvedValue(undefined);
     scheduleMock = jest.fn().mockResolvedValue(undefined);
+    findAssociationsMock = jest.fn().mockResolvedValue([]);
 
     const workspaceOrmManager = {
       executeInWorkspaceContext: (work: () => Promise<void>) => work(),
       getRepository: (entity: unknown) =>
         entity === MessageParticipantWorkspaceEntity
           ? { find: findParticipantsMock, findOne: findOneParticipantMock }
-          : {
-              findOne: findOneMock,
-              find: findMock,
-              update: updateMock,
-            },
+          : entity === MessageChannelMessageAssociationWorkspaceEntity
+            ? { find: findAssociationsMock }
+            : {
+                findOne: findOneMock,
+                find: findMock,
+                update: updateMock,
+              },
     } as unknown as WorkspaceOrmManager;
 
     service = new MessageEngagementService(workspaceOrmManager, {
@@ -195,7 +200,6 @@ describe('MessageEngagementService', () => {
         where: {
           headerMessageId: In(replyArgs.replyHeaderMessageIds),
           messageCampaignId: Not(IsNull()),
-          repliedAt: IsNull(),
         },
       });
       expect(updateMock).toHaveBeenCalledWith(
@@ -307,7 +311,6 @@ describe('MessageEngagementService', () => {
           where: {
             messageThreadId: THREAD_ID,
             messageCampaignId: Not(IsNull()),
-            repliedAt: IsNull(),
           },
           order: { receivedAt: 'DESC' },
         });
@@ -374,6 +377,109 @@ describe('MessageEngagementService', () => {
 
         expect(findMock).toHaveBeenCalledTimes(1);
         expect(updateMock).not.toHaveBeenCalled();
+      });
+
+      it('attributes a reply excluded from storage using the mailbox provider thread', async () => {
+        inThread({ id: MESSAGE_ID, receivedAt: SENT_AT });
+        addressTo(MESSAGE_ID);
+        findAssociationsMock.mockResolvedValue([
+          { message: { messageThreadId: THREAD_ID } },
+        ]);
+
+        await service.recordReply({
+          ...replyArgs,
+          receivedAt: REPLY_RECEIVED_AT,
+          messageChannelId: 'mailbox-1',
+          messageThreadExternalId: 'provider-thread-1',
+        });
+
+        expect(findAssociationsMock).toHaveBeenCalledWith(
+          expect.objectContaining({
+            where: {
+              messageChannelId: 'mailbox-1',
+              messageThreadExternalId: 'provider-thread-1',
+            },
+          }),
+        );
+        expect(updateMock).toHaveBeenCalledWith(
+          { id: MESSAGE_ID, repliedAt: IsNull() },
+          { repliedAt: new Date(REPLY_RECEIVED_AT) },
+        );
+        expect(scheduleMock).toHaveBeenCalledWith({
+          workspaceId: WORKSPACE_ID,
+          campaignId: CAMPAIGN_ID,
+        });
+      });
+
+      it('does not resolve a provider thread without a mailbox scope', async () => {
+        await service.recordReply({
+          ...replyArgs,
+          messageThreadExternalId: 'provider-thread-1',
+        });
+
+        expect(findAssociationsMock).not.toHaveBeenCalled();
+        expect(updateMock).not.toHaveBeenCalled();
+      });
+
+      it('does not count a provider thread that has no stored sent message', async () => {
+        await service.recordReply({
+          ...replyArgs,
+          messageChannelId: 'mailbox-1',
+          messageThreadExternalId: 'unrelated-thread',
+        });
+
+        expect(updateMock).not.toHaveBeenCalled();
+      });
+
+      it('handles database timestamps returned as strings', async () => {
+        inThread({
+          id: MESSAGE_ID,
+          receivedAt: SENT_AT.toISOString() as unknown as Date,
+        });
+        addressTo(MESSAGE_ID);
+
+        await service.recordReply(threadReplyArgs);
+
+        expect(updateMock).toHaveBeenCalledWith(
+          { id: MESSAGE_ID, repliedAt: IsNull() },
+          { repliedAt: new Date(REPLY_RECEIVED_AT) },
+        );
+      });
+
+      it('does not attribute a repeat reply to an older unanswered campaign', async () => {
+        findMock.mockImplementation(async ({ where }) =>
+          'messageThreadId' in where
+            ? [
+                ...('repliedAt' in where
+                  ? []
+                  : [
+                      {
+                        id: MESSAGE_ID,
+                        receivedAt: SENT_AT,
+                        repliedAt: new Date(REPLY_RECEIVED_AT),
+                        messageCampaignId: CAMPAIGN_ID,
+                      },
+                    ]),
+                {
+                  id: ANCESTOR_MESSAGE_ID,
+                  receivedAt: new Date('2026-08-01'),
+                  repliedAt: null,
+                  messageCampaignId: 'older-campaign',
+                },
+              ]
+            : [],
+        );
+        addressTo(MESSAGE_ID, ANCESTOR_MESSAGE_ID);
+
+        await service.recordReply(threadReplyArgs);
+
+        expect(updateMock).toHaveBeenCalledWith(
+          { id: MESSAGE_ID, repliedAt: IsNull() },
+          { repliedAt: new Date(REPLY_RECEIVED_AT) },
+        );
+        expect(scheduleMock).not.toHaveBeenCalledWith(
+          expect.objectContaining({ campaignId: 'older-campaign' }),
+        );
       });
     });
   });

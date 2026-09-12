@@ -9,6 +9,7 @@ import { buildSystemAuthContext } from 'src/engine/twenty-orm/utils/build-system
 import { WorkspaceOrmManager } from 'src/engine/twenty-orm/workspace-orm.manager';
 import { MessageCampaignStatisticsService } from 'src/modules/emailing/services/message-campaign-statistics.service';
 import { MessageParticipantWorkspaceEntity } from 'src/modules/messaging/common/standard-objects/message-participant.workspace-entity';
+import { MessageChannelMessageAssociationWorkspaceEntity } from 'src/modules/messaging/common/standard-objects/message-channel-message-association.workspace-entity';
 import { MessageWorkspaceEntity } from 'src/modules/messaging/common/standard-objects/message.workspace-entity';
 
 type RecordEngagementArgs = {
@@ -23,6 +24,8 @@ type RecordReplyArgs = {
   replyHeaderMessageIds: string[];
   senderHandle: string;
   messageThreadId?: string;
+  messageChannelId?: string;
+  messageThreadExternalId?: string;
   receivedAt?: string;
 };
 
@@ -43,14 +46,15 @@ export class MessageEngagementService {
     await this.record(args, { isClick: true });
   }
 
-  // The reply itself is imported as its own message; this only stamps the
-  // campaign message it answers, so the count stays one per recipient however
-  // many times they write back.
+  // Only stamp the sent campaign message. A reply can be excluded from message
+  // storage, and repeated replies still count once per recipient.
   async recordReply({
     workspaceId,
     replyHeaderMessageIds,
     senderHandle,
     messageThreadId,
+    messageChannelId,
+    messageThreadExternalId,
     receivedAt,
   }: RecordReplyArgs): Promise<void> {
     const normalizedSenderHandle = senderHandle.trim().toLowerCase();
@@ -63,6 +67,10 @@ export class MessageEngagementService {
       ? new Date(receivedAt)
       : new Date();
 
+    if (Number.isNaN(repliedAt.getTime())) {
+      return;
+    }
+
     await this.workspaceOrmManager.executeInWorkspaceContext(async () => {
       const message =
         (await this.findRepliedCampaignMessageByHeader({
@@ -70,7 +78,12 @@ export class MessageEngagementService {
           senderHandle: normalizedSenderHandle,
         })) ??
         (await this.findRepliedCampaignMessageByThread({
-          messageThreadId,
+          messageThreadId:
+            messageThreadId ??
+            (await this.findCampaignReplyThreadId(
+              messageChannelId,
+              messageThreadExternalId,
+            )),
           senderHandle: normalizedSenderHandle,
           repliedAt,
         }));
@@ -117,9 +130,11 @@ export class MessageEngagementService {
       where: {
         headerMessageId: In(replyHeaderMessageIds),
         messageCampaignId: Not(IsNull()),
-        repliedAt: IsNull(),
       },
     });
+
+    // Include already-replied messages when choosing a target. Otherwise a
+    // retry or second reply can fall through to an older campaign ancestor.
 
     if (candidateMessages.length === 0) {
       return null;
@@ -176,7 +191,6 @@ export class MessageEngagementService {
       where: {
         messageThreadId,
         messageCampaignId: Not(IsNull()),
-        repliedAt: IsNull(),
       },
       order: { receivedAt: 'DESC' },
     });
@@ -197,9 +211,39 @@ export class MessageEngagementService {
         (campaignMessage) =>
           recipientMessageIds.has(campaignMessage.id) &&
           isDefined(campaignMessage.receivedAt) &&
-          campaignMessage.receivedAt < repliedAt,
+          new Date(campaignMessage.receivedAt).getTime() < repliedAt.getTime(),
       ) ?? null
     );
+  }
+
+  private async findCampaignReplyThreadId(
+    messageChannelId?: string,
+    messageThreadExternalId?: string,
+  ): Promise<string | undefined> {
+    if (
+      !isNonEmptyString(messageChannelId) ||
+      !isNonEmptyString(messageThreadExternalId)
+    ) {
+      return undefined;
+    }
+
+    const associationRepository = this.workspaceOrmManager.getRepository(
+      MessageChannelMessageAssociationWorkspaceEntity,
+      { shouldBypassPermissionChecks: true },
+    );
+    const associations = await associationRepository.find({
+      where: { messageChannelId, messageThreadExternalId },
+      relations: { message: true },
+    });
+    const threadIds = [
+      ...new Set(
+        associations
+          .map(({ message }) => message?.messageThreadId)
+          .filter(isNonEmptyString),
+      ),
+    ];
+
+    return threadIds.length === 1 ? threadIds[0] : undefined;
   }
 
   private async findMessageIdsAddressedTo({

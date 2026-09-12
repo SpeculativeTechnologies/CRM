@@ -22,6 +22,8 @@ export class AttributeCampaignReplyJob {
         replyHeaderMessageIds: reply.replyHeaderMessageIds,
         senderHandle: reply.senderHandle,
         messageThreadId: reply.messageThreadId,
+        messageChannelId: reply.messageChannelId,
+        messageThreadExternalId: reply.messageThreadExternalId,
         receivedAt: reply.receivedAt,
       });
     }
