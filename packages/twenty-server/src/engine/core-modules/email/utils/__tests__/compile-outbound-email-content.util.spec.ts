@@ -188,6 +188,27 @@ describe('compileOutboundEmailContent', () => {
     expect(html).toContain('<table role="presentation">');
   });
 
+  it('should strip unsafe CSS from raw HTML while retaining its email formatting', async () => {
+    const html = await compileDocument({
+      type: 'doc',
+      content: [
+        {
+          type: 'html',
+          attrs: {
+            html: '<p style="color:#1961ed;padding:12px;position:fixed;background:url(https://tracker.example/pixel);width:expression(alert(1))">Campaign text</p>',
+          },
+        },
+      ],
+    });
+
+    expect(html).toContain(
+      '<p style="color:#1961ed;padding:12px">Campaign text</p>',
+    );
+    expect(html).not.toContain('position:fixed');
+    expect(html).not.toContain('tracker.example');
+    expect(html).not.toContain('expression(');
+  });
+
   it('should wrap linked images in an anchor', async () => {
     const html = await compileDocument({
       type: 'doc',
