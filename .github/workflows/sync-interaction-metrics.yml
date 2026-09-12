@@ -1,0 +1,60 @@
+name: Sync interaction metrics
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Target environment
+        type: choice
+        options: [staging, production]
+        default: staging
+        required: true
+      apply:
+        description: Create/update CRM fields (false is a dry run)
+        type: boolean
+        default: false
+      full:
+        description: Recompute every Person
+        type: boolean
+        default: true
+  schedule:
+    - cron: '17 3 * * *'
+    - cron: '47 4 * * 0'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: interaction-metrics-${{ github.event_name == 'workflow_dispatch' && inputs.environment || 'production' }}
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    if: github.event_name == 'workflow_dispatch' || vars.INTERACTION_METRICS_SYNC_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    environment: ${{ github.event_name == 'workflow_dispatch' && inputs.environment || 'production' }}
+    timeout-minutes: 45
+    env:
+      TWENTY_API_URL: ${{ vars.TWENTY_API_URL }}
+      TWENTY_API_KEY: ${{ secrets.TWENTY_API_KEY }}
+      CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+      CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+      - uses: actions/setup-python@e797f83bcb11b83ae66e0230d6156d7c80228e7c
+        with:
+          python-version: '3.13'
+      - name: Unit tests
+        working-directory: deploy/interaction-metrics
+        run: python -m unittest -v
+      - name: Sync metrics
+        shell: bash
+        run: |
+          args=()
+          if [[ "${{ github.event_name }}" == "schedule" || "${{ inputs.apply }}" == "true" ]]; then
+            args+=(--apply --provision)
+          fi
+          if [[ "${{ github.event.schedule }}" == "47 4 * * 0" || "${{ inputs.full }}" == "true" ]]; then
+            args+=(--all)
+          fi
+          python deploy/interaction-metrics/sync_interaction_metrics.py "${args[@]}"
