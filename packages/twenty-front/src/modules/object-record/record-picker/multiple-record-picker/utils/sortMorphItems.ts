@@ -3,8 +3,8 @@ import { type SearchRecord } from '~/generated/graphql';
 
 // Picked and unpicked records arrive from two separate search queries, so
 // their concatenation order would always list picked records first. Rank
-// every item with the ordering the search API applies (relevance, then id)
-// so a checked record stays where it would naturally appear in the results.
+// every item by search relevance instead, then alphabetically, so a checked
+// record stays where it would naturally appear among the results.
 const compareSearchRecords = (a: SearchRecord, b: SearchRecord): number => {
   if (a.tsRankCD !== b.tsRankCD) {
     return b.tsRankCD - a.tsRankCD;
@@ -12,6 +12,22 @@ const compareSearchRecords = (a: SearchRecord, b: SearchRecord): number => {
 
   if (a.tsRank !== b.tsRank) {
     return b.tsRank - a.tsRank;
+  }
+
+  // Records without a label render as a placeholder, so keep them last.
+  if (a.label === '' || b.label === '') {
+    if (a.label === b.label) return a.recordId < b.recordId ? -1 : 1;
+
+    return a.label === '' ? 1 : -1;
+  }
+
+  const labelComparison = a.label.localeCompare(b.label, undefined, {
+    sensitivity: 'base',
+    numeric: true,
+  });
+
+  if (labelComparison !== 0) {
+    return labelComparison;
   }
 
   if (a.recordId === b.recordId) {

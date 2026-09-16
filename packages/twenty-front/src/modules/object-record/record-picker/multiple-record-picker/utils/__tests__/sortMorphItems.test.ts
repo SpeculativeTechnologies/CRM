@@ -14,10 +14,10 @@ const createMorphItem = (
 
 const createSearchRecord = (
   recordId: string,
-  ranks: { tsRank?: number; tsRankCD?: number } = {},
+  ranks: { tsRank?: number; tsRankCD?: number; label?: string } = {},
 ): SearchRecord => ({
   recordId,
-  label: `Record ${recordId}`,
+  label: ranks.label ?? `Record ${recordId}`,
   objectNameSingular: 'person',
   objectLabelSingular: 'Person',
   tsRank: ranks.tsRank ?? 0,
@@ -43,7 +43,7 @@ describe('sortMorphItems', () => {
     expect(result[1].isSelected).toBe(true);
   });
 
-  it('should interleave picked and unpicked records by id when the search has no ranks', () => {
+  it('should interleave picked and unpicked records alphabetically when the search has no ranks', () => {
     const morphItems: RecordPickerPickableMorphItem[] = [
       createMorphItem('b', true),
       createMorphItem('d', true),
@@ -84,6 +84,40 @@ describe('sortMorphItems', () => {
     const result = sortMorphItems(morphItems, searchRecords);
 
     expect(result.map((item) => item.recordId)).toEqual(['b', 'c', 'd', 'a']);
+  });
+
+  it('should order equally ranked records by label before id, ignoring case', () => {
+    const morphItems: RecordPickerPickableMorphItem[] = [
+      createMorphItem('1', true),
+      createMorphItem('2', false),
+      createMorphItem('3', false),
+    ];
+    const searchRecords: SearchRecord[] = [
+      createSearchRecord('1', { label: 'zoe' }),
+      createSearchRecord('2', { label: 'Alice' }),
+      createSearchRecord('3', { label: 'bob' }),
+    ];
+
+    const result = sortMorphItems(morphItems, searchRecords);
+
+    expect(result.map((item) => item.recordId)).toEqual(['2', '3', '1']);
+  });
+
+  it('should place records without a label after labelled ones', () => {
+    const morphItems: RecordPickerPickableMorphItem[] = [
+      createMorphItem('1', true),
+      createMorphItem('2', false),
+      createMorphItem('3', true),
+    ];
+    const searchRecords: SearchRecord[] = [
+      createSearchRecord('1', { label: '' }),
+      createSearchRecord('2', { label: 'Zed' }),
+      createSearchRecord('3', { label: '' }),
+    ];
+
+    const result = sortMorphItems(morphItems, searchRecords);
+
+    expect(result.map((item) => item.recordId)).toEqual(['2', '1', '3']);
   });
 
   it('should handle empty morphItems array', () => {

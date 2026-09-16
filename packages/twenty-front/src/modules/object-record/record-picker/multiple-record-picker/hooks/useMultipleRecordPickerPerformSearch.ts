@@ -238,24 +238,44 @@ export const useMultipleRecordPickerPerformSearch = () => {
         ),
       ];
 
-      const morphItems = loadMore
-        ? newMorphItems.reduce(
-            (acc, item) => {
-              if (
-                !acc.some((existing) => existing.recordId === item.recordId)
-              ) {
-                acc.push(item);
-              }
-              return acc;
-            },
-            [] as typeof newMorphItems,
-          )
-        : newMorphItems;
-
-      const sortedMorphItems = sortMorphItems(morphItems, [
+      const searchRecordsForSorting = [
         ...searchRecordsFilteredOnPickedRecords,
         ...searchRecordsExcludingPickedRecords,
-      ]);
+      ];
+
+      let sortedMorphItems: RecordPickerPickableMorphItem[];
+
+      if (loadMore) {
+        // Rows already on screen keep their position; only the new page is
+        // sorted and appended, so loading more never shuffles the list.
+        const updatedItemByRecordId = new Map(
+          newMorphItems.map((item) => [item.recordId, item]),
+        );
+        const existingRecordIds = new Set(
+          existingMorphItems.map(({ recordId }) => recordId),
+        );
+
+        const existingItemsInDisplayOrder = existingMorphItems
+          .map(({ recordId }) => updatedItemByRecordId.get(recordId))
+          .filter(isDefined);
+
+        const appendedItems = newMorphItems.filter(
+          ({ recordId }, index) =>
+            !existingRecordIds.has(recordId) &&
+            newMorphItems.findIndex((item) => item.recordId === recordId) ===
+              index,
+        );
+
+        sortedMorphItems = [
+          ...existingItemsInDisplayOrder,
+          ...sortMorphItems(appendedItems, searchRecordsForSorting),
+        ];
+      } else {
+        sortedMorphItems = sortMorphItems(
+          newMorphItems,
+          searchRecordsForSorting,
+        );
+      }
 
       store.set(
         multipleRecordPickerPickableMorphItemsComponentState.atomFamily(
