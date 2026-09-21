@@ -1,4 +1,4 @@
-import { Global, Module } from '@nestjs/common';
+import { forwardRef, Global, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { ProcessNestedRelationsHelper } from 'src/engine/api/common/common-nested-relations-processor/process-nested-relations.helper';
@@ -21,6 +21,7 @@ import { MetadataEventsToDbListener } from 'src/engine/subscriptions/metadata-ev
 import { ObjectRecordEventPublisher } from 'src/engine/subscriptions/object-record-event/object-record-event-publisher';
 import { SubscriptionService } from 'src/engine/subscriptions/subscription.service';
 import { WorkspaceEventBroadcaster } from 'src/engine/subscriptions/workspace-event-broadcaster/workspace-event-broadcaster.service';
+import { WorkspaceQueryHookModule } from 'src/engine/api/graphql/workspace-query-runner/workspace-query-hook/workspace-query-hook.module';
 import { WorkspaceCacheModule } from 'src/engine/workspace-cache/workspace-cache.module';
 
 @Global()
@@ -36,6 +37,9 @@ import { WorkspaceCacheModule } from 'src/engine/workspace-cache/workspace-cache
     NavigationMenuItemModule,
     I18nModule,
     ApplicationTranslationCatalogModule,
+    // forwardRef: the hook module pulls in the feature query hook modules, which
+    // transitively reach this global module.
+    forwardRef(() => WorkspaceQueryHookModule),
   ],
   providers: [
     SubscriptionService,

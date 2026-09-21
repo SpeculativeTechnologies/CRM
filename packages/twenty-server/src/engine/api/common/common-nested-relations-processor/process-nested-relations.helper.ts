@@ -26,6 +26,9 @@ import { ProcessAggregateHelper } from 'src/engine/api/graphql/graphql-query-run
 import { buildColumnsToSelect } from 'src/engine/api/graphql/graphql-query-runner/utils/build-columns-to-select';
 import { getTargetObjectMetadataOrThrow } from 'src/engine/api/graphql/graphql-query-runner/utils/get-target-object-metadata.util';
 import { type AggregationField } from 'src/engine/api/graphql/workspace-schema-builder/utils/get-available-aggregations-from-object-fields.util';
+import { CommonQueryNames } from 'src/engine/api/common/types/common-query-args.type';
+import { type QueryResultFieldValue } from 'src/engine/api/graphql/workspace-query-runner/factories/query-result-getters/interfaces/query-result-field-value';
+import { WorkspaceQueryHookService } from 'src/engine/api/graphql/workspace-query-runner/workspace-query-hook/workspace-query-hook.service';
 import { type WorkspaceAuthContext } from 'src/engine/core-modules/auth/types/workspace-auth-context.type';
 import { FlatEntityMaps } from 'src/engine/metadata-modules/flat-entity/types/flat-entity-maps.type';
 import { findFlatEntityByIdInFlatEntityMaps } from 'src/engine/metadata-modules/flat-entity/utils/find-flat-entity-by-id-in-flat-entity-maps.util';
@@ -65,7 +68,10 @@ type ProcessNestedRelationsArgs<T extends ObjectRecord = ObjectRecord> = {
 
 @Injectable()
 export class ProcessNestedRelationsHelper {
-  constructor(private readonly workspaceOrmManager: WorkspaceOrmManager) {}
+  constructor(
+    private readonly workspaceOrmManager: WorkspaceOrmManager,
+    private readonly workspaceQueryHookService: WorkspaceQueryHookService,
+  ) {}
 
   public async processNestedRelations<T extends ObjectRecord = ObjectRecord>(
     args: ProcessNestedRelationsArgs<T>,
@@ -290,6 +296,12 @@ export class ProcessNestedRelationsHelper {
         }),
       );
 
+    await this.applyPostQueryHooksOnRelationResults({
+      authContext,
+      targetObjectNameSingular,
+      relationResults,
+    });
+
     this.assignRelationResults({
       parentRecords: parentObjectRecords,
       parentObjectRecordsAggregatedValues,
@@ -329,6 +341,27 @@ export class ProcessNestedRelationsHelper {
         relationQueryLimiter,
       );
     }
+  }
+
+  // Relation results are resolved outside the root query runner, so the post
+  // query hooks that redact restricted content never ran on them. Without this
+  // a relation traversal returns message and calendar event bodies that the
+  // same records hide when queried at the root.
+  private async applyPostQueryHooksOnRelationResults({
+    authContext,
+    targetObjectNameSingular,
+    relationResults,
+  }: {
+    authContext: WorkspaceAuthContext;
+    targetObjectNameSingular: string;
+    relationResults: ObjectLiteral[];
+  }): Promise<void> {
+    await this.workspaceQueryHookService.executePostQueryHooks(
+      authContext,
+      targetObjectNameSingular,
+      CommonQueryNames.FIND_MANY,
+      relationResults as QueryResultFieldValue,
+    );
   }
 
   private getTargetObjectMetadata({
