@@ -14,6 +14,7 @@ import {
   isFieldMetadataSupportedInGroupBy,
   pascalCase,
 } from 'twenty-shared/utils';
+import { isVisibilityRestrictedField } from 'twenty-shared/constants';
 
 import { GqlInputTypeDefinitionKind } from 'src/engine/api/graphql/workspace-schema-builder/enums/gql-input-type-definition-kind.enum';
 import { GROUP_BY_DATE_GRANULARITY_INPUT_KEY } from 'src/engine/api/graphql/workspace-schema-builder/graphql-type-generators/input-types/group-by-input/group-by-date-granularity-gql-input-type.generator';
@@ -48,7 +49,8 @@ export class ObjectMetadataGroupByGqlInputTypeGenerator {
     const inputType = new GraphQLInputObjectType({
       name: `${pascalCase(flatObjectMetadata.nameSingular)}${GqlInputTypeDefinitionKind.GroupBy.toString()}Input`,
       description: flatObjectMetadata.description,
-      fields: () => this.generateFields(fields, context),
+      fields: () =>
+        this.generateFields(fields, context, flatObjectMetadata.nameSingular),
     }) as GraphQLInputObjectType;
 
     const key = computeObjectMetadataInputTypeKey(
@@ -62,11 +64,21 @@ export class ObjectMetadataGroupByGqlInputTypeGenerator {
   private generateFields(
     fields: FlatFieldMetadata[],
     context: SchemaGenerationContext,
+    objectNameSingular: string,
   ): GraphQLInputFieldConfigMap {
     const allGeneratedFields: GraphQLInputFieldConfigMap = {};
 
     for (const fieldMetadata of fields) {
       if (!isFieldMetadataSupportedInGroupBy(fieldMetadata)) {
+        continue;
+      }
+
+      if (
+        isVisibilityRestrictedField({
+          objectNameSingular,
+          fieldName: fieldMetadata.name,
+        })
+      ) {
         continue;
       }
 

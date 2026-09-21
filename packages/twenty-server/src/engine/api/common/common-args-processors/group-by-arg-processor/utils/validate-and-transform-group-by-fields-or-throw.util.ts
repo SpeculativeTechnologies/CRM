@@ -4,6 +4,7 @@ import {
   isFieldMetadataSupportedInGroupBy,
   isPlainObject,
 } from 'twenty-shared/utils';
+import { isVisibilityRestrictedField } from 'twenty-shared/constants';
 
 import { isGroupByDateFieldDefinition } from 'src/engine/api/common/common-args-processors/group-by-arg-processor/utils/is-group-by-date-field-definition.util';
 import { validateAndTransformRelationGroupByFieldOrThrow } from 'src/engine/api/common/common-args-processors/group-by-arg-processor/utils/validate-and-transform-relation-group-by-field-or-throw.util';
@@ -118,6 +119,7 @@ const validateAndTransformCompositeGroupByDefinitionOrThrow = ({
 const validateAndTransformSingleGroupByFieldOrThrow = ({
   fieldNames,
   fieldName,
+  objectNameSingular,
   fieldIdByName,
   fieldIdByJoinColumnName,
   flatObjectMetadataMaps,
@@ -126,6 +128,7 @@ const validateAndTransformSingleGroupByFieldOrThrow = ({
 }: {
   fieldNames: Record<string, unknown>;
   fieldName: string;
+  objectNameSingular: string;
   fieldIdByName: Record<string, string>;
   fieldIdByJoinColumnName: Record<string, string>;
   flatObjectMetadataMaps: FlatEntityMaps<FlatObjectMetadata>;
@@ -138,6 +141,21 @@ const validateAndTransformSingleGroupByFieldOrThrow = ({
     fieldIdByJoinColumnName,
     flatFieldMetadataMaps,
   });
+
+  // Grouping projects the raw column value as the dimension key, which would
+  // return the very content the visibility hooks redact on every read path.
+  if (
+    isVisibilityRestrictedField({
+      objectNameSingular,
+      fieldName: fieldMetadata.name,
+    })
+  ) {
+    throw new CommonQueryRunnerException(
+      `Field "${fieldName}" is not supported in groupBy`,
+      CommonQueryRunnerExceptionCode.INVALID_QUERY_INPUT,
+      { userFriendlyMessage: STANDARD_ERROR_MESSAGE },
+    );
+  }
 
   const relationType = isMorphOrRelationFlatFieldMetadata(fieldMetadata)
     ? fieldMetadata.settings.relationType
@@ -272,6 +290,7 @@ export const validateAndTransformGroupByFieldsOrThrow = ({
       validateAndTransformSingleGroupByFieldOrThrow({
         fieldNames,
         fieldName,
+        objectNameSingular: flatObjectMetadata.nameSingular,
         fieldIdByName,
         fieldIdByJoinColumnName,
         flatObjectMetadataMaps,
