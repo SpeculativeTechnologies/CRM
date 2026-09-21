@@ -1,10 +1,10 @@
 import { FieldMetadataType } from 'twenty-shared/types';
 import {
+  isVisibilityRestrictedField,
   isDefined,
   isFieldMetadataSupportedInGroupBy,
   isPlainObject,
 } from 'twenty-shared/utils';
-import { isVisibilityRestrictedField } from 'twenty-shared/constants';
 
 import { isGroupByDateFieldDefinition } from 'src/engine/api/common/common-args-processors/group-by-arg-processor/utils/is-group-by-date-field-definition.util';
 import { validateAndTransformRelationGroupByFieldOrThrow } from 'src/engine/api/common/common-args-processors/group-by-arg-processor/utils/validate-and-transform-relation-group-by-field-or-throw.util';

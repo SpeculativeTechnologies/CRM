@@ -71,7 +71,4 @@ export { TWENTY_ICONS_BASE_URL } from './TwentyIconsBaseUrl';
 export { UI_SCALE_VALUES } from './UiScaleValues';
 export { VIEW_GROUP_VISIBLE_OPTIONS_MAX } from './ViewGroupVisibleOptionsMax';
 export { VIEW_TYPE_DEFAULT_ICONS } from './ViewTypeDefaultIcons';
-export {
-  VISIBILITY_RESTRICTED_FIELD_NAMES_BY_OBJECT,
-  isVisibilityRestrictedField,
-} from './VisibilityRestrictedFieldNamesByObject';
+export { VISIBILITY_RESTRICTED_FIELD_NAMES_BY_OBJECT } from './VisibilityRestrictedFieldNamesByObject';

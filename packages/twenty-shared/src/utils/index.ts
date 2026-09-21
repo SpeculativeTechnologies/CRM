@@ -325,3 +325,4 @@ export { isValidCountryCode } from './validation/phones-value/isValidCountryCode
 export { isVariableReference, resolveInput } from './variable-resolver';
 export { getViewLayoutFromViewType } from './views/getViewLayoutFromViewType';
 export { isWidgetViewType } from './views/isWidgetViewType';
+export { isVisibilityRestrictedField } from './visibility/isVisibilityRestrictedField';

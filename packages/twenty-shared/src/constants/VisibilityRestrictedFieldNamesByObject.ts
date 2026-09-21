@@ -13,14 +13,3 @@ export const VISIBILITY_RESTRICTED_FIELD_NAMES_BY_OBJECT: Record<
   message: ['subject', 'text'],
   calendarEvent: ['title', 'description'],
 };
-
-export const isVisibilityRestrictedField = ({
-  objectNameSingular,
-  fieldName,
-}: {
-  objectNameSingular: string;
-  fieldName: string;
-}): boolean =>
-  VISIBILITY_RESTRICTED_FIELD_NAMES_BY_OBJECT[objectNameSingular]?.includes(
-    fieldName,
-  ) ?? false;

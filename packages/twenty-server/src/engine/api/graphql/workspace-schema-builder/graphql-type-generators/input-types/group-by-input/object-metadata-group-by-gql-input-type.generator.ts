@@ -10,11 +10,11 @@ import {
 } from 'graphql';
 import { FieldMetadataType } from 'twenty-shared/types';
 import {
+  isVisibilityRestrictedField,
   isDefined,
   isFieldMetadataSupportedInGroupBy,
   pascalCase,
 } from 'twenty-shared/utils';
-import { isVisibilityRestrictedField } from 'twenty-shared/constants';
 
 import { GqlInputTypeDefinitionKind } from 'src/engine/api/graphql/workspace-schema-builder/enums/gql-input-type-definition-kind.enum';
 import { GROUP_BY_DATE_GRANULARITY_INPUT_KEY } from 'src/engine/api/graphql/workspace-schema-builder/graphql-type-generators/input-types/group-by-input/group-by-date-granularity-gql-input-type.generator';
