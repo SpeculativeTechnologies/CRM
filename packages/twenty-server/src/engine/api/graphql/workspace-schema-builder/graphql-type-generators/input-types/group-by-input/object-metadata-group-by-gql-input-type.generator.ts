@@ -10,6 +10,7 @@ import {
 } from 'graphql';
 import { FieldMetadataType } from 'twenty-shared/types';
 import {
+  isVisibilityRestrictedField,
   isDefined,
   isFieldMetadataSupportedInGroupBy,
   pascalCase,
@@ -48,7 +49,8 @@ export class ObjectMetadataGroupByGqlInputTypeGenerator {
     const inputType = new GraphQLInputObjectType({
       name: `${pascalCase(flatObjectMetadata.nameSingular)}${GqlInputTypeDefinitionKind.GroupBy.toString()}Input`,
       description: flatObjectMetadata.description,
-      fields: () => this.generateFields(fields, context),
+      fields: () =>
+        this.generateFields(fields, context, flatObjectMetadata.nameSingular),
     }) as GraphQLInputObjectType;
 
     const key = computeObjectMetadataInputTypeKey(
@@ -62,11 +64,21 @@ export class ObjectMetadataGroupByGqlInputTypeGenerator {
   private generateFields(
     fields: FlatFieldMetadata[],
     context: SchemaGenerationContext,
+    objectNameSingular: string,
   ): GraphQLInputFieldConfigMap {
     const allGeneratedFields: GraphQLInputFieldConfigMap = {};
 
     for (const fieldMetadata of fields) {
       if (!isFieldMetadataSupportedInGroupBy(fieldMetadata)) {
+        continue;
+      }
+
+      if (
+        isVisibilityRestrictedField({
+          objectNameSingular,
+          fieldName: fieldMetadata.name,
+        })
+      ) {
         continue;
       }
 

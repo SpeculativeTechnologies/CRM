@@ -7,10 +7,10 @@ import { ApplyCalendarEventsVisibilityRestrictionsService } from 'src/modules/ca
 
 @Injectable()
 @WorkspaceQueryHook({
-  key: `calendarEvent.findMany`,
+  key: `calendarEvent.updateOne`,
   type: WorkspaceQueryHookType.POST_HOOK,
 })
-export class CalendarEventFindManyPostQueryHook extends CalendarEventVisibilityPostQueryHook {
+export class CalendarEventUpdateOnePostQueryHook extends CalendarEventVisibilityPostQueryHook {
   // Nest emits no design:paramtypes for a subclass without its own
   // constructor, so the injected service would arrive undefined.
   constructor(

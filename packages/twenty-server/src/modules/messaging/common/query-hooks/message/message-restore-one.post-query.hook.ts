@@ -7,10 +7,10 @@ import { MessageVisibilityPostQueryHook } from 'src/modules/messaging/common/que
 
 @Injectable()
 @WorkspaceQueryHook({
-  key: `message.findMany`,
+  key: `message.restoreOne`,
   type: WorkspaceQueryHookType.POST_HOOK,
 })
-export class MessageFindManyPostQueryHook extends MessageVisibilityPostQueryHook {
+export class MessageRestoreOnePostQueryHook extends MessageVisibilityPostQueryHook {
   // Nest emits no design:paramtypes for a subclass without its own
   // constructor, so the injected service would arrive undefined.
   constructor(
