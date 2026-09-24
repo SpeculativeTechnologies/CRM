@@ -11,6 +11,7 @@ import { FieldsWidgetFieldList } from '@/page-layout/widgets/fields/components/F
 import { FieldsWidgetGroupContainer } from '@/page-layout/widgets/fields/components/FieldsWidgetGroupContainer';
 import { useFieldsWidgetGroupsForDisplay } from '@/page-layout/widgets/fields/hooks/useFieldsWidgetGroupsForDisplay';
 import { useFieldsWidgetHiddenFieldsForDisplay } from '@/page-layout/widgets/fields/hooks/useFieldsWidgetHiddenFieldsForDisplay';
+import { useIsInPinnedTab } from '@/page-layout/widgets/hooks/useIsInPinnedTab';
 import { AnimatedPlaceholder } from '@/ui/feedback/empty-state/components/AnimatedPlaceholder/AnimatedPlaceholder';
 import { EmptyState } from '@/ui/feedback/empty-state/components/EmptyState';
 import { StyledWidgetScrollContainer } from '@/ui/layout/components/WidgetContentContainer';
@@ -53,6 +54,7 @@ type FieldsWidgetProps = {
 export const FieldsWidget = ({ widget }: FieldsWidgetProps) => {
   const targetRecord = useTargetRecord();
   const isInSidePanel = useWorkspaceSurface().type === 'side-panel';
+  const { isInPinnedTab } = useIsInPinnedTab();
 
   const instanceId = `fields-${widget.id}-${targetRecord.id}${isInSidePanel ? '-side-panel' : ''}`;
 
@@ -145,6 +147,7 @@ export const FieldsWidget = ({ widget }: FieldsWidgetProps) => {
                     <FieldsWidgetFieldList
                       fields={group.fields}
                       instanceId={instanceId}
+                      isInPinnedTab={isInPinnedTab}
                     />
                   </StyledPropertyBox>
                 </FieldsWidgetGroupContainer>
@@ -156,6 +159,7 @@ export const FieldsWidget = ({ widget }: FieldsWidgetProps) => {
                 <FieldsWidgetFieldList
                   fields={visibleFields}
                   instanceId={instanceId}
+                  isInPinnedTab={isInPinnedTab}
                 />
               </StyledInlineFieldsPropertyBox>
             )}
@@ -169,6 +173,7 @@ export const FieldsWidget = ({ widget }: FieldsWidgetProps) => {
                   <FieldsWidgetFieldList
                     fields={hiddenFieldsWithOffsetGlobalIndex}
                     instanceId={instanceId}
+                    isInPinnedTab={isInPinnedTab}
                   />
                 </StyledPropertyBox>
               </FieldsWidgetGroupContainer>
@@ -178,6 +183,7 @@ export const FieldsWidget = ({ widget }: FieldsWidgetProps) => {
               objectMetadataItem={objectMetadataItem}
               recordId={targetRecord.id}
               flattenedFieldMetadataItems={flattenedFieldMetadataItems}
+              isInPinnedTab={isInPinnedTab}
             />
             <FieldsWidgetCellEditModePortal
               objectMetadataItem={objectMetadataItem}

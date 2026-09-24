@@ -12,12 +12,12 @@ export const FieldDisplayList = ({
   isChipCountDisplayed?: boolean;
   maxInlineCount?: number;
 }) => {
-  const { isInSidePanel } = useContext(FieldContext);
+  const { isInSidePanel, isInPinnedTab } = useContext(FieldContext);
 
   return (
     <ExpandableList
       isChipCountDisplayed={isChipCountDisplayed}
-      isVertical={isInSidePanel}
+      isVertical={isInSidePanel || isInPinnedTab}
       maxInlineCount={maxInlineCount}
     >
       {children}

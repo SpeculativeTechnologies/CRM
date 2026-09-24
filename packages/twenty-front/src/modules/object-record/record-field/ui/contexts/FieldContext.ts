@@ -33,6 +33,7 @@ export type GenericFieldContextType = {
   displayedMaxRows?: number;
   isDisplayModeFixHeight?: boolean;
   isInSidePanel?: boolean;
+  isInPinnedTab?: boolean;
   isRecordFieldReadOnly: boolean;
   disableChipClick?: boolean;
   onRecordChipClick?: (event: MouseEvent) => void;

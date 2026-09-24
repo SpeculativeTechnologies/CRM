@@ -77,6 +77,11 @@ const idealCustomerProfileField = getMockFieldMetadataItemOrThrow({
   fieldName: 'idealCustomerProfile',
 });
 
+const workPolicyField = getMockFieldMetadataItemOrThrow({
+  objectMetadataItem: companyObjectMetadataItem,
+  fieldName: 'workPolicy',
+});
+
 const TEST_RECORD_ID = 'test-fields-widget-record-123';
 const FIELDS_VIEW_ID = 'test-fields-view-001';
 const TAB_ID_OVERVIEW = 'tab-overview';
@@ -102,6 +107,7 @@ const mockCompanyRecord: ObjectRecord = {
     secondaryLinks: null,
   },
   idealCustomerProfile: true,
+  workPolicy: ['ON_SITE', 'HYBRID'],
   annualRecurringRevenue: {
     __typename: 'Currency',
     amountMicros: 5000000000000,
@@ -352,6 +358,35 @@ const meta: Meta<typeof FieldsWidget> = {
 
 export default meta;
 type Story = StoryObj<typeof FieldsWidget>;
+
+export const PinnedMultiSelectPills: Story = {
+  render: () => (
+    <FieldsWidgetStoryRenderer
+      view={createView({
+        viewFields: [createViewField('vf-work-policy', workPolicyField.id, 0)],
+      })}
+    />
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    expect(await canvas.findByRole('list')).toBeVisible();
+    expect(await canvas.findAllByRole('listitem')).toHaveLength(2);
+
+    const onSiteChip = await canvas.findByText('On-Site');
+    await userEvent.hover(onSiteChip);
+
+    await waitFor(() => {
+      const visibleLists = canvas
+        .getAllByRole('list')
+        .filter((list) => list.getAttribute('aria-hidden') !== 'true');
+
+      for (const list of visibleLists) {
+        expect(within(list).getAllByRole('listitem')).toHaveLength(2);
+      }
+    });
+  },
+};
 
 export const WithViewFieldGroups: Story = {
   render: () => {

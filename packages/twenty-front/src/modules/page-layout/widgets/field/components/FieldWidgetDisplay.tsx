@@ -16,6 +16,7 @@ import { FieldWidgetInlineCell } from '@/page-layout/widgets/field/components/Fi
 import { fieldWidgetHoverComponentState } from '@/page-layout/widgets/field/states/fieldWidgetHoverComponentState';
 import { generateFieldWidgetInstanceId } from '@/page-layout/widgets/field/utils/generateFieldWidgetInstanceId';
 import { useCurrentWidget } from '@/page-layout/widgets/hooks/useCurrentWidget';
+import { useIsInPinnedTab } from '@/page-layout/widgets/hooks/useIsInPinnedTab';
 import { getObjectPermissionsFromMapByObjectMetadataId } from '@/settings/roles/role-permissions/objects-permissions/utils/getObjectPermissionsFromMapByObjectMetadataId';
 import { SidePanelProvider } from '@/ui/layout/side-panel/contexts/SidePanelContext';
 import { useAtomComponentState } from '@/ui/utilities/state/jotai/hooks/useAtomComponentState';
@@ -41,6 +42,7 @@ export const FieldWidgetDisplay = ({
   isInSidePanel,
 }: FieldWidgetDisplayProps) => {
   const widget = useCurrentWidget();
+  const { isInPinnedTab } = useIsInPinnedTab();
 
   const [fieldWidgetHover, setFieldWidgetHover] = useAtomComponentState(
     fieldWidgetHoverComponentState,
@@ -91,6 +93,7 @@ export const FieldWidgetDisplay = ({
                 useUpdateRecord: useUpdateOneObjectRecordMutation,
                 isDisplayModeFixHeight: false,
                 isInSidePanel,
+                isInPinnedTab,
                 isRecordFieldReadOnly: isRecordFieldReadOnly({
                   isRecordReadOnly,
                   isSystemObject: objectMetadataItem.isSystem,
@@ -123,6 +126,7 @@ export const FieldWidgetDisplay = ({
             recordId={recordId}
             instanceId={instanceId}
             isHovered={fieldWidgetHover}
+            isInPinnedTab={isInPinnedTab}
             onMouseLeave={handleMouseLeave}
           />
           <FieldWidgetCellEditModePortal

@@ -36,6 +36,7 @@ type RecordInlineCellAnchoredPortalProps = {
   objectMetadataItem: EnrichedObjectMetadataItem;
   recordId: string;
   instanceIdPrefix: string;
+  isInPinnedTab?: boolean;
   children: React.ReactNode;
   onCloseEditMode?: () => void;
 };
@@ -45,6 +46,7 @@ export const RecordInlineCellAnchoredPortal = ({
   objectMetadataItem,
   recordId,
   instanceIdPrefix,
+  isInPinnedTab,
   children,
   onCloseEditMode,
 }: RecordInlineCellAnchoredPortalProps) => {
@@ -110,6 +112,7 @@ export const RecordInlineCellAnchoredPortal = ({
           useUpdateRecord: useUpdateOneObjectRecordMutation,
           isDisplayModeFixHeight: true,
           isInSidePanel,
+          isInPinnedTab,
           isRecordFieldReadOnly,
           isForbidden,
           onCloseEditMode,

@@ -13,11 +13,13 @@ import { useSetAtomComponentState } from '@/ui/utilities/state/jotai/hooks/useSe
 type FieldsWidgetFieldListProps = {
   fields: FieldsWidgetGroupField[];
   instanceId: string;
+  isInPinnedTab: boolean;
 };
 
 export const FieldsWidgetFieldList = ({
   fields,
   instanceId,
+  isInPinnedTab,
 }: FieldsWidgetFieldListProps) => {
   const targetRecord = useTargetRecord();
 
@@ -59,6 +61,7 @@ export const FieldsWidgetFieldList = ({
       useUpdateRecord={useUpdateOneObjectRecordMutation}
       recordLoading={recordLoading}
       instanceId={instanceId}
+      isInPinnedTab={isInPinnedTab}
       onMouseEnter={() => setRecordFieldListHoverPosition(globalIndex)}
     />
   ));

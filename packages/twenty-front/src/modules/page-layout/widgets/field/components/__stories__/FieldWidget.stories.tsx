@@ -428,7 +428,7 @@ const renderFieldWidgetStory = ({
                   value={{
                     layoutMode: PageLayoutTabLayoutMode.VERTICAL_LIST,
                     presentation: 'stack',
-                    tabId: 'fields',
+                    tabId: TAB_ID_OVERVIEW,
                   }}
                 >
                   <WidgetComponentInstanceContext.Provider
@@ -844,6 +844,9 @@ export const MultiSelectFieldWidget: Story = {
     }),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
+
+    expect(await canvas.findByRole('list')).toBeVisible();
+    expect(await canvas.findAllByRole('listitem')).toHaveLength(2);
 
     const onSiteChip = await canvas.findByText(/On-Site/);
     expect(onSiteChip).toBeVisible();
