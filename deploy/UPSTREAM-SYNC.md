@@ -170,8 +170,10 @@ next week's conflict count.
 One-time setup, repo settings:
 
 - Secret `SYNC_UPSTREAM_TOKEN`: fine-grained PAT (or GitHub App token) scoped
-  to this repository with Contents, Pull requests and Issues read/write.
-  `GITHUB_TOKEN` is not enough: pull requests it opens do not trigger CI Fork.
+  to this repository with Contents, Pull requests, Issues and Workflows
+  read/write. Without Workflows the final push is rejected any week upstream
+  edits `.github/workflows` (2026-09-28). `GITHUB_TOKEN` is not enough: pull
+  requests it opens do not trigger CI Fork.
 - Secret `CLAUDE_CODE_OAUTH_TOKEN` (optional): enables the agent step.
 - Variable `SYNC_UPSTREAM_AUTOMERGE` (optional): `true` to auto-merge
   mechanically resolved syncs once CI is green.
@@ -180,5 +182,8 @@ Retire the old cron on the Mac deploy host so two runners do not race:
 `crontab -e` and remove the `sync-upstream.sh` line.
 
 When a run fails before opening a PR it files or comments on an "Upstream
-sync conflict" issue and the workflow summary says why. An open sync PR
+sync conflict" issue and the workflow summary says why. If the merge was
+fully resolved and only the push failed, the branch is kept as the
+`sync-upstream-bundle` artifact (with the agent notes) for 14 days, and the
+issue says how to push it by hand instead of paying for another agent run. An open sync PR
 blocks the next run until it is merged or closed.

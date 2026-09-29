@@ -26,9 +26,12 @@ name: Sync upstream
 #
 # One-time setup (repo settings):
 #   secret SYNC_UPSTREAM_TOKEN  fine-grained PAT (or GitHub App token) on this
-#                               repo with Contents, Pull requests and Issues
-#                               read/write. GITHUB_TOKEN cannot be used: PRs it
-#                               opens do not trigger CI Fork.
+#                               repo with Contents, Pull requests, Issues and
+#                               Workflows read/write. Workflows is needed
+#                               whenever upstream edits .github/workflows,
+#                               otherwise the final push is rejected.
+#                               GITHUB_TOKEN cannot be used: PRs it opens do
+#                               not trigger CI Fork.
 #   secret CLAUDE_CODE_OAUTH_TOKEN  (optional) enables step 3.
 #   variable SYNC_UPSTREAM_AUTOMERGE  (optional) "true" enables auto-merge.
 
@@ -61,7 +64,7 @@ jobs:
       - name: Require the sync token
         run: |
           if [ -z "$GH_TOKEN" ]; then
-            echo "::error::SYNC_UPSTREAM_TOKEN is not set. Add a fine-grained PAT with Contents, Pull requests and Issues read/write on this repository."
+            echo "::error::SYNC_UPSTREAM_TOKEN is not set. Add a fine-grained PAT with Contents, Pull requests, Issues and Workflows read/write on this repository."
             exit 1
           fi
 
@@ -169,6 +172,18 @@ jobs:
         env:
           SYNC_UPSTREAM_SERVER_URL: ${{ steps.server.outputs.server-url }}
         run: bash deploy/sync-upstream.sh finish "${{ steps.kind.outputs.kind }}"
+
+      - name: Keep the resolved branch when the push failed
+        if: always() && steps.finish.outputs.bundle == 'true'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: sync-upstream-bundle
+          retention-days: 14
+          path: |
+            ${{ runner.temp }}/sync-upstream-state/sync-upstream.bundle
+            ${{ runner.temp }}/sync-upstream-state/agent-notes.md
+            ${{ runner.temp }}/sync-upstream-state/regeneration.md
+            ${{ runner.temp }}/sync-upstream-state/conflicts.txt
 
       - name: File a conflict issue
         if: always() && steps.merge.outputs.outcome == 'conflict' && steps.finish.outcome != 'success'
