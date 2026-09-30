@@ -135,6 +135,12 @@ jobs:
             "Unported" listing any fork behavior you could not carry over, and
             a section "Needs a human" for anything uncertain. That file becomes
             part of the PR description.
+
+            This runs headless: your session ends the moment you reply without
+            a tool call, and nothing wakes you up again. Never run a command
+            or subagent in the background, and never end a turn to wait for
+            one. Run typecheck in the foreground and read its output. Stop
+            only after the files are staged and agent-notes.md is written.
           claude_args: '--max-turns 400 --model opus --allowedTools "Edit,Write,Read,Glob,Grep,Bash(git *),Bash(npx nx *),Bash(npx jest *),Bash(yarn *),Bash(cd *),Bash(cat *),Bash(ls *),Bash(grep *),Bash(rm *),Bash(mkdir *),Bash(diff *),Bash(sed *),Bash(head *),Bash(tail *),Bash(wc *),Bash(sort *),Bash(find *),Bash(echo *),Bash(mv *),Bash(cp *),Bash(awk *),Bash(cut *),Bash(tr *),Bash(xargs *),Bash(pwd *),Bash(npx tsc *),Bash(npx lingui *),Bash(npx prettier *),Bash(npx eslint *),Bash(node *),Bash(jq *),Bash(uniq *),Bash(comm *),Bash(printf *),Bash(test *),Bash(basename *),Bash(dirname *),Bash(realpath *),Bash(touch *),Bash(true),Bash(git)"'
 
       # The run log only counts permission denials; the transcript says which
@@ -184,8 +190,13 @@ jobs:
           SYNC_UPSTREAM_SERVER_URL: ${{ steps.server.outputs.server-url }}
         run: bash deploy/sync-upstream.sh finish "${{ steps.kind.outputs.kind }}"
 
+      - name: Save an unfinished agent resolution
+        id: partial
+        if: always() && steps.kind.outputs.kind == 'unresolved' && steps.agent.outcome != 'skipped' && steps.agent.outcome != ''
+        run: bash deploy/sync-upstream.sh save-partial
+
       - name: Keep the resolved branch when the push failed
-        if: always() && steps.finish.outputs.bundle == 'true'
+        if: always() && (steps.finish.outputs.bundle == 'true' || steps.partial.outputs.bundle == 'true')
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: sync-upstream-bundle
@@ -195,6 +206,7 @@ jobs:
             ${{ runner.temp }}/sync-upstream-state/agent-notes.md
             ${{ runner.temp }}/sync-upstream-state/regeneration.md
             ${{ runner.temp }}/sync-upstream-state/conflicts.txt
+            ${{ runner.temp }}/sync-upstream-state/remaining-conflicts.txt
 
       - name: File a conflict issue
         if: always() && steps.merge.outputs.outcome == 'conflict' && steps.finish.outcome != 'success'

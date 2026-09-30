@@ -13,6 +13,7 @@
 #   bash deploy/sync-upstream.sh run             # same, explicit
 #   bash deploy/sync-upstream.sh finish <kind>   # CI only: commit, regenerate, push, PR
 #   bash deploy/sync-upstream.sh report-conflict # CI only: file the conflict issue
+#   bash deploy/sync-upstream.sh save-partial    # CI only: bundle an unfinished agent resolution
 #
 # Outside CI the merge happens in a throwaway worktree and the checkout the
 # script lives in is never touched. In CI (GITHUB_ACTIONS=true) it works in
@@ -139,7 +140,12 @@ report_conflict() {
   behind="$(cat "$STATE_DIR/behind" 2>/dev/null || echo '?')"
   conflicts="$(cat "$STATE_DIR/conflicts.txt" 2>/dev/null || echo '(list unavailable)')"
 
-  if [ -s "$STATE_DIR/sync-upstream.bundle" ]; then
+  if [ -s "$STATE_DIR/sync-upstream.bundle" ] && [ -f "$STATE_DIR/remaining-conflicts.txt" ]; then
+    local branch
+    branch="$(cat "$STATE_DIR/branch" 2>/dev/null)"
+    body="$(printf 'Weekly upstream sync merged twentyhq/twenty main (%s commits); the agent ran but stopped before finishing. Its partial resolution is saved as a single WIP merge commit in the `sync-upstream-bundle` artifact, so it can be resumed instead of redone:\n\n```\ngh run download %s -R %s -n sync-upstream-bundle\ngit fetch sync-upstream.bundle %s:%s-partial && git switch %s-partial\n```\n\nFiles still containing conflict markers:\n```\n%s\n```\n\nThe agent transcript is the `sync-upstream-agent-transcript` artifact. Resolution policy: `%s`. Run: %s\n' \
+      "$behind" "${GITHUB_RUN_ID:-<run id>}" "$REPO" "$branch" "$branch" "$branch" "$(cat "$STATE_DIR/remaining-conflicts.txt")" "$PLAYBOOK" "$RUN_URL")"
+  elif [ -s "$STATE_DIR/sync-upstream.bundle" ]; then
     local branch reason
     branch="$(cat "$STATE_DIR/branch" 2>/dev/null)"
     reason="the push was rejected"
@@ -466,9 +472,29 @@ run() {
   finish "$kind"
 }
 
+# The agent can stop with its resolution only partly staged (2026-09-30: it
+# backgrounded the final typecheck and the session ended). Commit whatever is
+# in the tree, markers included, so the work can be resumed locally instead of
+# paying for a fresh agent run. The commit never leaves the runner except as
+# the bundle artifact.
+save_partial() {
+  local branch
+  branch="$(cat "$STATE_DIR/branch")"
+  git add -A
+  git -c user.name="sync-upstream" -c user.email="sync-upstream@localhost" \
+    commit -q --no-verify -m "WIP: partial upstream merge resolution ($TODAY), do not merge" ||
+    { log "WARN: nothing to save"; return 0; }
+  printf '%s\n' "$(git grep -l -E '^(<<<<<<< |>>>>>>> )' -- ':!*.snap' ':!*.po' ':!deploy/UPSTREAM-SYNC.md' 2>/dev/null)" \
+    > "$STATE_DIR/remaining-conflicts.txt"
+  log "partial resolution saved; $(grep -c . "$STATE_DIR/remaining-conflicts.txt") files still have markers"
+  bundle_branch "$branch"
+  emit partial true
+}
+
 case "${1:-run}" in
   run) run ;;
   finish) cd "$REPO_ROOT" && finish "${2:?kind: clean|mechanical|agent}" ;;
   report-conflict) cd "$REPO_ROOT" && report_conflict ;;
-  *) echo "usage: $0 [run|finish <kind>|report-conflict]" >&2; exit 64 ;;
+  save-partial) cd "$REPO_ROOT" && save_partial ;;
+  *) echo "usage: $0 [run|finish <kind>|report-conflict|save-partial]" >&2; exit 64 ;;
 esac
