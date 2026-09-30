@@ -135,7 +135,18 @@ jobs:
             "Unported" listing any fork behavior you could not carry over, and
             a section "Needs a human" for anything uncertain. That file becomes
             part of the PR description.
-          claude_args: '--max-turns 400 --model opus --allowedTools "Edit,Write,Read,Glob,Grep,Bash(git *),Bash(npx nx *),Bash(npx jest *),Bash(yarn *),Bash(cd *),Bash(cat *),Bash(ls *),Bash(grep *),Bash(rm *),Bash(mkdir *),Bash(diff *),Bash(sed *),Bash(head *),Bash(tail *),Bash(wc *),Bash(sort *),Bash(find *),Bash(echo *),Bash(mv *),Bash(cp *),Bash(awk *),Bash(cut *),Bash(tr *),Bash(xargs *),Bash(pwd *)"'
+          claude_args: '--max-turns 400 --model opus --allowedTools "Edit,Write,Read,Glob,Grep,Bash(git *),Bash(npx nx *),Bash(npx jest *),Bash(yarn *),Bash(cd *),Bash(cat *),Bash(ls *),Bash(grep *),Bash(rm *),Bash(mkdir *),Bash(diff *),Bash(sed *),Bash(head *),Bash(tail *),Bash(wc *),Bash(sort *),Bash(find *),Bash(echo *),Bash(mv *),Bash(cp *),Bash(awk *),Bash(cut *),Bash(tr *),Bash(xargs *),Bash(pwd *),Bash(npx tsc *),Bash(npx lingui *),Bash(npx prettier *),Bash(npx eslint *),Bash(node *),Bash(jq *),Bash(uniq *),Bash(comm *),Bash(printf *),Bash(test *),Bash(basename *),Bash(dirname *),Bash(realpath *),Bash(touch *),Bash(true),Bash(git)"'
+
+      # The run log only counts permission denials; the transcript says which
+      # commands were blocked (the 2026-09-21 run stopped after 49 of them).
+      - name: Keep the agent transcript
+        if: always() && steps.agent.outcome != 'skipped' && steps.agent.outcome != ''
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: sync-upstream-agent-transcript
+          retention-days: 14
+          if-no-files-found: ignore
+          path: ${{ runner.temp }}/claude-execution-output.json
 
       - name: Decide what to finish
         id: kind
