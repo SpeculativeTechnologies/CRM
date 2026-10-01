@@ -57,6 +57,19 @@ const mocks: MockedResponse[] = [
                   extension
                   url
                 }
+                caredForPets {
+                  edges {
+                    node {
+                      __typename
+                      id
+                      pet {
+                        __typename
+                        id
+                        name
+                      }
+                    }
+                  }
+                }
                 createdAt
                 deletedAt
                 id

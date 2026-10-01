@@ -82,7 +82,8 @@ export const RecordTableColumnAggregateFooterDropdownContent = () => {
             aggregateOperations={page.operations}
             title={page.title}
           >
-            {page.id === 'countAggregateOperationsOptions' && canCountByValue ? (
+            {page.id === 'countAggregateOperationsOptions' &&
+            canCountByValue ? (
               <Dropdown.ActionItem
                 page="countByValueOptions"
                 hasSubmenu

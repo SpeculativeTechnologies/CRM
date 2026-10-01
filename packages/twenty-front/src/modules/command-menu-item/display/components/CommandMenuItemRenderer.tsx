@@ -158,11 +158,7 @@ const CommandMenuItemRelatedPeopleDropdownRenderer = ({
   const { Icon, label } = useCommandMenuItemDisplay(item);
 
   return (
-    <Dropdown.ActionItem
-      page="related-people"
-      hasSubmenu
-      startIcon={<Icon />}
-    >
+    <Dropdown.ActionItem page="related-people" hasSubmenu startIcon={<Icon />}>
       {label}
     </Dropdown.ActionItem>
   );

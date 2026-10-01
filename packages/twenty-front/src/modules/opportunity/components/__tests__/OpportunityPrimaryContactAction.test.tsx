@@ -1,3 +1,4 @@
+import { type ReactNode } from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
@@ -37,16 +38,16 @@ jest.mock('@/ui/utilities/state/jotai/hooks/useAtomFamilyStateValue', () => ({
 }));
 jest.mock('twenty-ui/primitives/input', () => ({
   Button: ({
-    title,
+    children,
     onClick,
     disabled,
   }: {
-    title: string;
+    children: ReactNode;
     onClick: () => void;
     disabled: boolean;
   }) => (
     <button onClick={onClick} disabled={disabled}>
-      {title}
+      {children}
     </button>
   ),
 }));
