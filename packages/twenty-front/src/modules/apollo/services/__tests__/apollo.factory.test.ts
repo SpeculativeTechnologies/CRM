@@ -4,12 +4,12 @@ import fetchMock, { enableFetchMocks } from 'jest-fetch-mock';
 
 import { ApolloFactory, type Options } from '@/apollo/services/apollo.factory';
 import { isAuthProxyRedirect } from '@/apollo/utils/isAuthProxyRedirect';
+import { clearSessionGeneration } from '@/auth/utils/clearSessionGeneration';
+import { getSessionGeneration } from '@/auth/utils/getSessionGeneration';
+import { rotateSessionGeneration } from '@/auth/utils/rotateSessionGeneration';
 import { CUSTOM_WORKSPACE_APPLICATION_MOCK } from '@/object-metadata/hooks/__tests__/constants/CustomWorkspaceApplicationMock.test.constant';
 import {
-  AUTO_SELECT_FAST_MODEL_ID,
-  AUTO_SELECT_SMART_MODEL_ID,
-} from 'twenty-shared/constants';
-import {
+  AiModelTier,
   WorkspaceActivationStatus,
   WorkspaceDiscoverability,
 } from '~/generated-metadata/graphql';
@@ -66,6 +66,8 @@ const mockWorkspace = {
   currentBillingSubscription: null,
   workspaceMembersCount: 0,
   isPublicInviteLinkEnabled: false,
+  isCampaignClickTrackingEnabled: false,
+  isCampaignOpenTrackingEnabled: false,
   workspaceDiscoverability: WorkspaceDiscoverability.PUBLIC,
   isGoogleAuthEnabled: false,
   isMicrosoftAuthEnabled: false,
@@ -86,11 +88,10 @@ const mockWorkspace = {
   isTwoFactorAuthenticationEnforced: false,
   trashRetentionDays: 14,
   eventLogRetentionDays: 365 * 3,
-  fastModel: AUTO_SELECT_FAST_MODEL_ID,
-  smartModel: AUTO_SELECT_SMART_MODEL_ID,
-  routerModel: 'auto',
-  enabledAiModelIds: [],
-  useRecommendedModels: true,
+  aiChatModelTier: AiModelTier.fast,
+  aiAgentModelTier: AiModelTier.fast,
+  isAutoModelSelectionEnabled: true,
+  aiModelIdByTier: {},
   isInternalMessagesImportEnabled: false,
   workspaceCustomApplication: CUSTOM_WORKSPACE_APPLICATION_MOCK,
   workspaceCustomApplicationId: CUSTOM_WORKSPACE_APPLICATION_MOCK.id,
@@ -146,6 +147,7 @@ describe('ApolloFactory', () => {
     jest.clearAllMocks();
     fetchMock.resetMocks();
     jest.mocked(isAuthProxyRedirect).mockReset().mockResolvedValue(false);
+    clearSessionGeneration();
   });
 
   const flushPendingProbe = () =>
@@ -347,11 +349,49 @@ describe('ApolloFactory', () => {
   // the end of the session rather than something the client can retry.
   it('should sign out on an unauthenticated response', async () => {
     fetchMock.mockResponse(UNAUTHENTICATED_RESPONSE);
+    mockOnUnauthenticatedError.mockImplementation(clearSessionGeneration);
+    rotateSessionGeneration();
+
+    expect(getSessionGeneration()).not.toBeNull();
 
     await expect(makeRequest()).rejects.toBeInstanceOf(CombinedGraphQLErrors);
 
     expect(mockOnUnauthenticatedError).toHaveBeenCalledTimes(1);
+    expect(getSessionGeneration()).toBeNull();
     expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('should ignore an unauthenticated response from an older session', async () => {
+    let markRequestStarted!: () => void;
+    const requestStarted = new Promise<void>((resolve) => {
+      markRequestStarted = resolve;
+    });
+    let releaseResponse!: (response: { body: string }) => void;
+    const pendingResponse = new Promise<{ body: string }>((resolve) => {
+      releaseResponse = resolve;
+    });
+
+    fetchMock.mockResponse(() => {
+      markRequestStarted();
+
+      return pendingResponse;
+    });
+
+    rotateSessionGeneration();
+    const requestSessionGeneration = getSessionGeneration();
+    const request = makeRequest();
+
+    expect(requestSessionGeneration).not.toBeNull();
+
+    await requestStarted;
+    rotateSessionGeneration();
+
+    expect(getSessionGeneration()).not.toBe(requestSessionGeneration);
+
+    releaseResponse({ body: UNAUTHENTICATED_RESPONSE });
+
+    await expect(request).rejects.toBeInstanceOf(CombinedGraphQLErrors);
+    expect(mockOnUnauthenticatedError).not.toHaveBeenCalled();
   });
 
   it('should leave a permission denial alone', async () => {

@@ -9,9 +9,8 @@ import {
   isDefined,
 } from 'twenty-shared/utils';
 import { computeMetadataNameFromLabel } from '~/pages/settings/data-model/utils/computeMetadataNameFromLabel';
-import { Button } from 'twenty-ui/input';
-import { Section } from 'twenty-ui/layout';
-import { H2Title } from 'twenty-ui/typography';
+import { Button } from 'twenty-ui/primitives/input';
+import { Section } from 'twenty-ui/components';
 import { IconLink } from 'twenty-ui/icon';
 import { FieldMetadataType, RelationType } from '~/generated-metadata/graphql';
 import { useNavigateSettings } from '~/hooks/useNavigateSettings';
@@ -145,20 +144,21 @@ export const SettingsObjectNewLinkedFieldConfigure = () => {
           }
           trailing={
             <Button
-              title={t`Save`}
-              variant="primary"
-              size="small"
-              accent="blue"
+              variant="solid"
+              size="sm"
+              color="accent"
               disabled={!canSave}
               onClick={save}
-            />
+            >
+              {t`Save`}
+            </Button>
           }
         />
       }
     >
       <SettingsPageContainer>
-        <Section>
-          <H2Title
+        <Section.Root>
+          <Section.Header
             title={t`Source`}
             description={t`Show a field from the related Person. Values stay current and can only be edited on that Person record.`}
           />
@@ -202,9 +202,9 @@ export const SettingsObjectNewLinkedFieldConfigure = () => {
               {relation.label} → {source.label}
             </p>
           )}
-        </Section>
-        <Section>
-          <H2Title
+        </Section.Root>
+        <Section.Root>
+          <Section.Header
             title={t`Field name`}
             description={t`Available in this object's views and record pages. Supports sorting, filtering, and CSV export.`}
           />
@@ -218,7 +218,7 @@ export const SettingsObjectNewLinkedFieldConfigure = () => {
           {nameAlreadyExists && (
             <p role="alert">{t`A field with this name already exists. Choose another name.`}</p>
           )}
-        </Section>
+        </Section.Root>
       </SettingsPageContainer>
     </SettingsPageLayout>
   );

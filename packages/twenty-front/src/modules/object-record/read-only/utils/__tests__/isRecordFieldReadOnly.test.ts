@@ -1,5 +1,9 @@
 import { isRecordFieldReadOnly } from '@/object-record/read-only/utils/isRecordFieldReadOnly';
-import { FieldMetadataType, RelationType } from '~/generated-metadata/graphql';
+import {
+  FieldMetadataType,
+  MetadataWritability,
+  RelationType,
+} from '~/generated-metadata/graphql';
 
 describe('isRecordFieldReadOnly', () => {
   const mockObjectPermissions = {
@@ -15,6 +19,7 @@ describe('isRecordFieldReadOnly', () => {
       id: 'field-123',
       isUIEditable: true,
       type: FieldMetadataType.TEXT,
+      writability: MetadataWritability.OPEN,
     },
   };
 
@@ -200,6 +205,42 @@ describe('isRecordFieldReadOnly', () => {
   it('should return false when isSystemObject is not provided', () => {
     const result = isRecordFieldReadOnly({
       ...mockParams,
+    });
+
+    expect(result).toBe(false);
+  });
+
+  it('should return true when the field writability is SYSTEM', () => {
+    const result = isRecordFieldReadOnly({
+      ...mockParams,
+      fieldMetadataItem: {
+        ...mockParams.fieldMetadataItem,
+        writability: MetadataWritability.SYSTEM,
+      },
+    });
+
+    expect(result).toBe(true);
+  });
+
+  it('should return true when the field writability is APPLICATION', () => {
+    const result = isRecordFieldReadOnly({
+      ...mockParams,
+      fieldMetadataItem: {
+        ...mockParams.fieldMetadataItem,
+        writability: MetadataWritability.APPLICATION,
+      },
+    });
+
+    expect(result).toBe(true);
+  });
+
+  it('should treat a missing field writability as OPEN', () => {
+    const result = isRecordFieldReadOnly({
+      ...mockParams,
+      fieldMetadataItem: {
+        ...mockParams.fieldMetadataItem,
+        writability: undefined,
+      },
     });
 
     expect(result).toBe(false);

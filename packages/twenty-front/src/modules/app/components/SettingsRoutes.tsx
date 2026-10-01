@@ -458,6 +458,26 @@ const SettingsUsage = lazy(() =>
   })),
 );
 
+const SettingsBillingLimits = lazy(() =>
+  import('~/pages/settings/billing/SettingsBillingLimits').then((module) => ({
+    default: module.SettingsBillingLimits,
+  })),
+);
+
+const SettingsBillingNewLimit = lazy(() =>
+  import('~/pages/settings/billing/SettingsBillingNewLimit').then((module) => ({
+    default: module.SettingsBillingNewLimit,
+  })),
+);
+
+const SettingsBillingLimitEdit = lazy(() =>
+  import('~/pages/settings/billing/SettingsBillingLimitEdit').then(
+    (module) => ({
+      default: module.SettingsBillingLimitEdit,
+    }),
+  ),
+);
+
 const SettingsUsageUserDetail = lazy(() =>
   import('~/pages/settings/billing/SettingsUsageUserDetail').then((module) => ({
     default: module.SettingsUsageUserDetail,
@@ -510,6 +530,22 @@ const SettingsObjectNewIndex = lazy(() =>
   ),
 );
 
+const SettingsObjectNewValidationRule = lazy(() =>
+  import('~/pages/settings/data-model/validation-rules/SettingsObjectNewValidationRule').then(
+    (module) => ({
+      default: module.SettingsObjectNewValidationRule,
+    }),
+  ),
+);
+
+const SettingsObjectValidationRuleEdit = lazy(() =>
+  import('~/pages/settings/data-model/validation-rules/SettingsObjectValidationRuleEdit').then(
+    (module) => ({
+      default: module.SettingsObjectValidationRuleEdit,
+    }),
+  ),
+);
+
 const SettingsObjectFieldEdit = lazy(() =>
   import('~/pages/settings/data-model/SettingsObjectFieldEdit').then(
     (module) => ({
@@ -518,10 +554,18 @@ const SettingsObjectFieldEdit = lazy(() =>
   ),
 );
 
-const SettingsSecuritySSOIdentifyProvider = lazy(() =>
-  import('~/pages/settings/security/SettingsSecuritySSOIdentifyProvider').then(
+const SettingsObjectTranslations = lazy(() =>
+  import('~/pages/settings/data-model/SettingsObjectTranslations').then(
     (module) => ({
-      default: module.SettingsSecuritySSOIdentifyProvider,
+      default: module.SettingsObjectTranslations,
+    }),
+  ),
+);
+
+const SettingsSecuritySsoIdentifyProvider = lazy(() =>
+  import('~/pages/settings/security/SettingsSecuritySsoIdentifyProvider').then(
+    (module) => ({
+      default: module.SettingsSecuritySsoIdentifyProvider,
     }),
   ),
 );
@@ -788,6 +832,18 @@ const createSettingsRouteElements = ({
         element={<SettingsUsageUserDetail />}
       />
       <Route
+        path={SettingsPath.BillingLimits}
+        element={<SettingsBillingLimits />}
+      />
+      <Route
+        path={SettingsPath.BillingNewLimit}
+        element={<SettingsBillingNewLimit />}
+      />
+      <Route
+        path={SettingsPath.BillingLimitEdit}
+        element={<SettingsBillingLimitEdit />}
+      />
+      <Route
         path={SettingsPath.Subdomain}
         element={<SettingsSubdomainPage />}
       />
@@ -796,7 +852,11 @@ const createSettingsRouteElements = ({
         element={<SettingsCustomDomainPage />}
       />
       <Route
-        path={SettingsPath.PublicDomain}
+        path={SettingsPath.ApplicationPublicDomainNew}
+        element={<SettingPublicDomain />}
+      />
+      <Route
+        path={SettingsPath.ApplicationPublicDomainDetail}
         element={<SettingPublicDomain />}
       />
       <Route path={SettingsPath.LegalDpa} element={<SettingsLegalDpa />} />
@@ -916,8 +976,28 @@ const createSettingsRouteElements = ({
         handle={MAIN_AND_SIDE_PANEL_SETTINGS_ROUTE_HANDLE}
       />
       <Route
+        path={SettingsPath.ObjectNewValidationRule}
+        element={<SettingsObjectNewValidationRule />}
+        handle={MAIN_AND_SIDE_PANEL_SETTINGS_ROUTE_HANDLE}
+      />
+      <Route
+        path={SettingsPath.ObjectValidationRuleEdit}
+        element={<SettingsObjectValidationRuleEdit />}
+        handle={MAIN_AND_SIDE_PANEL_SETTINGS_ROUTE_HANDLE}
+      />
+      <Route
         path={SettingsPath.ObjectFieldEdit}
         element={<SettingsObjectFieldEdit />}
+        handle={MAIN_AND_SIDE_PANEL_SETTINGS_ROUTE_HANDLE}
+      />
+      <Route
+        path={SettingsPath.ObjectTranslations}
+        element={<SettingsObjectTranslations />}
+        handle={MAIN_AND_SIDE_PANEL_SETTINGS_ROUTE_HANDLE}
+      />
+      <Route
+        path={SettingsPath.ObjectFieldTranslations}
+        element={<SettingsObjectTranslations />}
         handle={MAIN_AND_SIDE_PANEL_SETTINGS_ROUTE_HANDLE}
       />
     </Route>
@@ -1082,8 +1162,8 @@ const createSettingsRouteElements = ({
       }
     >
       <Route
-        path={SettingsPath.NewSSOIdentityProvider}
-        element={<SettingsSecuritySSOIdentifyProvider />}
+        path={SettingsPath.NewSsoIdentityProvider}
+        element={<SettingsSecuritySsoIdentifyProvider />}
       />
       <Route
         path={SettingsPath.NewApprovedAccessDomain}
@@ -1098,7 +1178,7 @@ const createSettingsRouteElements = ({
           path={SettingsPath.Enterprise}
           element={
             <Navigate
-              to={getSettingsPath(SettingsPath.AdminPanelEnterprise)}
+              to={getSettingsPath(SettingsPath.AdminPanelOrganization)}
               replace
             />
           }

@@ -1,5 +1,5 @@
 import { type TextColorName } from '@/advanced-text-editor/constants/TextColorNames';
-import { themeCssVariables } from 'twenty-ui/theme-constants';
+import { themeCssVariables } from 'twenty-ui/theme';
 
 // The tag text tokens are declared for both themes, so the same variable
 // resolves to a readable colour whichever one is active.

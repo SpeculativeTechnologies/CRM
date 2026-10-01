@@ -1,94 +1,77 @@
 import { Injectable } from '@nestjs/common';
 
-import { NO_BILLING_SUBSCRIPTION } from 'src/engine/core-modules/billing/constants/no-billing-subscription.constant';
 import { BillingUsageService } from 'src/engine/core-modules/billing/services/billing-usage.service';
-import { BillingService } from 'src/engine/core-modules/billing/services/billing.service';
-import { type CurrentBillingSubscription } from 'src/engine/core-modules/billing/types/flat-billing-subscription.type';
-import { USAGE_RECORDED } from 'src/engine/core-modules/usage/constants/usage-recorded.constant';
+import { type UsageRefusal } from 'src/engine/core-modules/billing/types/usage-refusal.type';
+import { UsageLimitQuotaService } from 'src/engine/core-modules/usage-limit/services/usage-limit-quota.service';
 import { UsageOperationType } from 'src/engine/core-modules/usage/enums/usage-operation-type.enum';
 import { UsageResourceType } from 'src/engine/core-modules/usage/enums/usage-resource-type.enum';
 import { UsageUnit } from 'src/engine/core-modules/usage/enums/usage-unit.enum';
 import { UsageRecorderService } from 'src/engine/core-modules/usage/services/usage-recorder.service';
-import { convertDollarsToBillingCredits } from 'src/engine/metadata-modules/ai/ai-billing/utils/convert-dollars-to-billing-credits.util';
-import { type EmailCreditContext } from 'src/modules/emailing/types/email-credit-context.type';
-import { WorkspaceCacheService } from 'src/engine/workspace-cache/services/workspace-cache.service';
-import { EMAIL_MARGIN_MULTIPLIER } from 'src/modules/emailing/constants/email-margin-multiplier';
-import { SES_EMAIL_COST_PER_THOUSAND_DOLLARS } from 'src/modules/emailing/constants/ses-email-cost-per-thousand-dollars';
+import { type UsageSpenders } from 'src/engine/core-modules/usage/types/usage-spenders.type';
+import { buildEmailQuotaCost } from 'src/modules/emailing/utils/build-email-quota-cost.util';
+import { computeEmailCreditsUsedMicro } from 'src/modules/emailing/utils/compute-email-credits-used-micro.util';
+
+type EmailUsageScope = {
+  workspaceId: string;
+  spenders: UsageSpenders;
+};
+
+type EmailSendScope = EmailUsageScope & { emailCount?: number };
 
 @Injectable()
 export class EmailBillingService {
   constructor(
     private readonly usageRecorderService: UsageRecorderService,
-    private readonly billingService: BillingService,
     private readonly billingUsageService: BillingUsageService,
-    private readonly workspaceCacheService: WorkspaceCacheService,
+    private readonly usageLimitQuotaService: UsageLimitQuotaService,
   ) {}
 
-  async validateEmailCreditsOrThrow(workspaceId: string): Promise<void> {
-    await this.billingUsageService.hasAvailableCreditsOrThrow(workspaceId);
+  async validateEmailSendOrThrow({
+    workspaceId,
+    spenders,
+    emailCount,
+  }: EmailSendScope): Promise<void> {
+    await this.billingUsageService.assertUsageAllowed({
+      workspaceId,
+      resourceType: UsageResourceType.EMAIL,
+      operationType: UsageOperationType.EMAIL_SEND,
+      spenders,
+      cost: buildEmailQuotaCost(emailCount),
+    });
   }
 
-  async resolveEmailCreditContext(
-    workspaceId: string,
-  ): Promise<EmailCreditContext> {
-    if (!this.billingService.isBillingEnabled()) {
-      return {
-        hasCredits: true,
-        currentBillingSubscription: NO_BILLING_SUBSCRIPTION,
-      };
-    }
-
-    const { currentBillingSubscription } =
-      await this.workspaceCacheService.getOrRecompute(workspaceId, [
-        'currentBillingSubscription',
-      ]);
-
-    const { hasAvailableCredits } =
-      await this.billingUsageService.getCreditAvailability({
-        workspaceId,
-        currentBillingSubscription,
-      });
-
-    return { hasCredits: hasAvailableCredits, currentBillingSubscription };
+  async findEmailSendRefusal({
+    workspaceId,
+    spenders,
+    emailCount,
+  }: EmailSendScope): Promise<UsageRefusal | null> {
+    return this.billingUsageService.findUsageRefusal({
+      workspaceId,
+      resourceType: UsageResourceType.EMAIL,
+      operationType: UsageOperationType.EMAIL_SEND,
+      spenders,
+      cost: buildEmailQuotaCost(emailCount),
+    });
   }
 
   async billSentEmails({
     workspaceId,
     sentEmailCount,
-    userWorkspaceId,
-    currentBillingSubscription: providedCurrentBillingSubscription,
-  }: {
-    workspaceId: string;
-    sentEmailCount: number;
-    userWorkspaceId?: string | null;
-    currentBillingSubscription?: CurrentBillingSubscription;
-  }): Promise<void> {
+    spenders,
+  }: EmailUsageScope & { sentEmailCount: number }): Promise<void> {
     if (sentEmailCount <= 0) {
       return;
     }
 
-    const providerCostInDollars =
-      (sentEmailCount / 1000) * SES_EMAIL_COST_PER_THOUSAND_DOLLARS;
-    const chargedInDollars = providerCostInDollars * EMAIL_MARGIN_MULTIPLIER;
-    const creditsUsedMicro = Math.round(
-      convertDollarsToBillingCredits(chargedInDollars),
-    );
+    const creditsUsedMicro = computeEmailCreditsUsedMicro(sentEmailCount);
 
-    if (this.billingService.isBillingEnabled()) {
-      const currentBillingSubscription =
-        await this.billingUsageService.resolveCurrentBillingSubscription({
-          workspaceId,
-          providedCurrentBillingSubscription,
-        });
-
-      if (currentBillingSubscription !== NO_BILLING_SUBSCRIPTION) {
-        await this.billingUsageService.decrementAvailableCreditsInCache({
-          workspaceId,
-          usedCredits: creditsUsedMicro,
-          currentBillingSubscription,
-        });
-      }
-    }
+    await this.usageLimitQuotaService.consumeQuota({
+      workspaceId,
+      resourceType: UsageResourceType.EMAIL,
+      operationType: UsageOperationType.EMAIL_SEND,
+      spenders,
+      cost: { creditsUsedMicro, quantity: sentEmailCount },
+    });
 
     await this.usageRecorderService.record(workspaceId, [
       {
@@ -97,7 +80,7 @@ export class EmailBillingService {
         creditsUsedMicro,
         quantity: sentEmailCount,
         unit: UsageUnit.INVOCATION,
-        spenders: { userWorkspaceId },
+        spenders,
       },
     ]);
   }

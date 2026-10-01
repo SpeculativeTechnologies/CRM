@@ -29,7 +29,6 @@ import './instrument';
 
 import { settings } from './engine/constants/settings';
 import { enableValidationMetadataCache } from './utils/enable-validation-metadata-cache.util';
-import { generateFrontConfig } from './utils/generate-front-config';
 
 const bootstrap = async () => {
   enableValidationMetadataCache();
@@ -100,9 +99,9 @@ const bootstrap = async () => {
 
   app.useLogger(logger);
 
-  app.useBodyParser('json', { limit: settings.storage.maxFileSize });
+  app.useBodyParser('json', { limit: settings.maxRequestBodySize });
   app.useBodyParser('urlencoded', {
-    limit: settings.storage.maxFileSize,
+    limit: settings.maxRequestBodySize,
     extended: true,
   });
   app.useBodyParser('text', { type: 'text/plain', limit: '1024kb' });
@@ -110,7 +109,8 @@ const bootstrap = async () => {
   app.use(
     `/${ApiPath.GraphQL}`,
     graphqlUploadExpress({
-      maxFieldSize: bytes(settings.storage.maxFileSize)!,
+      maxFieldSize: bytes(settings.maxRequestBodySize)!,
+      maxFileSize: bytes(settings.maxRequestBodySize)!,
       maxFiles: 10,
     }),
   );
@@ -118,12 +118,11 @@ const bootstrap = async () => {
   app.use(
     `/${ApiPath.Metadata}`,
     graphqlUploadExpress({
-      maxFieldSize: bytes(settings.storage.maxFileSize)!,
+      maxFieldSize: bytes(settings.maxRequestBodySize)!,
+      maxFileSize: bytes(settings.maxRequestBodySize)!,
       maxFiles: 10,
     }),
   );
-
-  generateFrontConfig();
 
   const keepAliveTimeout = twentyConfigService.get(
     'SERVER_KEEP_ALIVE_TIMEOUT_MS',

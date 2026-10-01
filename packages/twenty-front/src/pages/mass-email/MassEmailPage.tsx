@@ -12,8 +12,8 @@ import { t } from '@lingui/core/macro';
 import { AppPath, SettingsPath } from 'twenty-shared/types';
 import { isDefined } from 'twenty-shared/utils';
 import { IconMail } from 'twenty-ui/icon';
-import { Button } from 'twenty-ui/input';
-import { themeCssVariables } from 'twenty-ui/theme-constants';
+import { Button } from 'twenty-ui/primitives/input';
+import { themeCssVariables } from 'twenty-ui/theme';
 import { useNavigateApp } from '~/hooks/useNavigateApp';
 import { useNavigateSettings } from '~/hooks/useNavigateSettings';
 
@@ -55,22 +55,20 @@ export const MassEmailPage = () => {
       {!hasRecipients ? (
         <StyledEmptyState>
           {t`No recipients selected.`}
-          <Button
-            size="small"
-            variant="secondary"
-            title={t`Go to People`}
-            onClick={goToPeople}
-          />
+          <Button size="sm" variant="outline" onClick={goToPeople}>
+            {t`Go to People`}
+          </Button>
         </StyledEmptyState>
       ) : accountLoading ? null : !isDefined(connectedAccountId) ? (
         <StyledEmptyState>
           {t`Connect an email account to send emails.`}
           <Button
-            size="small"
-            variant="secondary"
-            title={t`Connect account`}
+            size="sm"
+            variant="outline"
             onClick={() => navigateSettings(SettingsPath.NewAccount)}
-          />
+          >
+            {t`Connect account`}
+          </Button>
         </StyledEmptyState>
       ) : (
         <MassEmailWorkspace

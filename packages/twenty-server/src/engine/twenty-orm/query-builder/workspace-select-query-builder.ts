@@ -1,6 +1,7 @@
 import { type ObjectsPermissions } from 'twenty-shared/types';
 import { isDefined, pascalCase } from 'twenty-shared/utils';
-import { FindOperator, type ObjectLiteral } from 'typeorm';
+import { type ObjectLiteral } from 'typeorm';
+import { InstanceChecker } from 'typeorm/util/InstanceChecker';
 
 import { RelationType } from 'src/engine/metadata-modules/field-metadata/interfaces/relation-type.interface';
 
@@ -47,7 +48,10 @@ import {
   type SelectStatementState,
   type WhereClause,
 } from 'src/engine/twenty-orm/sql/utils/build-select-statement.util';
-import { type WorkspaceTableShape } from 'src/engine/twenty-orm/table-shape/types/workspace-table-shape.type';
+import {
+  type WorkspaceRelationShape,
+  type WorkspaceTableShape,
+} from 'src/engine/twenty-orm/table-shape/types/workspace-table-shape.type';
 import { escapeIdentifier } from 'src/engine/workspace-manager/workspace-migration/utils/remove-sql-injection.util';
 
 let objectWhereParameterSequence = 0;
@@ -57,7 +61,7 @@ const isNestedWhereObject = (value: unknown): value is ObjectWhereLike =>
   isDefined(value) &&
   typeof value === 'object' &&
   !Array.isArray(value) &&
-  !(value instanceof FindOperator) &&
+  !InstanceChecker.isFindOperator(value) &&
   !(value instanceof Date);
 
 export type QueryBuilderContext = {
@@ -70,11 +74,6 @@ export type QueryBuilderContext = {
   onBeforeExecute: (queryBuilder: WorkspaceSelectQueryBuilder) => void;
   formatResult: <T>(records: unknown) => T;
 };
-
-type RelationFilterFactory = (
-  queryBuilder: WorkspaceSelectQueryBuilder,
-  targetAlias: string,
-) => void;
 
 export class WorkspaceSelectQueryBuilder implements WhereExpressionLike {
   readonly alias: string;
@@ -129,8 +128,11 @@ export class WorkspaceSelectQueryBuilder implements WhereExpressionLike {
     ];
   }
 
-  clone(): WorkspaceSelectQueryBuilder {
-    const cloned = new WorkspaceSelectQueryBuilder(this.alias, this.context);
+  clone(executor?: QueryExecutor): WorkspaceSelectQueryBuilder {
+    const cloned = new WorkspaceSelectQueryBuilder(
+      this.alias,
+      isDefined(executor) ? { ...this.context, executor } : this.context,
+    );
 
     cloned.whereClauses.push(...this.whereClauses);
     cloned.existsFilterClauses.push(
@@ -205,34 +207,6 @@ export class WorkspaceSelectQueryBuilder implements WhereExpressionLike {
     parameters?: Record<string, unknown>,
   ): this {
     return this.appendWhere('or', condition, parameters);
-  }
-
-  addRelationFilter(
-    relationFieldName: string,
-    applyFilter: RelationFilterFactory,
-    isFirst: boolean,
-  ): this {
-    const relationShape =
-      this.tableShape.relationShapeByFieldName[relationFieldName];
-
-    if (!isDefined(relationShape)) {
-      throw new TwentyOrmException(
-        `Relation "${relationFieldName}" does not exist on "${this.tableShape.nameSingular}"`,
-        TwentyOrmExceptionCode.UNKNOWN_RELATION,
-      );
-    }
-
-    const parameters: Record<string, unknown> = {};
-    const condition = this.buildRelationExistsCondition({
-      relationFieldName,
-      relationShape,
-      applyFilter,
-      parameters,
-    });
-
-    return isFirst
-      ? this.where(condition, parameters)
-      : this.andWhere(condition, parameters);
   }
 
   setParameters(parameters: Record<string, unknown>): this {
@@ -749,6 +723,23 @@ export class WorkspaceSelectQueryBuilder implements WhereExpressionLike {
     );
   }
 
+  getJoinParentRelationShape(
+    alias: string,
+  ): WorkspaceRelationShape | undefined {
+    const clause =
+      this.joinClauses.find((joinClause) => joinClause.alias === alias) ??
+      this.existsFilterClauses.find(
+        (existsFilterClause) => existsFilterClause.alias === alias,
+      );
+
+    if (!isDefined(clause)) {
+      return undefined;
+    }
+
+    return this.getTableShapeForAlias(clause.parentAlias)
+      ?.relationShapeByFieldName[clause.relationFieldName];
+  }
+
   markRowLevelPermissionApplied(alias: string): boolean {
     if (this.aliasesWithRowLevelPermissionApplied.has(alias)) {
       return false;
@@ -937,6 +928,7 @@ export class WorkspaceSelectQueryBuilder implements WhereExpressionLike {
             sql: `${quoteColumn(this.alias, 'id')} IN (${sql})`,
           },
         ],
+        includeDeleted: this.includeDeleted,
         parameters: filteredQuery.getParameters(),
       });
     }
@@ -966,6 +958,7 @@ export class WorkspaceSelectQueryBuilder implements WhereExpressionLike {
         formatResult: this.context.formatResult,
       },
       whereClauses: this.whereClauses,
+      includeDeleted: this.includeDeleted,
       parameters: this.parameters,
     });
   }
@@ -1020,6 +1013,15 @@ export class WorkspaceSelectQueryBuilder implements WhereExpressionLike {
       return this;
     }
 
+    // Dropping a condition it cannot read would widen the query, and a
+    // delete to every row.
+    if (typeof condition !== 'string') {
+      throw new TwentyOrmException(
+        'A where condition must be a SQL string, a where object or a where factory',
+        TwentyOrmExceptionCode.INVALID_QUERY,
+      );
+    }
+
     if (condition.length > 0) {
       this.whereClauses.push({ operator, sql: `(${condition})` });
     }
@@ -1056,7 +1058,7 @@ export class WorkspaceSelectQueryBuilder implements WhereExpressionLike {
           this.buildRelationExistsCondition({
             relationFieldName: columnName,
             relationShape,
-            applyFilter: (queryBuilder) => queryBuilder.where(value),
+            applyWhere: (nestedBuilder) => nestedBuilder.where(value),
             parameters,
           }),
         );
@@ -1072,7 +1074,7 @@ export class WorkspaceSelectQueryBuilder implements WhereExpressionLike {
         hasCompositeChildColumns &&
         isDefined(value) &&
         typeof value === 'object' &&
-        !(value instanceof FindOperator) &&
+        !InstanceChecker.isFindOperator(value) &&
         !Array.isArray(value)
       ) {
         for (const [subFieldName, subValue] of Object.entries(
@@ -1113,15 +1115,50 @@ export class WorkspaceSelectQueryBuilder implements WhereExpressionLike {
     return { sql: conditions.join(' AND '), parameters };
   }
 
+  // Registers a correlated EXISTS on a relation and returns the token to place
+  // in a where clause; the caller writes the related table's condition on the
+  // nested builder, whose alias names that table. Unlike a join, an EXISTS never
+  // duplicates root rows, so this is how a to-many relation gets filtered.
+  addRelationExistsFilter({
+    relationFieldName,
+    applyWhere,
+  }: {
+    relationFieldName: string;
+    applyWhere: (nestedBuilder: WorkspaceSelectQueryBuilder) => void;
+  }): string {
+    const relationShape =
+      this.tableShape.relationShapeByFieldName[relationFieldName];
+
+    if (!isDefined(relationShape)) {
+      throw new TwentyOrmException(
+        `Unknown relation "${relationFieldName}" on "${this.tableShape.nameSingular}"`,
+        TwentyOrmExceptionCode.UNKNOWN_RELATION,
+      );
+    }
+
+    const parameters: Record<string, unknown> = {};
+
+    const token = this.buildRelationExistsCondition({
+      relationFieldName,
+      relationShape,
+      applyWhere,
+      parameters,
+    });
+
+    this.setParameters(parameters);
+
+    return token;
+  }
+
   private buildRelationExistsCondition({
     relationFieldName,
     relationShape,
-    applyFilter,
+    applyWhere,
     parameters,
   }: {
     relationFieldName: string;
     relationShape: WorkspaceTableShape['relationShapeByFieldName'][string];
-    applyFilter: RelationFilterFactory;
+    applyWhere: (nestedBuilder: WorkspaceSelectQueryBuilder) => void;
     parameters: Record<string, unknown>;
   }): string {
     const targetTableShape = this.context.tableShapeByObjectMetadataId(
@@ -1152,7 +1189,7 @@ export class WorkspaceSelectQueryBuilder implements WhereExpressionLike {
       tableShape: targetTableShape,
     });
 
-    applyFilter(nestedBuilder, alias);
+    applyWhere(nestedBuilder);
 
     Object.assign(parameters, nestedBuilder.parameters);
 
@@ -1220,7 +1257,7 @@ export class WorkspaceSelectQueryBuilder implements WhereExpressionLike {
       return parameterName;
     };
 
-    if (value instanceof FindOperator) {
+    if (InstanceChecker.isFindOperator(value)) {
       switch (value.type) {
         case 'in':
           return `${quotedColumn} IN (:...${nextParameter(value.value)})`;

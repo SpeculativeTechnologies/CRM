@@ -3,7 +3,7 @@ import { styled } from '@linaria/react';
 import { t } from '@lingui/core/macro';
 import { useEffect, useMemo, useState } from 'react';
 import { isDefined } from 'twenty-shared/utils';
-import { Pill } from 'twenty-ui/data-display';
+import { useToast } from 'twenty-ui/components';
 import {
   IconAlertTriangle,
   IconArrowMerge,
@@ -11,8 +11,9 @@ import {
   IconChevronRight,
   IconCopy,
 } from 'twenty-ui/icon';
-import { Button } from 'twenty-ui/input';
-import { themeCssVariables } from 'twenty-ui/theme-constants';
+import { Pill } from 'twenty-ui/primitives/data-display';
+import { Button } from 'twenty-ui/primitives/input';
+import { themeCssVariables } from 'twenty-ui/theme';
 
 import { useApolloCoreClient } from '@/object-metadata/hooks/useApolloCoreClient';
 import { useMergeManyRecords } from '@/object-record/hooks/useMergeManyRecords';
@@ -37,7 +38,6 @@ import {
   getUniquePersonDuplicateLinks,
   getUniquePersonDuplicatePhones,
 } from '@/person-duplicate-review/utils/personDuplicateReview';
-import { useSnackBar } from '@/ui/feedback/snack-bar-manager/hooks/useSnackBar';
 import { PageContainer } from '@/ui/layout/page/components/PageContainer';
 import { PageHeader } from '@/ui/layout/page/components/PageHeader';
 
@@ -203,7 +203,7 @@ export const PersonDuplicatesPage = () => {
   const { mergeManyRecords, loading: isMerging } = useMergeManyRecords({
     objectNameSingular: 'person',
   });
-  const { enqueueSuccessSnackBar, enqueueErrorSnackBar } = useSnackBar();
+  const { enqueueToast } = useToast();
   const [keepSeparate, { loading: isKeepingSeparate }] = useMutation<
     { keepPersonDuplicateRecordsSeparate: boolean },
     { pairs: PersonDuplicatePairInput[] }
@@ -371,12 +371,14 @@ export const PersonDuplicatesPage = () => {
       await apolloCoreClient.refetchQueries({
         include: [GET_PERSON_DUPLICATE_GROUPS_COUNT],
       });
-      enqueueSuccessSnackBar({
-        message: t`These people will remain separate unless their identity details change.`,
+      enqueueToast({
+        variant: 'success',
+        children: t`These people will remain separate unless their identity details change.`,
       });
     } catch {
-      enqueueErrorSnackBar({
-        message: t`The keep-separate decision could not be saved.`,
+      enqueueToast({
+        variant: 'error',
+        children: t`The keep-separate decision could not be saved.`,
       });
     }
   };
@@ -457,13 +459,15 @@ export const PersonDuplicatesPage = () => {
       await apolloCoreClient.refetchQueries({
         include: [GET_PERSON_DUPLICATE_GROUPS_COUNT],
       });
-      enqueueSuccessSnackBar({
-        message: t`People merged. Absorbed records are available in Trash.`,
+      enqueueToast({
+        variant: 'success',
+        children: t`People merged. Absorbed records are available in Trash.`,
       });
       setIsConfirmingMerge(false);
     } catch {
-      enqueueErrorSnackBar({
-        message: t`The people could not be merged.`,
+      enqueueToast({
+        variant: 'error',
+        children: t`The people could not be merged.`,
       });
     }
   };
@@ -517,30 +521,32 @@ export const PersonDuplicatesPage = () => {
           </StyledIntroCopy>
           <StyledQueueControls>
             <Button
-              Icon={IconChevronLeft}
-              title={t`Previous`}
-              size="small"
-              variant="secondary"
+              startIcon={<IconChevronLeft />}
+              size="sm"
+              variant="outline"
               disabled={safeGroupIndex === 0}
               onClick={() =>
                 setGroupIndex((currentIndex) => Math.max(currentIndex - 1, 0))
               }
-            />
+            >
+              {t`Previous`}
+            </Button>
             <span>
               {safeGroupIndex + 1} of {totalCount}
             </span>
             <Button
-              Icon={IconChevronRight}
-              title={t`Next`}
-              size="small"
-              variant="secondary"
+              startIcon={<IconChevronRight />}
+              size="sm"
+              variant="outline"
               disabled={safeGroupIndex >= groups.length - 1}
               onClick={() =>
                 setGroupIndex((currentIndex) =>
                   Math.min(currentIndex + 1, groups.length - 1),
                 )
               }
-            />
+            >
+              {t`Next`}
+            </Button>
           </StyledQueueControls>
         </StyledIntro>
 
@@ -608,21 +614,23 @@ export const PersonDuplicatesPage = () => {
             </StyledConfirmationCopy>
             <StyledActions>
               <Button
-                title={t`Cancel`}
-                variant="secondary"
-                size="small"
+                variant="outline"
+                size="sm"
                 disabled={isResolving}
                 onClick={() => setIsConfirmingMerge(false)}
-              />
+              >
+                {t`Cancel`}
+              </Button>
               <Button
-                title={isMerging ? t`Merging…` : t`Confirm merge`}
-                variant="primary"
-                accent="blue"
-                size="small"
-                Icon={IconArrowMerge}
+                variant="solid"
+                color="accent"
+                size="sm"
+                startIcon={<IconArrowMerge />}
                 disabled={isResolving}
                 onClick={handleConfirmMerge}
-              />
+              >
+                {isMerging ? t`Merging…` : t`Confirm merge`}
+              </Button>
             </StyledActions>
           </StyledConfirmation>
         )}
@@ -635,18 +643,18 @@ export const PersonDuplicatesPage = () => {
           </StyledActionCopy>
           <StyledActions>
             <Button
-              title={isKeepingSeparate ? t`Saving…` : t`Keep everyone separate`}
-              variant="secondary"
-              size="medium"
+              variant="outline"
+              size="md"
               disabled={!canResolve || isResolving}
               onClick={handleKeepSeparate}
-            />
+            >
+              {isKeepingSeparate ? t`Saving…` : t`Keep everyone separate`}
+            </Button>
             <Button
-              title={t`Merge selected`}
-              variant="primary"
-              accent="blue"
-              size="medium"
-              Icon={IconArrowMerge}
+              variant="solid"
+              color="accent"
+              size="md"
+              startIcon={<IconArrowMerge />}
               disabled={
                 !canResolve ||
                 isResolving ||
@@ -654,7 +662,9 @@ export const PersonDuplicatesPage = () => {
                 !isDefined(basePersonId)
               }
               onClick={() => setIsConfirmingMerge(true)}
-            />
+            >
+              {t`Merge selected`}
+            </Button>
           </StyledActions>
         </StyledActionBar>
       </StyledPageBody>

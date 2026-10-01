@@ -3,9 +3,8 @@ import { IsNull, Not } from 'typeorm';
 import { type CacheStorageService } from 'src/engine/core-modules/cache-storage/services/cache-storage.service';
 import { type MessageQueueService } from 'src/engine/core-modules/message-queue/services/message-queue.service';
 import { type WorkspaceOrmManager } from 'src/engine/twenty-orm/workspace-orm.manager';
-import { type WorkspaceScopedRepository } from 'src/engine/twenty-orm/workspace-scoped-repository/workspace-scoped-repository';
-import { type CampaignDeliveryEntity } from 'src/engine/core-modules/emailing-domain/campaign-delivery.entity';
 import { MessageCampaignStatisticsService } from 'src/modules/emailing/services/message-campaign-statistics.service';
+import { CampaignDeliveryWorkspaceEntity } from 'src/modules/emailing/standard-objects/campaign-delivery.workspace-entity';
 import { MessageCampaignWorkspaceEntity } from 'src/modules/emailing/standard-objects/message-campaign.workspace-entity';
 import { MessageWorkspaceEntity } from 'src/modules/messaging/common/standard-objects/message.workspace-entity';
 
@@ -75,18 +74,15 @@ describe('MessageCampaignStatisticsService', () => {
       return where.clickedAt !== undefined ? 2 : 1;
     });
 
-    const queryBuilder = {
-      select: jest.fn().mockReturnThis(),
-      addSelect: jest.fn().mockReturnThis(),
-      where: jest.fn().mockReturnThis(),
-      andWhere: jest.fn().mockReturnThis(),
-      groupBy: jest.fn().mockReturnThis(),
-      getRawMany: jest.fn(async () => deliveryCountGroups),
-    };
+    const executeRawMock = jest.fn(async () => deliveryCountGroups);
 
     const workspaceOrmManager = {
       executeInWorkspaceContext: (work: () => Promise<void>) => work(),
       getRepository: (entity: unknown) => {
+        if (entity === CampaignDeliveryWorkspaceEntity) {
+          return { executeRaw: executeRawMock };
+        }
+
         if (entity === MessageWorkspaceEntity) {
           return { count: messageCountMock };
         }
@@ -106,9 +102,6 @@ describe('MessageCampaignStatisticsService', () => {
     } as unknown as WorkspaceOrmManager;
 
     service = new MessageCampaignStatisticsService(
-      {
-        createQueryBuilder: () => queryBuilder,
-      } as unknown as WorkspaceScopedRepository<CampaignDeliveryEntity>,
       workspaceOrmManager,
       {} as MessageQueueService,
       {} as CacheStorageService,

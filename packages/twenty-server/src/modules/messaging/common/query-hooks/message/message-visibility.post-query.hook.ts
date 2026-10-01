@@ -42,10 +42,17 @@ export abstract class MessageVisibilityPostQueryHook implements WorkspacePostQue
       ? authContext.user.id
       : undefined;
 
+    // An application reading its own channel has no user behind it, so without
+    // its applicationId the restrictions would redact the app's own messages.
+    const applicationId = isApplicationAuthContext(authContext)
+      ? authContext.application.id
+      : undefined;
+
     await this.applyMessagesVisibilityRestrictionsService.applyMessagesVisibilityRestrictions(
       payload,
       workspace.id,
       userId,
+      applicationId,
     );
   }
 }

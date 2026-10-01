@@ -7,7 +7,7 @@ import { SettingsLogicFunctionSettingsTab } from '@/settings/logic-functions/com
 import { SettingsLogicFunctionTestTab } from '@/settings/logic-functions/components/tabs/SettingsLogicFunctionTestTab';
 import { SettingsLogicFunctionTriggersTab } from '@/settings/logic-functions/components/tabs/SettingsLogicFunctionTriggersTab';
 import { SettingsPageLayout } from '@/settings/components/layout/SettingsPageLayout';
-import { TabList } from '@/ui/layout/tab-list/components/TabList';
+import { SettingsTabBar } from '@/settings/components/layout/SettingsTabBar';
 import { activeTabIdComponentState } from '@/ui/layout/tab-list/states/activeTabIdComponentState';
 import { useAtomComponentStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomComponentStateValue';
 import { t } from '@lingui/core/macro';
@@ -71,6 +71,8 @@ export const SettingsLogicFunctionDetail = () => {
     logicFunctionId,
   });
 
+  const canTestFunction = logicFunction?.canRunOnDemand ?? false;
+
   const handleTestFunction = async () => {
     navigate(
       { search: location.search, hash: '#test' },
@@ -88,14 +90,20 @@ export const SettingsLogicFunctionDetail = () => {
       hide: isReadonly,
     },
     { id: 'settings', title: t`Settings`, Icon: IconSettings },
-    { id: 'test', title: t`Test`, Icon: IconPlayerPlay },
+    {
+      id: 'test',
+      title: t`Test`,
+      Icon: IconPlayerPlay,
+      disabled: !canTestFunction,
+      hide: !canTestFunction,
+    },
     { id: 'triggers', title: t`Triggers`, Icon: IconBolt },
   ];
 
   const isEditorTab = activeTabId === 'editor';
   const isTriggersTab = activeTabId === 'triggers';
   const isSettingsTab = activeTabId === 'settings';
-  const isTestTab = activeTabId === 'test';
+  const isTestTab = activeTabId === 'test' && canTestFunction;
 
   const breadcrumbLinks = isDefined(applicationId)
     ? (() => {
@@ -153,9 +161,15 @@ export const SettingsLogicFunctionDetail = () => {
           />
         }
         links={breadcrumbLinks}
+        secondaryBar={
+          <SettingsTabBar
+            aria-label={t`Function details`}
+            tabs={tabs}
+            componentInstanceId={instanceId}
+          />
+        }
       >
         <SettingsPageContainer>
-          <TabList tabs={tabs} componentInstanceId={instanceId} />
           {isEditorTab && (
             <SettingsLogicFunctionCodeEditorTab
               files={files}

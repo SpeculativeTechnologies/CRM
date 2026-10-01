@@ -79,6 +79,7 @@ export class WorkspaceMemberTranspiler {
       numberFormat,
       emailSignature,
       isEmailSignatureIncludedByDefault,
+      userId,
     } = workspaceMemberEntity;
 
     const avatarUrl = await this.generateSignedAvatarUrl({
@@ -100,6 +101,7 @@ export class WorkspaceMemberTranspiler {
       name,
       userEmail,
       avatarUrl,
+      userId,
       userWorkspaceId: userWorkspace.id,
       colorScheme,
       openRecordIn: openRecordIn as OpenRecordIn,

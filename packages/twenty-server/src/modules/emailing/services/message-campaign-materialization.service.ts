@@ -1,26 +1,24 @@
+import { CampaignDeliveryWorkspaceEntity } from 'src/modules/emailing/standard-objects/campaign-delivery.workspace-entity';
 import { CAMPAIGN_SEND_RETRY_LIMIT } from 'src/engine/core-modules/emailing-domain/constants/campaign-send-retry-limit.constant';
 import { CAMPAIGN_SEND_RETRY_BACKOFF } from 'src/engine/core-modules/emailing-domain/constants/campaign-send-retry-backoff.constant';
 import { Injectable } from '@nestjs/common';
 
-import { CampaignDeliveryEntity } from 'src/engine/core-modules/emailing-domain/campaign-delivery.entity';
 import { CAMPAIGN_DELIVERY_STATE } from 'src/engine/core-modules/emailing-domain/constants/campaign-delivery-state.constant';
-import { InjectWorkspaceScopedRepository } from 'src/engine/twenty-orm/workspace-scoped-repository/inject-workspace-scoped-repository.decorator';
-import { WorkspaceScopedRepository } from 'src/engine/twenty-orm/workspace-scoped-repository/workspace-scoped-repository';
 
 import chunk from 'lodash.chunk';
 import { In, type ObjectLiteral } from 'typeorm';
 import { v4 } from 'uuid';
 
-import {
-  MATERIALIZE_CAMPAIGN_CHUNK_JOB,
-  SEND_CAMPAIGN_EMAIL_JOB,
-} from 'src/engine/core-modules/emailing-domain/constants/campaign.constant';
+import { MATERIALIZE_CAMPAIGN_CHUNK_JOB } from 'src/engine/core-modules/emailing-domain/constants/campaign.constant';
+import { SEND_CAMPAIGN_EMAIL_BATCH_JOB } from 'src/engine/core-modules/emailing-domain/constants/send-campaign-email-batch-job.constant';
+import { resolveCampaignSendBatchSize } from 'src/engine/core-modules/emailing-domain/utils/resolve-campaign-send-batch-size.util';
 import { type MaterializeCampaignChunkJobData } from 'src/engine/core-modules/emailing-domain/types/materialize-campaign-chunk-job-data.type';
 import { type MaterializeCampaignJobData } from 'src/engine/core-modules/emailing-domain/types/materialize-campaign-job-data.type';
-import { type SendCampaignEmailJobData } from 'src/engine/core-modules/emailing-domain/types/send-campaign-email-job-data.type';
+import { type SendCampaignEmailBatchJobData } from 'src/engine/core-modules/emailing-domain/types/send-campaign-email-batch-job-data.type';
 import { InjectMessageQueue } from 'src/engine/core-modules/message-queue/decorators/message-queue.decorator';
 import { MessageQueue } from 'src/engine/core-modules/message-queue/message-queue.constants';
 import { MessageQueueService } from 'src/engine/core-modules/message-queue/services/message-queue.service';
+import { TwentyConfigService } from 'src/engine/core-modules/twenty-config/twenty-config.service';
 import { WorkspaceOrmManager } from 'src/engine/twenty-orm/workspace-orm.manager';
 import { buildSystemAuthContext } from 'src/engine/twenty-orm/utils/build-system-auth-context.util';
 import { MessageCampaignLifecycleService } from 'src/modules/emailing/services/message-campaign-lifecycle.service';
@@ -28,6 +26,7 @@ import { MessageCampaignWorkspaceEntity } from 'src/modules/emailing/standard-ob
 import { type CampaignRecipient } from 'src/engine/core-modules/emailing-domain/types/campaign-recipient.type';
 import { type CampaignMessageRecipient } from 'src/modules/emailing/types/campaign-message-recipient.type';
 import { buildCampaignMessageId } from 'src/modules/emailing/utils/build-campaign-message-id.util';
+import { buildCampaignThreadExternalId } from 'src/modules/emailing/utils/build-campaign-thread-external-id.util';
 import { compileCampaignEmailContent } from 'src/modules/emailing/utils/compile-campaign-email-content.util';
 import { MessageDirection } from 'src/modules/messaging/common/enums/message-direction.enum';
 import { MessageChannelMessageAssociationWorkspaceEntity } from 'src/modules/messaging/common/standard-objects/message-channel-message-association.workspace-entity';
@@ -42,11 +41,6 @@ import { isDefined } from 'twenty-shared/utils';
 
 const MATERIALIZATION_CHUNK_SIZE = 500;
 
-// Campaign rows are machine-generated and nothing subscribes to them: no
-// webhook, workflow trigger or timeline activity. Emitting would cost a
-// snapshot SELECT of every row written plus a timeline row per recipient.
-const SKIP_EVENT_EMISSION = { shouldSkipEventEmission: true };
-
 type CampaignMessageRow = {
   recipient: CampaignMessageRecipient;
   messageId: string;
@@ -57,12 +51,13 @@ type CampaignMessageRow = {
 @Injectable()
 export class MessageCampaignMaterializationService {
   constructor(
-    @InjectWorkspaceScopedRepository(CampaignDeliveryEntity)
-    private readonly campaignDeliveryRepository: WorkspaceScopedRepository<CampaignDeliveryEntity>,
     private readonly workspaceOrmManager: WorkspaceOrmManager,
     private readonly messageCampaignLifecycleService: MessageCampaignLifecycleService,
     @InjectMessageQueue(MessageQueue.campaignQueue)
     private readonly messageQueueService: MessageQueueService,
+    @InjectMessageQueue(MessageQueue.campaignSendQueue)
+    private readonly campaignSendQueueService: MessageQueueService,
+    private readonly twentyConfigService: TwentyConfigService,
   ) {}
 
   async processMaterializeJob({
@@ -95,10 +90,16 @@ export class MessageCampaignMaterializationService {
         recipients,
       });
 
-      const existingDeliveries = await this.campaignDeliveryRepository.find(
-        workspaceId,
-        { where: { campaignId }, select: { id: true, state: true } },
-      );
+      const existingDeliveries = await this.workspaceOrmManager
+        .getRepository(
+          CampaignDeliveryWorkspaceEntity,
+          { shouldBypassPermissionChecks: true },
+          { shouldSkipEventEmission: true },
+        )
+        .find({
+          where: { campaignId },
+          select: { id: true, state: true },
+        });
       const existingMessageIds = new Set(
         existingDeliveries.map((delivery) => delivery.id),
       );
@@ -225,8 +226,7 @@ export class MessageCampaignMaterializationService {
           null,
         );
 
-        await this.insertMessagesBeforeTheirDeliveries({
-          workspaceId,
+        await this.insertCampaignMessages({
           campaignId,
           messageChannelId,
           fromAddress: campaign.fromAddress?.primaryEmail ?? '',
@@ -239,6 +239,16 @@ export class MessageCampaignMaterializationService {
           }),
         });
       }
+
+      // Driven by the whole chunk rather than by the recipients that still
+      // needed message rows: a retry after a failed insert sees their messages
+      // already materialized, and those recipients would otherwise never get a
+      // delivery row and never be sent. Existing rows are left untouched so a
+      // retry cannot re-queue a delivery its send job already claimed or sent.
+      await this.insertMissingQueuedDeliveries({
+        campaignId,
+        recipients,
+      });
 
       await this.enqueueSendJobs({
         workspaceId,
@@ -335,17 +345,23 @@ export class MessageCampaignMaterializationService {
       return;
     }
 
-    await this.messageQueueService.bulkAdd<SendCampaignEmailJobData>(
-      SEND_CAMPAIGN_EMAIL_JOB,
-      recipients.map((recipient) => ({
+    const batchSize = resolveCampaignSendBatchSize(
+      this.twentyConfigService.get('EMAIL_SEND_RATE_LIMITING_LIMIT'),
+    );
+
+    await this.campaignSendQueueService.bulkAdd<SendCampaignEmailBatchJobData>(
+      SEND_CAMPAIGN_EMAIL_BATCH_JOB,
+      chunk(recipients, batchSize).map((batch) => ({
         data: {
           workspaceId,
           campaignId,
-          messageId: recipient.messageId,
-          personId: recipient.personId,
-          recipientEmail: recipient.email,
           emailingDomainId,
           userWorkspaceId,
+          recipients: batch.map((recipient) => ({
+            messageId: recipient.messageId,
+            personId: recipient.personId,
+            email: recipient.email,
+          })),
         },
       })),
       {
@@ -355,8 +371,7 @@ export class MessageCampaignMaterializationService {
     );
   }
 
-  private async insertMessagesBeforeTheirDeliveries({
-    workspaceId,
+  private async insertCampaignMessages({
     campaignId,
     messageChannelId,
     fromAddress,
@@ -365,7 +380,6 @@ export class MessageCampaignMaterializationService {
     now,
     recipients,
   }: {
-    workspaceId: string;
     campaignId: string;
     messageChannelId: string;
     fromAddress: string;
@@ -388,18 +402,35 @@ export class MessageCampaignMaterializationService {
         temporaryExternalId: v4(),
       })),
     });
+  }
 
-    await this.campaignDeliveryRepository.upsert(
-      workspaceId,
-      recipients.map((recipient) => ({
-        id: recipient.messageId,
-        campaignId,
-        personId: recipient.personId,
-        recipientEmail: recipient.email,
-        state: CAMPAIGN_DELIVERY_STATE.QUEUED,
-      })),
-      { conflictPaths: ['id'], skipUpdateIfNoValuesChanged: true },
-    );
+  private async insertMissingQueuedDeliveries({
+    campaignId,
+    recipients,
+  }: {
+    campaignId: string;
+    recipients: CampaignMessageRecipient[];
+  }): Promise<void> {
+    if (recipients.length === 0) {
+      return;
+    }
+
+    await this.workspaceOrmManager
+      .getRepository(
+        CampaignDeliveryWorkspaceEntity,
+        { shouldBypassPermissionChecks: true },
+        { shouldSkipEventEmission: true },
+      )
+      .insert(
+        recipients.map((recipient) => ({
+          id: recipient.messageId,
+          campaignId,
+          personId: recipient.personId,
+          recipientEmail: recipient.email,
+          state: CAMPAIGN_DELIVERY_STATE.QUEUED,
+        })),
+        { onConflictDoNothing: true },
+      );
   }
 
   private async insertChunk({
@@ -425,7 +456,7 @@ export class MessageCampaignMaterializationService {
           transactionScope.getRepository<T>(
             objectName,
             { shouldBypassPermissionChecks: true },
-            SKIP_EVENT_EMISSION,
+            { shouldSkipEventEmission: true },
           );
 
         await repositoryFor<MessageThreadWorkspaceEntity>(
@@ -452,7 +483,10 @@ export class MessageCampaignMaterializationService {
             messageId: row.messageId,
             messageChannelId,
             messageExternalId: row.temporaryExternalId,
-            messageThreadExternalId: row.temporaryExternalId,
+            messageThreadExternalId: buildCampaignThreadExternalId({
+              messageId: row.messageId,
+              fromAddress,
+            }),
             direction: MessageDirection.OUTGOING,
           })),
         );

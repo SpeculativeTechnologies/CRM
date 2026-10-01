@@ -123,4 +123,8 @@ export class UpdateViewInput {
   @Max(KANBAN_COLUMN_MAX_WIDTH)
   @Field(() => Int, { nullable: true })
   kanbanColumnWidth?: number | null;
+
+  @IsOptional()
+  @Field(() => Int, { nullable: true })
+  groupLoadLimit?: number | null;
 }

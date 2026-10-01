@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 
 import { msg } from '@lingui/core/macro';
 import { type APP_LOCALES, SOURCE_LOCALE } from 'twenty-shared/translations';
-import { isDefined } from 'twenty-shared/utils';
+import { isDefined, isNonEmptyString } from 'twenty-shared/utils';
 import {
   type WorkspaceCompanyEnrichment,
   type WorkspacePersonEnrichment,
@@ -15,7 +15,7 @@ import { I18nService } from 'src/engine/core-modules/i18n/i18n.service';
 import { TwentyConfigService } from 'src/engine/core-modules/twenty-config/twenty-config.service';
 import { UserWorkspaceService } from 'src/engine/core-modules/user-workspace/user-workspace.service';
 import { type WorkspaceEntity } from 'src/engine/core-modules/workspace/workspace.entity';
-import { type AgentChatThreadEntity } from 'src/engine/metadata-modules/ai/ai-chat/entities/agent-chat-thread.entity';
+import { AgentChatThreadWorkspaceEntity } from 'src/engine/metadata-modules/ai/ai-history/standard-objects/agent-chat-thread.workspace-entity';
 import { WorkspaceSetupChatOutcome } from 'src/engine/metadata-modules/ai/ai-chat/enums/workspace-setup-chat-outcome.enum';
 import { AgentChatStreamingService } from 'src/engine/metadata-modules/ai/ai-chat/services/agent-chat-streaming.service';
 import { AgentChatService } from 'src/engine/metadata-modules/ai/ai-chat/services/agent-chat.service';
@@ -25,6 +25,7 @@ import { tagAiChatStreamScope } from 'src/engine/metadata-modules/ai/ai-chat/uti
 import { AiModelRegistryService } from 'src/engine/metadata-modules/ai/ai-models/services/ai-model-registry.service';
 import { WorkspaceOrmManager } from 'src/engine/twenty-orm/workspace-orm.manager';
 import { buildSystemAuthContext } from 'src/engine/twenty-orm/utils/build-system-auth-context.util';
+import { AUTO_SELECT_MODEL_ID_BY_TIER } from 'twenty-shared/ai';
 
 const WORKSPACE_SETUP_CHAT_THREAD_TITLE = msg`Workspace setup`;
 
@@ -33,7 +34,7 @@ type StartWorkspaceSetupChatServiceResult =
       outcome:
         | WorkspaceSetupChatOutcome.STARTED
         | WorkspaceSetupChatOutcome.ALREADY_STARTED;
-      thread: AgentChatThreadEntity;
+      thread: AgentChatThreadWorkspaceEntity;
     }
   | {
       outcome: WorkspaceSetupChatOutcome.UNAVAILABLE;
@@ -61,6 +62,7 @@ export class WorkspaceSetupChatService {
     userEmail,
     userLocale,
     userWorkspaceId,
+    workspaceMemberId,
     workspace,
     companyContext,
     personContext,
@@ -69,6 +71,7 @@ export class WorkspaceSetupChatService {
     userEmail: string;
     userLocale: string | null;
     userWorkspaceId: string;
+    workspaceMemberId: string;
     workspace: WorkspaceEntity;
     companyContext: WorkspaceCompanyEnrichment | null;
     personContext: WorkspacePersonEnrichment | null;
@@ -102,22 +105,22 @@ export class WorkspaceSetupChatService {
       userWorkspaceId,
     });
 
-    let thread = await this.agentChatService.findThreadById({
+    let thread = await this.agentChatService.findWritableThread({
       threadId,
-      userWorkspaceId,
+      workspaceMemberId,
       workspaceId: workspace.id,
     });
 
     if (isDefined(thread)) {
       if (isDefined(thread.deletedAt)) {
-        thread = await this.agentChatService.unarchiveThread({
+        thread = await this.agentChatService.restoreThread({
           threadId,
-          userWorkspaceId,
+          workspaceMemberId,
           workspaceId: workspace.id,
         });
       }
 
-      if (isDefined(thread.activeStreamId)) {
+      if (isNonEmptyString(thread.activeStreamId)) {
         const interruptedError =
           await this.agentChatStreamingService.reapDeadStream({
             thread,
@@ -154,7 +157,7 @@ export class WorkspaceSetupChatService {
 
     thread ??= await this.createThreadWithDeterministicId({
       threadId,
-      userWorkspaceId,
+      workspaceMemberId,
       workspaceId: workspace.id,
       locale,
     });
@@ -163,6 +166,7 @@ export class WorkspaceSetupChatService {
       await this.agentChatStreamingService.startHiddenKickoffStream({
         thread,
         userWorkspaceId,
+        workspaceMemberId,
         workspace,
         text: buildWorkspaceSetupKickoffMessageText({
           companyEnrichment: companyContext,
@@ -174,7 +178,7 @@ export class WorkspaceSetupChatService {
           },
           locale,
         }),
-        modelId: workspace.fastModel,
+        modelId: AUTO_SELECT_MODEL_ID_BY_TIER.fast,
       });
 
     if (!isDefined(kickoffResult)) {
@@ -193,15 +197,15 @@ export class WorkspaceSetupChatService {
 
   private async createThreadWithDeterministicId({
     threadId,
-    userWorkspaceId,
+    workspaceMemberId,
     workspaceId,
     locale,
   }: {
     threadId: string;
-    userWorkspaceId: string;
+    workspaceMemberId: string;
     workspaceId: string;
     locale: string;
-  }): Promise<AgentChatThreadEntity> {
+  }): Promise<AgentChatThreadWorkspaceEntity> {
     const safeLocale = (locale as keyof typeof APP_LOCALES) ?? SOURCE_LOCALE;
     const title = this.i18nService
       .getI18nInstance(safeLocale)
@@ -209,7 +213,7 @@ export class WorkspaceSetupChatService {
 
     try {
       return await this.agentChatService.createThread({
-        userWorkspaceId,
+        workspaceMemberId,
         workspaceId,
         id: threadId,
         title,
@@ -217,9 +221,9 @@ export class WorkspaceSetupChatService {
     } catch (error) {
       if (this.isUniqueViolation(error)) {
         const concurrentlyCreatedThread =
-          await this.agentChatService.findThreadById({
+          await this.agentChatService.findWritableThread({
             threadId,
-            userWorkspaceId,
+            workspaceMemberId,
             workspaceId,
           });
 

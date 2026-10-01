@@ -6,8 +6,8 @@ import {
   SAVE_MESSAGE_CAMPAIGN_DRAFT,
 } from '@/activities/emails/graphql/mutations/saveMessageCampaignDraft';
 import { GET_MESSAGE_CAMPAIGNS } from '@/activities/emails/graphql/metadata-queries/messageCampaigns';
-import { useSnackBar } from '@/ui/feedback/snack-bar-manager/hooks/useSnackBar';
 import { t } from '@lingui/core/macro';
+import { useToast } from 'twenty-ui/components';
 
 export type SaveMessageCampaignDraftInput = {
   campaignId?: string;
@@ -19,7 +19,7 @@ export type SaveMessageCampaignDraftInput = {
 };
 
 export const useMessageCampaignDraft = () => {
-  const { enqueueErrorSnackBar, enqueueSuccessSnackBar } = useSnackBar();
+  const { enqueueToast } = useToast();
   const [saveMutation, { loading: isSaving }] = useMutation<
     { saveMessageCampaignDraft: { campaignId: string; updatedAt: string } },
     { input: SaveMessageCampaignDraftInput }
@@ -39,15 +39,16 @@ export const useMessageCampaignDraft = () => {
 
         return result.data?.saveMessageCampaignDraft ?? null;
       } catch (error) {
-        enqueueErrorSnackBar({
-          message:
+        enqueueToast({
+          variant: 'error',
+          children:
             error instanceof Error ? error.message : t`Failed to save draft`,
         });
 
         return null;
       }
     },
-    [enqueueErrorSnackBar, saveMutation],
+    [enqueueToast, saveMutation],
   );
 
   const deleteDraft = useCallback(
@@ -59,20 +60,21 @@ export const useMessageCampaignDraft = () => {
         });
 
         if (result.data?.deleteMessageCampaignDraft) {
-          enqueueSuccessSnackBar({ message: t`Draft deleted` });
+          enqueueToast({ variant: 'success', children: t`Draft deleted` });
 
           return true;
         }
       } catch (error) {
-        enqueueErrorSnackBar({
-          message:
+        enqueueToast({
+          variant: 'error',
+          children:
             error instanceof Error ? error.message : t`Failed to delete draft`,
         });
       }
 
       return false;
     },
-    [deleteMutation, enqueueErrorSnackBar, enqueueSuccessSnackBar],
+    [deleteMutation, enqueueToast],
   );
 
   return { saveDraft, deleteDraft, isSaving, isDeleting };

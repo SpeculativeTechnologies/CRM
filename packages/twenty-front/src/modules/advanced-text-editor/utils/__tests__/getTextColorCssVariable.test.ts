@@ -1,6 +1,6 @@
 import { TEXT_COLOR_NAMES } from '@/advanced-text-editor/constants/TextColorNames';
 import { getTextColorCssVariable } from '@/advanced-text-editor/utils/getTextColorCssVariable';
-import { themeCssVariables } from 'twenty-ui/theme-constants';
+import { themeCssVariables } from 'twenty-ui/theme';
 
 describe('getTextColorCssVariable', () => {
   // Resolving through the tag token is what makes a swatch readable in dark

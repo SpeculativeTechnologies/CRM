@@ -112,13 +112,18 @@ const getPhoneDisplayLabelText = ({
   callingCode,
   number,
 }: {
-  callingCode: string;
-  number: string;
+  callingCode: string | null;
+  number: string | null;
 }) => {
+  const safeCallingCode = callingCode ?? '';
+  const safeNumber = number ?? '';
+
   try {
-    return parsePhoneNumber(`${callingCode}${number}`).formatInternational();
+    return parsePhoneNumber(
+      `${safeCallingCode}${safeNumber}`,
+    ).formatInternational();
   } catch {
-    return `${callingCode}${number}`;
+    return `${safeCallingCode}${safeNumber}`;
   }
 };
 

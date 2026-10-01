@@ -1,7 +1,7 @@
+import { useCallRecordingWidgetData } from '@/page-layout/widgets/call-recording/hooks/useCallRecordingWidgetData';
 import { useCallRecordingWidgetTarget } from '@/page-layout/widgets/call-recording/hooks/useCallRecordingWidgetTarget';
-import { getCallRecordingVideoFileUrl } from '@/page-layout/widgets/call-recording/utils/getCallRecordingVideoFileUrl';
+import { getCallRecordingPlaybackMedia } from '@/page-layout/widgets/call-recording/utils/getCallRecordingPlaybackMedia';
 import { CallRecordingTranscriptBody } from '@/page-layout/widgets/call-recording-transcript/components/CallRecordingTranscriptBody';
-import { useCallRecordingTranscriptWidgetData } from '@/page-layout/widgets/call-recording-transcript/hooks/useCallRecordingTranscriptWidgetData';
 import { WidgetHeaderCountEffect } from '@/page-layout/widgets/components/WidgetHeaderCountEffect';
 import { useMemo } from 'react';
 import {
@@ -18,7 +18,7 @@ export const CallRecordingTranscriptWidgetContent = () => {
     error,
     restriction,
     refetchCallRecordingWidget,
-  } = useCallRecordingTranscriptWidgetData();
+  } = useCallRecordingWidgetData({ kind: 'transcript' });
 
   const canExposeCallRecordingData =
     !loading && !isDefined(error) && !isDefined(restriction);
@@ -33,7 +33,7 @@ export const CallRecordingTranscriptWidgetContent = () => {
     [callRecordingForDisplay?.transcript],
   );
 
-  const videoFileUrl = getCallRecordingVideoFileUrl(callRecordingForDisplay);
+  const playbackMedia = getCallRecordingPlaybackMedia(callRecordingForDisplay);
 
   const calendarEventHeaderCount = canExposeCallRecordingData
     ? callRecordingsCount
@@ -50,7 +50,7 @@ export const CallRecordingTranscriptWidgetContent = () => {
       <CallRecordingTranscriptBody
         callRecording={callRecording}
         transcriptEntries={transcriptEntries}
-        videoFileUrl={videoFileUrl}
+        playbackMedia={playbackMedia}
         loading={loading}
         error={error}
         restriction={restriction}

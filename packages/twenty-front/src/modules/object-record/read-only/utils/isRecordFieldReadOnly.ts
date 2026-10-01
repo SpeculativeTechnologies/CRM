@@ -1,5 +1,6 @@
 import { type FieldMetadataItem } from '@/object-metadata/types/FieldMetadataItem';
 import { isFieldMetadataReadOnlyByPermissions } from '@/object-record/read-only/utils/internal/isFieldMetadataReadOnlyByPermissions';
+import { isMetadataWritabilityRestricted } from '@/object-record/read-only/utils/internal/isMetadataWritabilityRestricted';
 import { isOneToManyRelationFieldReadOnlyDueToTargetUpdatePermission } from '@/object-record/read-only/utils/isOneToManyRelationFieldReadOnlyDueToTargetUpdatePermission';
 import { isConfiguredJunctionRelationField } from '@/object-record/record-field/ui/utils/junction/isConfiguredJunctionRelationField';
 import { type FieldDefinition } from '@/object-record/record-field/ui/types/FieldDefinition';
@@ -25,7 +26,7 @@ type IsRecordFieldReadOnlyParams = {
   isFieldFromStandardApplication?: boolean;
   fieldMetadataItem: Pick<
     FieldMetadataItem,
-    'id' | 'isUIEditable' | 'type' | 'settings'
+    'id' | 'isUIEditable' | 'writability' | 'type' | 'settings'
   >;
   objectPermissions: ObjectPermission;
   fieldDefinition?: FieldDefinition<FieldMetadata>;
@@ -82,6 +83,7 @@ export const isRecordFieldReadOnly = ({
     isLabelIdentifierComputedByFormula ||
     isReadOnlyStandardFieldOnSystemObject ||
     !(fieldMetadataItem.isUIEditable ?? true) ||
+    isMetadataWritabilityRestricted(fieldMetadataItem.writability) ||
     fieldReadOnlyByPermissions ||
     oneToManyTargetReadOnly
   );

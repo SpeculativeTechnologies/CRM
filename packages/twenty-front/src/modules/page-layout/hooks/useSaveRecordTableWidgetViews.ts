@@ -15,6 +15,7 @@ import { isDefined } from 'twenty-shared/utils';
 import { isDeeplyEqual } from '~/utils/isDeeplyEqual';
 import {
   type UpsertViewWidgetInput,
+  type ViewFilterOperand as GeneratedViewFilterOperand,
   type ViewFragmentFragment,
 } from '~/generated-metadata/graphql';
 
@@ -132,7 +133,8 @@ export const useSaveRecordTableWidgetViews = () => {
               viewFilters: widgetViewDraft.viewFilters.map((filter) => ({
                 id: filter.id,
                 fieldMetadataId: filter.fieldMetadataId,
-                operand: filter.operand,
+                operand:
+                  filter.operand as unknown as GeneratedViewFilterOperand,
                 value: filter.value,
                 viewFilterGroupId: filter.viewFilterGroupId ?? undefined,
                 positionInViewFilterGroup:

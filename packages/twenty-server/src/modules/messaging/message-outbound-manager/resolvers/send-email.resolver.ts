@@ -1,3 +1,4 @@
+import { EmailOperation } from 'twenty-shared/types';
 import {
   ForbiddenException,
   Logger,
@@ -20,7 +21,7 @@ import { AuthUserWorkspaceId } from 'src/engine/decorators/auth/auth-user-worksp
 import { AuthWorkspace } from 'src/engine/decorators/auth/auth-workspace.decorator';
 import { AuthWorkspaceMemberId } from 'src/engine/decorators/auth/auth-workspace-member-id.decorator';
 import { SettingsPermissionGuard } from 'src/engine/guards/settings-permission.guard';
-import { WorkspaceAuthGuard } from 'src/engine/guards/workspace-auth.guard';
+import { AuthPrincipalGuard } from 'src/engine/guards/auth-principal.guard';
 import { ConnectedAccountMetadataService } from 'src/engine/metadata-modules/connected-account/connected-account-metadata.service';
 import { SendEmailOutputDTO } from 'src/modules/messaging/message-outbound-manager/dtos/send-email-output.dto';
 import { SendEmailInput } from 'src/modules/messaging/message-outbound-manager/dtos/send-email.input';
@@ -42,7 +43,17 @@ import { isNonEmptyString } from '@sniptt/guards';
 @UsePipes(ResolverValidationPipe)
 @UseFilters(AuthGraphqlApiExceptionFilter)
 @UseGuards(
-  WorkspaceAuthGuard,
+  AuthPrincipalGuard({
+    userSession: {
+      standard: true,
+      impersonated: true,
+      playground: true,
+      workspaceAgnostic: false,
+    },
+    apiKey: true,
+    oauthClient: true,
+    application: true,
+  }),
   SettingsPermissionGuard(PermissionFlagType.SEND_EMAIL_TOOL),
 )
 export class SendEmailResolver {
@@ -65,7 +76,7 @@ export class SendEmailResolver {
     @AuthWorkspaceMemberId() workspaceMemberId: string,
   ): Promise<SaveMessageCampaignDraftOutputDTO> {
     const connectedAccount =
-      await this.connectedAccountMetadataService.verifyOwnership({
+      await this.connectedAccountMetadataService.verifyUsableByCaller({
         id: input.connectedAccountId,
         userWorkspaceId,
         workspaceId: workspace.id,
@@ -92,7 +103,7 @@ export class SendEmailResolver {
     @AuthWorkspaceMemberId() workspaceMemberId: string,
   ): Promise<SendMassEmailCampaignOutputDTO> {
     const connectedAccount =
-      await this.connectedAccountMetadataService.verifyOwnership({
+      await this.connectedAccountMetadataService.verifyUsableByCaller({
         id: input.connectedAccountId,
         userWorkspaceId,
         workspaceId: workspace.id,
@@ -141,8 +152,8 @@ export class SendEmailResolver {
 
     for (const email of input.emails) {
       try {
-        const composed = await this.emailComposerService.composeEmail(
-          {
+        const composed = await this.emailComposerService.composeEmail({
+          parameters: {
             recipients: {
               to: email.to,
               cc: (email.cc ?? []).join(', '),
@@ -153,8 +164,9 @@ export class SendEmailResolver {
             connectedAccountId: input.connectedAccountId,
             files: [],
           },
-          { workspaceId: workspace.id },
-        );
+          context: { workspaceId: workspace.id, userWorkspaceId },
+          operation: EmailOperation.SEND,
+        });
 
         if (!composed.success) {
           await recordOutcome({ ...email, email: email.to, success: false });
@@ -224,14 +236,14 @@ export class SendEmailResolver {
     @AuthUserWorkspaceId() userWorkspaceId: string,
   ): Promise<SendEmailOutputDTO> {
     try {
-      await this.connectedAccountMetadataService.verifyOwnership({
+      await this.connectedAccountMetadataService.verifyUsableByCaller({
         id: input.connectedAccountId,
         userWorkspaceId,
         workspaceId: workspace.id,
       });
 
-      const result = await this.emailComposerService.composeEmail(
-        {
+      const result = await this.emailComposerService.composeEmail({
+        parameters: {
           recipients: {
             to: input.to,
             cc: input.cc ?? '',
@@ -244,8 +256,9 @@ export class SendEmailResolver {
           files: input.files ?? [],
           inReplyTo: input.inReplyTo,
         },
-        { workspaceId: workspace.id },
-      );
+        context: { workspaceId: workspace.id },
+        operation: EmailOperation.SEND,
+      });
 
       if (!result.success) {
         return {

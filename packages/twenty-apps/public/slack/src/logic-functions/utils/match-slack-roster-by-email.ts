@@ -2,6 +2,7 @@ import { type WebClient } from '@slack/web-api';
 import { isNonEmptyString } from '@sniptt/guards';
 import { CoreApiClient } from 'twenty-client-sdk/core';
 
+import { SLACK_ROSTER_RATE_LIMIT_RETRY_BUDGET_MS } from 'src/logic-functions/constants/slack-roster-rate-limit-retry-budget-ms';
 import { listLinkedSlackUserIds } from 'src/logic-functions/data/list-linked-slack-user-ids';
 import { findWorkspaceMemberIdsByEmails } from 'src/logic-functions/data/find-workspace-member-ids-by-emails';
 import { type SlackRosterMatchSummary } from 'src/logic-functions/types/slack-roster-match.type';
@@ -9,8 +10,10 @@ import { collectSlackRosterMembers } from 'src/logic-functions/utils/collect-sla
 import { getVouchedSlackRosterEmail } from 'src/logic-functions/utils/get-vouched-slack-roster-email';
 import { linkSlackRosterCandidates } from 'src/logic-functions/utils/link-slack-roster-candidates';
 import { planSlackRosterMatch } from 'src/logic-functions/utils/plan-slack-roster-match';
+import { saveSlackRosterMatchRunOutcome } from 'src/logic-functions/utils/save-slack-roster-match-run-outcome';
+import { toErrorMessage } from 'src/logic-functions/utils/to-error-message.util';
 
-export const matchSlackRosterByEmail = async ({
+const runSlackRosterMatch = async ({
   slackClient,
   slackTeamId,
 }: {
@@ -21,7 +24,10 @@ export const matchSlackRosterByEmail = async ({
 
   const [linkedSlackUserIds, roster] = await Promise.all([
     listLinkedSlackUserIds(client, { slackTeamId }),
-    collectSlackRosterMembers({ slackClient }),
+    collectSlackRosterMembers({
+      slackClient,
+      rateLimitRetryBudgetMs: SLACK_ROSTER_RATE_LIMIT_RETRY_BUDGET_MS,
+    }),
   ]);
 
   const vouchedRosterEmails = roster.members
@@ -59,4 +65,29 @@ export const matchSlackRosterByEmail = async ({
     failedCount,
     isRosterTruncated: roster.isTruncated,
   };
+};
+
+export const matchSlackRosterByEmail = async ({
+  slackClient,
+  slackTeamId,
+}: {
+  slackClient: WebClient;
+  slackTeamId: string;
+}): Promise<SlackRosterMatchSummary> => {
+  try {
+    const summary = await runSlackRosterMatch({ slackClient, slackTeamId });
+
+    await saveSlackRosterMatchRunOutcome({
+      isSuccessful: summary.failedCount === 0,
+    });
+
+    return summary;
+  } catch (error) {
+    await saveSlackRosterMatchRunOutcome({
+      isSuccessful: false,
+      errorMessage: toErrorMessage(error),
+    });
+
+    throw error;
+  }
 };

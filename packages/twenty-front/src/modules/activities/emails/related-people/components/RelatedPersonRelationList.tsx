@@ -9,7 +9,7 @@ import { useState } from 'react';
 import { type RecordGqlOperationFilter } from 'twenty-shared/types';
 import { isDefined } from 'twenty-shared/utils';
 import { IconUser } from 'twenty-ui/icon';
-import { MenuItem } from 'twenty-ui/navigation';
+import { MenuItem } from 'twenty-ui/components';
 
 type RelatedPersonRelationListProps = {
   selectableListInstanceId: string;

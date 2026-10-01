@@ -135,7 +135,7 @@ export class ForkMissedWorkspaceCommandsService {
     options: ParsedUpgradeCommandOptions;
   }): Promise<WorkspaceIteratorReport> {
     if (workspaceIds.length === 0) {
-      return { fail: [], success: [], interrupted: false };
+      return { fail: [], success: [], skipped: [], interrupted: false };
     }
 
     return this.workspaceIteratorService.iterate({

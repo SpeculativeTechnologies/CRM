@@ -38,6 +38,7 @@ export class CalendarEventParticipantService {
     const calendarEventParticipantRepository =
       this.workspaceOrmManager.getRepository<CalendarEventParticipantWorkspaceEntity>(
         'calendarEventParticipant',
+        { shouldBypassPermissionChecks: true },
       );
 
     return calendarEventParticipantRepository.find({
@@ -55,6 +56,7 @@ export class CalendarEventParticipantService {
     const calendarEventParticipantRepository =
       transactionScope.getRepository<CalendarEventParticipantWorkspaceEntity>(
         'calendarEventParticipant',
+        { shouldBypassPermissionChecks: true },
       );
 
     if (operations.participantIdsToDelete.length > 0) {
@@ -63,10 +65,11 @@ export class CalendarEventParticipantService {
       });
     }
 
-    if (operations.participantsToUpdate.length > 0) {
-      await calendarEventParticipantRepository.updateMany(
-        operations.participantsToUpdate,
-      );
+    for (const participantsChunk of chunk(
+      operations.participantsToUpdate,
+      CALENDAR_EVENT_PARTICIPANT_CHUNK_SIZE,
+    )) {
+      await calendarEventParticipantRepository.updateMany(participantsChunk);
     }
 
     for (const participantsChunk of chunk(
@@ -97,6 +100,7 @@ export class CalendarEventParticipantService {
         const calendarEventParticipantRepository =
           this.workspaceOrmManager.getRepository<CalendarEventParticipantWorkspaceEntity>(
             'calendarEventParticipant',
+            { shouldBypassPermissionChecks: true },
           );
 
         const savedParticipants: CalendarEventParticipantWorkspaceEntity[] = [];

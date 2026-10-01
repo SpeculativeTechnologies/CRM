@@ -9,13 +9,12 @@ import {
   SettingsRouteOutlet,
 } from '@/app/components/SettingsRoutes';
 import { type WorkspaceRouteObject } from '@/app/routing/types/WorkspaceRouteObject';
-import indexAppPath from '@/navigation/utils/indexAppPath';
 import { RecordIndexSkeletonLoader } from '@/object-record/record-index/components/RecordIndexSkeletonLoader';
 import { lazyWithPreload } from '~/utils/lazyWithPreload';
 
-const WorkflowCoreIndexPage = lazy(() =>
-  import('~/pages/object-core/WorkflowCoreIndexPage').then((module) => ({
-    default: module.WorkflowCoreIndexPage,
+const WorkflowCoreShowPage = lazy(() =>
+  import('~/pages/object-core/WorkflowCoreShowPage').then((module) => ({
+    default: module.WorkflowCoreShowPage,
   })),
 );
 
@@ -92,7 +91,6 @@ const NotFound = lazy(() =>
 
 type CreateWorkspaceRouteObjectsArgs = {
   isAdminPageEnabled?: boolean;
-  isWorkflowCoreIndexPageEnabled?: boolean;
 };
 
 const MAIN_AND_SIDE_PANEL = ['main', 'side-panel'] as const;
@@ -100,31 +98,26 @@ const SETTINGS_ROOT_PATH = AppPath.SettingsCatchAll.replace('/*', '');
 
 export const createWorkspaceRouteObjects = ({
   isAdminPageEnabled,
-  isWorkflowCoreIndexPageEnabled,
 }: CreateWorkspaceRouteObjectsArgs): WorkspaceRouteObject[] => {
   const settingsRouteObjects = createSettingsRouteObjects({
     isAdminPageEnabled,
   });
 
   return [
-    ...(isWorkflowCoreIndexPageEnabled
-      ? [
-          {
-            path: AppPath.WorkflowCoreIndexPage,
-            element: (
-              <LazyRoute>
-                <WorkflowCoreIndexPage />
-              </LazyRoute>
-            ),
-            handle: {
-              workspaceSurfaces: MAIN_AND_SIDE_PANEL,
-              isLocationExpandableFromSidePanel: true,
-            },
-          } satisfies WorkspaceRouteObject,
-        ]
-      : []),
     {
-      path: indexAppPath.getIndexAppPath(),
+      path: AppPath.WorkflowCoreShowPage,
+      element: (
+        <LazyRoute>
+          <WorkflowCoreShowPage />
+        </LazyRoute>
+      ),
+      handle: {
+        workspaceSurfaces: MAIN_AND_SIDE_PANEL,
+        isLocationExpandableFromSidePanel: true,
+      },
+    },
+    {
+      path: AppPath.Index,
       element: <RecordIndexSkeletonLoader />,
     },
     {

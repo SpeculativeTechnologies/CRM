@@ -5,7 +5,7 @@ import { useLingui } from '@lingui/react/macro';
 import { useCallback, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { IconPlus, useIcons } from 'twenty-ui/icon';
-import { TabButton } from 'twenty-ui/input';
+import { TabButton } from 'twenty-ui/components';
 
 import { isPageLayoutTabDraggingComponentState } from '@/page-layout/states/isPageLayoutTabDraggingComponentState';
 import { useCloseDropdown } from '@/ui/layout/dropdown/hooks/useCloseDropdown';
@@ -20,7 +20,7 @@ import { activeTabIdComponentState } from '@/ui/layout/tab-list/states/activeTab
 import { TabListComponentInstanceContext } from '@/ui/layout/tab-list/states/contexts/TabListComponentInstanceContext';
 import { type TabListProps } from '@/ui/layout/tab-list/types/TabListProps';
 import { NodeDimension } from '@/ui/utilities/dimensions/components/NodeDimension';
-import { useIsMobile } from '@/ui/utilities/responsive/hooks/useIsMobile';
+import { useIsMobile } from 'twenty-ui/utilities';
 import { useWorkspaceSurface } from '@/ui/layout/hooks/useWorkspaceSurface';
 import { useClickOutsideListener } from '@/ui/utilities/pointer-event/hooks/useClickOutsideListener';
 import { useAtomComponentState } from '@/ui/utilities/state/jotai/hooks/useAtomComponentState';
@@ -46,11 +46,10 @@ import { shouldEnableTabEditingFeatures } from '@/page-layout/utils/shouldEnable
 import { useSidePanelMenu } from '@/side-panel/hooks/useSidePanelMenu';
 import { Dropdown } from '@/ui/layout/dropdown/components/Dropdown';
 import { TabListDropdown } from '@/ui/layout/tab-list/components/TabListDropdown';
-import { TabListFromUrlOptionalEffect } from '@/ui/layout/tab-list/components/TabListFromUrlOptionalEffect';
 import { type SingleTabProps } from '@/ui/layout/tab-list/types/SingleTabProps';
 import { useAvailableComponentInstanceIdOrThrow } from '@/ui/utilities/state/component-state/hooks/useAvailableComponentInstanceIdOrThrow';
 import { isDefined } from 'twenty-shared/utils';
-import { themeCssVariables } from 'twenty-ui/theme-constants';
+import { themeCssVariables } from 'twenty-ui/theme';
 import {
   PageLayoutTabLayoutMode,
   PageLayoutType,
@@ -123,6 +122,7 @@ type PageLayoutTabListProps = Omit<TabListProps, 'tabs'> & {
 };
 
 export const PageLayoutTabList = ({
+  'aria-label': ariaLabel,
   tabs,
   loading,
   behaveAsLinks,
@@ -192,9 +192,11 @@ export const PageLayoutTabList = ({
     return hiddenTabs.some((tab) => tab.id === activeTabId);
   }, [hasHiddenTabs, hiddenTabs, activeTabId]);
 
+  const isPageLayoutInEditMode = useIsPageLayoutInEditMode();
+
   const selectTab = useCallback(
     (tabId: string) => {
-      if (workspaceSurface.ownsRouteLocation) {
+      if (!isPageLayoutInEditMode && workspaceSurface.ownsRouteLocation) {
         navigate(
           { search: location.search, hash: `#${tabId}` },
           {
@@ -207,6 +209,7 @@ export const PageLayoutTabList = ({
       onChangeTab?.(tabId);
     },
     [
+      isPageLayoutInEditMode,
       navigate,
       location.search,
       location.state,
@@ -300,7 +303,6 @@ export const PageLayoutTabList = ({
     },
   });
 
-  const isPageLayoutInEditMode = useIsPageLayoutInEditMode();
   const [pageLayoutTabSettingsOpenTabId, setPageLayoutTabSettingsOpenTabId] =
     useAtomComponentState(
       pageLayoutTabSettingsOpenTabIdComponentState,
@@ -414,10 +416,6 @@ export const PageLayoutTabList = ({
     <TabListComponentInstanceContext.Provider
       value={{ instanceId: componentInstanceId }}
     >
-      <TabListFromUrlOptionalEffect
-        tabListIds={tabsWithIcons.map((tab) => tab.id)}
-      />
-
       {tabsWithIcons.length > 1 && !shouldScrollTabs && (
         <TabListHiddenMeasurements
           visibleTabs={tabsWithIcons}
@@ -431,12 +429,7 @@ export const PageLayoutTabList = ({
           addButtonMeasurement={
             addTabStrategy ? (
               <StyledAddButton>
-                <TabButton
-                  id="add-tab"
-                  LeftIcon={IconPlus}
-                  title={t`New Tab`}
-                  disableTestId
-                />
+                <TabButton startIcon={<IconPlus />}>{t`New Tab`}</TabButton>
               </StyledAddButton>
             ) : undefined
           }
@@ -453,6 +446,7 @@ export const PageLayoutTabList = ({
           centerTabs={centerTabs}
         >
           <PageLayoutTabListVisibleTabs
+            aria-label={ariaLabel}
             visibleTabs={tabsWithIcons}
             visibleTabCount={
               shouldScrollTabs ? tabsWithIcons.length : visibleTabCount
@@ -507,12 +501,11 @@ export const PageLayoutTabList = ({
           {addTabStrategy?.mode === 'direct' && (
             <StyledAddButton>
               <TabButton
-                id="add-tab"
-                LeftIcon={IconPlus}
-                title={t`New Tab`}
+                startIcon={<IconPlus />}
                 onClick={() => addTabStrategy.onCreate()}
-                disableTestId
-              />
+              >
+                {t`New Tab`}
+              </TabButton>
             </StyledAddButton>
           )}
           {addTabStrategy?.mode === 'dropdown' && (
@@ -520,12 +513,7 @@ export const PageLayoutTabList = ({
               <Dropdown
                 dropdownId={addTabDropdownId}
                 clickableComponent={
-                  <TabButton
-                    id="add-tab"
-                    LeftIcon={IconPlus}
-                    title={t`New Tab`}
-                    disableTestId
-                  />
+                  <TabButton startIcon={<IconPlus />}>{t`New Tab`}</TabButton>
                 }
                 dropdownComponents={
                   <PageLayoutTabListNewTabDropdownContent

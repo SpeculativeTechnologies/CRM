@@ -3,7 +3,7 @@ import React, { useMemo } from 'react';
 import { FieldDisplayList } from '@/object-record/record-field/ui/components/FieldDisplayList';
 import { type FieldEmailsValue } from '@/object-record/record-field/ui/types/FieldMetadata';
 import { isDefined } from 'twenty-shared/utils';
-import { RoundedLink } from 'twenty-ui/navigation';
+import { RoundedLink } from '@/ui/navigation/link/components/RoundedLink/RoundedLink';
 
 type EmailsDisplayProps = {
   value?: FieldEmailsValue;

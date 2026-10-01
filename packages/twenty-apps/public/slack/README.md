@@ -1,47 +1,20 @@
 # Slack
 
-**Your CRM, in the conversation — ask Twenty anything from Slack and post back to any channel.**
+**Your CRM, in the conversation. Ask Twenty anything from Slack, and post back to any channel.**
 
 ## ✨ What you get
 
-- **A CRM assistant in Slack** — `@twenty how many open opportunities do we have?` or `@twenty create a company called ACME`. It answers in-thread and can read, create, update and soft-delete records
-- **Follow-ups without re-mentioning** — once it has replied in a thread you can keep talking to it, for 24 hours in a channel and indefinitely in a DM
-- **It acts as whoever tagged it** — Slack accounts are matched to workspace members, so the bot can never do more than the person asking
-- **Slack steps for your workflows** — post, update or delete messages, send ephemerals, add reactions, list channels
-
-## 🤖 The assistant
-
-Mention the bot in a channel or DM it. It replies in the thread with your CRM data, using the recent conversation as context. Short answers end with native thumbs up / thumbs down buttons, and the rating is stored on the matching Slack Assistant Request record in Twenty.
-
-A Slack account with no link to a workspace member runs with the **Slack Assistant** role, which can read, create, update and soft-delete people, companies, opportunities, notes and tasks. Workspace members stay read-only and hard delete is off. Tighten the role in **Settings → Roles** if you want a narrower bot.
-
-Everyone else runs with their own permissions. Connecting the Slack workspace sweeps the roster and links every full member whose confirmed Slack email matches a workspace member; anyone the sweep missed is matched the first time they mention the bot. Each pair is stored as a **Slack User Link**. Guests and Slack Connect users are never matched automatically, so an admin links them by hand from the app's **Settings** tab, which also lists who the sweep skipped. See [SETUP.md](https://github.com/twentyhq/twenty/blob/main/packages/twenty-apps/public/slack/SETUP.md) for how linking, consent and re-verification work.
-
-When the bot is added to a channel it introduces itself once, with a short message in the channel and the details in a thread reply.
-
-## 🧰 The workflow steps
-
-| Step                           | Slack API            |
-| ------------------------------ | -------------------- |
-| `slack-post-message`           | `chat.postMessage`   |
-| `slack-post-ephemeral-message` | `chat.postEphemeral` |
-| `slack-update-message`         | `chat.update`        |
-| `slack-delete-message`         | `chat.delete`        |
-| `slack-add-reaction`           | `reactions.add`      |
-| `slack-list-channels`          | `conversations.list` |
-
-Pick a **workspace shared** or **just for me** Slack connection; steps run with that token.
+- **A CRM assistant in Slack**: `@twenty how many open opportunities do we have?` It answers as whoever tagged it
+- **Slack steps for your workflows**: post, update or delete messages, send ephemerals, add reactions, list channels
+- **Open by default, restrict when you want**: in the Settings tab, limit the assistant to Slack accounts linked to a workspace member
+- **Per-channel rules**: open a channel to anyone, restrict it to linked members, or silence the assistant there
 
 ## 💳 Billing
 
-No per-seat or per-message charge, but the app's runs are metered like any other app's — **$0.0001 per logic function invocation**, plus runtime.
+**Free to run**: no per-seat, per-message or per-event charge. Assistant answers use AI credits on the model's token usage.
 
-Every Slack event the bot is subscribed to costs an invocation, including messages it never answers: `message.channels` and `message.groups` deliver every message posted in the channels the bot belongs to, which is what makes un-mentioned thread follow-ups work. Drop those two subscriptions to limit the bot to explicit mentions and DMs. Each workflow step run costs an invocation too.
+## 📌 Getting started
 
-Answering costs AI credits on top, billed on the model's token usage — the whole prompt as well as the reply — so cost tracks the conversation context, the records the bot reads and the length of its answer.
+Open the Slack app in Twenty, click **Add connection**, and complete the Slack sign-in. You're all set.
 
-## 📌 Heads up
-
-- **You create the Slack app** — Twenty connects to a Slack app you own, so an admin has to create it and set its credentials before anyone can connect. The assistant needs a signing secret and event subscriptions on top. See [SETUP.md](https://github.com/twentyhq/twenty/blob/main/packages/twenty-apps/public/slack/SETUP.md).
-- **One Slack workspace per Twenty workspace** — connecting claims that Slack team. Removing the last connection using it releases the claim, so another Twenty workspace can then connect the same team.
-- **Private channels need membership** — public channels are covered by `chat:write.public`; anywhere else, invite the bot.
+**Self-hosting?** Your admin creates the Slack app and sets its credentials first: see the [self-hosting setup guide](https://github.com/twentyhq/twenty/blob/main/packages/twenty-apps/public/slack/SETUP.md).

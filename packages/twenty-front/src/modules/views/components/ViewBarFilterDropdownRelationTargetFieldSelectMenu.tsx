@@ -23,7 +23,7 @@ import { useInitializeFilterOnFieldMetadataItemFromViewBarFilterDropdown } from 
 import { CoreObjectNameSingular, FieldMetadataType } from 'twenty-shared/types';
 import { isDefined } from 'twenty-shared/utils';
 import { IconChevronLeft, useIcons } from 'twenty-ui/icon';
-import { MenuItem } from 'twenty-ui/navigation';
+import { MenuItem } from 'twenty-ui/components';
 
 const RELATION_RECORD_SELECTABLE_ITEM_ID = 'view-bar-relation-record-select';
 
@@ -91,7 +91,7 @@ export const ViewBarFilterDropdownRelationTargetFieldSelectMenu = () => {
   ];
 
   return (
-    <DropdownContent widthInPixels={GenericDropdownContentWidth.ExtraLarge}>
+    <DropdownContent width={GenericDropdownContentWidth.ExtraLarge}>
       <DropdownMenuHeader
         StartComponent={
           <DropdownMenuHeaderLeftComponent

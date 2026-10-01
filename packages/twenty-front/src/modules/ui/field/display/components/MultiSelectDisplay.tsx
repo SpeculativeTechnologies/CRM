@@ -1,8 +1,8 @@
 import { FieldDisplayList } from '@/object-record/record-field/ui/components/FieldDisplayList';
 import { type FieldMultiSelectValue } from '@/object-record/record-field/ui/types/FieldMetadata';
 import { isDefined } from 'twenty-shared/utils';
-import { Tag } from 'twenty-ui/data-display';
-import { type SelectOption } from 'twenty-ui/input';
+import { Tag } from 'twenty-ui/primitives/data-display';
+import { type SelectOption } from 'twenty-ui/primitives/input';
 
 export const MultiSelectDisplay = ({
   values,
@@ -24,9 +24,12 @@ export const MultiSelectDisplay = ({
           preventShrink
           key={selectedOption.value}
           color={selectedOption.color ?? 'transparent'}
-          text={selectedOption.label}
-          Icon={selectedOption.Icon ?? undefined}
-        />
+          startIcon={
+            isDefined(selectedOption.Icon) ? <selectedOption.Icon /> : undefined
+          }
+        >
+          {selectedOption.label}
+        </Tag>
       ))}
     </FieldDisplayList>
   );

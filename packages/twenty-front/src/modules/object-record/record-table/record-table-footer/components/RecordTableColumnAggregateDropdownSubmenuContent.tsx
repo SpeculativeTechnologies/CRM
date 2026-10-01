@@ -1,12 +1,7 @@
 import { RecordTableColumnAggregateFooterAggregateOperationMenuItems } from '@/object-record/record-table/record-table-footer/components/RecordTableColumnAggregateFooterAggregateOperationMenuItems';
-import { RecordTableColumnAggregateFooterDropdownContext } from '@/object-record/record-table/record-table-footer/components/RecordTableColumnAggregateFooterDropdownContext';
 import { type ExtendedAggregateOperations } from '@/object-record/record-table/types/ExtendedAggregateOperations';
-import { DropdownContent } from '@/ui/layout/dropdown/components/DropdownContent';
-import { DropdownMenuHeader } from '@/ui/layout/dropdown/components/DropdownMenuHeader/DropdownMenuHeader';
-import { DropdownMenuHeaderLeftComponent } from '@/ui/layout/dropdown/components/DropdownMenuHeader/internal/DropdownMenuHeaderLeftComponent';
-import { DropdownMenuItemsContainer } from '@/ui/layout/dropdown/components/DropdownMenuItemsContainer';
-import { type ReactNode, useContext } from 'react';
-import { IconChevronLeft } from 'twenty-ui/icon';
+import { type ReactNode } from 'react';
+import { Dropdown } from 'twenty-ui/components';
 
 export const RecordTableColumnAggregateFooterDropdownSubmenuContent = ({
   aggregateOperations,
@@ -17,29 +12,16 @@ export const RecordTableColumnAggregateFooterDropdownSubmenuContent = ({
   title: string;
   children?: ReactNode;
 }) => {
-  const { resetContent } = useContext(
-    RecordTableColumnAggregateFooterDropdownContext,
-  );
-
   return (
-    <DropdownContent>
-      <DropdownMenuHeader
-        StartComponent={
-          <DropdownMenuHeaderLeftComponent
-            onClick={resetContent}
-            Icon={IconChevronLeft}
-          />
-        }
-      >
-        {title}
-      </DropdownMenuHeader>
-      <DropdownMenuItemsContainer>
+    <>
+      <Dropdown.Back>{title}</Dropdown.Back>
+      <Dropdown.Section>
         <RecordTableColumnAggregateFooterAggregateOperationMenuItems
           aggregateOperations={aggregateOperations}
         >
           {children}
         </RecordTableColumnAggregateFooterAggregateOperationMenuItems>
-      </DropdownMenuItemsContainer>
-    </DropdownContent>
+      </Dropdown.Section>
+    </>
   );
 };

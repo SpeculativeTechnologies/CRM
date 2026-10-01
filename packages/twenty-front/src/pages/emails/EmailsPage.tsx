@@ -4,8 +4,8 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { AppPath } from 'twenty-shared/types';
 import { isDefined } from 'twenty-shared/utils';
 import { IconMail, IconSend, IconTrash } from 'twenty-ui/icon';
-import { Button } from 'twenty-ui/input';
-import { themeCssVariables } from 'twenty-ui/theme-constants';
+import { Button } from 'twenty-ui/primitives/input';
+import { themeCssVariables } from 'twenty-ui/theme';
 
 import { CampaignComposerFields } from '@/activities/emails/components/CampaignComposerFields';
 import { MassEmailWorkspace } from '@/activities/emails/mass-email/components/MassEmailWorkspace';
@@ -590,23 +590,25 @@ const CampaignEditor = ({
         </StyledSaveState>
         <StyledActions>
           <Button
-            size="small"
-            variant="secondary"
-            accent="danger"
-            title="Delete draft"
-            Icon={IconTrash}
+            size="sm"
+            variant="outline"
+            color="danger"
+            startIcon={<IconTrash />}
             disabled={isDeleting || campaignState.draftCampaignId === undefined}
             onClick={handleDelete}
-          />
+          >
+            Delete draft
+          </Button>
           <Button
-            size="small"
-            variant="primary"
-            accent="blue"
-            title="Send campaign"
-            Icon={IconSend}
+            size="sm"
+            variant="solid"
+            color="accent"
+            startIcon={<IconSend />}
             disabled={!campaignState.canSend}
             onClick={campaignState.handleSend}
-          />
+          >
+            Send campaign
+          </Button>
         </StyledActions>
       </StyledEditorFooter>
     </PageContainer>

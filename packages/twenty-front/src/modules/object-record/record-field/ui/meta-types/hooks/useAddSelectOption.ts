@@ -3,15 +3,15 @@ import { useUpdateOneFieldMetadataItem } from '@/object-metadata/hooks/useUpdate
 import { type FieldMetadataItemOption } from '@/object-metadata/types/FieldMetadataItem';
 import { getNewSelectOptionErrorMessage } from '@/object-record/record-field/ui/meta-types/utils/getNewSelectOptionErrorMessage';
 import { generateNewSelectOption } from '@/settings/data-model/fields/forms/select/utils/generateNewSelectOption';
-import { useSnackBar } from '@/ui/feedback/snack-bar-manager/hooks/useSnackBar';
 import { useCallback } from 'react';
 import { isDefined } from 'twenty-shared/utils';
+import { useToast } from 'twenty-ui/components';
 
 export const useAddSelectOption = (fieldMetadataId: string) => {
   const { fieldMetadataItem, objectMetadataItem } =
     useFieldMetadataItemById(fieldMetadataId);
   const { updateOneFieldMetadataItem } = useUpdateOneFieldMetadataItem();
-  const { enqueueErrorSnackBar } = useSnackBar();
+  const { enqueueToast } = useToast();
 
   const addSelectOption = useCallback(
     async (
@@ -32,7 +32,7 @@ export const useAddSelectOption = (fieldMetadataId: string) => {
       });
 
       if (isDefined(validationErrorMessage)) {
-        enqueueErrorSnackBar({ message: validationErrorMessage });
+        enqueueToast({ variant: 'error', children: validationErrorMessage });
 
         return undefined;
       }
@@ -50,7 +50,7 @@ export const useAddSelectOption = (fieldMetadataId: string) => {
       fieldMetadataItem?.options,
       objectMetadataItem,
       updateOneFieldMetadataItem,
-      enqueueErrorSnackBar,
+      enqueueToast,
     ],
   );
 

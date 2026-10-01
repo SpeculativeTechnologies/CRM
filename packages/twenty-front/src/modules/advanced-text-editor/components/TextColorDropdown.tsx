@@ -11,15 +11,12 @@ import { DropdownMenuSeparator } from '@/ui/layout/dropdown/components/DropdownM
 import { useToggleDropdown } from '@/ui/layout/dropdown/hooks/useToggleDropdown';
 import { useLingui } from '@lingui/react/macro';
 import { type Editor } from '@tiptap/react';
-import { useContext, useId } from 'react';
+import { useId } from 'react';
 import { IconCircleOff, IconColorSwatch } from 'twenty-ui/icon';
-import {
-  type ColorLabels,
-  DEFAULT_COLOR_LABELS,
-  MenuItemSelect,
-  MenuItemSelectColor,
-} from 'twenty-ui/navigation';
-import { ThemeContext } from 'twenty-ui/theme-constants';
+import { type ColorLabels, DEFAULT_COLOR_LABELS } from 'twenty-ui/components';
+import { ColorSample } from 'twenty-ui/primitives/data-display';
+import { ListItem } from 'twenty-ui/primitives/navigation';
+import { useTheme } from 'twenty-ui/theme';
 
 type TextColorDropdownProps = {
   editor: Editor;
@@ -30,7 +27,7 @@ export const TextColorDropdown = ({
   editor,
   activeColor,
 }: TextColorDropdownProps) => {
-  const { theme } = useContext(ThemeContext);
+  const theme = useTheme();
   const { t, i18n } = useLingui();
   const instanceId = useId();
   const dropdownId = `text-color-dropdown-${instanceId}`;
@@ -56,6 +53,7 @@ export const TextColorDropdown = ({
       dropdownId={dropdownId}
       clickableComponent={
         <BubbleMenuIconButton
+          label={t`Text color`}
           Icon={IconColorSwatch}
           isActive={activeColor !== undefined}
         />
@@ -63,29 +61,33 @@ export const TextColorDropdown = ({
       dropdownComponents={
         <DropdownContent>
           <DropdownMenuItemsContainer>
-            <MenuItemSelect
-              LeftIcon={IconCircleOff}
-              text={t`Default`}
+            <ListItem
+              startIcon={<IconCircleOff />}
               selected={activeColor === undefined}
+              indicator="check"
               onClick={() => {
                 editor.chain().focus().unsetTextColor().run();
                 closeDropdown();
               }}
-            />
+            >
+              {t`Default`}
+            </ListItem>
           </DropdownMenuItemsContainer>
           <DropdownMenuSeparator />
           <DropdownMenuItemsContainer hasMaxHeight>
             {TEXT_COLOR_NAMES.map((colorName) => (
-              <MenuItemSelectColor
+              <ListItem
                 key={colorName}
-                color={colorName}
-                colorLabels={colorLabels}
+                startIcon={<ColorSample colorName={colorName} />}
                 selected={colorName === activeColor}
+                indicator="check"
                 onClick={() => {
                   editor.chain().focus().setTextColor(colorName).run();
                   closeDropdown();
                 }}
-              />
+              >
+                {colorLabels[colorName]}
+              </ListItem>
             ))}
           </DropdownMenuItemsContainer>
         </DropdownContent>

@@ -1,11 +1,12 @@
 import { useLingui } from '@lingui/react/macro';
+import { Dropdown, IconButton } from 'twenty-ui/components';
 import { IconFilter } from 'twenty-ui/icon';
-import { IconButton } from 'twenty-ui/input';
 
 import { SidePanelObjectFilterDropdownContent } from '@/side-panel/components/SidePanelObjectFilterDropdownContent';
-import { Dropdown } from '@/ui/layout/dropdown/components/Dropdown';
+import { DropdownRoot } from '@/ui/layout/dropdown/components/DropdownRoot';
+import { DropdownContent } from '@/ui/layout/dropdown/components/DropdownContent';
 
-export const OBJECT_FILTER_DROPDOWN_ID = 'side-panel-object-filter-dropdown';
+const OBJECT_FILTER_DROPDOWN_ID = 'side-panel-object-filter-dropdown';
 
 type SidePanelObjectFilterDropdownProps = {
   selectedObjectNameSingulars: string[];
@@ -20,24 +21,25 @@ export const SidePanelObjectFilterDropdown = ({
   const isFilterActive = selectedObjectNameSingulars.length > 0;
 
   return (
-    <Dropdown
-      dropdownId={OBJECT_FILTER_DROPDOWN_ID}
-      dropdownPlacement="bottom-end"
-      clickableComponent={
-        <IconButton
-          Icon={IconFilter}
-          variant="tertiary"
-          accent={isFilterActive ? 'blue' : 'default'}
-          size="small"
-          ariaLabel={t`Filter by object type`}
-        />
-      }
-      dropdownComponents={
+    <DropdownRoot dropdownId={OBJECT_FILTER_DROPDOWN_ID} type="picker">
+      <Dropdown.Trigger
+        render={
+          <IconButton
+            variant="ghost"
+            color={isFilterActive ? 'accent' : 'neutral'}
+            size="sm"
+            aria-label={t`Filter by object type`}
+          >
+            <IconFilter />
+          </IconButton>
+        }
+      />
+      <DropdownContent side="bottom" align="end">
         <SidePanelObjectFilterDropdownContent
           selectedObjectNameSingulars={selectedObjectNameSingulars}
           onChangeSelectedObjects={onChangeSelectedObjects}
         />
-      }
-    />
+      </DropdownContent>
+    </DropdownRoot>
   );
 };

@@ -366,28 +366,21 @@ export const fromUniversalConfigurationToFlatPageLayoutWidgetConfiguration = ({
           })
         : undefined;
 
-      let viewId: string | undefined = undefined;
-
-      if (isDefined(viewUniversalIdentifier)) {
-        const flatView = findFlatEntityByUniversalIdentifier({
-          flatEntityMaps: flatViewMaps,
-          universalIdentifier: viewUniversalIdentifier,
-        });
-
-        if (!isDefined(flatView)) {
-          throw new FlatEntityMapsException(
-            `View not found for universal identifier: ${viewUniversalIdentifier}`,
-            FlatEntityMapsExceptionCode.ENTITY_NOT_FOUND,
-          );
-        }
-
-        viewId = flatView.id;
-      }
+      // Standard views are not synced together with page layouts: an upgrade
+      // step can create a widget before a later step creates the view it
+      // embeds. The widget is then created without a view, which renders
+      // empty until the view lands, instead of failing the whole migration.
+      const flatView = isDefined(viewUniversalIdentifier)
+        ? findFlatEntityByUniversalIdentifier({
+            flatEntityMaps: flatViewMaps,
+            universalIdentifier: viewUniversalIdentifier,
+          })
+        : undefined;
 
       return {
         ...rest,
         fieldMetadataId,
-        viewId,
+        viewId: flatView?.id,
         ...(isDefined(nestedRelationFieldMetadataId)
           ? { nestedRelationFieldMetadataId }
           : {}),
@@ -410,6 +403,8 @@ export const fromUniversalConfigurationToFlatPageLayoutWidgetConfiguration = ({
     case WidgetConfigurationType.EMAIL_THREAD:
     case WidgetConfigurationType.CALL_RECORDING_SUMMARY:
     case WidgetConfigurationType.CALL_RECORDING_TRANSCRIPT:
+    case WidgetConfigurationType.CHAT_THREADS:
+    case WidgetConfigurationType.CHAT:
     case WidgetConfigurationType.MESSAGE_CAMPAIGN_BODY:
     case WidgetConfigurationType.MESSAGE_CAMPAIGN_DETAILS:
       return universalConfiguration;

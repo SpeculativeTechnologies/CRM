@@ -96,11 +96,11 @@ describe('text colour mark registration', () => {
       (value) => `${value}!`,
     );
 
-    expect(transformed.content?.[0].content?.[0].marks?.[0]).toEqual({
+    expect(transformed.content?.[0]?.content?.[0]?.marks?.[0]).toEqual({
       type: TIPTAP_MARK_TYPES.TEXT_COLOR,
       attrs: { color: 'blue' },
     });
-    expect(transformed.content?.[0].content?.[0].text).toBe('Regards!');
+    expect(transformed.content?.[0]?.content?.[0]?.text).toBe('Regards!');
   });
 });
 

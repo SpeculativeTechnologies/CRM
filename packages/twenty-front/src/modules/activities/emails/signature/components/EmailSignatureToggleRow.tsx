@@ -1,8 +1,8 @@
 import { styled } from '@linaria/react';
 import { t } from '@lingui/core/macro';
 import { useId } from 'react';
-import { Toggle } from 'twenty-ui/input';
-import { themeCssVariables } from 'twenty-ui/theme-constants';
+import { Switch } from 'twenty-ui/primitives/input';
+import { themeCssVariables } from 'twenty-ui/theme';
 
 const StyledRow = styled.div`
   align-items: center;
@@ -29,11 +29,11 @@ export const EmailSignatureToggleRow = ({
 
   return (
     <StyledRow>
-      <Toggle
+      <Switch
         id={toggleId}
-        toggleSize="small"
-        value={isIncluded}
-        onChange={onChange}
+        size="sm"
+        checked={isIncluded}
+        onCheckedChange={onChange}
       />
       <StyledLabel htmlFor={toggleId}>{t`Add my signature`}</StyledLabel>
     </StyledRow>

@@ -7,12 +7,10 @@ import { ViewBarFilterDropdownAnyFieldSearchInput } from '@/views/components/Vie
 import { ViewBarFilterDropdownFieldSelectMenu } from '@/views/components/ViewBarFilterDropdownFieldSelectMenu';
 import { ViewBarFilterDropdownFilterInput } from '@/views/components/ViewBarFilterDropdownFilterInput';
 import { ViewBarFilterDropdownRelationTargetFieldSelectMenu } from '@/views/components/ViewBarFilterDropdownRelationTargetFieldSelectMenu';
-import { ViewBarFilterDropdownIds } from '@/views/constants/ViewBarFilterDropdownIds';
 
 export const ViewBarFilterDropdownContent = () => {
   const [objectFilterDropdownFilterIsSelected] = useAtomComponentState(
     objectFilterDropdownFilterIsSelectedComponentState,
-    ViewBarFilterDropdownIds.MAIN,
   );
 
   const objectFilterDropdownAnyFieldSearchIsSelected =

@@ -1,7 +1,7 @@
 import { styled } from '@linaria/react';
 import { Link } from 'react-router-dom';
 import { AppPath } from 'twenty-shared/types';
-import { Pill } from 'twenty-ui/data-display';
+import { Pill } from 'twenty-ui/primitives/data-display';
 
 import { usePersonDuplicateGroupsCount } from '@/person-duplicate-review/hooks/usePersonDuplicateGroupsCount';
 import { NavigationDrawerAnimatedCollapseWrapper } from '@/ui/navigation/navigation-drawer/components/NavigationDrawerAnimatedCollapseWrapper';

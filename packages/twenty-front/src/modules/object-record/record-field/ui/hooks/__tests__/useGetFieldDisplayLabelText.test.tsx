@@ -38,7 +38,7 @@ const wrapper = ({ children }: { children: ReactNode }) => (
             company: (record) => ({
               recordId: record.id,
               name: `Chip ${record.name}`,
-              avatarType: 'rounded',
+              avatarShape: 'circle',
               avatarUrl: '',
               isLabelIdentifier: true,
               objectNameSingular: 'company',

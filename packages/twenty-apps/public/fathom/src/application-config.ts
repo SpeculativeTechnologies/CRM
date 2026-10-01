@@ -13,10 +13,14 @@ export default defineApplication({
   logo: 'public/logo.svg',
   author: 'Twenty',
   category: 'Productivity',
-  websiteUrl: 'https://docs.twenty.com/developers/extend/apps/getting-started',
+  websiteUrl: 'https://www.fathom.ai',
   termsUrl: 'https://www.twenty.com/terms',
   emailSupport: 'contact@twenty.com',
   issueReportUrl: 'https://github.com/twentyhq/twenty/issues',
+  galleryImages: [
+    'public/gallery/fathom-cover-image-1.png',
+    'public/gallery/fathom-cover-image-2.png',
+  ],
   serverVariables: {
     FATHOM_CLIENT_ID: {
       description: 'OAuth client ID from the Twenty Fathom application.',

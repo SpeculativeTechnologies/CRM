@@ -23,7 +23,9 @@ import { findObjectNameByUniversalIdentifier } from 'src/engine/workspace-manage
 export type BuildStandardFlatPageLayoutWidgetMetadataMapsArgs = Omit<
   CreateStandardPageLayoutWidgetArgs,
   'context'
->;
+> & {
+  excludedWidgetTypes: WidgetType[];
+};
 
 const RECORD_PAGE_LAYOUT_WIDGET_TYPES = [
   WidgetType.FIELDS,
@@ -43,6 +45,8 @@ const RECORD_PAGE_LAYOUT_WIDGET_TYPES = [
   WidgetType.CALL_RECORDING_TRANSCRIPT,
   WidgetType.MESSAGE_CAMPAIGN_BODY,
   WidgetType.MESSAGE_CAMPAIGN_DETAILS,
+  WidgetType.CHAT_THREADS,
+  WidgetType.CHAT,
 ];
 
 const WIDGET_TYPE_TO_CONFIGURATION_TYPE: Partial<
@@ -72,11 +76,14 @@ const WIDGET_TYPE_TO_CONFIGURATION_TYPE: Partial<
     WidgetConfigurationType.MESSAGE_CAMPAIGN_BODY,
   [WidgetType.MESSAGE_CAMPAIGN_DETAILS]:
     WidgetConfigurationType.MESSAGE_CAMPAIGN_DETAILS,
+  [WidgetType.CHAT_THREADS]: WidgetConfigurationType.CHAT_THREADS,
+  [WidgetType.CHAT]: WidgetConfigurationType.CHAT,
 };
 
 const RECORD_PAGE_FIELDS_VIEW_NAME_BY_OBJECT: Partial<
   Record<AllStandardObjectName, string>
 > = {
+  attachment: 'attachmentRecordPageFields',
   blocklist: 'blocklistRecordPageFields',
   calendarChannelEventAssociation:
     'calendarChannelEventAssociationRecordPageFields',
@@ -84,6 +91,7 @@ const RECORD_PAGE_FIELDS_VIEW_NAME_BY_OBJECT: Partial<
   calendarEventParticipant: 'calendarEventParticipantRecordPageFields',
   callRecording: 'callRecordingRecordPageFields',
   company: 'companyRecordPageFields',
+  message: 'messageRecordPageFields',
   messageCampaign: 'messageCampaignRecordPageFields',
   messageChannelMessageAssociation:
     'messageChannelMessageAssociationRecordPageFields',
@@ -104,11 +112,15 @@ const buildRecordPageWidgetConfigurations = ({
   layoutObjectName,
   standardObjectMetadataRelatedEntityIds,
   fieldUniversalIdentifier,
+  fieldDisplayMode,
+  embeddedViewUniversalIdentifier,
 }: {
   widgetType: WidgetType;
   layoutObjectName: AllStandardObjectName | null;
   standardObjectMetadataRelatedEntityIds: BuildStandardFlatPageLayoutWidgetMetadataMapsArgs['standardObjectMetadataRelatedEntityIds'];
   fieldUniversalIdentifier?: string;
+  fieldDisplayMode?: FieldDisplayMode;
+  embeddedViewUniversalIdentifier?: string;
 }): {
   configuration: AllPageLayoutWidgetConfiguration;
   universalConfiguration: CreateStandardPageLayoutWidgetContext['universalConfiguration'];
@@ -129,6 +141,8 @@ const buildRecordPageWidgetConfigurations = ({
       objectName: layoutObjectName,
       standardObjectMetadataRelatedEntityIds,
       fieldUniversalIdentifier,
+      fieldDisplayMode,
+      embeddedViewUniversalIdentifier,
     });
   }
 
@@ -214,14 +228,55 @@ const buildFieldsWidgetConfiguration = ({
   };
 };
 
+const findStandardViewIdByUniversalIdentifier = ({
+  standardObjectMetadataRelatedEntityIds,
+  viewUniversalIdentifier,
+}: {
+  standardObjectMetadataRelatedEntityIds: BuildStandardFlatPageLayoutWidgetMetadataMapsArgs['standardObjectMetadataRelatedEntityIds'];
+  viewUniversalIdentifier: string;
+}): string => {
+  for (const [objectName, objectDefinition] of Object.entries(
+    STANDARD_OBJECTS,
+  )) {
+    if (!('views' in objectDefinition)) {
+      continue;
+    }
+
+    const viewName = Object.entries(
+      objectDefinition.views as Record<string, { universalIdentifier: string }>,
+    ).find(
+      ([, viewDefinition]) =>
+        viewDefinition.universalIdentifier === viewUniversalIdentifier,
+    )?.[0];
+
+    if (!isDefined(viewName)) {
+      continue;
+    }
+
+    const views = standardObjectMetadataRelatedEntityIds[
+      objectName as AllStandardObjectName
+    ].views as Record<string, { id: string }>;
+
+    return views[viewName].id;
+  }
+
+  throw new Error(
+    `No standard view found for universal identifier ${viewUniversalIdentifier}`,
+  );
+};
+
 const buildFieldWidgetConfiguration = ({
   objectName,
   standardObjectMetadataRelatedEntityIds,
   fieldUniversalIdentifier,
+  fieldDisplayMode = FieldDisplayMode.CARD,
+  embeddedViewUniversalIdentifier,
 }: {
   objectName: AllStandardObjectName;
   standardObjectMetadataRelatedEntityIds: BuildStandardFlatPageLayoutWidgetMetadataMapsArgs['standardObjectMetadataRelatedEntityIds'];
   fieldUniversalIdentifier: string;
+  fieldDisplayMode?: FieldDisplayMode;
+  embeddedViewUniversalIdentifier?: string;
 }): {
   configuration: AllPageLayoutWidgetConfiguration;
   universalConfiguration: CreateStandardPageLayoutWidgetContext['universalConfiguration'];
@@ -241,16 +296,40 @@ const buildFieldWidgetConfiguration = ({
 
   const fieldMetadataId = fieldName ? (fields[fieldName]?.id ?? null) : null;
 
+  if (!isDefined(embeddedViewUniversalIdentifier)) {
+    return {
+      configuration: {
+        configurationType: WidgetConfigurationType.FIELD,
+        fieldMetadataId: fieldMetadataId ?? fieldUniversalIdentifier,
+        fieldDisplayMode,
+      },
+      universalConfiguration: {
+        configurationType: WidgetConfigurationType.FIELD,
+        fieldMetadataId: fieldUniversalIdentifier,
+        fieldDisplayMode,
+      },
+    };
+  }
+
+  const embeddedViewId = findStandardViewIdByUniversalIdentifier({
+    standardObjectMetadataRelatedEntityIds,
+    viewUniversalIdentifier: embeddedViewUniversalIdentifier,
+  });
+
   return {
     configuration: {
       configurationType: WidgetConfigurationType.FIELD,
       fieldMetadataId: fieldMetadataId ?? fieldUniversalIdentifier,
-      fieldDisplayMode: FieldDisplayMode.CARD,
+      fieldDisplayMode,
+      viewId: embeddedViewId,
     },
+    // The universal FIELD configuration carries the view universal identifier
+    // under viewId, resolved to the workspace view id at migration time.
     universalConfiguration: {
       configurationType: WidgetConfigurationType.FIELD,
       fieldMetadataId: fieldUniversalIdentifier,
-      fieldDisplayMode: FieldDisplayMode.CARD,
+      fieldDisplayMode,
+      viewId: embeddedViewUniversalIdentifier,
     },
   };
 };
@@ -261,6 +340,7 @@ const computeRecordPageWidgets = ({
   twentyStandardApplicationId,
   standardObjectMetadataRelatedEntityIds,
   standardPageLayoutMetadataRelatedEntityIds,
+  excludedWidgetTypes,
 }: BuildStandardFlatPageLayoutWidgetMetadataMapsArgs): FlatPageLayoutWidget[] => {
   const allWidgets: FlatPageLayoutWidget[] = [];
 
@@ -288,6 +368,10 @@ const computeRecordPageWidgets = ({
       for (const widgetName of Object.keys(tab.widgets)) {
         const widget = tab.widgets[widgetName];
 
+        if (excludedWidgetTypes.includes(widget.type)) {
+          continue;
+        }
+
         const isRecordPageWidget = RECORD_PAGE_LAYOUT_WIDGET_TYPES.includes(
           widget.type,
         );
@@ -306,6 +390,9 @@ const computeRecordPageWidgets = ({
             layoutObjectName,
             standardObjectMetadataRelatedEntityIds,
             fieldUniversalIdentifier: widget.fieldUniversalIdentifier,
+            fieldDisplayMode: widget.fieldDisplayMode,
+            embeddedViewUniversalIdentifier:
+              widget.embeddedViewUniversalIdentifier,
           });
 
         allWidgets.push(

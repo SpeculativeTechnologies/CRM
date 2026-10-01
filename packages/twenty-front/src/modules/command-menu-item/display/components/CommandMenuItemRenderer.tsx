@@ -1,11 +1,11 @@
+import { type CommandMenuItemDefinition } from '@/command-menu-item/types/CommandMenuItemDefinition';
 import { AppMenuItem } from '@/applications/components/AppMenuItem';
 import { useIsThirdPartyApplication } from '@/applications/hooks/useIsThirdPartyApplication';
 import { CommandMenuContext } from '@/command-menu-item/contexts/CommandMenuContext';
 import { CommandListItemLoader } from '@/command-menu-item/display/components/CommandListItemLoader';
-import { CommandMenuDropdownSubMenuContext } from '@/command-menu-item/contexts/CommandMenuDropdownSubMenuContext';
+import { CommandMenuDropdownActionItem } from '@/command-menu-item/display/components/CommandMenuDropdownActionItem';
 import { CommandMenuItemRelatedPeopleButtonRenderer } from '@/command-menu-item/display/components/CommandMenuItemRelatedPeopleButtonRenderer';
-import { interpolateCommandMenuItemFields } from '@/command-menu-item/display/utils/interpolateCommandMenuItemFields';
-import { useCommandMenuItemClick } from '@/command-menu-item/hooks/useCommandMenuItemClick';
+import { useCommandMenuItemDisplay } from '@/command-menu-item/display/hooks/useCommandMenuItemDisplay';
 import { CommandMenuButton } from '@/command-menu/components/CommandMenuButton';
 import { CommandMenuItem } from '@/command-menu/components/CommandMenuItem';
 import { SelectableListItem } from '@/ui/layout/selectable-list/components/SelectableListItem';
@@ -13,17 +13,11 @@ import { SelectableListComponentInstanceContext } from '@/ui/layout/selectable-l
 import { isSelectedItemIdComponentFamilyState } from '@/ui/layout/selectable-list/states/isSelectedItemIdComponentFamilyState';
 import { useAvailableComponentInstanceIdOrThrow } from '@/ui/utilities/state/component-state/hooks/useAvailableComponentInstanceIdOrThrow';
 import { useAtomComponentFamilyStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomComponentFamilyStateValue';
-import { COMMAND_MENU_DEFAULT_ICON } from '@/workflow/workflow-trigger/constants/CommandMenuDefaultIcon';
 import { styled } from '@linaria/react';
 import { useContext } from 'react';
-import { assertUnreachable, isDefined } from 'twenty-shared/utils';
-import { useIcons } from 'twenty-ui/icon';
-import { Loader } from 'twenty-ui/feedback';
-import { MenuItem } from 'twenty-ui/navigation';
-import {
-  EngineComponentKey,
-  type CommandMenuItemFieldsFragment,
-} from '~/generated-metadata/graphql';
+import { assertUnreachable } from 'twenty-shared/utils';
+import { Dropdown } from 'twenty-ui/components';
+import { EngineComponentKey } from '~/generated-metadata/graphql';
 
 const StyledPreviewWrapper = styled.div`
   cursor: not-allowed;
@@ -34,7 +28,7 @@ const StyledPreviewWrapper = styled.div`
 `;
 
 type CommandMenuItemRendererProps = {
-  item: CommandMenuItemFieldsFragment;
+  item: CommandMenuItemDefinition;
   isPrimaryAction?: boolean;
   shouldHideLabel?: boolean;
 };
@@ -46,24 +40,24 @@ const CommandMenuItemButtonRenderer = ({
   isPrimaryAction = false,
   shouldHideLabel = false,
 }: CommandMenuItemButtonRendererProps) => {
-  const { commandMenuContextApi, isInPreviewMode } =
-    useContext(CommandMenuContext);
-  const { getIcon } = useIcons();
-
-  const { iconKey, label, shortLabel } = interpolateCommandMenuItemFields(
-    item,
-    commandMenuContextApi,
-  );
-
-  const Icon = getIcon(iconKey, COMMAND_MENU_DEFAULT_ICON);
-
-  const { handleClick, disabled } = useCommandMenuItemClick({
-    item,
+  const { isInPreviewMode } = useContext(CommandMenuContext);
+  const {
     Icon,
     label,
-  });
+    shortLabel,
+    handleClick,
+    disabled,
+    progress,
+    isLoading,
+  } = useCommandMenuItemDisplay(item);
 
-  const command = { key: item.id, label, shortLabel, Icon };
+  const command = {
+    key: item.id,
+    label,
+    shortLabel,
+    Icon,
+    hotKeys: item.hotKeys,
+  };
 
   if (isInPreviewMode) {
     return (
@@ -82,30 +76,24 @@ const CommandMenuItemButtonRenderer = ({
       command={command}
       onClick={disabled ? undefined : handleClick}
       disabled={disabled}
+      progress={progress}
+      loading={isLoading}
       isPrimaryAction={isPrimaryAction}
       shouldHideLabel={shouldHideLabel}
     />
   );
 };
 
+type CommandMenuItemSelectableRendererProps = Pick<
+  CommandMenuItemRendererProps,
+  'item'
+>;
+
 const CommandMenuItemSelectableRenderer = ({
   item,
-  displayType,
-}: CommandMenuItemRendererProps & {
-  displayType: 'listItem' | 'dropdownItem';
-}) => {
-  const { commandMenuContextApi } = useContext(CommandMenuContext);
-  const { getIcon } = useIcons();
-
-  const { iconKey, label } = interpolateCommandMenuItemFields(
-    item,
-    commandMenuContextApi,
-  );
-
-  const Icon = getIcon(iconKey, COMMAND_MENU_DEFAULT_ICON);
-
-  const { handleClick, disabled, progress, showDisabledLoader } =
-    useCommandMenuItemClick({ item, Icon, label });
+}: CommandMenuItemSelectableRendererProps) => {
+  const { Icon, label, handleClick, disabled, progress, isLoading } =
+    useCommandMenuItemDisplay(item);
 
   const selectableListInstanceId = useAvailableComponentInstanceIdOrThrow(
     SelectableListComponentInstanceContext,
@@ -119,37 +107,16 @@ const CommandMenuItemSelectableRenderer = ({
 
   const isThirdPartyApp = useIsThirdPartyApplication(item.applicationId);
 
-  const subMenuContext = useContext(CommandMenuDropdownSubMenuContext);
-
-  // Choosing a relation happens in a submenu of the list this item lives in,
-  // so it opens that submenu rather than mounting the command.
-  const opensRelatedPeopleSubMenu =
-    item.engineComponentKey ===
-      EngineComponentKey.COMPOSE_EMAIL_TO_RELATED_PEOPLE &&
-    isDefined(subMenuContext);
-
   const onItemClick = () => {
     if (disabled) {
       return;
     }
-
-    if (opensRelatedPeopleSubMenu) {
-      subMenuContext.onContentChange('related-people');
-
-      return;
-    }
-
     handleClick();
   };
 
-  const loaderComponent =
-    disabled && showDisabledLoader ? (
-      isDefined(progress) ? (
-        <CommandListItemLoader progress={progress} />
-      ) : (
-        <Loader />
-      )
-    ) : undefined;
+  const loaderComponent = isLoading ? (
+    <CommandListItemLoader progress={progress} />
+  ) : undefined;
 
   if (isThirdPartyApp) {
     return (
@@ -166,33 +133,38 @@ const CommandMenuItemSelectableRenderer = ({
     );
   }
 
-  if (displayType === 'listItem') {
-    return (
-      <SelectableListItem itemId={item.id} onEnter={onItemClick}>
-        <CommandMenuItem
-          id={item.id}
-          Icon={Icon}
-          label={label}
-          onClick={disabled ? undefined : handleClick}
-          hotKeys={item.hotKeys}
-          disabled={disabled}
-          RightComponent={loaderComponent}
-        />
-      </SelectableListItem>
-    );
-  }
-
   return (
     <SelectableListItem itemId={item.id} onEnter={onItemClick}>
-      <MenuItem
-        focused={isSelectedItemId}
-        LeftIcon={Icon}
-        onClick={onItemClick}
-        text={label}
+      <CommandMenuItem
+        id={item.id}
+        Icon={Icon}
+        label={label}
+        onClick={disabled ? undefined : handleClick}
+        hotKeys={item.hotKeys}
         disabled={disabled}
-        hasSubMenu={opensRelatedPeopleSubMenu}
+        RightComponent={loaderComponent}
       />
     </SelectableListItem>
+  );
+};
+
+// Picking which relation to email through happens in a submenu page of the
+// anchored dropdown, so this item navigates there instead of mounting.
+const CommandMenuItemRelatedPeopleDropdownRenderer = ({
+  item,
+}: {
+  item: CommandMenuItemDefinition;
+}) => {
+  const { Icon, label } = useCommandMenuItemDisplay(item);
+
+  return (
+    <Dropdown.ActionItem
+      page="related-people"
+      hasSubmenu
+      startIcon={<Icon />}
+    >
+      {label}
+    </Dropdown.ActionItem>
   );
 };
 
@@ -204,13 +176,14 @@ export const CommandMenuItemRenderer = ({
 }: CommandMenuItemRendererProps) => {
   const { displayType } = useContext(CommandMenuContext);
 
+  const isComposeEmailToRelatedPeople =
+    item.engineComponentKey ===
+    EngineComponentKey.COMPOSE_EMAIL_TO_RELATED_PEOPLE;
+
   if (displayType === 'button') {
     // Picking which relation to email through happens in a dropdown anchored to
     // the button, so this item never goes through the mount-and-execute path.
-    if (
-      item.engineComponentKey ===
-      EngineComponentKey.COMPOSE_EMAIL_TO_RELATED_PEOPLE
-    ) {
+    if (isComposeEmailToRelatedPeople) {
       return (
         <CommandMenuItemRelatedPeopleButtonRenderer
           item={item}
@@ -228,13 +201,16 @@ export const CommandMenuItemRenderer = ({
     );
   }
 
-  if (displayType === 'listItem' || displayType === 'dropdownItem') {
-    return (
-      <CommandMenuItemSelectableRenderer
-        item={item}
-        displayType={displayType}
-      />
-    );
+  if (displayType === 'listItem') {
+    return <CommandMenuItemSelectableRenderer item={item} />;
+  }
+
+  if (displayType === 'dropdownItem') {
+    if (isComposeEmailToRelatedPeople) {
+      return <CommandMenuItemRelatedPeopleDropdownRenderer item={item} />;
+    }
+
+    return <CommandMenuDropdownActionItem item={item} />;
   }
 
   return assertUnreachable(displayType, 'Unsupported display type');

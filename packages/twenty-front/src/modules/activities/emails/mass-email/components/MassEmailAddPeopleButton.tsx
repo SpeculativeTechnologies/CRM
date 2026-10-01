@@ -3,15 +3,15 @@ import { useId } from 'react';
 
 import { useOpenFormMultiRecordPicker } from '@/object-record/record-field/ui/form-types/hooks/useOpenFormMultiRecordPicker';
 import { MultipleRecordPicker } from '@/object-record/record-picker/multiple-record-picker/components/MultipleRecordPicker';
-import { useSnackBar } from '@/ui/feedback/snack-bar-manager/hooks/useSnackBar';
 import { Dropdown } from '@/ui/layout/dropdown/components/Dropdown';
 import { GenericDropdownContentWidth } from '@/ui/layout/dropdown/constants/GenericDropdownContentWidth';
 import { useCloseDropdown } from '@/ui/layout/dropdown/hooks/useCloseDropdown';
 import { t } from '@lingui/core/macro';
 import { MAX_EMAIL_RECIPIENTS } from 'twenty-shared/constants';
+import { useToast } from 'twenty-ui/components';
 import { IconUserPlus } from 'twenty-ui/icon';
-import { Button } from 'twenty-ui/input';
-import { themeCssVariables } from 'twenty-ui/theme-constants';
+import { Button } from 'twenty-ui/primitives/input';
+import { themeCssVariables } from 'twenty-ui/theme';
 
 const StyledContainer = styled.div`
   border-top: 1px solid ${themeCssVariables.border.color.medium};
@@ -30,7 +30,7 @@ export const MassEmailAddPeopleButton = ({
   const componentId = useId();
   const dropdownId = `mass-email-add-people-${componentId}`;
   const { closeDropdown } = useCloseDropdown();
-  const { enqueueWarningSnackBar } = useSnackBar();
+  const { enqueueToast } = useToast();
   const { openFormMultiRecordPicker } = useOpenFormMultiRecordPicker({
     objectNameSingular: 'person',
   });
@@ -52,12 +52,13 @@ export const MassEmailAddPeopleButton = ({
         onOpen={handleOpen}
         clickableComponent={
           <Button
-            title={t`Add people`}
-            Icon={IconUserPlus}
-            size="small"
-            variant="secondary"
+            startIcon={<IconUserPlus />}
+            size="sm"
+            variant="outline"
             fullWidth
-          />
+          >
+            {t`Add people`}
+          </Button>
         }
         dropdownComponents={
           <MultipleRecordPicker
@@ -71,8 +72,9 @@ export const MassEmailAddPeopleButton = ({
                 !selectedPersonIds.includes(recordId) &&
                 selectedPersonIds.length >= MAX_EMAIL_RECIPIENTS
               ) {
-                enqueueWarningSnackBar({
-                  message: t`You can select at most ${MAX_EMAIL_RECIPIENTS} people.`,
+                enqueueToast({
+                  variant: 'warning',
+                  children: t`You can select at most ${MAX_EMAIL_RECIPIENTS} people.`,
                 });
 
                 return;

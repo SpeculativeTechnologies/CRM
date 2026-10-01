@@ -26,8 +26,8 @@ jest.mock('@/object-record/hooks/useCreateManyRecords', () => ({
 jest.mock('@/object-record/hooks/useUpdateOneRecord', () => ({
   useUpdateOneRecord: () => ({ updateOneRecord: mockUpdateOneRecord }),
 }));
-jest.mock('@/ui/feedback/snack-bar-manager/hooks/useSnackBar', () => ({
-  useSnackBar: () => ({ enqueueErrorSnackBar: mockEnqueueErrorSnackBar }),
+jest.mock('twenty-ui/components', () => ({
+  useToast: () => ({ enqueueToast: mockEnqueueErrorSnackBar }),
 }));
 jest.mock('@/ui/utilities/state/jotai/hooks/useAtomFamilyStateValue', () => ({
   useAtomFamilyStateValue: () => ({
@@ -35,7 +35,7 @@ jest.mock('@/ui/utilities/state/jotai/hooks/useAtomFamilyStateValue', () => ({
     pointOfContactId: 'person-1',
   }),
 }));
-jest.mock('twenty-ui/input', () => ({
+jest.mock('twenty-ui/primitives/input', () => ({
   Button: ({
     title,
     onClick,

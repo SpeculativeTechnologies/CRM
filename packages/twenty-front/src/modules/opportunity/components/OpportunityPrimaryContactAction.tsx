@@ -7,9 +7,9 @@ import { useObjectPermissionsForObject } from '@/object-record/hooks/useObjectPe
 import { useUpdateOneRecord } from '@/object-record/hooks/useUpdateOneRecord';
 import { useIsRecordFieldReadOnly } from '@/object-record/read-only/hooks/useIsRecordFieldReadOnly';
 import { recordStoreFamilyState } from '@/object-record/record-store/states/recordStoreFamilyState';
-import { useSnackBar } from '@/ui/feedback/snack-bar-manager/hooks/useSnackBar';
 import { useAtomFamilyStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomFamilyStateValue';
-import { Button } from 'twenty-ui/input';
+import { useToast } from 'twenty-ui/components';
+import { Button } from 'twenty-ui/primitives/input';
 
 export const OpportunityPrimaryContactAction = ({
   opportunityId,
@@ -40,7 +40,7 @@ export const OpportunityPrimaryContactAction = ({
     objectNameSingular: 'opportunityContact',
   });
   const { updateOneRecord } = useUpdateOneRecord();
-  const { enqueueErrorSnackBar } = useSnackBar();
+  const { enqueueToast } = useToast();
   const [isSaving, setIsSaving] = useState(false);
   const isPrimary = recordStore?.pointOfContactId === personId;
 
@@ -63,8 +63,9 @@ export const OpportunityPrimaryContactAction = ({
         updateOneRecordInput: { pointOfContactId: personId },
       });
     } catch {
-      enqueueErrorSnackBar({
-        message: t`Could not change the primary contact`,
+      enqueueToast({
+        variant: 'error',
+        children: t`Could not change the primary contact`,
       });
     } finally {
       setIsSaving(false);
@@ -76,12 +77,13 @@ export const OpportunityPrimaryContactAction = ({
 
   return (
     <Button
-      title={t`Make primary`}
-      variant="tertiary"
-      size="small"
+      variant="ghost"
+      size="sm"
       disabled={isSaving}
-      isLoading={isSaving}
+      loading={isSaving}
       onClick={handleMakePrimary}
-    />
+    >
+      {t`Make primary`}
+    </Button>
   );
 };

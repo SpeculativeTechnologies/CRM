@@ -2,10 +2,10 @@ import { styled } from '@linaria/react';
 import { t } from '@lingui/core/macro';
 import { AppPath } from 'twenty-shared/types';
 import { getAppPath } from 'twenty-shared/utils';
-import { Avatar } from 'twenty-ui/data-display';
+import { Avatar } from 'twenty-ui/primitives/data-display';
 import { IconExternalLink } from 'twenty-ui/icon';
-import { Checkbox, Radio } from 'twenty-ui/input';
-import { themeCssVariables } from 'twenty-ui/theme-constants';
+import { Checkbox, Radio, RadioGroup } from 'twenty-ui/primitives/input';
+import { themeCssVariables } from 'twenty-ui/theme';
 
 import { type PersonDuplicatePerson } from '@/person-duplicate-review/types/PersonDuplicateReview';
 import { getPersonDuplicateDisplayName } from '@/person-duplicate-review/utils/personDuplicateReview';
@@ -123,28 +123,35 @@ export const PersonDuplicateCard = ({
       <StyledSelectionRow>
         <Checkbox
           checked={selected}
-          onChange={onToggleSelected}
+          onCheckedChange={onToggleSelected}
           aria-label={t`Include ${displayName} in merge`}
         />
-        <Radio
-          checked={isBase}
-          disabled={!selected}
-          label={isBase ? t`Survivor` : t`Keep this record`}
-          onCheckedChange={(checked) => {
-            if (checked) {
+        <RadioGroup
+          value={isBase ? 'base' : undefined}
+          onValueChange={(value) => {
+            if (value === 'base') {
               onSelectBase();
             }
           }}
-        />
+          aria-label={t`Choose survivor`}
+        >
+          <Radio
+            value="base"
+            disabled={!selected}
+            aria-label={isBase ? t`Survivor` : t`Keep this record`}
+          >
+            {isBase ? t`Survivor` : t`Keep this record`}
+          </Radio>
+        </RadioGroup>
       </StyledSelectionRow>
 
       <StyledPersonHeader>
         <Avatar
-          avatarUrl={person.avatarUrl}
-          placeholder={displayName}
-          placeholderColorSeed={person.id}
+          src={person.avatarUrl}
+          name={displayName}
+          colorSeed={person.id}
           size="lg"
-          type="rounded"
+          shape="circle"
         />
         <StyledPersonIdentity>
           <StyledName>{displayName}</StyledName>

@@ -1,6 +1,6 @@
 import { isNonEmptyString } from '@sniptt/guards';
 
-import { type MessageHeader } from 'src/modules/messaging/message-import-manager/types/message';
+import { type MessageHeader } from 'src/modules/messaging/message-import-manager/types/message.type';
 
 const AUTO_REPLY_FLAG_HEADER_NAMES = [
   'x-autoreply',

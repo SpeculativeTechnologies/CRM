@@ -12,6 +12,7 @@ import { type RunOnWorkspaceArgs } from 'src/database/commands/command-runners/w
 import { getStandardFlatEntitiesToCreateOrThrow } from 'src/database/commands/upgrade-version-command/2-10/utils/get-standard-flat-entities-to-create-or-throw.util';
 import { ApplicationService } from 'src/engine/core-modules/application/application.service';
 import { RegisteredWorkspaceCommand } from 'src/engine/core-modules/upgrade/decorators/registered-workspace-command.decorator';
+import { resolveEffectiveFlatEntity } from 'src/engine/metadata-modules/overrides/utils/resolve-effective-flat-entity.util';
 import { WidgetConfigurationType } from 'src/engine/metadata-modules/page-layout-widget/enums/widget-configuration-type.type';
 import { WorkspaceCacheService } from 'src/engine/workspace-cache/services/workspace-cache.service';
 import { computeTwentyStandardApplicationAllFlatEntityMaps } from 'src/engine/workspace-manager/twenty-standard-application/utils/twenty-standard-application-all-flat-entity-maps.constant';
@@ -176,13 +177,15 @@ export class AddOpportunityContactsCommand extends ProvisionedWorkspaceCommandRu
                     )
                     .map(
                       (existingWidget) =>
-                        existingWidget.overrides?.position ??
-                        existingWidget.position,
+                        resolveEffectiveFlatEntity({
+                          metadataName: 'pageLayoutWidget',
+                          flatEntity: existingWidget,
+                        }).position,
                     )
-                    .map((existingWidget) =>
-                      existingWidget?.layoutMode ===
+                    .map((effectivePosition) =>
+                      effectivePosition?.layoutMode ===
                       PageLayoutTabLayoutMode.VERTICAL_LIST
-                        ? existingWidget.index
+                        ? effectivePosition.index
                         : -1,
                     ),
                 ),
