@@ -135,8 +135,11 @@ def run(args, stack):
                     '--label', f'org.opencontainers.image.revision={revision}', '-t', image,
                     '-f', str(ROOT / 'packages/twenty-docker/twenty/Dockerfile'), str(ROOT), check=False))
     stack.image = resolve_image(image)
-    for name, command in [('instance-upgrade', ['run-instance-commands', '--force', '--include-slow']),
-                          ('workspace-upgrade', ['upgrade']), ('cache-flush', ['cache:flush'])]:
+    # `upgrade` alone, as in the cloud deploy: it runs instance and workspace
+    # steps interleaved in version order. Running every instance command first
+    # applied 2.43's delete of unlinked core workflow versions before the 2.40
+    # to 2.42 backfills that link them.
+    for name, command in [('upgrade', ['upgrade']), ('cache-flush', ['cache:flush'])]:
         stack.phase(name, lambda command=command: stack.command(*command))
     if args.port == 0:
         with socket.socket() as listener:

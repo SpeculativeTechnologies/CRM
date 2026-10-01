@@ -89,8 +89,8 @@ Fixtures exercise writes followed by a fresh API read; mirrors use existing
 records without logging response bodies. Browser persistence and affected UI
 paths remain explicit reviewer/agent checks.
 
-The actual sequence is `run-instance-commands --force --include-slow`, `upgrade`,
-`cache:flush`, API/worker startup, queue drain, `upgrade:status`, `upgrade --dry-run`,
+The actual sequence is `upgrade`, which runs instance and workspace steps
+interleaved in version order, then `cache:flush`, API/worker startup, queue drain, `upgrade:status`, `upgrade --dry-run`,
 and API/metadata/persistence smoke checks. The status must name an up-to-date
 instance and zero behind/failed workspaces. Fresh Redis must contain no pending
 or failed jobs. Queue drain has a configurable `--timeout` (300 seconds default).

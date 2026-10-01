@@ -85,8 +85,7 @@ def prepare(args, previous):
     state['ready'] = False
     save(state)
     stack.build()
-    for name, arguments in [('instance-upgrade', ['run-instance-commands', '--force', '--include-slow']),
-                            ('workspace-upgrade', ['upgrade']), ('cache-flush', ['cache:flush'])]:
+    for name, arguments in [('upgrade', ['upgrade']), ('cache-flush', ['cache:flush'])]:
         result = stack.phase(name, lambda arguments=arguments: stack.command(*arguments))
         if re.search(r'\bERROR\b', result.stdout.decode(errors='replace')):
             raise RuntimeError(f'{name} logged an error; reset after fixing it')
