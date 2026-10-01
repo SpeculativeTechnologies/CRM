@@ -1520,6 +1520,12 @@ exports[`STANDARD_OBJECTS universal identifiers should never change without an e
   },
   "message": {
     "fields": {
+      "clickCount": {
+        "universalIdentifier": "15d8b6ec-4f29-4a03-b8c1-7e94d20a5f63",
+      },
+      "clickedAt": {
+        "universalIdentifier": "c94a7f30-8b15-4e62-a7d9-16f0c3b84e75",
+      },
       "createdAt": {
         "universalIdentifier": "74d0ddc0-4dbe-5c29-8d4a-2e512c1e66ab",
       },
@@ -1550,11 +1556,20 @@ exports[`STANDARD_OBJECTS universal identifiers should never change without an e
       "messageThread": {
         "universalIdentifier": "20202020-30f2-4ccd-9f5c-e41bb9d26214",
       },
+      "openCount": {
+        "universalIdentifier": "7b2e4d91-0a63-4c58-8f27-d1a63b9e5c04",
+      },
+      "openedAt": {
+        "universalIdentifier": "3f1c8a52-6d40-4b7e-9a13-2c5f8e7b41d9",
+      },
       "position": {
         "universalIdentifier": "44735eaf-ce39-5023-8d32-3ba27ef7d11d",
       },
       "receivedAt": {
         "universalIdentifier": "20202020-140a-4a2a-9f86-f13b6a979afc",
+      },
+      "repliedAt": {
+        "universalIdentifier": "6a3e91d7-2f48-4b05-9c86-e4d70b1a5f32",
       },
       "searchVector": {
         "universalIdentifier": "22b10c43-5f5c-53c2-bd68-c77811314633",
@@ -1574,7 +1589,7 @@ exports[`STANDARD_OBJECTS universal identifiers should never change without an e
     },
     "indexes": {
       "headerMessageIdIndex": {
-        "universalIdentifier": "0904b3e4-6052-4a8d-bf41-f12a27c7e34a",
+        "universalIdentifier": "d4a1f28b-6c53-4e07-9b32-58ac71e0d946",
       },
       "messageCampaignIdIndex": {
         "universalIdentifier": "79e777ca-7008-46c5-b3a6-3108b7c7dfb6",
@@ -1655,6 +1670,12 @@ exports[`STANDARD_OBJECTS universal identifiers should never change without an e
       "bouncedCount": {
         "universalIdentifier": "20d884a9-34dd-4667-8ecb-ceec224258e2",
       },
+      "ccAddresses": {
+        "universalIdentifier": "5552de17-c256-412f-8561-d17f14cc589c",
+      },
+      "clickedCount": {
+        "universalIdentifier": "4e7b21ca-5d38-49f6-b013-8ca2f57d9e40",
+      },
       "complainedCount": {
         "universalIdentifier": "82842cfa-f12a-4bab-bbde-b2cf587d0406",
       },
@@ -1688,11 +1709,17 @@ exports[`STANDARD_OBJECTS universal identifiers should never change without an e
       "name": {
         "universalIdentifier": "dc8bca0e-37c4-4b78-814d-2e91124274e3",
       },
+      "openedCount": {
+        "universalIdentifier": "a06f3d18-9c74-4bd5-8e21-5f7a4c093b6e",
+      },
       "position": {
         "universalIdentifier": "e43f6c94-602c-54af-a398-559510beb43b",
       },
       "recipients": {
         "universalIdentifier": "05a3271c-5b91-493c-8f30-2d27b31d019e",
+      },
+      "repliedCount": {
+        "universalIdentifier": "b8f04d61-9a27-4c53-8e70-3d1a6b5f2c98",
       },
       "scheduledAt": {
         "universalIdentifier": "0b281092-f5a5-4dd6-969b-5229f6620071",
@@ -2647,6 +2674,9 @@ exports[`STANDARD_OBJECTS universal identifiers should never change without an e
   },
   "opportunity": {
     "fields": {
+      "additionalContacts": {
+        "universalIdentifier": "52c1adec-64cc-4aa7-adcf-e7c8c108ac9f",
+      },
       "agentChatThreadTargets": {
         "universalIdentifier": "33677c4d-eca9-5560-8e07-b0fae616e5fb",
       },
@@ -2853,8 +2883,58 @@ exports[`STANDARD_OBJECTS universal identifiers should never change without an e
       },
     },
   },
+  "opportunityContact": {
+    "fields": {
+      "createdAt": {
+        "universalIdentifier": "6a6966de-cd27-510c-af2e-b776c08863ab",
+      },
+      "createdBy": {
+        "universalIdentifier": "bb133111-89f2-52e4-be0a-28850f7face3",
+      },
+      "deletedAt": {
+        "universalIdentifier": "04f7a0f3-6b8a-505a-a4cf-6045e6c9b161",
+      },
+      "id": {
+        "universalIdentifier": "d63bc7eb-c885-5ad0-85dd-fa8b78eaa202",
+      },
+      "opportunity": {
+        "universalIdentifier": "eebf2942-bdfd-4111-9f2e-4d3b7ac61e5c",
+      },
+      "person": {
+        "universalIdentifier": "580276af-691c-4813-90c9-7df90e50e6f7",
+      },
+      "position": {
+        "universalIdentifier": "c3bac4ef-8ff5-5477-8224-e321487e5b12",
+      },
+      "searchVector": {
+        "universalIdentifier": "f6e384df-66c0-5392-970a-9be9c817dbf7",
+      },
+      "updatedAt": {
+        "universalIdentifier": "3453844d-54bb-5c61-b073-1637ccf67a07",
+      },
+      "updatedBy": {
+        "universalIdentifier": "2bcf85b0-a3a5-5eab-a44b-49d2af80f945",
+      },
+    },
+    "indexes": {
+      "opportunityIdIndex": {
+        "universalIdentifier": "95dd772e-195e-41ad-838a-9ba211eb2cde",
+      },
+      "opportunityPersonUniqueIndex": {
+        "universalIdentifier": "69e19f35-29e5-437e-a047-9b19cda20779",
+      },
+      "personIdIndex": {
+        "universalIdentifier": "712b8857-3c94-4b99-8578-43c85159616d",
+      },
+    },
+    "universalIdentifier": "f1fb5376-149e-485c-af41-221c726b00ca",
+    "views": {},
+  },
   "person": {
     "fields": {
+      "additionalOpportunities": {
+        "universalIdentifier": "172384a3-c8b4-4200-a499-0d30288022f1",
+      },
       "agentChatThreadTargets": {
         "universalIdentifier": "9d3f43e7-65bc-54c5-b4a1-bc0d92426b3a",
       },
@@ -2911,6 +2991,9 @@ exports[`STANDARD_OBJECTS universal identifiers should never change without an e
       },
       "noteTargets": {
         "universalIdentifier": "1c0e0dfe-a01f-58d6-8948-08b93164d03c",
+      },
+      "openTaskCount": {
+        "universalIdentifier": "20202020-7d4e-4a1f-9c8b-3e2f1a0b5c6d",
       },
       "phones": {
         "universalIdentifier": "20202020-0638-448e-8825-439134618022",
@@ -4119,8 +4202,14 @@ exports[`STANDARD_OBJECTS universal identifiers should never change without an e
       "deletedAt": {
         "universalIdentifier": "0c39c6a8-a1bf-54fb-8c86-ca2981820fd0",
       },
+      "emailSignature": {
+        "universalIdentifier": "20202020-3f7a-4d21-b8c5-1e9d4a6c73f2",
+      },
       "id": {
         "universalIdentifier": "d77dff76-dcfd-52a3-b352-832898b28b9d",
+      },
+      "isEmailSignatureIncludedByDefault": {
+        "universalIdentifier": "20202020-9c14-4e86-a7d3-52b8f0c1a4e7",
       },
       "jobTitle": {
         "universalIdentifier": "20202020-4dd4-4619-826e-08f6c06b374d",

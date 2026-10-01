@@ -485,6 +485,9 @@ exports[`getStandardPageLayoutMetadataRelatedEntityIds should return standard pa
       "home": {
         "id": "00000000-0000-0000-0000-000000000113",
         "widgets": {
+          "additionalContacts": {
+            "id": "00000000-0000-0000-0000-000000000115",
+          },
           "company": {
             "id": "00000000-0000-0000-0000-000000000116",
           },
@@ -493,9 +496,6 @@ exports[`getStandardPageLayoutMetadataRelatedEntityIds should return standard pa
           },
           "owner": {
             "id": "00000000-0000-0000-0000-000000000117",
-          },
-          "pointOfContact": {
-            "id": "00000000-0000-0000-0000-000000000115",
           },
         },
       },
