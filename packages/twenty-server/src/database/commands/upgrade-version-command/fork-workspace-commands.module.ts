@@ -23,6 +23,8 @@ import { AddMessageHeaderMessageIdIndexCommand } from 'src/database/commands/upg
 import { AdoptTimelineActivitySearchVectorFieldCommand } from 'src/database/commands/upgrade-version-command/2-35/2-35-workspace-command-1787749299999-adopt-timeline-activity-search-vector-field.command';
 import { AdoptMessageCampaignIndexViewsCommand } from 'src/database/commands/upgrade-version-command/2-38/2-38-workspace-command-1788200700999-adopt-message-campaign-index-views.command';
 import { MoveMessageCampaignLabelIdentifierToNameCommand } from 'src/database/commands/upgrade-version-command/2-40/2-40-workspace-command-1788957151734-move-message-campaign-label-identifier-to-name.command';
+import { RestoreWorkflowCoreSoftRefFieldCommand } from 'src/database/commands/upgrade-version-command/2-40/2-40-workspace-command-1788960408160-restore-workflow-core-soft-ref-field.command';
+import { AdoptTimelineActivityMessageCampaignIndexesCommand } from 'src/database/commands/upgrade-version-command/2-41/2-41-workspace-command-1789461461999-adopt-timeline-activity-message-campaign-indexes.command';
 import { ConvertLegacyObjectNavigationCommandMenuItemsCommand } from 'src/database/commands/upgrade-version-command/2-38/2-38-workspace-command-1788200701001-convert-legacy-object-navigation-command-menu-items.command';
 import { RewriteTemplateCommandMenuItemLabelsCommand } from 'src/database/commands/upgrade-version-command/2-38/2-38-workspace-command-1788200701003-rewrite-template-command-menu-item-labels.command';
 import { RestoreSettingsNavigationLabelsAfterLabelRewriteCommand } from 'src/database/commands/upgrade-version-command/2-38/2-38-workspace-command-1788200701004-restore-settings-navigation-labels-after-label-rewrite.command';
@@ -77,6 +79,8 @@ import { ConnectionModule } from 'src/modules/connection/connection.module';
     AdoptTimelineActivitySearchVectorFieldCommand,
     AdoptMessageCampaignIndexViewsCommand,
     MoveMessageCampaignLabelIdentifierToNameCommand,
+    RestoreWorkflowCoreSoftRefFieldCommand,
+    AdoptTimelineActivityMessageCampaignIndexesCommand,
     ConvertLegacyObjectNavigationCommandMenuItemsCommand,
     RewriteTemplateCommandMenuItemLabelsCommand,
     RestoreSettingsNavigationLabelsAfterLabelRewriteCommand,
