@@ -181,11 +181,11 @@ jobs:
       # dry run from the target image lists every step it would run, including
       # commands caught up from behind the cursor, and fails on the errors that
       # cost six deploys on 2026-09-03/04. Read its output in the step summary.
-      - name: Require digest and retention-aware host deploy contract
+      - name: Require digest, retention and ordered-upgrade host deploy contracts
         run: |
           gcloud compute ssh "${{ steps.target.outputs.vm }}" \
             --zone "${{ steps.target.outputs.zone }}" --tunnel-through-iap --quiet \
-            --command 'sudo grep -qx "# RELEASE_ARTIFACT_CONTRACT=1" /opt/twenty/cloud-deploy.sh && sudo grep -qx "# RELEASE_RETENTION_CONTRACT=1" /opt/twenty/cloud-deploy.sh && sudo test -r /opt/twenty/cloud-image-retention.py && sudo test -r /opt/twenty/image-retention.json'
+            --command 'sudo grep -qx "# RELEASE_ARTIFACT_CONTRACT=1" /opt/twenty/cloud-deploy.sh && sudo grep -qx "# RELEASE_RETENTION_CONTRACT=1" /opt/twenty/cloud-deploy.sh && sudo grep -qx "# RELEASE_UPGRADE_ORDER_CONTRACT=1" /opt/twenty/cloud-deploy.sh && sudo test -r /opt/twenty/cloud-image-retention.py && sudo test -r /opt/twenty/image-retention.json || { echo "Required host release contract missing; owner must install the reviewed crm-ops host tooling before deployment." >&2; exit 1; }'
 
       - name: Maintain images, rehearse and deploy under the host release lock
         run: |

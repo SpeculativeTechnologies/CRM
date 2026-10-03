@@ -1,11 +1,44 @@
 import os
 from pathlib import Path
+import re
 import subprocess
 import tempfile
 import unittest
 
 
 ROOT = Path(__file__).resolve().parents[2]
+
+
+class HostContractTests(unittest.TestCase):
+    def test_host_preflight_refuses_old_or_incomplete_tooling(self):
+        workflow = (ROOT / ".github/workflows/cd-deploy-cloud.yaml").read_text()
+        command = re.search(r"--command '(sudo grep -qx [^\n]+)'", workflow).group(1)
+        self.assertLess(workflow.index(command), workflow.index("--rehearse"))
+        contracts = ["RELEASE_ARTIFACT_CONTRACT=1", "RELEASE_RETENTION_CONTRACT=1",
+                     "RELEASE_UPGRADE_ORDER_CONTRACT=1"]
+        cases = [("current", contracts, True, True)]
+        cases.extend(("missing " + contract, [item for item in contracts if item != contract], True, False)
+                     for contract in contracts)
+        cases.extend([
+            ("unsupported order", contracts[:2] + ["RELEASE_UPGRADE_ORDER_CONTRACT=2"], True, False),
+            ("partial marker", contracts[:2] + ["RELEASE_UPGRADE_ORDER_CONTRACT=10"], True, False),
+            ("missing helpers", contracts, False, False),
+            ("missing script", None, True, False),
+        ])
+        for name, markers, helpers, accepted in cases:
+            with self.subTest(name=name), tempfile.TemporaryDirectory() as directory:
+                host = Path(directory)
+                if markers is not None:
+                    (host / "cloud-deploy.sh").write_text("\n".join("# " + marker for marker in markers) + "\n")
+                if helpers:
+                    (host / "cloud-image-retention.py").touch()
+                    (host / "image-retention.json").touch()
+                # Exercise the workflow's exact remote shell expression locally.
+                local_command = command.replace("/opt/twenty", directory).replace("sudo ", "")
+                result = subprocess.run(["bash", "-c", local_command], text=True, capture_output=True, timeout=5)
+                self.assertEqual(result.returncode == 0, accepted, result.stderr)
+                if not accepted:
+                    self.assertIn("owner must install", result.stderr)
 
 
 class RehearsalTests(unittest.TestCase):
