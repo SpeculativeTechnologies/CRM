@@ -97,6 +97,7 @@ const VIEW_FIELD_MANIFEST: ViewFieldManifest = {
   size: 150,
   position: 0,
   aggregateOperation: AggregateOperations.COUNT,
+  aggregateValue: '42',
   viewFieldGroupUniversalIdentifier: VIEW_FIELD_GROUP_UID,
 };
 
@@ -430,7 +431,11 @@ const EXPORTED_KINDS: ExportedKind[] = [
       'universalOverrides',
       'createdByUserWorkspaceId',
     ],
-    knownGaps: VIEW_KIND_GAPS,
+    knownGaps: {
+      ...VIEW_KIND_GAPS,
+      parentViewId:
+        'parentViewId is a raw workspace uuid kept outside the metadata relation graph, so it has no universal identifier to carry in a portable manifest',
+    },
   },
   {
     metadataName: 'viewField',

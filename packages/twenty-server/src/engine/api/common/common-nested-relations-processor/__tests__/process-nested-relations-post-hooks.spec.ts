@@ -127,6 +127,7 @@ describe('ProcessNestedRelationsHelper post query hooks', () => {
 
     const repository = {
       createQueryBuilder: jest.fn().mockReturnValue(queryBuilder),
+      isReadDeniedByReadability: jest.fn().mockReturnValue(false),
     };
 
     const workspaceOrmManager = {
