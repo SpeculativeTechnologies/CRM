@@ -3,6 +3,8 @@ import { type FieldRelationMetadata } from '@/object-record/record-field/ui/type
 import { type ValidResolvedJunctionConfig } from '@/object-record/record-field/ui/utils/junction/types/ValidResolvedJunctionConfig';
 import { FieldWidgetRelationRecordsCard } from '@/page-layout/widgets/field/components/FieldWidgetRelationRecordsCard';
 import { useFieldWidgetJunctionRelationRecords } from '@/page-layout/widgets/field/hooks/useFieldWidgetJunctionRelationRecords';
+import { OpportunityPrimaryContactAction } from '@/opportunity/components/OpportunityPrimaryContactAction';
+import { useTargetRecord } from '@/ui/layout/contexts/useTargetRecord';
 
 type FieldWidgetJunctionRelationCardProps = {
   fieldDefinition: FieldDefinition<FieldRelationMetadata>;
@@ -17,6 +19,7 @@ export const FieldWidgetJunctionRelationCard = ({
   isInSidePanel,
   junctionConfig,
 }: FieldWidgetJunctionRelationCardProps) => {
+  const targetRecord = useTargetRecord();
   const junctionRelationRecords = useFieldWidgetJunctionRelationRecords({
     relationValue,
     junctionConfig,
@@ -35,6 +38,17 @@ export const FieldWidgetJunctionRelationCard = ({
       )}
       isInSidePanel={isInSidePanel}
       isReadOnly
+      renderAdditionalAction={({ record, objectNameSingular }) =>
+        junctionConfig.junctionObjectMetadata.nameSingular ===
+          'opportunityContact' &&
+        targetRecord.targetObjectNameSingular === 'opportunity' &&
+        objectNameSingular === 'person' ? (
+          <OpportunityPrimaryContactAction
+            opportunityId={targetRecord.id}
+            personId={record.id}
+          />
+        ) : undefined
+      }
     />
   );
 };

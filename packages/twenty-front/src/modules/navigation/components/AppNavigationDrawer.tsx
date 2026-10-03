@@ -1,6 +1,7 @@
 import { useIsSettingsDrawer } from '@/navigation/hooks/useIsSettingsDrawer';
 
 import { MainNavigationDrawerContent } from '@/navigation/components/MainNavigationDrawerContent';
+import { MainNavigationDrawerFeatureRequestItem } from '@/navigation/components/MainNavigationDrawerFeatureRequestItem';
 import { MainNavigationDrawerModeSwitcher } from '@/navigation/components/MainNavigationDrawerModeSwitcher';
 import { NavigationDrawerModeTransition } from '@/navigation/components/NavigationDrawerModeTransition';
 import { SettingsNavigationDrawerContent } from '@/navigation/components/SettingsNavigationDrawerContent';
@@ -40,6 +41,11 @@ export const AppNavigationDrawer = ({
           <MainNavigationDrawerContent />
         )}
       </NavigationDrawerModeTransition>
+      {!isSettingsDrawer && (
+        <NavigationDrawerFixedContent>
+          <MainNavigationDrawerFeatureRequestItem />
+        </NavigationDrawerFixedContent>
+      )}
     </NavigationDrawer>
   );
 };

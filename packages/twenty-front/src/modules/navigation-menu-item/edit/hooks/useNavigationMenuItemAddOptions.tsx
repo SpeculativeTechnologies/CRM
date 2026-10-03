@@ -48,6 +48,7 @@ type UseNavigationMenuItemAddOptionsParams = {
   step: NavigationMenuItemAddStep;
   search: string;
   objectId: string | null;
+  selectedObjectNameSingulars?: string[];
   folderId?: string;
   currentItems: NavigationMenuItem[];
   isSearchingAllItems: boolean;
@@ -60,6 +61,7 @@ export const useNavigationMenuItemAddOptions = ({
   step,
   search,
   objectId,
+  selectedObjectNameSingulars,
   folderId,
   currentItems,
   isSearchingAllItems,
@@ -94,6 +96,7 @@ export const useNavigationMenuItemAddOptions = ({
     isSearchDebouncing,
   } = useNavigationMenuItemSearchRecords({
     searchInput: search,
+    selectedObjectNameSingulars,
     currentItems,
     skip: step !== 'record' && !isSearchingAllItems,
   });

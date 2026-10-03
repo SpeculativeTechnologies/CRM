@@ -14,6 +14,17 @@ jest.mock('@/navigation/components/MainNavigationDrawerContent', () => ({
   MainNavigationDrawerContent: () => <div>Main content</div>,
 }));
 
+jest.mock(
+  '@/navigation/components/MainNavigationDrawerFeatureRequestItem',
+  () => ({
+    MainNavigationDrawerFeatureRequestItem: () => (
+      <a href="https://github.com/SpeculativeTechnologies/CRM/issues/new">
+        Request a feature
+      </a>
+    ),
+  }),
+);
+
 jest.mock('@/navigation/components/MainNavigationDrawerModeSwitcher', () => ({
   MainNavigationDrawerModeSwitcher: () => (
     <button type="button">Navigation modes</button>
@@ -52,6 +63,18 @@ describe('AppNavigationDrawer', () => {
   beforeEach(() => {
     jest.mocked(useIsMobile).mockReturnValue(false);
     jest.mocked(useIsSettingsDrawer).mockReturnValue(false);
+  });
+
+  it('keeps the feature request link in the main navigation after the drawer refactor', () => {
+    const { rerender } = render(<AppNavigationDrawer />);
+    expect(
+      screen.getByRole('link', { name: 'Request a feature' }),
+    ).toBeInTheDocument();
+    jest.mocked(useIsSettingsDrawer).mockReturnValue(true);
+    rerender(<AppNavigationDrawer />);
+    expect(
+      screen.queryByRole('link', { name: 'Request a feature' }),
+    ).not.toBeInTheDocument();
   });
 
   it('keeps the mode switcher mounted when the drawer content changes', () => {

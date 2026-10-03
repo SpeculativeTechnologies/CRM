@@ -5,7 +5,7 @@ import { act, renderHook } from '@testing-library/react';
 import { useNavigationMenuItemSearchRecords } from '@/navigation-menu-item/edit/hooks/useNavigationMenuItemSearchRecords';
 
 jest.mock('@/side-panel/hooks/useSearchableObjectNameSingulars', () => ({
-  useSearchableObjectNameSingulars: () => ['person'],
+  useSearchableObjectNameSingulars: () => ['person', 'company', 'opportunity'],
 }));
 jest.mock('@/object-record/hooks/useObjectRecordSearchRecords', () => ({
   useObjectRecordSearchRecords: jest.fn(() => ({
@@ -86,5 +86,48 @@ describe('navigation record search duplicates', () => {
     expect(result.current.navigationMenuItemSearchRecords).toEqual([
       { ...record, isAlreadyInSidebar: false },
     ]);
+  });
+});
+
+describe('navigation record search object filters', () => {
+  it('searches selected readable objects and restores all objects when cleared', () => {
+    const { rerender } = renderHook(
+      ({ selectedObjectNameSingulars }) =>
+        useNavigationMenuItemSearchRecords({
+          searchInput: '',
+          currentItems: [],
+          selectedObjectNameSingulars,
+        }),
+      {
+        initialProps: {
+          selectedObjectNameSingulars: ['person', 'company', 'unreadable'],
+        },
+      },
+    );
+    expect(useObjectRecordSearchRecords).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        objectNameSingulars: ['person', 'company'],
+        skip: false,
+      }),
+    );
+    rerender({ selectedObjectNameSingulars: ['opportunity'] });
+    expect(useObjectRecordSearchRecords).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        objectNameSingulars: ['opportunity'],
+      }),
+    );
+    rerender({ selectedObjectNameSingulars: [] });
+    expect(useObjectRecordSearchRecords).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        objectNameSingulars: ['person', 'company', 'opportunity'],
+      }),
+    );
+    rerender({ selectedObjectNameSingulars: ['unreadable'] });
+    expect(useObjectRecordSearchRecords).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        objectNameSingulars: [],
+        skip: true,
+      }),
+    );
   });
 });

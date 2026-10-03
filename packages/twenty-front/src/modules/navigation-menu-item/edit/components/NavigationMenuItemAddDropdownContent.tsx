@@ -32,6 +32,7 @@ import {
 } from '@/navigation-menu-item/edit/hooks/useNavigationMenuItemEditController';
 import { DropdownMenuSeparator } from '@/ui/layout/dropdown/components/DropdownMenuSeparator';
 import { normalizeSearchText } from '~/utils/normalizeSearchText';
+import { SidePanelObjectFilterDropdown } from '@/side-panel/components/SidePanelObjectFilterDropdown';
 
 type Step = NavigationMenuItemAddStep;
 type NavigationMenuItemAddDropdownContentProps = {
@@ -60,6 +61,8 @@ export const NavigationMenuItemAddDropdownContent = ({
   const [search, setSearch] = useState('');
   const isSearchingAllItems = step === 'main' && search.trim().length > 0;
   const [objectId, setObjectId] = useState<string | null>(null);
+  const [selectedObjectNameSingulars, setSelectedObjectNameSingulars] =
+    useState<string[]>(['person', 'company']);
   const { currentItems, createItem } =
     useNavigationMenuItemEditController(section);
   const insertionIndex =
@@ -102,6 +105,8 @@ export const NavigationMenuItemAddDropdownContent = ({
     step,
     search,
     objectId,
+    selectedObjectNameSingulars:
+      step === 'record' ? selectedObjectNameSingulars : undefined,
     folderId,
     currentItems,
     isSearchingAllItems,
@@ -185,6 +190,14 @@ export const NavigationMenuItemAddDropdownContent = ({
         index={insertionIndex}
       />
       <DropdownMenuHeader
+        EndComponent={
+          step === 'record' ? (
+            <SidePanelObjectFilterDropdown
+              selectedObjectNameSingulars={selectedObjectNameSingulars}
+              onChangeSelectedObjects={setSelectedObjectNameSingulars}
+            />
+          ) : undefined
+        }
         StartComponent={
           <DropdownMenuHeaderLeftComponent
             Icon={step === 'main' ? IconX : IconChevronLeft}

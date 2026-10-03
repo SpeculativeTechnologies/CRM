@@ -1,5 +1,5 @@
 import { styled } from '@linaria/react';
-import { Fragment, useState } from 'react';
+import { Fragment, type ReactNode, useState } from 'react';
 
 import { useObjectMetadataItem } from '@/object-metadata/hooks/useObjectMetadataItem';
 import { useUpdateOneRecord } from '@/object-record/hooks/useUpdateOneRecord';
@@ -41,6 +41,7 @@ type FieldWidgetRelationRecordsCardProps = {
   relationRecords: FieldWidgetRelationCardRecord[];
   isInSidePanel: boolean;
   isReadOnly?: boolean;
+  renderAdditionalAction?: (record: FieldWidgetRelationCardRecord) => ReactNode;
 };
 
 export const FieldWidgetRelationRecordsCard = ({
@@ -48,6 +49,7 @@ export const FieldWidgetRelationRecordsCard = ({
   relationRecords,
   isInSidePanel,
   isReadOnly = false,
+  renderAdditionalAction,
 }: FieldWidgetRelationRecordsCardProps) => {
   const widget = useCurrentWidget();
 
@@ -156,6 +158,11 @@ export const FieldWidgetRelationRecordsCard = ({
                         relationRecord={record}
                         relationObjectMetadataNameSingular={objectNameSingular}
                         relationFieldMetadataId={fieldMetadataId}
+                        additionalAction={renderAdditionalAction?.({
+                          record,
+                          objectNameSingular,
+                          fieldMetadataId,
+                        })}
                       />
                     </Fragment>
                   ),

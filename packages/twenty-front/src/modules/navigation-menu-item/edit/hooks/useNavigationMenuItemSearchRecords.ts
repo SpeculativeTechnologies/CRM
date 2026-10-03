@@ -20,6 +20,7 @@ type UseNavigationMenuItemSearchRecordsParams = {
   searchInput: string;
   currentItems: NavigationMenuItem[];
   selectedObjectNameSingular?: string | null;
+  selectedObjectNameSingulars?: string[];
   skip?: boolean;
 };
 
@@ -27,6 +28,7 @@ export const useNavigationMenuItemSearchRecords = ({
   searchInput,
   currentItems,
   selectedObjectNameSingular = null,
+  selectedObjectNameSingulars = [],
   skip = false,
 }: UseNavigationMenuItemSearchRecordsParams) => {
   const trimmedSearchInput = searchInput.trim();
@@ -36,9 +38,14 @@ export const useNavigationMenuItemSearchRecords = ({
     SEARCH_DEBOUNCE_DELAY,
   );
 
-  const includedObjectNameSingulars = useSearchableObjectNameSingulars({
+  const searchableObjectNameSingulars = useSearchableObjectNameSingulars({
     selectedObjectNameSingular,
   });
+  const includedObjectNameSingulars = searchableObjectNameSingulars.filter(
+    (objectNameSingular) =>
+      selectedObjectNameSingulars.length === 0 ||
+      selectedObjectNameSingulars.includes(objectNameSingular),
+  );
 
   const { loading: recordSearchLoading, searchRecords } =
     useObjectRecordSearchRecords({
