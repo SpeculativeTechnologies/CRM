@@ -13,6 +13,7 @@
 #   bash deploy/sync-upstream.sh run             # same, explicit
 #   bash deploy/sync-upstream.sh finish <kind>   # CI only: commit, regenerate, push, PR
 #   bash deploy/sync-upstream.sh report-conflict # CI only: file the conflict issue
+#   bash deploy/sync-upstream.sh save-partial    # CI only: bundle an unfinished agent resolution
 #
 # Outside CI the merge happens in a throwaway worktree and the checkout the
 # script lives in is never touched. In CI (GITHUB_ACTIONS=true) it works in
@@ -56,7 +57,20 @@ emit() {
 # Push over https with gh's token — cron and CI have no ssh key.
 push_branch() {
   git -c credential.helper= -c 'credential.helper=!gh auth git-credential' \
-    push --no-follow-tags "$HTTPS_URL" "$1"
+    push --no-follow-tags "$HTTPS_URL" "$1" 2>&1 | tee "$STATE_DIR/push.log"
+}
+
+# A failed push after the agent step throws away hours of resolution work
+# (2026-09-28). Keep the branch as a bundle the workflow uploads, so a human
+# can push it with their own credentials instead of rerunning the agent.
+bundle_branch() {
+  local branch="$1" bundle="$STATE_DIR/sync-upstream.bundle"
+  if git bundle create "$bundle" "origin/main..$branch" >/dev/null 2>&1; then
+    emit bundle true
+  else
+    log "FAIL: could not bundle $branch"
+    return 1
+  fi
 }
 
 # Best-effort desktop notification (no-op when headless).
@@ -127,8 +141,23 @@ report_conflict() {
   behind="$(cat "$STATE_DIR/behind" 2>/dev/null || echo '?')"
   conflicts="$(cat "$STATE_DIR/conflicts.txt" 2>/dev/null || echo '(list unavailable)')"
 
-  body="$(printf 'Weekly upstream sync could not merge twentyhq/twenty main (%s commits behind) and the automated resolution did not finish — manual merge needed:\n\n```\ngit fetch upstream && git switch -c sync/upstream-manual main && git -c merge.ours.driver=true merge upstream/main\n```\n\nReal code conflicts (locale catalogs, generated GraphQL types and jest snapshots are excluded; take upstream for those and regenerate):\n```\n%s\n```\n\nResolution policy: `%s`. Run: %s\n' \
-    "$behind" "$conflicts" "$PLAYBOOK" "$RUN_URL")"
+  if [ -s "$STATE_DIR/sync-upstream.bundle" ] && [ -f "$STATE_DIR/remaining-conflicts.txt" ]; then
+    local branch
+    branch="$(cat "$STATE_DIR/branch" 2>/dev/null)"
+    body="$(printf 'Weekly upstream sync merged twentyhq/twenty main (%s commits); the agent ran but stopped before finishing. Its partial resolution is saved as a single WIP merge commit in the `sync-upstream-bundle` artifact, so it can be resumed instead of redone:\n\n```\ngh run download %s -R %s -n sync-upstream-bundle\ngit fetch sync-upstream.bundle %s:%s-partial && git switch %s-partial\n```\n\nFiles still containing conflict markers:\n```\n%s\n```\n\nThe agent transcript is the `sync-upstream-agent-transcript` artifact. Resolution policy: `%s`. Run: %s\n' \
+      "$behind" "${GITHUB_RUN_ID:-<run id>}" "$REPO" "$branch" "$branch" "$branch" "$(cat "$STATE_DIR/remaining-conflicts.txt")" "$PLAYBOOK" "$RUN_URL")"
+  elif [ -s "$STATE_DIR/sync-upstream.bundle" ]; then
+    local branch reason
+    branch="$(cat "$STATE_DIR/branch" 2>/dev/null)"
+    reason="the push was rejected"
+    grep -q 'without `workflow` scope' "$STATE_DIR/push.log" 2>/dev/null &&
+      reason="the push was rejected because upstream changed \`.github/workflows\` and \`SYNC_UPSTREAM_TOKEN\` lacks Workflows read/write"
+    body="$(printf 'Weekly upstream sync merged twentyhq/twenty main (%s commits) and resolved every conflict, but %s.\n\nThe resolved branch is saved as the `sync-upstream-bundle` artifact of the run. Push it with your own credentials instead of rerunning the agent:\n\n```\ngh run download %s -R %s -n sync-upstream-bundle\ngit fetch sync-upstream.bundle %s:%s && git push origin %s\n```\n\nThen open the PR with the agent notes from the same artifact. Run: %s\n' \
+      "$behind" "$reason" "${GITHUB_RUN_ID:-<run id>}" "$REPO" "$branch" "$branch" "$branch" "$RUN_URL")"
+  else
+    body="$(printf 'Weekly upstream sync could not merge twentyhq/twenty main (%s commits behind) and the automated resolution did not finish — manual merge needed:\n\n```\ngit fetch upstream && git switch -c sync/upstream-manual main && git -c merge.ours.driver=true merge upstream/main\n```\n\nReal code conflicts (locale catalogs, generated GraphQL types and jest snapshots are excluded; take upstream for those and regenerate):\n```\n%s\n```\n\nResolution policy: `%s`. Run: %s\n' \
+      "$behind" "$conflicts" "$PLAYBOOK" "$RUN_URL")"
+  fi
 
   local open_issue_number
   open_issue_number="$(gh issue list -R "$REPO" --state open \
@@ -186,7 +215,11 @@ regenerate() {
   : > "$notes"
   log "regenerating catalogs, snapshots and generated types"
 
-  yarn install >/dev/null 2>&1 || { echo "- yarn install FAILED" >> "$notes"; log "WARN: yarn install failed"; }
+  if ! yarn install > "$STATE_DIR/yarn-install.log" 2>&1; then
+    echo "- yarn install FAILED" >> "$notes"
+    log "WARN: yarn install failed:"
+    tail -n 30 "$STATE_DIR/yarn-install.log"
+  fi
   npx nx run-many -t build -p twenty-shared twenty-ui >/dev/null 2>&1 ||
     echo "- twenty-shared/twenty-ui build FAILED; snapshot re-recording may be wrong" >> "$notes"
 
@@ -302,7 +335,12 @@ finish() {
   fi
 
   if ! push_branch "$branch"; then
-    log "FAIL: could not push $branch (does the token have contents:write?)"
+    if grep -q 'without `workflow` scope' "$STATE_DIR/push.log"; then
+      log "FAIL: upstream changed .github/workflows and SYNC_UPSTREAM_TOKEN cannot write workflow files; give it Workflows read/write (fine-grained) or the workflow scope (classic)"
+    else
+      log "FAIL: could not push $branch (does the token have contents:write?)"
+    fi
+    bundle_branch "$branch"
     notify "Upstream sync merged but the push failed"
     return 1
   fi
@@ -400,8 +438,11 @@ run() {
     kind=clean
     : > "$STATE_DIR/snapshots.txt"
     : > "$STATE_DIR/graphql.txt"
+    emit regenerate_graphql false
   else
     resolve_mechanical_conflicts
+    # Publish before returning the open merge to the agent.
+    emit regenerate_graphql "$([ -s "$STATE_DIR/graphql.txt" ] && echo true || echo false)"
     local remaining
     remaining="$(git diff --name-only --diff-filter=U)"
     if [ -n "$remaining" ]; then
@@ -427,7 +468,6 @@ run() {
     fi
   fi
 
-  emit regenerate_graphql "$([ -s "$STATE_DIR/graphql.txt" ] && echo true || echo false)"
   if [ "$IN_CI" = "true" ]; then
     emit outcome "$kind"
     exit 0
@@ -435,9 +475,32 @@ run() {
   finish "$kind"
 }
 
+# The agent can stop with its resolution only partly staged (2026-09-30: it
+# backgrounded the final typecheck and the session ended). Commit whatever is
+# in the tree, markers included, so the work can be resumed locally instead of
+# paying for a fresh agent run. The commit never leaves the runner except as
+# the bundle artifact.
+save_partial() {
+  local branch
+  branch="$(cat "$STATE_DIR/branch")"
+  git add -A || { log "FAIL: could not stage the partial resolution"; return 1; }
+  if git rev-parse -q --verify MERGE_HEAD >/dev/null || ! git diff --cached --quiet; then
+    git -c user.name="sync-upstream" -c user.email="sync-upstream@localhost" \
+      commit -q --no-verify -m "WIP: partial upstream merge resolution ($TODAY), do not merge" ||
+      { log "FAIL: could not commit the partial resolution"; return 1; }
+  fi
+  # Finalization can fail after committing. Preserve that branch as well.
+  printf '%s\n' "$(git grep -l -E '^(<<<<<<< |>>>>>>> )' -- ':!*.snap' ':!*.po' ':!deploy/UPSTREAM-SYNC.md' 2>/dev/null)" \
+    > "$STATE_DIR/remaining-conflicts.txt"
+  log "partial resolution saved; $(grep -c . "$STATE_DIR/remaining-conflicts.txt") files still have markers"
+  bundle_branch "$branch" || return 1
+  emit partial true
+}
+
 case "${1:-run}" in
   run) run ;;
   finish) cd "$REPO_ROOT" && finish "${2:?kind: clean|mechanical|agent}" ;;
   report-conflict) cd "$REPO_ROOT" && report_conflict ;;
-  *) echo "usage: $0 [run|finish <kind>|report-conflict]" >&2; exit 64 ;;
+  save-partial) cd "$REPO_ROOT" && save_partial ;;
+  *) echo "usage: $0 [run|finish <kind>|report-conflict|save-partial]" >&2; exit 64 ;;
 esac
