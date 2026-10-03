@@ -56,6 +56,9 @@ Use `frontComponentUniversalIdentifier` for app-defined front components. A `fro
 
 ## Settings Menu Items
 
+`yarn twenty dev:add` supports the `SettingsMenuItem` entity type; use the
+generator to create the definition before configuring its target component.
+
 To add an entry to an app's settings menu, declare it with `defineSettingsMenuItem` and point it at the front component that renders it:
 
 ```ts
