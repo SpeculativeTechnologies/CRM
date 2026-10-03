@@ -10,10 +10,8 @@ import {
   type RelatedInteraction,
   updateRelatedLastContactForPeople,
 } from 'src/utils/update-related-last-contact';
-import {
-  type RecordUpsert,
-  upsertRecordsInBatches,
-} from 'src/utils/upsert-records-in-batches';
+import { type RecordUpsert } from 'src/utils/upsert-records-in-batches';
+import { savePersonContactUpdates } from 'src/utils/save-person-contact-updates';
 
 export const applyPersonInteractions = async (
   client: CoreApiClient,
@@ -60,6 +58,6 @@ export const applyPersonInteractions = async (
     }
   }
 
-  await upsertRecordsInBatches(client, 'createPeople', updates);
+  await savePersonContactUpdates(client, updates, stateByPersonId);
   await updateRelatedLastContactForPeople(client, contactByPersonId);
 };

@@ -78,7 +78,7 @@ beforeEach(() => {
   vi.setSystemTime(new Date(NOW));
   queryMock.mockReset();
   mutationMock.mockReset();
-  mutationMock.mockResolvedValue({});
+  mutationMock.mockResolvedValue({ updatePeople: [{ id: 'saved-person' }] });
 });
 
 afterEach(() => {
@@ -111,27 +111,22 @@ describe('on-calendar-interaction handler', () => {
     ]);
 
     await handler(
-      buildBatch([
-        { personId: PERSON_ID, calendarEventId: CALENDAR_EVENT_ID },
-      ]),
+      buildBatch([{ personId: PERSON_ID, calendarEventId: CALENDAR_EVENT_ID }]),
     );
 
     expect(
       queryMock.mock.calls[0][0].calendarEventParticipants.__args.filter,
     ).toEqual({ calendarEventId: { in: [CALENDAR_EVENT_ID] } });
-    expect(mutationMock.mock.calls[0][0].createPeople.__args.data).toEqual([
-      {
-        id: PERSON_ID,
-        lastContactAt: PAST_EVENT_STARTS_AT,
-        lastContactById: null,
-        lastContactItemContactLogId: null,
-        lastContactItemCalendarEventId: CALENDAR_EVENT_ID,
-        lastContactItemMessageId: null,
-        lastOutboundAt: PAST_EVENT_STARTS_AT,
-        lastInboundAt: PAST_EVENT_STARTS_AT,
-        lastMeetingId: CALENDAR_EVENT_ID,
-      },
-    ]);
+    expect(mutationMock.mock.calls[0][0].updatePeople.__args.data).toEqual({
+      lastContactAt: PAST_EVENT_STARTS_AT,
+      lastContactById: null,
+      lastContactItemContactLogId: null,
+      lastContactItemCalendarEventId: CALENDAR_EVENT_ID,
+      lastContactItemMessageId: null,
+      lastOutboundAt: PAST_EVENT_STARTS_AT,
+      lastInboundAt: PAST_EVENT_STARTS_AT,
+      lastMeetingId: CALENDAR_EVENT_ID,
+    });
   });
 
   it('should do nothing when no participant has both a person and a calendar event', async () => {

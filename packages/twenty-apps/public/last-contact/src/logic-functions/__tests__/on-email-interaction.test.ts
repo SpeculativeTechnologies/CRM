@@ -71,7 +71,7 @@ const setupQueryMock = (messageParticipants: Record<string, unknown>[]) => {
 beforeEach(() => {
   queryMock.mockReset();
   mutationMock.mockReset();
-  mutationMock.mockResolvedValue({});
+  mutationMock.mockResolvedValue({ updatePeople: [{ id: 'saved-person' }] });
 });
 
 describe('on-email-interaction definition', () => {
@@ -102,24 +102,16 @@ describe('on-email-interaction handler', () => {
       },
     ]);
 
-    await handler(
-      buildBatch([{ personId: PERSON_ID, messageId: MESSAGE_ID }]),
-    );
+    await handler(buildBatch([{ personId: PERSON_ID, messageId: MESSAGE_ID }]));
 
-    expect(mutationMock.mock.calls[0][0].createPeople.__args).toEqual({
-      upsert: true,
-      data: [
-        {
-          id: PERSON_ID,
-          lastContactAt: RECEIVED_AT,
-          lastContactById: MEMBER_ID,
-          lastContactItemContactLogId: null,
-          lastContactItemMessageId: MESSAGE_ID,
-          lastContactItemCalendarEventId: null,
-          lastOutboundAt: RECEIVED_AT,
-          lastEmailId: MESSAGE_ID,
-        },
-      ],
+    expect(mutationMock.mock.calls[0][0].updatePeople.__args.data).toEqual({
+      lastContactAt: RECEIVED_AT,
+      lastContactById: MEMBER_ID,
+      lastContactItemContactLogId: null,
+      lastContactItemMessageId: MESSAGE_ID,
+      lastContactItemCalendarEventId: null,
+      lastOutboundAt: RECEIVED_AT,
+      lastEmailId: MESSAGE_ID,
     });
   });
 
@@ -150,27 +142,24 @@ describe('on-email-interaction handler', () => {
       ([query]) => query.messageParticipants,
     );
     expect(participantQueries).toHaveLength(1);
-    expect(
-      participantQueries[0][0].messageParticipants.__args.filter,
-    ).toEqual({ messageId: { in: [OLDER_MESSAGE_ID, MESSAGE_ID] } });
+    expect(participantQueries[0][0].messageParticipants.__args.filter).toEqual({
+      messageId: { in: [OLDER_MESSAGE_ID, MESSAGE_ID] },
+    });
 
-    const personUpserts = mutationMock.mock.calls.filter(
-      ([mutation]) => mutation.createPeople,
+    const personUpdates = mutationMock.mock.calls.filter(
+      ([mutation]) => mutation.updatePeople,
     );
-    expect(personUpserts).toHaveLength(1);
-    expect(personUpserts[0][0].createPeople.__args.data).toEqual([
-      {
-        id: PERSON_ID,
-        lastContactAt: RECEIVED_AT,
-        lastContactById: MEMBER_ID,
-        lastContactItemContactLogId: null,
-        lastContactItemMessageId: MESSAGE_ID,
-        lastContactItemCalendarEventId: null,
-        lastOutboundAt: RECEIVED_AT,
-        lastInboundAt: OLDER_RECEIVED_AT,
-        lastEmailId: MESSAGE_ID,
-      },
-    ]);
+    expect(personUpdates).toHaveLength(1);
+    expect(personUpdates[0][0].updatePeople.__args.data).toEqual({
+      lastContactAt: RECEIVED_AT,
+      lastContactById: MEMBER_ID,
+      lastContactItemContactLogId: null,
+      lastContactItemMessageId: MESSAGE_ID,
+      lastContactItemCalendarEventId: null,
+      lastOutboundAt: RECEIVED_AT,
+      lastInboundAt: OLDER_RECEIVED_AT,
+      lastEmailId: MESSAGE_ID,
+    });
   });
 
   it('should do nothing when no participant has both a person and a message', async () => {
@@ -195,9 +184,7 @@ describe('on-email-interaction handler', () => {
       },
     ]);
 
-    await handler(
-      buildBatch([{ personId: PERSON_ID, messageId: MESSAGE_ID }]),
-    );
+    await handler(buildBatch([{ personId: PERSON_ID, messageId: MESSAGE_ID }]));
 
     expect(mutationMock).not.toHaveBeenCalled();
   });

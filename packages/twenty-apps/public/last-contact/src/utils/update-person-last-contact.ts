@@ -2,6 +2,10 @@ import { type CoreApiClient } from 'twenty-client-sdk/core';
 
 import { chunk } from 'src/utils/chunk';
 import { executeWithRetry } from 'src/utils/execute-with-retry';
+import {
+  PERSON_CONTACT_SELECTION,
+  type PersonContactSnapshot,
+} from 'src/utils/person-contact-snapshot';
 import { type RecordUpsert } from 'src/utils/upsert-records-in-batches';
 
 const PAGE_SIZE = 200;
@@ -15,10 +19,7 @@ export type Interaction = {
   workspaceMemberId: string | null;
 } & ({ kind: 'email'; direction: InteractionDirection } | { kind: 'meeting' });
 
-export type PersonLastContactState = {
-  lastContactAt?: string | null;
-  lastOutboundAt?: string | null;
-  lastInboundAt?: string | null;
+export type PersonLastContactState = PersonContactSnapshot & {
   lastEmail?: { receivedAt: string | null } | null;
   lastMeeting?: { startsAt: string | null } | null;
 };
@@ -68,9 +69,7 @@ export const collectPersonLastContactState = async (
             edges: {
               node: {
                 id: true,
-                lastContactAt: true,
-                lastOutboundAt: true,
-                lastInboundAt: true,
+                ...PERSON_CONTACT_SELECTION,
                 lastEmail: { receivedAt: true },
                 lastMeeting: { startsAt: true },
               },

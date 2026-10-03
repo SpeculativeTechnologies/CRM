@@ -80,7 +80,7 @@ const setupQueryMock = ({
 beforeEach(() => {
   queryMock.mockReset();
   mutationMock.mockReset();
-  mutationMock.mockResolvedValue({});
+  mutationMock.mockResolvedValue({ updatePeople: [{ id: 'saved-person' }] });
 });
 
 describe('on-calendar-event-started definition', () => {
@@ -170,12 +170,11 @@ describe('on-calendar-event-started handler', () => {
       participantsByEventCalls[1][0].calendarEventParticipants.__args.after,
     ).toBe('participants-cursor-1');
 
-    const personUpserts = mutationMock.mock.calls.filter(
-      ([mutation]) => mutation.createPeople,
+    const personUpdates = mutationMock.mock.calls.filter(
+      ([mutation]) => mutation.updatePeople,
     );
-    expect(personUpserts).toHaveLength(1);
-    expect(personUpserts[0][0].createPeople.__args.data).toHaveLength(2);
-    expect(personUpserts[0][0].createPeople.__args.data[0]).toMatchObject({
+    expect(personUpdates).toHaveLength(2);
+    expect(personUpdates[0][0].updatePeople.__args.data).toMatchObject({
       lastContactAt: PAST_EVENT_STARTS_AT,
       lastContactItemCalendarEventId: 'event-1',
     });

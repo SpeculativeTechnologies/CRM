@@ -4,15 +4,18 @@ import {
   buildPersonAggregates,
   buildPersonUpdateData,
 } from 'src/utils/person-last-contact-aggregation';
-import {
-  type RecordUpsert,
-  upsertRecordsInBatches,
-} from 'src/utils/upsert-records-in-batches';
+import { type RecordUpsert } from 'src/utils/upsert-records-in-batches';
+import { collectPersonLastContactState } from 'src/utils/update-person-last-contact';
+import { savePersonContactUpdates } from 'src/utils/save-person-contact-updates';
 
 export const backfillPeopleLastContact = async (
   client: CoreApiClient,
   personIds: string[],
 ): Promise<void> => {
+  const stateByPersonId = await collectPersonLastContactState(
+    client,
+    personIds,
+  );
   const aggByPersonId = await buildPersonAggregates(client, personIds);
   const upserts: RecordUpsert[] = [];
 
@@ -27,5 +30,5 @@ export const backfillPeopleLastContact = async (
     upserts.push({ id: personId, ...data });
   }
 
-  await upsertRecordsInBatches(client, 'createPeople', upserts);
+  await savePersonContactUpdates(client, upserts, stateByPersonId);
 };
