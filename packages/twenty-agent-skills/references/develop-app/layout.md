@@ -24,6 +24,17 @@ When adding layouts or tabs:
 - Place front components where they support the surrounding record context.
 - Include empty and loading behavior for front components shown on record pages.
 
+### Standalone Widget Definitions
+
+Use `definePageLayoutWidget` from `twenty-sdk/define` to declare a widget
+separately from its parent tab. In addition to the widget's usual configuration,
+provide `pageLayoutTabUniversalIdentifier` with the parent tab's universal
+identifier and an explicit `position`. Both are required because the parent
+tab and its layout mode cannot be inferred from a standalone widget definition.
+
+`yarn twenty dev:add` supports the `PageLayoutWidget` entity type; use the
+generator to create its file and identifiers before editing the configuration.
+
 ## Front Component Widgets
 
 When adding an app-defined front component to a record page layout, use the component's universal identifier in the widget configuration:

@@ -88,6 +88,31 @@ Use verbose apply for bounded troubleshooting:
 yarn twenty apply --verbose
 ```
 
+By default, sync infers deletions for entities missing from local source. Use
+`yarn twenty plan --no-delete` to preview changes while preserving those
+entities, then `yarn twenty apply --no-delete` to apply the same policy. The
+`dev` command also accepts `--no-delete`; keep using bounded `plan` and `apply`
+for agent workflows. This is especially useful after a partial pull.
+
+## Pull Installed App Source
+
+`yarn twenty pull [appPath]` writes supported parts of an installed application
+from the active remote back to local source files. It is experimental, covers
+only part of an application, and overwrites the files it pulls. Commit local
+work first and review the report and diff afterward.
+
+Use `-u <id>` or `--universal-identifier <id>` to select the application, and
+`-v` or `--verbose` for a detailed report:
+
+```bash
+yarn twenty pull ./my-app --universal-identifier <application-uuid> --verbose
+```
+
+Install dependencies if the pulled directory cannot resolve `twenty-sdk`.
+Before syncing the reviewed source back, use `yarn twenty plan --no-delete`
+and `yarn twenty apply --no-delete` so unsupported or missing entities are
+preserved on the remote.
+
 ## Troubleshooting
 
 Start by identifying which layer is failing:

@@ -54,6 +54,13 @@ Object metadata belongs to the front component's own context, so a side panel ca
 
 Use the generated or core Twenty client for reads and writes. Keep loading, empty, error, disabled, and saving states explicit so runtime failures are visible and recoverable.
 
+For a component rendered in an AI chat tool-call context, use `useToolCall()`
+from `twenty-sdk/front-component`. It returns the current
+`FrontComponentToolCall`, or `null` when no tool-call context is supplied. The
+value includes `toolCallId`, `toolName`, and `status`, with optional `input`,
+`output`, and `errorText`. Input can be absent while streaming, and output is
+absent until the call has run; render those states explicitly.
+
 ## Headless Actions And DRY Helpers
 
 Headless front components should be thin action shells. The component file should mostly read SDK hooks, return the `Command` helper, and delegate reusable behavior to helpers.
