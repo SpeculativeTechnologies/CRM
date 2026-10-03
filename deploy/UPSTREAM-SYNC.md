@@ -184,6 +184,24 @@ Retire the old cron on the Mac deploy host so two runners do not race:
 When a run fails before opening a PR it files or comments on an "Upstream
 sync conflict" issue and the workflow summary says why. If the merge was
 fully resolved and only the push failed, the branch is kept as the
-`sync-upstream-bundle` artifact (with the agent notes) for 14 days, and the
-issue says how to push it by hand instead of paying for another agent run. An open sync PR
-blocks the next run until it is merged or closed.
+`sync-upstream-bundle` artifact (with the agent notes) for 14 days. Failed agent
+resolutions and finalization failures also retain a WIP bundle, including staged
+conflict markers or already-committed work. The issue explains how to recover it
+instead of paying for another agent run; a WIP bundle must be finished and
+verified before opening its PR. An open sync PR blocks the next run until it is
+merged or closed.
+
+### New agent workflows need a trusted default-branch copy
+
+Claude's GitHub App validates a workflow against the default branch before
+issuing its token. A sync that adds or changes an agent workflow can fail this
+check even when its application code is correct. Land the reviewed workflow
+byte-for-byte in a separate prerequisite PR first, retaining its permissions,
+source-path filter, and verdict gate. Then rerun the sync PR's failed check.
+Do not disable the workflow or relax its gate to get the sync green.
+
+For the September 30 sync, `ci-agent-skills-drift.yaml` is that prerequisite.
+Its existing `changed-files.yaml` dependency is already compatible; the
+prerequisite only changes sync tooling, so the app-development source filter
+skips the agent there. The full sync changes those sources and must run the
+agent and pass its structured verdict after the workflow is trusted.

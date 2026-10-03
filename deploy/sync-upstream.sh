@@ -68,7 +68,8 @@ bundle_branch() {
   if git bundle create "$bundle" "origin/main..$branch" >/dev/null 2>&1; then
     emit bundle true
   else
-    log "WARN: could not bundle $branch"
+    log "FAIL: could not bundle $branch"
+    return 1
   fi
 }
 
@@ -437,8 +438,11 @@ run() {
     kind=clean
     : > "$STATE_DIR/snapshots.txt"
     : > "$STATE_DIR/graphql.txt"
+    emit regenerate_graphql false
   else
     resolve_mechanical_conflicts
+    # Publish before returning the open merge to the agent.
+    emit regenerate_graphql "$([ -s "$STATE_DIR/graphql.txt" ] && echo true || echo false)"
     local remaining
     remaining="$(git diff --name-only --diff-filter=U)"
     if [ -n "$remaining" ]; then
@@ -464,7 +468,6 @@ run() {
     fi
   fi
 
-  emit regenerate_graphql "$([ -s "$STATE_DIR/graphql.txt" ] && echo true || echo false)"
   if [ "$IN_CI" = "true" ]; then
     emit outcome "$kind"
     exit 0
@@ -480,14 +483,17 @@ run() {
 save_partial() {
   local branch
   branch="$(cat "$STATE_DIR/branch")"
-  git add -A
-  git -c user.name="sync-upstream" -c user.email="sync-upstream@localhost" \
-    commit -q --no-verify -m "WIP: partial upstream merge resolution ($TODAY), do not merge" ||
-    { log "WARN: nothing to save"; return 0; }
+  git add -A || { log "FAIL: could not stage the partial resolution"; return 1; }
+  if git rev-parse -q --verify MERGE_HEAD >/dev/null || ! git diff --cached --quiet; then
+    git -c user.name="sync-upstream" -c user.email="sync-upstream@localhost" \
+      commit -q --no-verify -m "WIP: partial upstream merge resolution ($TODAY), do not merge" ||
+      { log "FAIL: could not commit the partial resolution"; return 1; }
+  fi
+  # Finalization can fail after committing. Preserve that branch as well.
   printf '%s\n' "$(git grep -l -E '^(<<<<<<< |>>>>>>> )' -- ':!*.snap' ':!*.po' ':!deploy/UPSTREAM-SYNC.md' 2>/dev/null)" \
     > "$STATE_DIR/remaining-conflicts.txt"
   log "partial resolution saved; $(grep -c . "$STATE_DIR/remaining-conflicts.txt") files still have markers"
-  bundle_branch "$branch"
+  bundle_branch "$branch" || return 1
   emit partial true
 }
 

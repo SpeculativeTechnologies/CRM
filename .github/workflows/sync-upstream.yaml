@@ -196,7 +196,7 @@ jobs:
 
       - name: Save an unfinished agent resolution
         id: partial
-        if: always() && steps.kind.outputs.kind == 'unresolved' && steps.agent.outcome != 'skipped' && steps.agent.outcome != ''
+        if: always() && steps.merge.outputs.outcome == 'conflict' && steps.agent.outcome != 'skipped' && steps.agent.outcome != '' && steps.finish.outcome != 'success' && steps.finish.outputs.bundle != 'true'
         run: bash deploy/sync-upstream.sh save-partial
 
       - name: Keep the resolved branch when the push failed
