@@ -81,6 +81,21 @@ jobs:
       # needs a live app; website/zapier tests need their own upstream CI setup.
       - name: Unit-test affected (except twenty-front / e2e / website / zapier)
         run: npx nx affected --nxBail -t test --exclude=twenty-front,twenty-e2e-testing,twenty-website,twenty-zapier --parallel=1 --base=$NX_BASE --head=$NX_HEAD
+      # This installed app has its own lockfile and is outside the root Nx graph.
+      # Root typechecks missed broken imports and stale tests after an upstream sync.
+      - name: Verify the fork's last-contact app
+        run: |
+          if git diff --quiet "$NX_BASE" "$NX_HEAD" -- \
+            packages/twenty-apps/public/last-contact .github/workflows/ci-fork.yaml; then
+            echo "Last-contact app is unchanged."
+          else
+            cd packages/twenty-apps/public/last-contact
+            yarn install --immutable
+            yarn typecheck
+            yarn lint
+            yarn test:unit
+            yarn test:setup
+          fi
       # Adding a `t` or `<Trans>` string without re-extracting leaves the
       # catalogs with no entry for its generated id, and Lingui then renders
       # the id itself ("cKqT2J" where "View full record" belongs). Nothing
