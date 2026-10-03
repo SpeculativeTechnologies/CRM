@@ -1,6 +1,7 @@
 import { DragDropItemSortableCell } from '@/ui/utilities/drag-and-drop/components/DragDropItemSortableCell';
 import { DragDropProvider } from '@dnd-kit/react';
 import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 // Playwright resolves a click on a non-interactive element to its closest
 // button-like ancestor before deciding whether the click target is enabled,
@@ -24,9 +25,47 @@ const renderSortableCell = ({ disabled }: { disabled: boolean }) =>
   );
 
 const getSortableRoot = () =>
-  screen.getByTestId('widget-content').parentElement;
+  screen.getByTestId('widget-content').parentElement?.parentElement;
 
 describe('DragDropItemSortableCell', () => {
+  it('keeps widget actions enabled while preserving disabled controls', async () => {
+    const handleClick = jest.fn();
+    render(
+      <DragDropProvider>
+        <DragDropItemSortableCell
+          id="widget-id"
+          index={0}
+          group="tab-id"
+          disabled
+        >
+          <button onClick={handleClick}>Make primary</button>
+          <button disabled onClick={handleClick}>
+            Restricted action
+          </button>
+        </DragDropItemSortableCell>
+      </DragDropProvider>,
+    );
+
+    const action = screen.getByRole('button', { name: 'Make primary' });
+    await waitFor(() => {
+      expect(action.closest('[aria-disabled]')).toHaveAttribute(
+        'aria-disabled',
+        'false',
+      );
+    });
+    const user = userEvent.setup();
+    await user.tab();
+    expect(action).toHaveFocus();
+    await user.keyboard('{Enter}');
+    const restrictedAction = screen.getByRole('button', {
+      name: 'Restricted action',
+    });
+    expect(restrictedAction).toBeDisabled();
+    await user.tab();
+    expect(restrictedAction).not.toHaveFocus();
+    expect(handleClick).toHaveBeenCalledTimes(1);
+  });
+
   it('keeps content clickable when dragging is disabled', async () => {
     renderSortableCell({ disabled: true });
 

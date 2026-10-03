@@ -56,6 +56,10 @@ const StyledSortableRoot = styled.div<{
   }
 `;
 
+const StyledSortableContent = styled.div`
+  display: contents;
+`;
+
 type DragDropItemSortableCellProps = {
   accept?: UseSortableInput['accept'];
   allowNativeDragWhenDisabled?: boolean;
@@ -141,7 +145,12 @@ export const DragDropItemSortableCell = ({
             : preventNativeDragStart
         }
       >
-        {children}
+        {/* dnd-kit disables its drag activator, not the widget's controls.
+            Keep that inherited ARIA state out of the content; controls still
+            enforce their own permissions and disabled states. */}
+        <StyledSortableContent aria-disabled={false}>
+          {children}
+        </StyledSortableContent>
       </StyledSortableRoot>
     </DragDropItemSortableHandleRefContext.Provider>
   );
