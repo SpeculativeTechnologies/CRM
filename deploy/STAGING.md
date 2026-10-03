@@ -61,3 +61,11 @@ and the read-only staging preview are owner operations described in the private
 runbook. The workflow refuses an old host contract; it never installs host files.
 To rehearse by hand without deploying, feed the rehearsal script to the host
 script with `--rehearse-only`; see [RELEASE-AUTOMATION.md](RELEASE-AUTOMATION.md#reading-a-failed-run).
+
+The host must also advertise `RELEASE_UPGRADE_ORDER_CONTRACT=1`. This means
+`upgrade` applies instance and workspace commands in version order, without a
+separate instance-command pre-run. The previous host script can delete workflow
+versions before earlier workspace backfills link them. The owner must install
+the paired reviewed `crm-ops` script before staging the upstream sync; merging
+the PR does not install it. The workflow refuses the old script before rehearsal
+or migration.

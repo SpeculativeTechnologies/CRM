@@ -81,14 +81,14 @@ case "$action" in
     # Runs in a one-off container rather than exec-ing into the server, because
     # the server is precisely what cannot come up while the schema is behind.
     echo "[staging] applying instance migrations and workspace upgrades"
-    # --include-slow matters: without it the instance step applies only fast
-    # commands and leaves the slow data migrations pending forever. The cache
-    # flush after the upgrade matters too, because upgrade:status is cached and
+    # upgrade runs instance commands, slow ones included, interleaved with the
+    # workspace commands in version order; running the instance commands first
+    # breaks commands that depend on an earlier workspace backfill. The cache
+    # flush after the upgrade matters, because upgrade:status is cached and
     # would otherwise still report the pre-upgrade answer.
     compose run --rm --no-deps --entrypoint sh server -c '
       set -e
       cd /app/packages/twenty-server
-      node dist/command/command.js run-instance-commands --force --include-slow
       node dist/command/command.js upgrade
       node dist/command/command.js cache:flush
     '

@@ -17,8 +17,10 @@ a Cloudflare tunnel with Access in front of both the app and the API. One image
 per commit on `main` (and on labeled PRs) in GHCR. A deploy is
 `cloud-deploy.sh <sha> <image@sha256:digest>` on the box: pull, migrate in a one-off container,
 restart server and worker, roll the image back on failure. The migration is
-`run-instance-commands --force --include-slow` then `upgrade` then
-`cache:flush`. Two workspaces exist on each box, with identical history until
+`upgrade` then `cache:flush`. Until 2026-10 it was preceded by
+`run-instance-commands --force --include-slow`, which applied every instance
+command ahead of the workspace commands it depends on and advanced every
+workspace cursor past them; see the 2026-09-30 sync. Two workspaces exist on each box, with identical history until
 1173f659.
 
 ## The invariant the upgrade tracker cannot see

@@ -115,10 +115,9 @@ case "$action" in
     ;;
   sync)
     verify_local_target
-    info "applying pending instance migrations"
-    npx nx run twenty-server:database:migrate
-
-    info "applying pending workspace upgrades"
+    # The initialized database already has its legacy migrations. Upgrade must
+    # interleave instance and workspace steps so later DDL cannot outrun backfills.
+    info "applying pending instance and workspace upgrades in version order"
     npx nx run twenty-server:command -- upgrade
 
     info "invalidating local metadata caches"
