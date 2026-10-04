@@ -80,7 +80,7 @@ answer is already known.
 | `people-merge-many.integration-spec.ts` | the fork's version, always | nothing |
 | `graphql-query-filter-*.parser*`, `turnRecordFilterIntoGqlOperationFilter.ts` | one-to-many relation filters (EXISTS subquery, `instanceof WorkspaceSelectQueryBuilder` guard) | new operands and refactors |
 | `SettingsNavigationDrawer.tsx` | hidden settings tab row | layout changes |
-| `generate-front-config*` | the fork's file, a superset | nothing |
+| `generate-front-config*`, `get-fork-front-runtime-config.util.ts`, frontend HTML rendering | runtime `SERVER_URL`, `FRONT_AUTO_BASE_URL` and `ENVIRONMENT_LABEL` through the shared fork helper; test the renderer actually used by the packaged server | document negotiation, client configuration bootstrap, domain isolation and security policy |
 | `logic-function-executor.service.ts` | internal API URL (Cloudflare Access blocks the public one) | the rest |
 | `instance-commands.constant.ts`, `workspace-command-provider.module.ts` | fork registrations (`merge=union`) | upstream registrations |
 | `standard-object*.constant.ts` (twenty-shared) | fork objects and fields; universal identifiers must stay unique across both sides | upstream objects and fields |
@@ -93,6 +93,12 @@ answer is already known.
 
 ### What breaks that CI does not see
 
+- **Packaged frontend configuration.** Keeping `generateFrontConfig` is not
+  enough: upstream moved HTML delivery to `FrontendService`, which must pass
+  the fork runtime settings into `renderFrontendHtml`. Local Vite injection
+  uses another path. Verify the release image with the preview smoke check,
+  explicitly requesting `Accept: text/html`, and retain its runtime URL and
+  environment-label assertions.
 - **Backdated upgrade commands.** Production seeded at ~2.9, and both sides
   insert workspace commands behind positions the boxes already passed:
   upstream backdates into released versions, the fork adds fixes in front of

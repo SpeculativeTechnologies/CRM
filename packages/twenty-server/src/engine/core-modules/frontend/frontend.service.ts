@@ -14,6 +14,7 @@ import { isFrontendDocumentRequest } from 'src/engine/core-modules/frontend/util
 import { renderFrontendHtml } from 'src/engine/core-modules/frontend/utils/render-frontend-html.util';
 import { TwentyConfigService } from 'src/engine/core-modules/twenty-config/twenty-config.service';
 import { WorkspaceNotFoundDefaultError } from 'src/engine/core-modules/workspace/workspace.exception';
+import { getForkFrontRuntimeConfig } from 'src/utils/get-fork-front-runtime-config.util';
 import { getRequestBaseUrl } from 'src/utils/get-request-base-url.util';
 import { streamToBuffer } from 'src/utils/stream-to-buffer';
 
@@ -146,7 +147,15 @@ export class FrontendService {
         response.removeHeader('X-Frame-Options');
       }
 
-      response.type('html').end(renderFrontendHtml(template, clientConfig));
+      response
+        .type('html')
+        .end(
+          renderFrontendHtml(
+            template,
+            clientConfig,
+            getForkFrontRuntimeConfig(process.env),
+          ),
+        );
     } catch (error) {
       this.logger.error('Unable to serve frontend document', error);
       response

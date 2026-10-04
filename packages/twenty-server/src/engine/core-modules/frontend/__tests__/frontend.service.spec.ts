@@ -49,6 +49,7 @@ class HealthController {
 }
 
 describe('frontend HTML delivery', () => {
+  const originalEnvironment = process.env;
   const config = {
     isMultiWorkspaceEnabled: true,
     frontDomain: 'twenty.test',
@@ -80,6 +81,10 @@ describe('frontend HTML delivery', () => {
   };
 
   beforeEach(async () => {
+    process.env = { ...originalEnvironment };
+    delete process.env.SERVER_URL;
+    delete process.env.FRONT_AUTO_BASE_URL;
+    delete process.env.ENVIRONMENT_LABEL;
     jest.useRealTimers();
     getClientConfig.mockReset().mockResolvedValue(config);
     resolveWorkspaceAndPublicDomain
@@ -102,6 +107,7 @@ describe('frontend HTML delivery', () => {
   });
 
   afterEach(async () => {
+    process.env = originalEnvironment;
     await app.close();
     rmSync(directory, { recursive: true, force: true });
     jest.restoreAllMocks();
@@ -157,6 +163,51 @@ describe('frontend HTML delivery', () => {
       .expect(404);
     expect(fetchTemplate).not.toHaveBeenCalled();
     expect(getClientConfig).not.toHaveBeenCalled();
+  });
+
+  it.each([false, true])(
+    'preserves runtime settings with automatic API URL selection set to %s',
+    async (automaticBaseUrl) => {
+      process.env.SERVER_URL = 'https://crm.example.test';
+      process.env.FRONT_AUTO_BASE_URL = String(automaticBaseUrl);
+      process.env.ENVIRONMENT_LABEL = 'Staging';
+
+      const response = await request(app.getHttpServer())
+        .get('/')
+        .set('Accept', 'text/html')
+        .expect(200);
+      const serializedRuntimeConfig = response.text.match(
+        /window\._env_ = (.*?);<\/script>/,
+      )?.[1];
+
+      expect(JSON.parse(serializedRuntimeConfig!)).toEqual({
+        ...(automaticBaseUrl
+          ? {}
+          : { REACT_APP_SERVER_BASE_URL: 'https://crm.example.test' }),
+        REACT_APP_ENVIRONMENT_LABEL: 'Staging',
+      });
+      expect(response.text).toContain('twenty-client-config');
+    },
+  );
+
+  it('safely preserves script terminators and replacement tokens in runtime settings', async () => {
+    const environmentLabel =
+      "</script><script>alert(1)</script>$&$'\u2028\u2029";
+
+    process.env.ENVIRONMENT_LABEL = environmentLabel;
+
+    const response = await request(app.getHttpServer())
+      .get('/')
+      .set('Accept', 'text/html')
+      .expect(200);
+    const serializedRuntimeConfig = response.text.match(
+      /window\._env_ = (.*?);<\/script>/,
+    )?.[1];
+
+    expect(response.text).not.toContain('<script>alert(1)');
+    expect(JSON.parse(serializedRuntimeConfig!)).toEqual({
+      REACT_APP_ENVIRONMENT_LABEL: environmentLabel,
+    });
   });
 
   it.each(['/', '/index.html', '/objects/people'])(

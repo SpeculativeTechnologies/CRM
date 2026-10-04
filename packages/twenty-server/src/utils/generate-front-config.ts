@@ -1,8 +1,10 @@
 import * as fs from 'fs';
 import * as path from 'path';
 
-import { isNonEmptyString } from '@sniptt/guards';
 import { config } from 'dotenv';
+
+import { getForkFrontRuntimeConfig } from 'src/utils/get-fork-front-runtime-config.util';
+
 if (process.env.TWENTY_DISABLE_DOTENV !== 'true') {
   config({
     path: process.env.NODE_ENV === 'test' ? '.env.test' : '.env',
@@ -16,21 +18,9 @@ export function generateFrontConfig(): void {
   // from the page's own hostname at request time. This lets the same deploy
   // be reached at both http://<external-ip> and http://localhost without a
   // hairpin through the public interface.
-  const useAutoUrl =
-    process.env.FRONT_AUTO_BASE_URL === 'true' || !process.env.SERVER_URL;
-
   // ENVIRONMENT_LABEL is read at boot rather than baked into the build because
   // the same image SHA is promoted from staging to production.
-  const environmentLabel = process.env.ENVIRONMENT_LABEL;
-
-  const envForFront = {
-    ...(useAutoUrl
-      ? {}
-      : { REACT_APP_SERVER_BASE_URL: process.env.SERVER_URL }),
-    ...(isNonEmptyString(environmentLabel)
-      ? { REACT_APP_ENVIRONMENT_LABEL: environmentLabel }
-      : {}),
-  };
+  const envForFront = getForkFrontRuntimeConfig(process.env);
 
   const configString = `<!-- BEGIN: Twenty Config -->
     <script id="twenty-env-config">
