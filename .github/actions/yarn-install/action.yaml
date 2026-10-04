@@ -1,4 +1,5 @@
 name: Yarn Install
+description: Install the workspace's locked dependencies with Node and cache reuse.
 inputs:
   node-version:
     required: false
