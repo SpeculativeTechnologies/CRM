@@ -51,6 +51,8 @@ jobs:
           retention-days: 7
 
   dispatch:
+    # The destination and GitHub App belong to upstream, not this CRM fork.
+    if: github.repository == 'twentyhq/twenty'
     needs: build
     permissions: {}
     runs-on: ubuntu-latest
