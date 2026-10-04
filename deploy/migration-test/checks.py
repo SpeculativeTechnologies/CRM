@@ -52,8 +52,10 @@ def drain_queues(stack, timeout):
     raise RuntimeError('Background work did not drain before timeout')
 
 
-def request(url, query=None, token=None):
+def request(url, query=None, token=None, *, accept=None):
     headers = {'Content-Type': 'application/json'}
+    if accept:
+        headers['Accept'] = accept
     if token:
         headers['Authorization'] = f'Bearer {token}'
     data = json.dumps({'query': query}).encode() if query else None
@@ -107,7 +109,8 @@ def smoke(stack, preview, fixture):
         if request(url + '/graphql', query, token)['company']['name'] != 'Migration rehearsal persistence':
             raise RuntimeError('Created fixture record did not persist across requests')
     if preview:
-        html = request(url + '/')
+        # Upstream serves SPA documents only to clients explicitly accepting HTML.
+        html = request(url + '/', accept='text/html')
         if 'twenty-env-config' not in html or stack.environment['SERVER_URL'] not in html:
             raise RuntimeError('Release frontend did not receive runtime SERVER_URL')
         if stack.environment['ENVIRONMENT_LABEL'] not in html:

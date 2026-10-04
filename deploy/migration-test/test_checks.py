@@ -3,8 +3,10 @@ import json
 from pathlib import Path
 import tempfile
 import unittest
+from types import SimpleNamespace
+from unittest.mock import Mock, patch
 
-from checks import assert_plan, assert_status
+from checks import assert_plan, assert_status, request, smoke
 from main import validate_manifest
 
 
@@ -36,6 +38,42 @@ class MigrationGates(unittest.TestCase):
             (root / 'baseline.dump').write_bytes(b'changed migration ledger')
             with self.assertRaises(RuntimeError):
                 validate_manifest(root)
+
+
+class PreviewRequests(unittest.TestCase):
+    def test_document_request_explicitly_accepts_html(self):
+        with patch('checks.urllib.request.urlopen') as open_url:
+            open_url.return_value.__enter__.return_value.read.return_value = b'<html></html>'
+            self.assertEqual(request('http://localhost/', accept='text/html'), '<html></html>')
+            sent = open_url.call_args.args[0]
+            self.assertEqual(sent.get_header('Accept'), 'text/html')
+            self.assertEqual(sent.get_method(), 'GET')
+
+    def test_preview_negotiates_html_and_still_requires_runtime_configuration(self):
+        stack = Mock()
+        stack.name = 'synthetic-smoke'
+        stack.environment = {'SERVER_URL': 'http://localhost:49152', 'ENVIRONMENT_LABEL': 'test'}
+        stack.sql.return_value = '00000000-0000-0000-0000-000000000001'
+        stack.command.return_value = SimpleNamespace(stdout=b'TOKEN:fixture.test.token', returncode=0)
+
+        def respond(url, query=None, token=None, *, accept=None):
+            if url.endswith('/healthz'):
+                return 'ok'
+            if query and not token:
+                raise RuntimeError('Authentication required')
+            for collection in ['companies', 'people', 'objects']:
+                if query and collection in query:
+                    return {collection: {'edges': [{'node': {'id': 'fixture'}}]}}
+            self.assertEqual(accept, 'text/html')
+            return document[0]
+
+        document = ['<html>twenty-env-config http://localhost:49152 test</html>']
+        with patch('checks.docker', return_value=SimpleNamespace(stdout=b'127.0.0.1:49152')), \
+             patch('checks.request', side_effect=respond):
+            self.assertEqual(smoke(stack, True, False), 'http://127.0.0.1:49152')
+            document[0] = '<html>missing runtime configuration</html>'
+            with self.assertRaisesRegex(RuntimeError, 'runtime SERVER_URL'):
+                smoke(stack, True, False)
 
 class DiagnosticExports(unittest.TestCase):
     def test_refuses_mirror_and_redacts_fixture_tokens(self):
