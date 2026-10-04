@@ -4,9 +4,11 @@ import { useRecordShowPageRecordGqlFields } from '@/object-record/record-show/ho
 export const useRecordShowPageResource = ({
   objectNameSingular,
   recordId,
+  skip,
 }: {
   objectNameSingular: string;
   recordId: string;
+  skip?: boolean;
 }) => {
   const { recordGqlFields } = useRecordShowPageRecordGqlFields({
     objectNameSingular,
@@ -17,6 +19,7 @@ export const useRecordShowPageResource = ({
     objectNameSingular,
     recordGqlFields,
     withSoftDeleted: true,
+    skip,
   });
 
   return queryResult;

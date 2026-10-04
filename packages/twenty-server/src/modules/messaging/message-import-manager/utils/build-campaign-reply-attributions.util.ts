@@ -3,7 +3,10 @@ import { MessageParticipantRole } from 'twenty-shared/types';
 
 import { type CampaignReplyAttribution } from 'src/engine/core-modules/emailing-domain/types/attribute-campaign-reply-job-data.type';
 import { MessageDirection } from 'src/modules/messaging/common/enums/message-direction.enum';
-import { type MessageWithParticipants } from 'src/modules/messaging/message-import-manager/types/message';
+import {
+  type MessageParticipant,
+  type MessageWithParticipants,
+} from 'src/modules/messaging/message-import-manager/types/message.type';
 import { extractReplyHeaderMessageIds } from 'src/modules/messaging/message-import-manager/utils/extract-reply-header-message-ids.util';
 import { isAutoReplyMessage } from 'src/modules/messaging/message-import-manager/utils/is-auto-reply-message.util';
 
@@ -26,7 +29,7 @@ export const buildCampaignReplyAttributions = (
     const headers = message.messageHeaders ?? [];
     const replyHeaderMessageIds = extractReplyHeaderMessageIds(headers);
     const senderHandle = message.participants.find(
-      ({ role }) => role === MessageParticipantRole.FROM,
+      ({ role }: MessageParticipant) => role === MessageParticipantRole.FROM,
     )?.handle;
 
     if (

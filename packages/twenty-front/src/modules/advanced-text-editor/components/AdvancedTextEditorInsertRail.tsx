@@ -15,9 +15,9 @@ import {
   IconTypography,
   IconVariable,
 } from 'twenty-ui/icon';
-import { Button, LightIconButton } from 'twenty-ui/input';
-import { MenuItem } from 'twenty-ui/navigation';
-import { themeCssVariables } from 'twenty-ui/theme-constants';
+import { Button } from 'twenty-ui/primitives/input';
+import { LightIconButton, MenuItem } from 'twenty-ui/components';
+import { themeCssVariables } from 'twenty-ui/theme';
 
 import { ADVANCED_TEXT_EDITOR_BLOCK_INSERTION_RECIPES } from '@/advanced-text-editor/constants/AdvancedTextEditorBlockInsertionRecipes';
 import { type UploadedImage } from '@/advanced-text-editor/types/UploadedImage';
@@ -221,17 +221,19 @@ export const AdvancedTextEditorInsertRail = ({
       />
       <StyledRail>
         <LightIconButton
-          Icon={IconTypography}
-          size="medium"
-          accent={openMenu === 'text' ? 'secondary' : 'tertiary'}
-          title={t`Text`}
+          size="md"
+          variant={openMenu === 'text' ? 'outline' : 'ghost'}
+          aria-label={t`Text`}
+          tooltip={t`Text`}
           onClick={() => setOpenMenu(openMenu === 'text' ? null : 'text')}
-        />
+        >
+          {<IconTypography />}
+        </LightIconButton>
         <LightIconButton
-          Icon={IconPhoto}
-          size="medium"
-          accent={openMenu === 'image' ? 'secondary' : 'tertiary'}
-          title={isUploadingImage ? t`Uploading...` : t`Image`}
+          size="md"
+          variant={openMenu === 'image' ? 'outline' : 'ghost'}
+          aria-label={isUploadingImage ? t`Uploading...` : t`Image`}
+          tooltip={isUploadingImage ? t`Uploading...` : t`Image`}
           disabled={isUploadingImage}
           onClick={() => {
             if (isDefined(onImageUpload)) {
@@ -241,24 +243,30 @@ export const AdvancedTextEditorInsertRail = ({
 
             setOpenMenu(openMenu === 'image' ? null : 'image');
           }}
-        />
+        >
+          {<IconPhoto />}
+        </LightIconButton>
         <LightIconButton
-          Icon={IconLayoutGrid}
-          size="medium"
-          accent={openMenu === 'blocks' ? 'secondary' : 'tertiary'}
-          title={t`Blocks`}
+          size="md"
+          variant={openMenu === 'blocks' ? 'outline' : 'ghost'}
+          aria-label={t`Blocks`}
+          tooltip={t`Blocks`}
           onClick={() => setOpenMenu(openMenu === 'blocks' ? null : 'blocks')}
-        />
+        >
+          {<IconLayoutGrid />}
+        </LightIconButton>
         {hasVariables && (
           <LightIconButton
-            Icon={IconVariable}
-            size="medium"
-            accent={openMenu === 'variables' ? 'secondary' : 'tertiary'}
-            title={t`Variables`}
+            size="md"
+            variant={openMenu === 'variables' ? 'outline' : 'ghost'}
+            aria-label={t`Variables`}
+            tooltip={t`Variables`}
             onClick={() =>
               setOpenMenu(openMenu === 'variables' ? null : 'variables')
             }
-          />
+          >
+            {<IconVariable />}
+          </LightIconButton>
         )}
       </StyledRail>
       {openMenu === 'variables' && (
@@ -315,11 +323,9 @@ export const AdvancedTextEditorInsertRail = ({
             <StyledImageHint>
               {t`Paste a link to a hosted image`}
             </StyledImageHint>
-            <Button
-              title={t`Insert image`}
-              size="small"
-              onClick={handleInsertImage}
-            />
+            <Button size="sm" onClick={handleInsertImage}>
+              {t`Insert image`}
+            </Button>
           </StyledImageForm>
         </StyledPopover>
       )}

@@ -16,7 +16,7 @@ import { type MessageCampaign } from '@/activities/emails/types/MessageCampaign'
 import { FormAdvancedTextFieldInput } from '@/advanced-text-editor/components/FormAdvancedTextFieldInput';
 import { AdvancedTextEditorInsertRail } from '@/advanced-text-editor/components/AdvancedTextEditorInsertRail';
 import { useSetAtomState } from '@/ui/utilities/state/jotai/hooks/useSetAtomState';
-import { themeCssVariables } from 'twenty-ui/theme-constants';
+import { themeCssVariables } from 'twenty-ui/theme';
 
 const StyledSignatureRow = styled.div`
   display: flex;
@@ -28,7 +28,6 @@ const StyledContainer = styled.div`
   flex: 1;
   flex-direction: column;
   min-height: 0;
-  position: relative;
 `;
 
 type CampaignBodyFieldProps = {

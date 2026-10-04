@@ -10,13 +10,25 @@ import { PersonDuplicateReviewService } from 'src/engine/core-modules/person-dup
 import { WorkspaceEntity } from 'src/engine/core-modules/workspace/workspace.entity';
 import { AuthWorkspace } from 'src/engine/decorators/auth/auth-workspace.decorator';
 import { AuthWorkspaceMemberId } from 'src/engine/decorators/auth/auth-workspace-member-id.decorator';
+import { AuthPrincipalGuard } from 'src/engine/guards/auth-principal.guard';
 import { NoPermissionGuard } from 'src/engine/guards/no-permission.guard';
-import { UserAuthGuard } from 'src/engine/guards/user-auth.guard';
-import { WorkspaceAuthGuard } from 'src/engine/guards/workspace-auth.guard';
 import { getWorkspaceAuthContext } from 'src/engine/core-modules/auth/storage/workspace-auth-context.storage';
 
 @CoreResolver()
-@UseGuards(WorkspaceAuthGuard, UserAuthGuard, NoPermissionGuard)
+@UseGuards(
+  AuthPrincipalGuard({
+    userSession: {
+      standard: true,
+      impersonated: true,
+      playground: true,
+      workspaceAgnostic: false,
+    },
+    apiKey: false,
+    oauthClient: false,
+    application: false,
+  }),
+  NoPermissionGuard,
+)
 export class PersonDuplicateReviewResolver {
   constructor(
     private readonly personDuplicateReviewService: PersonDuplicateReviewService,

@@ -1,5 +1,5 @@
 import { styled } from '@linaria/react';
-import { useState } from 'react';
+import { type MouseEvent, useState } from 'react';
 
 import { MassEmailAddPeopleButton } from '@/activities/emails/mass-email/components/MassEmailAddPeopleButton';
 import { type MassEmailComposerState } from '@/activities/emails/mass-email/hooks/useMassEmailComposerState';
@@ -10,10 +10,10 @@ import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomState
 import { t } from '@lingui/core/macro';
 import { MAX_EMAIL_RECIPIENTS } from 'twenty-shared/constants';
 import { isDefined } from 'twenty-shared/utils';
-import { Avatar } from 'twenty-ui/data-display';
+import { Avatar } from 'twenty-ui/primitives/data-display';
 import { IconSearch, IconUsers, IconX } from 'twenty-ui/icon';
-import { LightIconButton } from 'twenty-ui/input';
-import { themeCssVariables } from 'twenty-ui/theme-constants';
+import { LightIconButton } from 'twenty-ui/components';
+import { themeCssVariables } from 'twenty-ui/theme';
 import { getAbsoluteImageUrl } from '~/utils/image/getAbsoluteImageUrl';
 
 const StyledContainer = styled.div`
@@ -168,10 +168,10 @@ export const MassEmailRecipientList = ({
           onClick={() => onSelect(null)}
         >
           <Avatar
-            placeholder={t`Everyone`}
-            Icon={IconUsers}
+            name={t`Everyone`}
+            icon={<IconUsers />}
             size="lg"
-            type="rounded"
+            shape="circle"
           />
           <StyledRowText>
             <StyledRowTitle>{t`Everyone`}</StyledRowTitle>
@@ -191,11 +191,11 @@ export const MassEmailRecipientList = ({
               onClick={() => onSelect(recipient.personId)}
             >
               <Avatar
-                avatarUrl={getAbsoluteImageUrl(recipient.avatarUrl)}
-                placeholder={recipient.displayName}
-                placeholderColorSeed={recipient.personId}
+                src={getAbsoluteImageUrl(recipient.avatarUrl)}
+                name={recipient.displayName}
+                colorSeed={recipient.personId}
                 size="lg"
-                type="rounded"
+                shape="circle"
               />
               <StyledRowText>
                 <StyledRowTitle>
@@ -205,14 +205,15 @@ export const MassEmailRecipientList = ({
                 <StyledRowSubtitle>{recipient.email}</StyledRowSubtitle>
               </StyledRowText>
               <LightIconButton
-                Icon={IconX}
-                size="small"
-                accent="tertiary"
-                onClick={(event) => {
+                aria-label={t`Remove recipient`}
+                size="sm"
+                onClick={(event: MouseEvent<HTMLElement>) => {
                   event.stopPropagation();
                   handleRemove(recipient.personId);
                 }}
-              />
+              >
+                {<IconX />}
+              </LightIconButton>
             </StyledRow>
           );
         })}

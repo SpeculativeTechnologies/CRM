@@ -1,7 +1,7 @@
 import { FieldDisplayList } from '@/object-record/record-field/ui/components/FieldDisplayList';
 import { useFieldFocus } from '@/object-record/record-field/ui/hooks/useFieldFocus';
 import { useMultiSelectFieldDisplay } from '@/object-record/record-field/ui/meta-types/hooks/useMultiSelectFieldDisplay';
-import { Tag } from 'twenty-ui/data-display';
+import { Tag } from 'twenty-ui/primitives/data-display';
 import { isDefined } from 'twenty-shared/utils';
 
 export const MultiSelectFieldDisplay = () => {
@@ -18,11 +18,9 @@ export const MultiSelectFieldDisplay = () => {
   if (!isDefined(selectedOptions)) return null;
 
   const tags = selectedOptions.map((selectedOption) => (
-    <Tag
-      key={selectedOption.value}
-      color={selectedOption.color}
-      text={selectedOption.label}
-    />
+    <Tag key={selectedOption.value} color={selectedOption.color}>
+      {selectedOption.label}
+    </Tag>
   ));
 
   return (

@@ -14,10 +14,24 @@ import {
   RequireFeatureFlag,
 } from 'src/engine/guards/feature-flag.guard';
 import { NoPermissionGuard } from 'src/engine/guards/no-permission.guard';
-import { WorkspaceAuthGuard } from 'src/engine/guards/workspace-auth.guard';
+import { AuthPrincipalGuard } from 'src/engine/guards/auth-principal.guard';
 import { MessageCampaignQueryService } from 'src/modules/emailing/services/message-campaign-query.service';
 
-@UseGuards(WorkspaceAuthGuard, FeatureFlagGuard, NoPermissionGuard)
+@UseGuards(
+  AuthPrincipalGuard({
+    userSession: {
+      standard: true,
+      impersonated: true,
+      playground: true,
+      workspaceAgnostic: false,
+    },
+    apiKey: true,
+    oauthClient: { withUser: true, withoutUser: true },
+    application: { withUser: true, withoutUser: true },
+  }),
+  FeatureFlagGuard,
+  NoPermissionGuard,
+)
 @MetadataResolver()
 export class MessageCampaignResolver {
   constructor(

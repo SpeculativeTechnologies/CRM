@@ -37,8 +37,8 @@ import {
   CommonQueryNames,
   MergeManyQueryArgs,
 } from 'src/engine/api/common/types/common-query-args.type';
+import { getAllSelectableColumnNames } from 'src/engine/api/utils/get-all-selectable-column-names.utils';
 import { buildColumnsToReturn } from 'src/engine/api/graphql/graphql-query-runner/utils/build-columns-to-return';
-import { buildColumnsToSelect } from 'src/engine/api/graphql/graphql-query-runner/utils/build-columns-to-select';
 import {
   PERSON_AVATAR_FIELD_NAMES,
   getNewestPersonAvatarFieldValues,
@@ -59,6 +59,7 @@ import { buildFieldMapsFromFlatObjectMetadata } from 'src/engine/metadata-module
 import { isMorphOrRelationFlatFieldMetadata } from 'src/engine/metadata-modules/flat-field-metadata/utils/is-morph-or-relation-flat-field-metadata.util';
 import { FlatObjectMetadata } from 'src/engine/metadata-modules/flat-object-metadata/types/flat-object-metadata.type';
 import { assertMutationNotOnRemoteObject } from 'src/engine/metadata-modules/object-metadata/utils/assert-mutation-not-on-remote-object.util';
+import { resolveEffectiveFlatEntityProperty } from 'src/engine/metadata-modules/overrides/utils/resolve-effective-flat-entity-property.util';
 import { type WorkspaceRepository } from 'src/engine/twenty-orm/repository/workspace-repository';
 import { type WorkspaceTransactionScope } from 'src/engine/twenty-orm/types/workspace-transaction-scope.type';
 import { InjectWorkspaceScopedRepository } from 'src/engine/twenty-orm/workspace-scoped-repository/inject-workspace-scoped-repository.decorator';
@@ -238,12 +239,17 @@ export class CommonMergeManyQueryRunnerService extends CommonBaseQueryRunnerServ
     context: CommonExtendedQueryRunnerContext,
     args: CommonExtendedInput<MergeManyQueryArgs>,
   ): Promise<ObjectRecord[]> {
-    const columnsToSelect: Record<string, boolean> = buildColumnsToSelect({
-      select: args.selectedFieldsResult.select,
-      relations: args.selectedFieldsResult.relations,
-      flatObjectMetadata: context.flatObjectMetadata,
-      flatObjectMetadataMaps: context.flatObjectMetadataMaps,
-      flatFieldMetadataMaps: context.flatFieldMetadataMaps,
+    const restrictedFields =
+      context.repository.objectRecordsPermissions?.[
+        context.flatObjectMetadata.id
+      ]?.restrictedFields;
+
+    const columnsToSelect = getAllSelectableColumnNames({
+      restrictedFields: restrictedFields ?? {},
+      objectMetadata: {
+        objectMetadataMapItem: context.flatObjectMetadata,
+        flatFieldMetadataMaps: context.flatFieldMetadataMaps,
+      },
     });
 
     // The avatar fields are system fields excluded from the normal merge, so we select them
@@ -494,7 +500,11 @@ export class CommonMergeManyQueryRunnerService extends CommonBaseQueryRunnerServ
       if (
         !isMorphOrRelationFlatFieldMetadata(field) ||
         field.relationTargetObjectMetadataId !== flatObjectMetadata.id ||
-        !field.isActive
+        !resolveEffectiveFlatEntityProperty({
+          metadataName: 'fieldMetadata',
+          flatEntity: field,
+          property: 'isActive',
+        })
       ) {
         continue;
       }
@@ -774,8 +784,18 @@ export class CommonMergeManyQueryRunnerService extends CommonBaseQueryRunnerServ
       flatObjectMetadata,
       flatObjectMetadataMaps,
       flatFieldMetadataMaps,
+      flatIndexMaps,
       rolePermissionConfig,
     } = queryRunnerContext;
+
+    if (!isDefined(flatIndexMaps)) {
+      throw new CommonQueryRunnerException(
+        `Missing flatIndexMaps in queryRunnerContext`,
+        CommonQueryRunnerExceptionCode.MISSING_FLAT_INDEX_MAPS,
+        { userFriendlyMessage: STANDARD_ERROR_MESSAGE },
+      );
+    }
+
     const alias = flatObjectMetadata.nameSingular;
     const isPersonMerge = this.isPersonObject(flatObjectMetadata);
     const workspaceSchemaName = getWorkspaceSchemaName(

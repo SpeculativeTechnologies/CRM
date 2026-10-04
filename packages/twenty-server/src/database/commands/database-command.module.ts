@@ -1,3 +1,4 @@
+import { AgentHistoryMigrationModule } from 'src/database/commands/agent-history/agent-history-migration.module';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
@@ -23,8 +24,9 @@ import { StaleRegistrationCleanupModule } from 'src/engine/core-modules/applicat
 import { ApplicationUpgradeModule } from 'src/engine/core-modules/application/application-upgrade/application-upgrade.module';
 import { ApplicationModule } from 'src/engine/core-modules/application/application.module';
 import { PreInstalledAppsModule } from 'src/engine/core-modules/application/pre-installed-apps/pre-installed-apps.module';
+import { ApplicationRecurringChargeModule } from 'src/engine/core-modules/billing/app-billing/application-recurring-charge.module';
 import { BillingReminderModule } from 'src/engine/core-modules/billing/reminders/billing-reminder.module';
-import { EnterpriseKeyValidationCronCommand } from 'src/engine/core-modules/enterprise/cron/command/enterprise-key-validation.cron.command';
+import { EnterpriseKeyValidationCronCommand } from 'src/engine/core-modules/enterprise/cron/command/organization-key-validation.cron.command';
 import { EnterpriseModule } from 'src/engine/core-modules/enterprise/enterprise.module';
 import { EventLogCleanupModule } from 'src/engine/core-modules/event-logs/cleanup/event-log-cleanup.module';
 import { FeatureFlagModule } from 'src/engine/core-modules/feature-flag/feature-flag.module';
@@ -50,6 +52,7 @@ import { DevSeederModule } from 'src/engine/workspace-manager/dev-seeder/dev-see
 import { WorkspaceCleanerModule } from 'src/engine/workspace-manager/workspace-cleaner/workspace-cleaner.module';
 import { WorkspaceManagerModule } from 'src/engine/workspace-manager/workspace-manager.module';
 import { WorkspaceMigrationModule } from 'src/engine/workspace-manager/workspace-migration/workspace-migration.module';
+import { WorkspaceMigrationRunnerModule } from 'src/engine/workspace-manager/workspace-migration/workspace-migration-runner/workspace-migration-runner.module';
 import { WorkspaceVersionModule } from 'src/engine/workspace-manager/workspace-version/workspace-version.module';
 import { WebhookSubscriptionModule } from 'src/modules/connected-account/webhook-subscription-manager/webhook-subscription.module';
 import { CalendarEventImportManagerModule } from 'src/modules/calendar/calendar-event-import-manager/calendar-event-import-manager.module';
@@ -61,6 +64,7 @@ import { WorkflowCoreConsistencyModule } from 'src/modules/workflow/workflow-cor
 
 @Module({
   imports: [
+    AgentHistoryMigrationModule,
     UpgradeVersionCommandModule,
     TypeOrmModule.forFeature([WorkspaceEntity, RoleEntity]),
     WorkspaceExportModule,
@@ -83,8 +87,10 @@ import { WorkflowCoreConsistencyModule } from 'src/modules/workflow/workflow-cor
     FeatureFlagModule,
     WorkspaceCleanerModule,
     WorkspaceMigrationModule,
+    WorkspaceMigrationRunnerModule,
     TrashCleanupModule,
     BillingReminderModule,
+    ApplicationRecurringChargeModule,
     CodeInterpreterSessionCleanupModule,
     PublicDomainModule,
     EventLogCleanupModule,

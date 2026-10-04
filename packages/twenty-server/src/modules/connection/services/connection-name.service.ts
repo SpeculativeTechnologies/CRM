@@ -6,7 +6,7 @@ import { type FullNameMetadata } from 'twenty-shared/types';
 import { isDefined } from 'twenty-shared/utils';
 
 import { WorkspaceOrmManager } from 'src/engine/twenty-orm/workspace-orm.manager';
-import { type RolePermissionConfig } from 'src/engine/twenty-orm/types/role-permission-config';
+import { type RolePermissionConfig } from 'src/engine/twenty-orm/types/role-permission-config.type';
 import { composeConnectionName } from 'src/modules/connection/utils/compose-connection-name.util';
 import { type PersonWorkspaceEntity } from 'src/modules/person/standard-objects/person.workspace-entity';
 

@@ -6,7 +6,7 @@ import { PersonDuplicatesNavigationSection } from '@/person-duplicate-review/com
 import { styled } from '@linaria/react';
 import { lazy, Suspense } from 'react';
 
-import { themeCssVariables } from 'twenty-ui/theme-constants';
+import { themeCssVariables } from 'twenty-ui/theme';
 
 const FavoritesSectionDispatcher = lazy(() =>
   import('@/navigation-menu-item/display/sections/favorites/components/FavoritesSectionDispatcher').then(

@@ -1,7 +1,8 @@
+import { ListItem } from 'twenty-ui/primitives/navigation';
+import { SelectOptionIcon } from '@/ui/input/components/SelectOptionIcon';
 import { type FieldMetadataItem } from '@/object-metadata/types/FieldMetadataItem';
 import { isManyToOneRelationField } from '@/object-metadata/utils/isManyToOneRelationField';
 import { isOneToManyRelationField } from '@/object-metadata/utils/isOneToManyRelationField';
-import { FILTER_FIELD_LIST_ID } from '@/object-record/object-filter-dropdown/constants/FilterFieldListId';
 import { SelectableListItem } from '@/ui/layout/selectable-list/components/SelectableListItem';
 import { useSelectableList } from '@/ui/layout/selectable-list/hooks/useSelectableList';
 import { isSelectedItemIdComponentFamilyState } from '@/ui/layout/selectable-list/states/isSelectedItemIdComponentFamilyState';
@@ -12,7 +13,6 @@ import { objectFilterDropdownIsSelectingRelationTargetFieldComponentState } from
 import { objectFilterDropdownSearchInputComponentState } from '@/object-record/object-filter-dropdown/states/objectFilterDropdownSearchInputComponentState';
 import { useSetAtomComponentState } from '@/ui/utilities/state/jotai/hooks/useSetAtomComponentState';
 import { useIcons } from 'twenty-ui/icon';
-import { MenuItem } from 'twenty-ui/navigation';
 
 export type ViewBarFilterDropdownFieldSelectMenuItemProps = {
   fieldMetadataItemToSelect: FieldMetadataItem;
@@ -21,7 +21,7 @@ export type ViewBarFilterDropdownFieldSelectMenuItemProps = {
 export const ViewBarFilterDropdownFieldSelectMenuItem = ({
   fieldMetadataItemToSelect,
 }: ViewBarFilterDropdownFieldSelectMenuItemProps) => {
-  const { resetSelectedItem } = useSelectableList(FILTER_FIELD_LIST_ID);
+  const { resetSelectedItem } = useSelectableList();
 
   const isSelectedItemId = useAtomComponentFamilyStateValue(
     isSelectedItemIdComponentFamilyState,
@@ -69,16 +69,17 @@ export const ViewBarFilterDropdownFieldSelectMenuItem = ({
       itemId={fieldMetadataItemToSelect.id}
       onEnter={handleClick}
     >
-      <MenuItem
+      <ListItem
         focused={isSelectedItemId}
         onClick={handleClick}
-        LeftIcon={Icon}
-        text={fieldMetadataItemToSelect.label}
-        hasSubMenu={
+        startIcon={<SelectOptionIcon Icon={Icon} />}
+        hasSubmenu={
           isManyToOneRelationField(fieldMetadataItemToSelect) ||
           isOneToManyRelationField(fieldMetadataItemToSelect)
         }
-      />
+      >
+        {fieldMetadataItemToSelect.label}
+      </ListItem>
     </SelectableListItem>
   );
 };

@@ -3,8 +3,8 @@ import { type FlatViewFilter } from '@/metadata-store/types/FlatViewFilter';
 import { currentRecordFilterGroupsComponentState } from '@/object-record/record-filter-group/states/currentRecordFilterGroupsComponentState';
 import { currentRecordFiltersComponentState } from '@/object-record/record-filter/states/currentRecordFiltersComponentState';
 import { useAtomComponentStateCallbackState } from '@/ui/utilities/state/jotai/hooks/useAtomComponentStateCallbackState';
-import { usePerformViewFilterAPIPersist } from '@/views/hooks/internal/usePerformViewFilterAPIPersist';
-import { usePerformViewFilterGroupAPIPersist } from '@/views/hooks/internal/usePerformViewFilterGroupAPIPersist';
+import { usePerformViewFilterApiPersist } from '@/views/hooks/internal/usePerformViewFilterApiPersist';
+import { usePerformViewFilterGroupApiPersist } from '@/views/hooks/internal/usePerformViewFilterGroupApiPersist';
 import { useCanPersistViewChanges } from '@/views/hooks/useCanPersistViewChanges';
 import { useGetCurrentViewOnly } from '@/views/hooks/useGetCurrentViewOnly';
 import { getViewFilterGroupsToCreate } from '@/views/utils/getViewFilterGroupsToCreate';
@@ -18,6 +18,7 @@ import { mapRecordFilterToViewFilter } from '@/views/utils/mapRecordFilterToView
 import { useStore } from 'jotai';
 import { useCallback } from 'react';
 import { isDefined } from 'twenty-shared/utils';
+import { type ViewFilterOperand as GeneratedViewFilterOperand } from '~/generated-metadata/graphql';
 
 export const useSaveRecordFiltersAndGroupFiltersToViewFiltersAndGroupFilters =
   () => {
@@ -27,16 +28,16 @@ export const useSaveRecordFiltersAndGroupFiltersToViewFiltersAndGroupFilters =
     const store = useStore();
 
     const {
-      performViewFilterGroupAPICreate,
-      performViewFilterGroupAPIUpdate,
-      performViewFilterGroupAPIDestroy,
-    } = usePerformViewFilterGroupAPIPersist();
+      performViewFilterGroupApiCreate,
+      performViewFilterGroupApiUpdate,
+      performViewFilterGroupApiDestroy,
+    } = usePerformViewFilterGroupApiPersist();
 
     const {
-      performViewFilterAPICreate,
-      performViewFilterAPIUpdate,
-      performViewFilterAPIDestroy,
-    } = usePerformViewFilterAPIPersist();
+      performViewFilterApiCreate,
+      performViewFilterApiUpdate,
+      performViewFilterApiDestroy,
+    } = usePerformViewFilterApiPersist();
 
     const currentRecordFilterGroupsCallbackState =
       useAtomComponentStateCallbackState(
@@ -84,7 +85,7 @@ export const useSaveRecordFiltersAndGroupFiltersToViewFiltersAndGroupFilters =
           (viewFilterGroup) => viewFilterGroup.id,
         );
 
-        const createFilterGroupResult = await performViewFilterGroupAPICreate(
+        const createFilterGroupResult = await performViewFilterGroupApiCreate(
           viewFilterGroupsToCreate,
           currentView,
         );
@@ -92,7 +93,7 @@ export const useSaveRecordFiltersAndGroupFiltersToViewFiltersAndGroupFilters =
           return;
         }
 
-        const updateFilterGroupResult = await performViewFilterGroupAPIUpdate(
+        const updateFilterGroupResult = await performViewFilterGroupApiUpdate(
           viewFilterGroupsToUpdate,
         );
         if (updateFilterGroupResult.status === 'failed') {
@@ -134,7 +135,11 @@ export const useSaveRecordFiltersAndGroupFiltersToViewFiltersAndGroupFilters =
               fieldMetadataId: viewFilter.fieldMetadataId,
               viewId: currentView.id,
               value: viewFilter.value,
-              operand: viewFilter.operand,
+              // Flat view filters carry twenty-shared's ViewFilterOperand; the
+              // generated input expects the generated enum. Identical members,
+              // so bridge the nominal enum identity.
+              operand:
+                viewFilter.operand as unknown as GeneratedViewFilterOperand,
               viewFilterGroupId: viewFilter.viewFilterGroupId,
               positionInViewFilterGroup: viewFilter.positionInViewFilterGroup,
               subFieldName: viewFilter.subFieldName ?? null,
@@ -150,7 +155,8 @@ export const useSaveRecordFiltersAndGroupFiltersToViewFiltersAndGroupFilters =
               id: viewFilter.id,
               update: {
                 value: viewFilter.value,
-                operand: viewFilter.operand,
+                operand:
+                  viewFilter.operand as unknown as GeneratedViewFilterOperand,
                 positionInViewFilterGroup: viewFilter.positionInViewFilterGroup,
                 viewFilterGroupId: viewFilter.viewFilterGroupId,
                 subFieldName: viewFilter.subFieldName ?? null,
@@ -169,28 +175,28 @@ export const useSaveRecordFiltersAndGroupFiltersToViewFiltersAndGroupFilters =
           }),
         );
 
-        const createResult = await performViewFilterAPICreate(
+        const createResult = await performViewFilterApiCreate(
           createViewFilterInputs,
         );
         if (createResult.status === 'failed') {
           return;
         }
 
-        const updateResult = await performViewFilterAPIUpdate(
+        const updateResult = await performViewFilterApiUpdate(
           updateViewFilterInputs,
         );
         if (updateResult.status === 'failed') {
           return;
         }
 
-        const deleteResult = await performViewFilterAPIDestroy(
+        const deleteResult = await performViewFilterApiDestroy(
           destroyViewFilterInputs,
         );
         if (deleteResult.status === 'failed') {
           return;
         }
 
-        const destroyFilterGroupResult = await performViewFilterGroupAPIDestroy(
+        const destroyFilterGroupResult = await performViewFilterGroupApiDestroy(
           viewFilterGroupIdsToDestroy,
         );
         if (destroyFilterGroupResult.status === 'failed') {
@@ -216,12 +222,12 @@ export const useSaveRecordFiltersAndGroupFiltersToViewFiltersAndGroupFilters =
         store,
         currentRecordFilterGroupsCallbackState,
         currentRecordFiltersCallbackState,
-        performViewFilterGroupAPICreate,
-        performViewFilterGroupAPIUpdate,
-        performViewFilterGroupAPIDestroy,
-        performViewFilterAPICreate,
-        performViewFilterAPIUpdate,
-        performViewFilterAPIDestroy,
+        performViewFilterGroupApiCreate,
+        performViewFilterGroupApiUpdate,
+        performViewFilterGroupApiDestroy,
+        performViewFilterApiCreate,
+        performViewFilterApiUpdate,
+        performViewFilterApiDestroy,
       ]);
 
     return {

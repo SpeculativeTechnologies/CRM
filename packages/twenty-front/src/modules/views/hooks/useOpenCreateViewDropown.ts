@@ -1,7 +1,8 @@
 import { useOpenDropdown } from '@/ui/layout/dropdown/hooks/useOpenDropdown';
 import { useSetAtomComponentState } from '@/ui/utilities/state/jotai/hooks/useSetAtomComponentState';
 import { type View } from '@/views/types/View';
-import { VIEW_PICKER_DROPDOWN_ID } from '@/views/view-picker/constants/ViewPickerDropdownId';
+import { useRecordIndexContextOrThrow } from '@/object-record/record-index/contexts/RecordIndexContext';
+import { getViewPickerDropdownId } from '@/views/view-picker/utils/getViewPickerDropdownId';
 import { useViewPickerMode } from '@/views/view-picker/hooks/useViewPickerMode';
 import { viewPickerParentViewIdComponentState } from '@/views/view-picker/states/viewPickerParentViewIdComponentState';
 import { viewPickerReferenceViewIdComponentState } from '@/views/view-picker/states/viewPickerReferenceViewIdComponentState';
@@ -22,6 +23,7 @@ export const useOpenCreateViewDropdown = (viewBardId?: string) => {
   const { setViewPickerMode } = useViewPickerMode(viewBardId);
 
   const { openDropdown } = useOpenDropdown();
+  const { recordIndexId } = useRecordIndexContextOrThrow();
 
   const openCreateViewDropdown = (
     referenceView: View | undefined,
@@ -32,7 +34,8 @@ export const useOpenCreateViewDropdown = (viewBardId?: string) => {
       setViewPickerParentViewId(parentViewId ?? '');
       setViewPickerMode('create-empty');
       openDropdown({
-        dropdownComponentInstanceIdFromProps: VIEW_PICKER_DROPDOWN_ID,
+        dropdownComponentInstanceIdFromProps:
+          getViewPickerDropdownId(recordIndexId),
       });
     }
   };

@@ -2,24 +2,28 @@ import { useObjectMetadataItem } from '@/object-metadata/hooks/useObjectMetadata
 import { getObjectMetadataIdentifierFields } from '@/object-metadata/utils/getObjectMetadataIdentifierFields';
 import { ObjectRecordShowPageBreadcrumb } from '@/object-record/record-show/components/ObjectRecordShowPageBreadcrumb';
 import { RecordIdentifierBarTitle } from '@/object-record/record-show/components/RecordIdentifierBarTitle';
+import { RecordShowPageHeaderRecordTitle } from '@/object-record/record-show/components/RecordShowPageHeaderRecordTitle';
+import { type RecordShowPageHeaderTitleMode } from '@/object-record/record-show/types/RecordShowPageHeaderTitleMode';
 import { useWorkspaceSurface } from '@/ui/layout/hooks/useWorkspaceSurface';
 import { PageCardHeader } from '@/ui/layout/page/components/PageCardHeader';
 
 type RecordShowPageHeaderProps = {
   objectNameSingular: string;
   objectRecordId: string;
+  titleMode?: RecordShowPageHeaderTitleMode;
   children?: React.ReactNode;
 };
 
 type RecordShowPageMainHeaderProps = RecordShowPageHeaderProps;
 type RecordShowPagePanelHeaderProps = Omit<
   RecordShowPageHeaderProps,
-  'children'
+  'children' | 'titleMode'
 >;
 
 const RecordShowPageMainHeader = ({
   objectNameSingular,
   objectRecordId,
+  titleMode = 'breadcrumb',
   children,
 }: RecordShowPageMainHeaderProps) => {
   const { objectMetadataItem } = useObjectMetadataItem({
@@ -28,6 +32,20 @@ const RecordShowPageMainHeader = ({
 
   const { labelIdentifierFieldMetadataItem } =
     getObjectMetadataIdentifierFields({ objectMetadataItem });
+
+  if (titleMode === 'record-title') {
+    return (
+      <PageCardHeader
+        title={
+          <RecordShowPageHeaderRecordTitle
+            objectNameSingular={objectNameSingular}
+            objectRecordId={objectRecordId}
+          />
+        }
+        actionButton={children}
+      />
+    );
+  }
 
   return (
     <PageCardHeader
@@ -63,6 +81,7 @@ const RecordShowPagePanelHeader = ({
 export const RecordShowPageHeader = ({
   objectNameSingular,
   objectRecordId,
+  titleMode,
   children,
 }: RecordShowPageHeaderProps) => {
   const workspaceSurface = useWorkspaceSurface();
@@ -76,6 +95,7 @@ export const RecordShowPageHeader = ({
     <RecordShowPageMainHeader
       objectNameSingular={objectNameSingular}
       objectRecordId={objectRecordId}
+      titleMode={titleMode}
     >
       {children}
     </RecordShowPageMainHeader>

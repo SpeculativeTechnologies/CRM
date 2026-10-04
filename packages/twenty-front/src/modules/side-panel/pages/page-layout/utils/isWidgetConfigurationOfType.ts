@@ -5,6 +5,8 @@ import {
   type CalendarConfiguration,
   type CallRecordingSummaryConfiguration,
   type CallRecordingTranscriptConfiguration,
+  type ChatConfiguration,
+  type ChatThreadsConfiguration,
   type EmailThreadConfiguration,
   type EmailsConfiguration,
   type FieldRichTextConfiguration,
@@ -66,6 +68,15 @@ type WidgetConfigurationTypenameMap = {
     'configurationType'
   > & {
     configurationType: WidgetConfigurationType.CALL_RECORDING_TRANSCRIPT;
+  };
+  ChatThreadsConfiguration: Omit<
+    ChatThreadsConfiguration,
+    'configurationType'
+  > & {
+    configurationType: WidgetConfigurationType.CHAT_THREADS;
+  };
+  ChatConfiguration: Omit<ChatConfiguration, 'configurationType'> & {
+    configurationType: WidgetConfigurationType.CHAT;
   };
   MessageCampaignBodyConfiguration: Omit<
     MessageCampaignBodyConfiguration,
@@ -151,9 +162,6 @@ type WidgetConfigurationTypenameMap = {
 };
 
 type WidgetConfigurationTypename = keyof WidgetConfigurationTypenameMap;
-
-export type WidgetConfigurationOfType<T extends WidgetConfigurationTypename> =
-  WidgetConfigurationTypenameMap[T];
 
 export const isWidgetConfigurationOfType = <
   T extends WidgetConfigurationTypename,

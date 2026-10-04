@@ -339,7 +339,12 @@ describe('ForkMissedWorkspaceCommandsService', () => {
       options: {},
     });
 
-    expect(report).toEqual({ fail: [], success: [], interrupted: false });
+    expect(report).toEqual({
+      fail: [],
+      success: [],
+      skipped: [],
+      interrupted: false,
+    });
     expect(iterate).not.toHaveBeenCalled();
   });
 });

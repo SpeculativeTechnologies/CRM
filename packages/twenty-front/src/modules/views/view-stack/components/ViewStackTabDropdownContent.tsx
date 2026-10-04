@@ -10,7 +10,7 @@ import { DropdownMenuItemsContainer } from '@/ui/layout/dropdown/components/Drop
 import { DropdownMenuSeparator } from '@/ui/layout/dropdown/components/DropdownMenuSeparator';
 import { useCloseDropdown } from '@/ui/layout/dropdown/hooks/useCloseDropdown';
 import { useSetAtomComponentState } from '@/ui/utilities/state/jotai/hooks/useSetAtomComponentState';
-import { usePerformViewAPIUpdate } from '@/views/hooks/internal/usePerformViewAPIUpdate';
+import { usePerformViewApiUpdate } from '@/views/hooks/internal/usePerformViewApiUpdate';
 import { useChangeView } from '@/views/hooks/useChangeView';
 import { useOpenCreateViewDropdown } from '@/views/hooks/useOpenCreateViewDropown';
 import { VIEW_PICKER_DROPDOWN_ID } from '@/views/view-picker/constants/ViewPickerDropdownId';
@@ -20,8 +20,8 @@ import { ViewPickerOptionDropdown } from '@/views/view-picker/components/ViewPic
 import { type ViewStack } from '@/views/view-stack/types/ViewStack';
 import { useLingui } from '@lingui/react/macro';
 import { IconPlus } from 'twenty-ui/icon';
-import { MenuItem } from 'twenty-ui/navigation';
-import { themeCssVariables } from 'twenty-ui/theme-constants';
+import { MenuItem } from 'twenty-ui/components';
+import { themeCssVariables } from 'twenty-ui/theme';
 import { moveArrayItem } from '~/utils/array/moveArrayItem';
 
 const StyledBoldDropdownMenuItemsContainerWrapper = styled.div`
@@ -46,7 +46,7 @@ export const ViewStackTabDropdownContent = ({
   const { changeView } = useChangeView();
   const { closeDropdown } = useCloseDropdown();
   const { openCreateViewDropdown } = useOpenCreateViewDropdown();
-  const { performViewAPIUpdate } = usePerformViewAPIUpdate();
+  const { performViewApiUpdate } = usePerformViewApiUpdate();
   const { setViewPickerMode } = useViewPickerMode();
 
   const setViewPickerReferenceViewId = useSetAtomComponentState(
@@ -83,7 +83,7 @@ export const ViewStackTabDropdownContent = ({
       await Promise.all(
         reorderedChildViews.map(async (childView, index) => {
           if (childView.position !== index) {
-            await performViewAPIUpdate({
+            await performViewApiUpdate({
               id: childView.id,
               input: { position: index },
             });
@@ -91,7 +91,7 @@ export const ViewStackTabDropdownContent = ({
         }),
       );
     },
-    [childViews, performViewAPIUpdate],
+    [childViews, performViewApiUpdate],
   );
 
   return (

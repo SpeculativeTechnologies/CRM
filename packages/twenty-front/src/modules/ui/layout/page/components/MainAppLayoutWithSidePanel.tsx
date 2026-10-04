@@ -1,22 +1,13 @@
+import { WorkspaceSetupChatSidePanelEffect } from '@/onboarding/effect-components/WorkspaceSetupChatSidePanelEffect';
 import { CommandMenuForMobile } from '@/command-menu/components/CommandMenuForMobile';
 import { useCommandMenuHotKeys } from '@/command-menu/hooks/useCommandMenuHotKeys';
 import { RouteContextStoreProvider } from '@/context-store/components/RouteContextStoreProvider';
+import { LogConsole } from '@/log-console/components/LogConsole';
 import { SidePanelForDesktop } from '@/side-panel/components/SidePanelForDesktop';
 import { SidePanelPathUrlSyncEffect } from '@/side-panel/routing/components/SidePanelPathUrlSyncEffect';
-import { useIsMobile } from '@/ui/utilities/responsive/hooks/useIsMobile';
+import { useIsMobile } from 'twenty-ui/utilities';
 import { styled } from '@linaria/react';
-import { AnimatePresence, motion } from 'framer-motion';
-import { useEffect, useState } from 'react';
-import { useLocation, useOutlet } from 'react-router-dom';
-import { isDefined } from 'twenty-shared/utils';
-import { isSettingsPath } from '~/utils/isSettingsPath';
-
-const ROUTE_SECTION_DATA_ATTRIBUTE = 'data-main-app-route-section';
-
-const APP_TO_SETTINGS_TRANSITION_DURATION_IN_SECONDS = 0.3;
-
-const getMainAppLayoutRouteSection = (pathname: string) =>
-  isSettingsPath(pathname) ? 'settings' : 'app';
+import { Outlet } from 'react-router-dom';
 
 const StyledRow = styled.div`
   display: flex;
@@ -38,12 +29,26 @@ const StyledRow = styled.div`
   }
 `;
 
+const StyledMainColumn = styled.div`
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  min-height: 0;
+  min-width: 0;
+  position: relative;
+
+  @media print {
+    display: block;
+    min-height: auto;
+    min-width: auto;
+  }
+`;
+
 const StyledContent = styled.div`
   display: flex;
   flex: 1 1 0;
   min-height: 0;
   min-width: 0;
-  overflow: hidden;
 
   @media print {
     display: block;
@@ -52,76 +57,6 @@ const StyledContent = styled.div`
     overflow: visible;
   }
 `;
-
-const StyledContentTransitionContainer = styled.div`
-  display: grid;
-  flex: 1 1 0;
-  min-height: 0;
-  min-width: 0;
-  overflow: hidden;
-
-  @media print {
-    display: block;
-    min-height: auto;
-    min-width: auto;
-    overflow: visible;
-  }
-`;
-
-const StyledContentTransitionPage = styled(motion.div)`
-  display: flex;
-  grid-area: 1 / 1;
-  min-height: 0;
-  min-width: 0;
-  width: 100%;
-
-  @media print {
-    display: block;
-    min-height: auto;
-    min-width: auto;
-  }
-`;
-
-const MainAppLayoutOutlet = () => {
-  const { pathname } = useLocation();
-  const outlet = useOutlet();
-  const routeSection = getMainAppLayoutRouteSection(pathname);
-  const [containerElement, setContainerElement] =
-    useState<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    if (!isDefined(containerElement)) {
-      return;
-    }
-
-    Array.from(containerElement.children).forEach((child) => {
-      if (child instanceof HTMLElement) {
-        child.inert =
-          child.getAttribute(ROUTE_SECTION_DATA_ATTRIBUTE) !== routeSection;
-      }
-    });
-  }, [containerElement, routeSection]);
-
-  return (
-    <StyledContentTransitionContainer ref={setContainerElement}>
-      <AnimatePresence initial={false}>
-        <StyledContentTransitionPage
-          key={routeSection}
-          {...{ [ROUTE_SECTION_DATA_ATTRIBUTE]: routeSection }}
-          initial={{ opacity: 0, y: 4 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -4, pointerEvents: 'none' }}
-          transition={{
-            duration: APP_TO_SETTINGS_TRANSITION_DURATION_IN_SECONDS,
-            ease: 'easeInOut',
-          }}
-        >
-          {outlet}
-        </StyledContentTransitionPage>
-      </AnimatePresence>
-    </StyledContentTransitionContainer>
-  );
-};
 
 export const MainAppLayoutWithSidePanel = () => {
   const isMobile = useIsMobile();
@@ -132,9 +67,13 @@ export const MainAppLayoutWithSidePanel = () => {
     <StyledRow>
       <RouteContextStoreProvider />
       <SidePanelPathUrlSyncEffect />
-      <StyledContent>
-        <MainAppLayoutOutlet />
-      </StyledContent>
+      <WorkspaceSetupChatSidePanelEffect />
+      <StyledMainColumn>
+        <StyledContent>
+          <Outlet />
+        </StyledContent>
+        <LogConsole />
+      </StyledMainColumn>
       {isMobile ? <CommandMenuForMobile /> : <SidePanelForDesktop />}
     </StyledRow>
   );

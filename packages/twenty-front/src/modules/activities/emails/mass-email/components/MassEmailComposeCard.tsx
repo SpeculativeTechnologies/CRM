@@ -21,10 +21,11 @@ import { DND_KIT_SENSORS } from '@/ui/utilities/drag-and-drop/constants/DndKitSe
 import { DragDropItemDndContext } from '@/ui/utilities/drag-and-drop/context/DragDropItemDndContext';
 import { t } from '@lingui/core/macro';
 import { isDefined } from 'twenty-shared/utils';
-import { Avatar } from 'twenty-ui/data-display';
+import { Avatar } from 'twenty-ui/primitives/data-display';
 import { IconRestore, IconSend, IconUsers } from 'twenty-ui/icon';
-import { Button, LightIconButton, type SelectOption } from 'twenty-ui/input';
-import { themeCssVariables } from 'twenty-ui/theme-constants';
+import { LightIconButton } from 'twenty-ui/components';
+import { Button, type SelectOption } from 'twenty-ui/primitives/input';
+import { themeCssVariables } from 'twenty-ui/theme';
 import { getAbsoluteImageUrl } from '~/utils/image/getAbsoluteImageUrl';
 
 const StyledMain = styled.div`
@@ -282,11 +283,11 @@ export const MassEmailComposeCard = ({
             {isDefined(selectedRecipient) ? (
               <>
                 <Avatar
-                  avatarUrl={getAbsoluteImageUrl(selectedRecipient.avatarUrl)}
-                  placeholder={selectedRecipient.displayName}
-                  placeholderColorSeed={selectedRecipient.personId}
+                  src={getAbsoluteImageUrl(selectedRecipient.avatarUrl)}
+                  name={selectedRecipient.displayName}
+                  colorSeed={selectedRecipient.personId}
                   size="sm"
-                  type="rounded"
+                  shape="circle"
                 />
                 {selectedRecipient.displayName}
                 <StyledSecondaryText>
@@ -296,10 +297,10 @@ export const MassEmailComposeCard = ({
             ) : (
               <>
                 <Avatar
-                  Icon={IconUsers}
-                  placeholder={t`Everyone`}
+                  icon={<IconUsers />}
+                  name={t`Everyone`}
                   size="sm"
-                  type="rounded"
+                  shape="circle"
                 />
                 {t`Everyone`}
                 <StyledSecondaryText>
@@ -419,23 +420,25 @@ export const MassEmailComposeCard = ({
           <StyledCustomizedRow>
             {t`Customized for this recipient`}
             <LightIconButton
-              Icon={IconRestore}
-              size="small"
-              accent="tertiary"
+              aria-label={t`Reset to template`}
+              size="sm"
               onClick={handleReset}
-            />
+            >
+              {<IconRestore />}
+            </LightIconButton>
           </StyledCustomizedRow>
         )}
         <StyledFooter>
           <Button
-            size="small"
-            variant="primary"
-            accent="blue"
-            title={sendButtonTitle}
-            Icon={IconSend}
+            size="sm"
+            variant="solid"
+            color="accent"
+            startIcon={<IconSend />}
             onClick={composerState.handleSend}
             disabled={!composerState.canSend}
-          />
+          >
+            {sendButtonTitle}
+          </Button>
         </StyledFooter>
       </StyledCard>
     </StyledMain>

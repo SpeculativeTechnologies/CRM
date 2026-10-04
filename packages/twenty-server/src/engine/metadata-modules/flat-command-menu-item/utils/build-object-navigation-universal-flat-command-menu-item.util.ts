@@ -29,9 +29,16 @@ const NAVIGATION_FEATURE_FLAG_GATE_BY_OBJECT_UNIVERSAL_IDENTIFIER: Partial<
   Record<string, FeatureFlagKey>
 > = {
   [STANDARD_OBJECTS.messageCampaign.universalIdentifier]:
-    FeatureFlagKey.IS_EMAIL_GROUP_ENABLED,
+    FeatureFlagKey.IS_MESSAGE_CAMPAIGN_ENABLED,
   [STANDARD_OBJECTS.messageList.universalIdentifier]:
-    FeatureFlagKey.IS_EMAIL_GROUP_ENABLED,
+    FeatureFlagKey.IS_MESSAGE_CAMPAIGN_ENABLED,
+};
+
+const NAVIGATION_HIDING_FEATURE_FLAG_BY_OBJECT_UNIVERSAL_IDENTIFIER: Partial<
+  Record<string, FeatureFlagKey>
+> = {
+  [STANDARD_OBJECTS.workflowVersion.universalIdentifier]:
+    FeatureFlagKey.IS_WORKFLOW_CORE_INDEX_PAGE_ENABLED,
 };
 
 export const buildNavigationConditionalAvailabilityExpression = ({
@@ -46,6 +53,14 @@ export const buildNavigationConditionalAvailabilityExpression = ({
     NAVIGATION_FEATURE_FLAG_GATE_BY_OBJECT_UNIVERSAL_IDENTIFIER[
       universalIdentifier
     ];
+  const hidingFeatureFlagGate =
+    NAVIGATION_HIDING_FEATURE_FLAG_BY_OBJECT_UNIVERSAL_IDENTIFIER[
+      universalIdentifier
+    ];
+
+  if (isDefined(hidingFeatureFlagGate)) {
+    return `not featureFlags.${hidingFeatureFlagGate} and ${targetObjectReadPermissionExpression}`;
+  }
 
   return isDefined(featureFlagGate)
     ? `featureFlags.${featureFlagGate} and ${targetObjectReadPermissionExpression}`
@@ -92,6 +107,7 @@ export const buildObjectNavigationUniversalFlatCommandMenuItem = ({
     isPinned: false,
     availabilityType: CommandMenuItemAvailabilityType.GLOBAL,
     conditionalAvailabilityExpression,
+    conditionalPinnedExpression: null,
     frontComponentUniversalIdentifier: null,
     engineComponentKey: EngineComponentKey.NAVIGATION,
     payload: null,
@@ -101,6 +117,7 @@ export const buildObjectNavigationUniversalFlatCommandMenuItem = ({
       ? ['G', objectMetadata.shortcut]
       : null,
     workflowVersionId: null,
+    coreWorkflowVersionId: null,
     availabilityObjectMetadataUniversalIdentifier: null,
     pageLayoutUniversalIdentifier: null,
     isActive: objectMetadata.isActive,

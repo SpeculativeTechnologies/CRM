@@ -4,7 +4,7 @@ import { In } from 'typeorm';
 import { isDefined } from 'twenty-shared/utils';
 
 import { WorkspaceOrmManager } from 'src/engine/twenty-orm/workspace-orm.manager';
-import { type RolePermissionConfig } from 'src/engine/twenty-orm/types/role-permission-config';
+import { type RolePermissionConfig } from 'src/engine/twenty-orm/types/role-permission-config.type';
 import { type PersonWorkspaceEntity } from 'src/modules/person/standard-objects/person.workspace-entity';
 import { computeOpenTaskCountByPersonId } from 'src/modules/person/utils/compute-open-task-count-by-person-id.util';
 import { type TaskTargetWorkspaceEntity } from 'src/modules/task/standard-objects/task-target.workspace-entity';

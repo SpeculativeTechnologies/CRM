@@ -2,8 +2,8 @@ import { useMutation } from '@apollo/client/react';
 import { useCallback } from 'react';
 
 import { SAVE_MASS_EMAIL_CAMPAIGN_DRAFT } from '@/activities/emails/mass-email/graphql/massEmailCampaign';
-import { useSnackBar } from '@/ui/feedback/snack-bar-manager/hooks/useSnackBar';
 import { t } from '@lingui/core/macro';
+import { useToast } from 'twenty-ui/components';
 
 type SaveMassEmailCampaignDraftInput = {
   campaignId?: string;
@@ -15,7 +15,7 @@ type SaveMassEmailCampaignDraftInput = {
 };
 
 export const useMassEmailCampaignDraft = () => {
-  const { enqueueErrorSnackBar } = useSnackBar();
+  const { enqueueToast } = useToast();
   const [saveMutation, { loading: isSaving }] = useMutation<
     { saveMassEmailCampaignDraft: { campaignId: string; updatedAt: string } },
     { input: SaveMassEmailCampaignDraftInput }
@@ -30,15 +30,16 @@ export const useMassEmailCampaignDraft = () => {
 
         return result.data?.saveMassEmailCampaignDraft ?? null;
       } catch (error) {
-        enqueueErrorSnackBar({
-          message:
+        enqueueToast({
+          variant: 'error',
+          children:
             error instanceof Error ? error.message : t`Failed to save draft`,
         });
 
         return null;
       }
     },
-    [enqueueErrorSnackBar, saveMutation],
+    [enqueueToast, saveMutation],
   );
 
   return { saveDraft, isSaving };

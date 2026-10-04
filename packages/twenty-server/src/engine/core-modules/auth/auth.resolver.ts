@@ -8,7 +8,10 @@ import GraphQLUpload from 'graphql-upload/GraphQLUpload.mjs';
 import omit from 'lodash.omit';
 import { PermissionFlagType } from 'twenty-shared/constants';
 import { SOURCE_LOCALE } from 'twenty-shared/translations';
-import { TwoFactorAuthenticationStrategy } from 'twenty-shared/types';
+import {
+  FileFolder,
+  TwoFactorAuthenticationStrategy,
+} from 'twenty-shared/types';
 import { assertIsDefinedOrThrow, isDefined } from 'twenty-shared/utils';
 import { Repository } from 'typeorm';
 
@@ -32,8 +35,8 @@ import { AvailableWorkspacesAndAccessTokensDTO } from 'src/engine/core-modules/a
 import { EmailPasswordResetLinkDTO } from 'src/engine/core-modules/auth/dto/email-password-reset-link.dto';
 import { EmailPasswordResetLinkInput } from 'src/engine/core-modules/auth/dto/email-password-reset-link.input';
 import { GetAuthTokenFromEmailVerificationTokenInput } from 'src/engine/core-modules/auth/dto/get-auth-token-from-email-verification-token.input';
-import { GetAuthorizationUrlForSSODTO } from 'src/engine/core-modules/auth/dto/get-authorization-url-for-sso.dto';
-import { GetAuthorizationUrlForSSOInput } from 'src/engine/core-modules/auth/dto/get-authorization-url-for-sso.input';
+import { GetAuthorizationUrlForSsoDTO } from 'src/engine/core-modules/auth/dto/get-authorization-url-for-sso.dto';
+import { GetAuthorizationUrlForSsoInput } from 'src/engine/core-modules/auth/dto/get-authorization-url-for-sso.input';
 import { InvalidatePasswordDTO } from 'src/engine/core-modules/auth/dto/invalidate-password.dto';
 import { SignUpDTO } from 'src/engine/core-modules/auth/dto/sign-up.dto';
 import { TransientTokenDTO } from 'src/engine/core-modules/auth/dto/transient-token.dto';
@@ -51,7 +54,7 @@ import { EmailVerificationTokenService } from 'src/engine/core-modules/auth/toke
 import { LoginTokenService } from 'src/engine/core-modules/auth/token/services/login-token.service';
 import { RefreshTokenService } from 'src/engine/core-modules/auth/token/services/refresh-token.service';
 import { RenewTokenService } from 'src/engine/core-modules/auth/token/services/renew-token.service';
-import { SSOExchangeTokenService } from 'src/engine/core-modules/auth/token/services/sso-exchange-token.service';
+import { SsoExchangeTokenService } from 'src/engine/core-modules/auth/token/services/sso-exchange-token.service';
 import { TransientTokenService } from 'src/engine/core-modules/auth/token/services/transient-token.service';
 import { WorkspaceAgnosticTokenService } from 'src/engine/core-modules/auth/token/services/workspace-agnostic-token.service';
 import { AuthContextUser } from 'src/engine/core-modules/auth/types/auth-context.type';
@@ -67,14 +70,17 @@ import { EmailVerificationExceptionFilter } from 'src/engine/core-modules/email-
 import { EmailVerificationTrigger } from 'src/engine/core-modules/email-verification/email-verification.constants';
 import { EmailVerificationService } from 'src/engine/core-modules/email-verification/services/email-verification.service';
 import { FileWithSignedUrlDTO } from 'src/engine/core-modules/file/dtos/file-with-sign-url.dto';
+import { FileUploadTargetDTO } from 'src/engine/core-modules/file/file-upload/dtos/file-upload-target.dto';
+import { FileUploadGraphqlApiExceptionFilter } from 'src/engine/core-modules/file/file-upload/filters/file-upload-graphql-api-exception.filter';
 import { FileCorePictureService } from 'src/engine/core-modules/file/file-core-picture/services/file-core-picture.service';
+import { FileUploadService } from 'src/engine/core-modules/file/file-upload/services/file-upload.service';
 import { PreventNestToAutoLogGraphqlErrorsFilter } from 'src/engine/core-modules/graphql/filters/prevent-nest-to-auto-log-graphql-errors.filter';
 import { ResolverValidationPipe } from 'src/engine/core-modules/graphql/pipes/resolver-validation.pipe';
 import { I18nContext } from 'src/engine/core-modules/i18n/types/i18n-context.type';
 import { IMPERSONATION_DENIAL_BY_REASON } from 'src/engine/core-modules/impersonation/constants/impersonation-denial-by-reason.constant';
 import { IMPERSONATION_DENIAL_LOG_MESSAGE_BY_REASON } from 'src/engine/core-modules/impersonation/constants/impersonation-denial-log-message-by-reason.constant';
 import { ImpersonationAuthorizationService } from 'src/engine/core-modules/impersonation/services/impersonation-authorization.service';
-import { SSOService } from 'src/engine/core-modules/sso/services/sso.service';
+import { SsoService } from 'src/engine/core-modules/sso/services/sso.service';
 import { TwoFactorAuthenticationVerificationInput } from 'src/engine/core-modules/two-factor-authentication/dto/two-factor-authentication-verification.input';
 import { TwoFactorAuthenticationExceptionFilter } from 'src/engine/core-modules/two-factor-authentication/two-factor-authentication-exception.filter';
 import { TwoFactorAuthenticationService } from 'src/engine/core-modules/two-factor-authentication/two-factor-authentication.service';
@@ -90,12 +96,11 @@ import { WorkspaceEntity } from 'src/engine/core-modules/workspace/workspace.ent
 import { AuthProvider } from 'src/engine/decorators/auth/auth-provider.decorator';
 import { AuthUser } from 'src/engine/decorators/auth/auth-user.decorator';
 import { AuthWorkspace } from 'src/engine/decorators/auth/auth-workspace.decorator';
+import { AllowSuspendedWorkspace } from 'src/engine/decorators/auth/allow-suspended-workspace.decorator';
 import { NoPermissionGuard } from 'src/engine/guards/no-permission.guard';
 import { PublicEndpointGuard } from 'src/engine/guards/public-endpoint.guard';
-import { RequireAccessTokenGuard } from 'src/engine/guards/require-access-token.guard';
+import { AuthPrincipalGuard } from 'src/engine/guards/auth-principal.guard';
 import { SettingsPermissionGuard } from 'src/engine/guards/settings-permission.guard';
-import { UserAuthGuard } from 'src/engine/guards/user-auth.guard';
-import { WorkspaceAuthGuard } from 'src/engine/guards/workspace-auth.guard';
 import { PermissionsGraphqlApiExceptionFilter } from 'src/engine/metadata-modules/permissions/utils/permissions-graphql-api-exception.filter';
 import { getRequestBaseUrl } from 'src/utils/get-request-base-url.util';
 import { streamToBuffer } from 'src/utils/stream-to-buffer';
@@ -104,7 +109,7 @@ import { ApiKeyToken } from './dto/api-key-token.dto';
 import { AuthToken } from './dto/auth-token.dto';
 import { AuthTokens } from './dto/auth-tokens.dto';
 import { GetAuthTokensFromLoginTokenInput } from './dto/get-auth-tokens-from-login-token.input';
-import { GetAuthTokensFromSSOExchangeTokenInput } from './dto/get-auth-tokens-from-sso-exchange-token.input';
+import { GetAuthTokensFromSsoExchangeTokenInput } from './dto/get-auth-tokens-from-sso-exchange-token.input';
 import { LoginTokenDTO } from './dto/login-token.dto';
 import { SignUpInNewWorkspaceInput } from './dto/sign-up-in-new-workspace.input';
 import { SignUpInput } from './dto/sign-up.input';
@@ -127,6 +132,7 @@ const PASSWORD_RESET_EMAIL_RATE_LIMIT_WINDOW_MS = 15 * 60 * 1000;
   EmailVerificationExceptionFilter,
   TwoFactorAuthenticationExceptionFilter,
   WorkspaceGraphqlApiExceptionFilter,
+  FileUploadGraphqlApiExceptionFilter,
   ThrottlerGraphqlApiExceptionFilter,
   PreventNestToAutoLogGraphqlErrorsFilter,
 )
@@ -148,7 +154,7 @@ export class AuthResolver {
     private resetPasswordService: ResetPasswordService,
     private loginTokenService: LoginTokenService,
     private workspaceAgnosticTokenService: WorkspaceAgnosticTokenService,
-    private ssoExchangeTokenService: SSOExchangeTokenService,
+    private ssoExchangeTokenService: SsoExchangeTokenService,
     private refreshTokenService: RefreshTokenService,
     private signInUpService: SignInUpService,
     private transientTokenService: TransientTokenService,
@@ -156,11 +162,12 @@ export class AuthResolver {
     private workspaceDomainsService: WorkspaceDomainsService,
     private userWorkspaceService: UserWorkspaceService,
     private emailVerificationTokenService: EmailVerificationTokenService,
-    private ssoService: SSOService,
+    private ssoService: SsoService,
     private readonly eventLogEmitterService: EventLogEmitterService,
     private readonly impersonationAuthorizationService: ImpersonationAuthorizationService,
     private readonly subdomainManagerService: SubdomainManagerService,
     private readonly fileCorePictureService: FileCorePictureService,
+    private readonly fileUploadService: FileUploadService,
     private readonly userSessionService: UserSessionService,
     private readonly userSessionCookieService: UserSessionCookieService,
   ) {}
@@ -175,10 +182,11 @@ export class AuthResolver {
     );
   }
 
-  @Mutation(() => GetAuthorizationUrlForSSODTO)
+  @Mutation(() => GetAuthorizationUrlForSsoDTO)
   @UseGuards(PublicEndpointGuard, NoPermissionGuard)
+  @AllowSuspendedWorkspace()
   async getAuthorizationUrlForSSO(
-    @Args('input') params: GetAuthorizationUrlForSSOInput,
+    @Args('input') params: GetAuthorizationUrlForSsoInput,
   ) {
     return await this.ssoService.getAuthorizationUrlForSSO(
       params.identityProviderId,
@@ -208,6 +216,7 @@ export class AuthResolver {
 
   @Mutation(() => LoginTokenDTO)
   @UseGuards(CaptchaGuard, PublicEndpointGuard, NoPermissionGuard)
+  @AllowSuspendedWorkspace()
   async getLoginTokenFromCredentials(
     @Args()
     getLoginTokenFromCredentialsInput: UserCredentialsInput,
@@ -243,6 +252,7 @@ export class AuthResolver {
 
   @Mutation(() => AvailableWorkspacesAndAccessTokensDTO)
   @UseGuards(CaptchaGuard, PublicEndpointGuard, NoPermissionGuard)
+  @AllowSuspendedWorkspace()
   async signIn(
     @Args()
     userCredentials: UserCredentialsInput,
@@ -290,6 +300,7 @@ export class AuthResolver {
 
   @Mutation(() => VerifyEmailAndGetLoginTokenDTO)
   @UseGuards(PublicEndpointGuard, NoPermissionGuard)
+  @AllowSuspendedWorkspace()
   async verifyEmailAndGetLoginToken(
     @Args()
     getAuthTokenFromEmailVerificationTokenInput: GetAuthTokenFromEmailVerificationTokenInput,
@@ -334,6 +345,7 @@ export class AuthResolver {
 
   @Mutation(() => AvailableWorkspacesAndAccessTokensDTO)
   @UseGuards(PublicEndpointGuard, NoPermissionGuard)
+  @AllowSuspendedWorkspace()
   async verifyEmailAndGetWorkspaceAgnosticToken(
     @Args()
     getAuthTokenFromEmailVerificationTokenInput: GetAuthTokenFromEmailVerificationTokenInput,
@@ -397,6 +409,7 @@ export class AuthResolver {
 
   @Mutation(() => AuthTokens)
   @UseGuards(CaptchaGuard, PublicEndpointGuard, NoPermissionGuard)
+  @AllowSuspendedWorkspace()
   async getAuthTokensFromOTP(
     @Args()
     twoFactorAuthenticationVerificationInput: TwoFactorAuthenticationVerificationInput,
@@ -439,6 +452,7 @@ export class AuthResolver {
 
   @Mutation(() => AvailableWorkspacesAndAccessTokensDTO)
   @UseGuards(CaptchaGuard, PublicEndpointGuard, NoPermissionGuard)
+  @AllowSuspendedWorkspace()
   async signUp(
     @Args() signUpInput: UserCredentialsInput,
     @Context() context: { req: Request },
@@ -502,6 +516,7 @@ export class AuthResolver {
 
   @Mutation(() => SignUpDTO)
   @UseGuards(CaptchaGuard, PublicEndpointGuard, NoPermissionGuard)
+  @AllowSuspendedWorkspace()
   async signUpInWorkspace(
     @Args() signUpInput: SignUpInput,
   ): Promise<SignUpDTO> {
@@ -574,7 +589,15 @@ export class AuthResolver {
   }
 
   @Query(() => SubdomainAvailabilityDTO)
-  @UseGuards(UserAuthGuard, NoPermissionGuard)
+  @UseGuards(
+    AuthPrincipalGuard({
+      userSession: true,
+      apiKey: false,
+      oauthClient: { withUser: true, withoutUser: false },
+      application: { withUser: true, withoutUser: false },
+    }),
+    NoPermissionGuard,
+  )
   async checkWorkspaceSubdomainAvailability(
     @Args('subdomain') subdomain: string,
   ): Promise<SubdomainAvailabilityDTO> {
@@ -582,7 +605,15 @@ export class AuthResolver {
   }
 
   @Query(() => WorkspaceCreationDefaultsDTO)
-  @UseGuards(UserAuthGuard, NoPermissionGuard)
+  @UseGuards(
+    AuthPrincipalGuard({
+      userSession: true,
+      apiKey: false,
+      oauthClient: { withUser: true, withoutUser: false },
+      application: { withUser: true, withoutUser: false },
+    }),
+    NoPermissionGuard,
+  )
   async getWorkspaceCreationDefaults(
     @AuthUser() currentUser: AuthContextUser,
   ): Promise<WorkspaceCreationDefaultsDTO> {
@@ -594,7 +625,16 @@ export class AuthResolver {
   }
 
   @Mutation(() => SignUpDTO)
-  @UseGuards(UserAuthGuard, NoPermissionGuard)
+  @UseGuards(
+    AuthPrincipalGuard({
+      userSession: true,
+      apiKey: false,
+      oauthClient: false,
+      application: false,
+    }),
+    NoPermissionGuard,
+  )
+  @AllowSuspendedWorkspace()
   async signUpInNewWorkspace(
     @AuthUser() currentUser: AuthContextUser,
     @AuthProvider() authProvider: AuthProviderEnum,
@@ -630,8 +670,20 @@ export class AuthResolver {
     };
   }
 
-  @Mutation(() => FileWithSignedUrlDTO)
-  @UseGuards(UserAuthGuard, NoPermissionGuard)
+  @Mutation(() => FileWithSignedUrlDTO, {
+    deprecationReason:
+      'Use createNewWorkspaceLogoUpload and completeNewWorkspaceLogoUpload, which send the logo straight to file storage.',
+  })
+  @UseGuards(
+    AuthPrincipalGuard({
+      userSession: true,
+      apiKey: false,
+      oauthClient: { withUser: true, withoutUser: false },
+      application: { withUser: true, withoutUser: false },
+    }),
+    NoPermissionGuard,
+  )
+  @AllowSuspendedWorkspace()
   async uploadNewWorkspaceLogo(
     @AuthUser() currentUser: AuthContextUser,
     @Args('workspaceId') workspaceId: string,
@@ -648,7 +700,7 @@ export class AuthResolver {
 
     const buffer = await streamToBuffer(
       createReadStream(),
-      bytes(settings.storage.maxFileSize) ?? undefined,
+      bytes(settings.storage.maxMultipartFileSize) ?? undefined,
     );
 
     return this.fileCorePictureService.uploadWorkspacePicture({
@@ -658,8 +710,82 @@ export class AuthResolver {
     });
   }
 
+  @Mutation(() => FileUploadTargetDTO)
+  @UseGuards(
+    AuthPrincipalGuard({
+      userSession: true,
+      apiKey: false,
+      oauthClient: { withUser: true, withoutUser: false },
+      application: { withUser: true, withoutUser: false },
+    }),
+    NoPermissionGuard,
+  )
+  @AllowSuspendedWorkspace()
+  async createNewWorkspaceLogoUpload(
+    @AuthUser() currentUser: AuthContextUser,
+    @Args('workspaceId') workspaceId: string,
+    @Args({ name: 'filename', type: () => String })
+    filename: string,
+    @Args({ name: 'size', type: () => Number })
+    size: number,
+  ): Promise<FileUploadTargetDTO> {
+    const workspace =
+      await this.fileCorePictureService.getPendingWorkspaceForLogoUploadOrThrow(
+        {
+          userId: currentUser.id,
+          workspaceId,
+        },
+      );
+
+    return this.fileUploadService.createFileUpload({
+      workspaceId: workspace.id,
+      filename,
+      size,
+      fileFolder: FileFolder.CorePicture,
+    });
+  }
+
+  @Mutation(() => FileWithSignedUrlDTO)
+  @UseGuards(
+    AuthPrincipalGuard({
+      userSession: true,
+      apiKey: false,
+      oauthClient: { withUser: true, withoutUser: false },
+      application: { withUser: true, withoutUser: false },
+    }),
+    NoPermissionGuard,
+  )
+  @AllowSuspendedWorkspace()
+  async completeNewWorkspaceLogoUpload(
+    @AuthUser() currentUser: AuthContextUser,
+    @Args('workspaceId') workspaceId: string,
+    @Args({ name: 'fileId', type: () => String })
+    fileId: string,
+  ): Promise<FileWithSignedUrlDTO> {
+    const workspace =
+      await this.fileCorePictureService.getPendingWorkspaceForLogoUploadOrThrow(
+        {
+          userId: currentUser.id,
+          workspaceId,
+        },
+      );
+
+    return this.fileCorePictureService.completeWorkspaceLogoUpload({
+      workspaceId: workspace.id,
+      fileId,
+    });
+  }
+
   @Mutation(() => TransientTokenDTO)
-  @UseGuards(UserAuthGuard, NoPermissionGuard)
+  @UseGuards(
+    AuthPrincipalGuard({
+      userSession: true,
+      apiKey: false,
+      oauthClient: false,
+      application: false,
+    }),
+    NoPermissionGuard,
+  )
   async generateTransientToken(
     @AuthUser() user: AuthContextUser,
     @AuthWorkspace() workspace: WorkspaceEntity,
@@ -684,6 +810,7 @@ export class AuthResolver {
 
   @Mutation(() => AuthTokens)
   @UseGuards(PublicEndpointGuard, NoPermissionGuard)
+  @AllowSuspendedWorkspace()
   async getAuthTokensFromLoginToken(
     @Args() getAuthTokensFromLoginTokenInput: GetAuthTokensFromLoginTokenInput,
     @Args('origin') origin: string,
@@ -747,13 +874,14 @@ export class AuthResolver {
 
   @Mutation(() => AuthTokens)
   @UseGuards(PublicEndpointGuard, NoPermissionGuard)
+  @AllowSuspendedWorkspace()
   async getAuthTokensFromSSOExchangeToken(
     @Args()
-    { ssoExchangeToken }: GetAuthTokensFromSSOExchangeTokenInput,
+    { ssoExchangeToken }: GetAuthTokensFromSsoExchangeTokenInput,
     @Context() context: { req: Request },
   ): Promise<AuthTokens> {
     const { userId, authProvider } =
-      await this.ssoExchangeTokenService.validateAndConsumeSSOExchangeTokenOrThrow(
+      await this.ssoExchangeTokenService.validateAndConsumeSsoExchangeTokenOrThrow(
         ssoExchangeToken,
       );
 
@@ -941,7 +1069,15 @@ export class AuthResolver {
   }
 
   @Mutation(() => AuthorizeAppDTO)
-  @UseGuards(UserAuthGuard, NoPermissionGuard)
+  @UseGuards(
+    AuthPrincipalGuard({
+      userSession: true,
+      apiKey: false,
+      oauthClient: false,
+      application: false,
+    }),
+    NoPermissionGuard,
+  )
   async authorizeApp(
     @Args() authorizeAppInput: AuthorizeAppInput,
     @AuthUser() user: AuthContextUser,
@@ -958,6 +1094,7 @@ export class AuthResolver {
 
   @Mutation(() => AuthTokens)
   @UseGuards(PublicEndpointGuard, NoPermissionGuard)
+  @AllowSuspendedWorkspace()
   async renewToken(
     @Args() args: AppTokenInput,
     @Context() context: { req: Request },
@@ -977,6 +1114,7 @@ export class AuthResolver {
 
   @Mutation(() => Boolean)
   @UseGuards(PublicEndpointGuard, NoPermissionGuard)
+  @AllowSuspendedWorkspace()
   async signOut(
     @Context() context: { req: Request },
     @Args('refreshToken', { nullable: true }) refreshToken?: string,
@@ -1004,8 +1142,17 @@ export class AuthResolver {
   }
 
   @UseGuards(
-    WorkspaceAuthGuard,
-    RequireAccessTokenGuard,
+    AuthPrincipalGuard({
+      userSession: {
+        standard: true,
+        impersonated: true,
+        playground: false,
+        workspaceAgnostic: false,
+      },
+      apiKey: false,
+      oauthClient: false,
+      application: false,
+    }),
     SettingsPermissionGuard(PermissionFlagType.API_KEYS_AND_WEBHOOKS),
   )
   @Mutation(() => ApiKeyToken)
@@ -1021,8 +1168,17 @@ export class AuthResolver {
   }
 
   @UseGuards(
-    WorkspaceAuthGuard,
-    RequireAccessTokenGuard,
+    AuthPrincipalGuard({
+      userSession: {
+        standard: true,
+        impersonated: true,
+        playground: false,
+        workspaceAgnostic: false,
+      },
+      apiKey: false,
+      oauthClient: false,
+      application: false,
+    }),
     SettingsPermissionGuard(PermissionFlagType.API_KEYS_AND_WEBHOOKS),
   )
   @Mutation(() => AuthToken)
@@ -1040,6 +1196,7 @@ export class AuthResolver {
 
   @Mutation(() => EmailPasswordResetLinkDTO)
   @UseGuards(CaptchaGuard, PublicEndpointGuard, NoPermissionGuard)
+  @AllowSuspendedWorkspace()
   async emailPasswordResetLink(
     @Args() emailPasswordResetInput: EmailPasswordResetLinkInput,
     @Context() context: I18nContext,
@@ -1068,6 +1225,7 @@ export class AuthResolver {
 
   @Mutation(() => InvalidatePasswordDTO)
   @UseGuards(PublicEndpointGuard, NoPermissionGuard)
+  @AllowSuspendedWorkspace()
   async updatePasswordViaResetToken(
     @Args()
     { passwordResetToken, newPassword }: UpdatePasswordViaResetTokenInput,

@@ -11,13 +11,14 @@ import { findManyApplications } from 'test/integration/graphql/utils/find-many-a
 import { getAuthTokensFromLoginToken } from 'test/integration/graphql/utils/get-auth-tokens-from-login-token.util';
 import { signUpInNewWorkspace } from 'test/integration/graphql/utils/sign-up-in-new-workspace.util';
 import { signUp } from 'test/integration/graphql/utils/sign-up.util';
-import { generateApplicationToken } from 'test/integration/metadata/suites/application/utils/generate-application-token.util';
 import { createOneLogicFunction } from 'test/integration/metadata/suites/logic-function/utils/create-logic-function.util';
 import { deleteLogicFunction } from 'test/integration/metadata/suites/logic-function/utils/delete-logic-function.util';
 import { executeLogicFunction } from 'test/integration/metadata/suites/logic-function/utils/execute-logic-function.util';
 import { updateLogicFunctionSource } from 'test/integration/metadata/suites/logic-function/utils/update-logic-function-source.util';
-import { makeMetadataAPIRequest } from 'test/integration/metadata/suites/utils/make-metadata-api-request.util';
+import { makeMetadataApiRequest } from 'test/integration/metadata/suites/utils/make-metadata-api-request.util';
 import { expectEventually } from 'test/integration/utils/expect-eventually.util';
+import { generateApplicationTokenPair } from 'test/integration/utils/generate-application-token-pair.util';
+import { generateAppleAdminApplicationTokenPair } from 'test/integration/utils/generate-apple-admin-application-token-pair.util';
 import { waitForAllJobsToFinish } from 'test/integration/utils/wait-for-all-jobs-to-finish.util';
 import { isDefined } from 'twenty-shared/utils';
 import { v4 as uuidv4 } from 'uuid';
@@ -172,13 +173,12 @@ describe('enqueueJob (e2e)', () => {
 
     expect(otherWorkspaceApplication).toBeDefined();
 
-    const { data: tokenData } = await generateApplicationToken({
+    const tokenPair = await generateApplicationTokenPair({
+      workspaceId: newWorkspaceData.signUpInNewWorkspace.workspace.id,
       applicationId: otherWorkspaceApplication!.id,
-      expectToFail: false,
-      token: workspaceAccessToken,
     });
 
-    return tokenData.generateApplicationToken.applicationAccessToken.token;
+    return tokenPair.applicationAccessToken.token;
   };
 
   beforeAll(async () => {
@@ -198,44 +198,33 @@ describe('enqueueJob (e2e)', () => {
     expect(customApplication).toBeDefined();
     expect(standardApplication).toBeDefined();
 
-    const [{ data: customTokenData }, { data: standardTokenData }] =
-      await Promise.all([
-        generateApplicationToken({
-          applicationId: customApplication!.id,
-          expectToFail: false,
-        }),
-        generateApplicationToken({
-          applicationId: standardApplication!.id,
-          expectToFail: false,
-        }),
-      ]);
-
-    customApplicationToken =
-      customTokenData.generateApplicationToken.applicationAccessToken.token;
-    standardApplicationToken =
-      standardTokenData.generateApplicationToken.applicationAccessToken.token;
-
-    const [
-      { data: createData },
-      { data: retryableCreateData },
-      { data: appendingCreateData },
-    ] = await Promise.all([
-      createOneLogicFunction({
-        input: { name: `enqueue-job-target-${uuidv4()}` },
-        gqlFields: 'id universalIdentifier',
-        expectToFail: false,
+    const [customTokenPair, standardTokenPair] = await Promise.all([
+      generateAppleAdminApplicationTokenPair({
+        applicationId: customApplication!.id,
       }),
-      createOneLogicFunction({
-        input: { name: `enqueue-job-retryable-target-${uuidv4()}` },
-        gqlFields: 'id universalIdentifier',
-        expectToFail: false,
-      }),
-      createOneLogicFunction({
-        input: { name: `enqueue-job-appending-target-${uuidv4()}` },
-        gqlFields: 'id universalIdentifier',
-        expectToFail: false,
+      generateAppleAdminApplicationTokenPair({
+        applicationId: standardApplication!.id,
       }),
     ]);
+
+    customApplicationToken = customTokenPair.applicationAccessToken.token;
+    standardApplicationToken = standardTokenPair.applicationAccessToken.token;
+
+    const { data: createData } = await createOneLogicFunction({
+      input: { name: `enqueue-job-target-${uuidv4()}` },
+      gqlFields: 'id universalIdentifier',
+      expectToFail: false,
+    });
+    const { data: retryableCreateData } = await createOneLogicFunction({
+      input: { name: `enqueue-job-retryable-target-${uuidv4()}` },
+      gqlFields: 'id universalIdentifier',
+      expectToFail: false,
+    });
+    const { data: appendingCreateData } = await createOneLogicFunction({
+      input: { name: `enqueue-job-appending-target-${uuidv4()}` },
+      gqlFields: 'id universalIdentifier',
+      expectToFail: false,
+    });
 
     expect(createData.createOneLogicFunction.universalIdentifier).toBeDefined();
     expect(
@@ -298,20 +287,23 @@ describe('enqueueJob (e2e)', () => {
   });
 
   afterAll(async () => {
-    await Promise.all([
-      deleteLogicFunction({
-        input: { id: logicFunctionId },
-        expectToFail: false,
-      }),
-      deleteLogicFunction({
-        input: { id: retryableLogicFunctionId },
-        expectToFail: false,
-      }),
-      deleteLogicFunction({
-        input: { id: appendingLogicFunctionId },
-        expectToFail: false,
-      }),
-    ]);
+    const teardownErrors: unknown[] = [];
+
+    for (const id of [
+      logicFunctionId,
+      retryableLogicFunctionId,
+      appendingLogicFunctionId,
+    ]) {
+      try {
+        await deleteLogicFunction({ input: { id }, expectToFail: false });
+      } catch (error) {
+        teardownErrors.push(error);
+      }
+    }
+
+    if (teardownErrors.length > 0) {
+      throw teardownErrors[0];
+    }
 
     if (isDefined(otherWorkspaceUserAccessToken)) {
       await deleteUser({ accessToken: otherWorkspaceUserAccessToken });
@@ -321,7 +313,7 @@ describe('enqueueJob (e2e)', () => {
   });
 
   it('rejects requests that do not carry an APPLICATION_ACCESS token', async () => {
-    const response = await makeMetadataAPIRequest({
+    const response = await makeMetadataApiRequest({
       query: ENQUEUE_JOB,
       variables: { input: { logicFunctionUniversalIdentifier } },
     });
@@ -351,7 +343,7 @@ describe('enqueueJob (e2e)', () => {
 
     expect(buildData.executeOneLogicFunction.error).toBeNull();
 
-    const response = await makeMetadataAPIRequest(
+    const response = await makeMetadataApiRequest(
       {
         query: ENQUEUE_JOB,
         variables: {
@@ -378,7 +370,7 @@ describe('enqueueJob (e2e)', () => {
   it('caps application-requested retries independently from the overall queue budget', async () => {
     const markerPath = join(MARKER_DIRECTORY, 'application-retry-cap.txt');
 
-    const response = await makeMetadataAPIRequest(
+    const response = await makeMetadataApiRequest(
       {
         query: ENQUEUE_JOB,
         variables: {
@@ -409,7 +401,7 @@ describe('enqueueJob (e2e)', () => {
   it('uses a smaller overall queue budget as the application retry maximum', async () => {
     const markerPath = join(MARKER_DIRECTORY, 'queue-retry-cap.txt');
 
-    const response = await makeMetadataAPIRequest(
+    const response = await makeMetadataApiRequest(
       {
         query: ENQUEUE_JOB,
         variables: {
@@ -436,7 +428,7 @@ describe('enqueueJob (e2e)', () => {
   }, 60_000);
 
   it('rejects a logic function that belongs to another application', async () => {
-    const response = await makeMetadataAPIRequest(
+    const response = await makeMetadataApiRequest(
       {
         query: ENQUEUE_JOB,
         variables: {
@@ -451,7 +443,7 @@ describe('enqueueJob (e2e)', () => {
   });
 
   it('rejects an unknown logic function', async () => {
-    const response = await makeMetadataAPIRequest(
+    const response = await makeMetadataApiRequest(
       {
         query: ENQUEUE_JOB,
         variables: {
@@ -471,7 +463,7 @@ describe('enqueueJob (e2e)', () => {
       join(MARKER_DIRECTORY, 'batch-1.txt'),
     ];
 
-    const response = await makeMetadataAPIRequest(
+    const response = await makeMetadataApiRequest(
       {
         query: ENQUEUE_JOBS,
         variables: {
@@ -502,7 +494,7 @@ describe('enqueueJob (e2e)', () => {
   });
 
   it('rejects a batch targeting an unknown logic function', async () => {
-    const response = await makeMetadataAPIRequest(
+    const response = await makeMetadataApiRequest(
       {
         query: ENQUEUE_JOBS,
         variables: {
@@ -520,7 +512,7 @@ describe('enqueueJob (e2e)', () => {
   });
 
   it('rejects an empty batch', async () => {
-    const response = await makeMetadataAPIRequest(
+    const response = await makeMetadataApiRequest(
       {
         query: ENQUEUE_JOBS,
         variables: {
@@ -538,7 +530,7 @@ describe('enqueueJob (e2e)', () => {
     const markerPath = join(MARKER_DIRECTORY, 'job-status.txt');
     const jobId = `job-status-${uuidv4()}`;
 
-    const enqueueResponse = await makeMetadataAPIRequest(
+    const enqueueResponse = await makeMetadataApiRequest(
       {
         query: ENQUEUE_JOBS,
         variables: {
@@ -556,7 +548,7 @@ describe('enqueueJob (e2e)', () => {
 
     await waitForAllJobsToFinish();
 
-    const statusResponse = await makeMetadataAPIRequest(
+    const statusResponse = await makeMetadataApiRequest(
       { query: GET_JOBS, variables: { jobIds: [jobId] } },
       customApplicationToken,
     );
@@ -570,7 +562,7 @@ describe('enqueueJob (e2e)', () => {
   });
 
   it('omits unknown job ids instead of failing the whole read', async () => {
-    const response = await makeMetadataAPIRequest(
+    const response = await makeMetadataApiRequest(
       { query: GET_JOBS, variables: { jobIds: [uuidv4()] } },
       customApplicationToken,
     );
@@ -590,7 +582,7 @@ describe('enqueueJob (e2e)', () => {
       },
     };
 
-    const firstResponse = await makeMetadataAPIRequest(
+    const firstResponse = await makeMetadataApiRequest(
       { query: ENQUEUE_JOBS, variables },
       customApplicationToken,
     );
@@ -604,7 +596,7 @@ describe('enqueueJob (e2e)', () => {
       expect(existsSync(markerPath)).toBe(true);
     });
 
-    const secondResponse = await makeMetadataAPIRequest(
+    const secondResponse = await makeMetadataApiRequest(
       { query: ENQUEUE_JOBS, variables },
       customApplicationToken,
     );
@@ -623,7 +615,7 @@ describe('enqueueJob (e2e)', () => {
     const markerPath = join(MARKER_DIRECTORY, 'cross-workspace.txt');
     const jobId = `cross-workspace-${uuidv4()}`;
 
-    const enqueueResponse = await makeMetadataAPIRequest(
+    const enqueueResponse = await makeMetadataApiRequest(
       {
         query: ENQUEUE_JOBS,
         variables: {
@@ -644,7 +636,7 @@ describe('enqueueJob (e2e)', () => {
       expect(existsSync(markerPath)).toBe(true);
     });
 
-    const ownWorkspaceResponse = await makeMetadataAPIRequest(
+    const ownWorkspaceResponse = await makeMetadataApiRequest(
       { query: GET_JOBS, variables: { jobIds: [jobId] } },
       customApplicationToken,
     );
@@ -655,7 +647,7 @@ describe('enqueueJob (e2e)', () => {
     const otherWorkspaceApplicationToken =
       await createOtherWorkspaceApplicationToken();
 
-    const otherWorkspaceResponse = await makeMetadataAPIRequest(
+    const otherWorkspaceResponse = await makeMetadataApiRequest(
       { query: GET_JOBS, variables: { jobIds: [jobId] } },
       otherWorkspaceApplicationToken,
     );
@@ -667,7 +659,7 @@ describe('enqueueJob (e2e)', () => {
   it('rejects a batch that repeats a caller-supplied job id', async () => {
     const jobId = `duplicate-${uuidv4()}`;
 
-    const response = await makeMetadataAPIRequest(
+    const response = await makeMetadataApiRequest(
       {
         query: ENQUEUE_JOBS,
         variables: {
@@ -688,7 +680,7 @@ describe('enqueueJob (e2e)', () => {
   });
 
   it('rejects a batch that sets both payloads and jobs', async () => {
-    const response = await makeMetadataAPIRequest(
+    const response = await makeMetadataApiRequest(
       {
         query: ENQUEUE_JOBS,
         variables: {
@@ -707,7 +699,7 @@ describe('enqueueJob (e2e)', () => {
   });
 
   it('rejects job options outside of their allowed range', async () => {
-    const response = await makeMetadataAPIRequest(
+    const response = await makeMetadataApiRequest(
       {
         query: ENQUEUE_JOB,
         variables: {

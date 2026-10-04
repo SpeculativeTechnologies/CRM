@@ -1,5 +1,6 @@
 import { dispatchQueryInvalidations } from '@/sse-db-event/utils/dispatchQueryInvalidations';
 import { dispatchBrowserEvent } from '@/browser-event/utils/dispatchBrowserEvent';
+import { dispatchQueueJobEventsFromSseToBrowserEvents } from '@/sse-db-event/utils/dispatchQueueJobEventsFromSseToBrowserEvents';
 import { SSE_CLIENT_RECONNECTED_EVENT_NAME } from '@/sse-db-event/constants/SseClientReconnectedEventName';
 import { ON_EVENT_SUBSCRIPTION } from '@/sse-db-event/graphql/subscriptions/OnEventSubscription';
 import { useDispatchMetadataEventsFromSseToBrowserEvents } from '@/sse-db-event/hooks/useDispatchMetadataEventsFromSseToBrowserEvents';
@@ -127,98 +128,37 @@ export const useTriggerEventStreamCreation = () => {
             return;
           }
 
-          handleFirstEventReceived();
-
-          const eventSubscription = value?.data?.onEventSubscription;
-          dispatchQueryInvalidations(
-            eventSubscription?.queryIdsToRefetch ?? [],
-          );
-
-          const objectRecordEventsWithQueryIds =
-            eventSubscription?.objectRecordEventsWithQueryIds ?? [];
-
-          const metadataEvents = eventSubscription?.metadataEvents ?? [];
-
-          const objectRecordEvents = objectRecordEventsWithQueryIds.map(
-            (item) => item.objectRecordEvent,
-          );
-
-          dispatchMetadataEventsFromSseToBrowserEvents(metadataEvents);
-
-          triggerOptimisticEffectFromSseEvents({
-            objectRecordEvents,
-          });
-
-          dispatchObjectRecordEventsFromSseToBrowserEvents(
-            objectRecordEventsWithQueryIds,
-          );
-        },
-        error: (error) => {
-          captureException(error);
-          store.set(shouldDestroyEventStreamState.atom, true);
-        },
-        complete: () => {
-          store.set(shouldDestroyEventStreamState.atom, true);
-        },
-      },
-      {
-        message: ({ data, event }) => {
-          const result = data as ExecutionResult<{
-            onEventSubscription: EventSubscription;
-          }>;
-
           try {
-            if (event === 'next') {
-              store.set(lastSseEventReceivedTimestampState.atom, Date.now());
+            handleFirstEventReceived();
 
-              if (isDefined(result?.errors)) {
-                const extensions = getGraphqlErrorExtensionsFromError(
-                  result.errors[0],
-                );
+            const eventSubscription = value?.data?.onEventSubscription;
 
-                if (
-                  !isGracefullyHandledEventStreamError({
-                    subCode: extensions?.subCode,
-                    code: extensions?.code,
-                  })
-                ) {
-                  for (const error of result.errors) {
-                    captureException(error);
-                  }
-                }
+            dispatchQueryInvalidations(
+              eventSubscription?.queryIdsToRefetch ?? [],
+            );
 
-                store.set(shouldDestroyEventStreamState.atom, true);
-              } else {
-                handleFirstEventReceived();
+            const objectRecordEventsWithQueryIds =
+              eventSubscription?.objectRecordEventsWithQueryIds ?? [];
 
-                dispatchQueryInvalidations(
-                  result?.data?.onEventSubscription?.queryIdsToRefetch ?? [],
-                );
+            const metadataEvents = eventSubscription?.metadataEvents ?? [];
 
-                const objectRecordEventsWithQueryIds =
-                  result?.data?.onEventSubscription
-                    ?.objectRecordEventsWithQueryIds ?? [];
+            const queueJobEvents = eventSubscription?.queueJobEvents ?? [];
 
-                const objectRecordEvents = objectRecordEventsWithQueryIds.map(
-                  (objectRecordEventWithQueryIds) => {
-                    return objectRecordEventWithQueryIds.objectRecordEvent;
-                  },
-                );
+            const objectRecordEvents = objectRecordEventsWithQueryIds.map(
+              (item) => item.objectRecordEvent,
+            );
 
-                const metadataEvents =
-                  result?.data?.onEventSubscription?.metadataEvents ?? [];
+            dispatchMetadataEventsFromSseToBrowserEvents(metadataEvents);
 
-                dispatchMetadataEventsFromSseToBrowserEvents(metadataEvents);
+            dispatchQueueJobEventsFromSseToBrowserEvents(queueJobEvents);
 
-                triggerOptimisticEffectFromSseEvents({
-                  objectRecordEvents,
-                });
+            triggerOptimisticEffectFromSseEvents({
+              objectRecordEvents,
+            });
 
-                dispatchObjectRecordEventsFromSseToBrowserEvents(
-                  objectRecordEventsWithQueryIds,
-                );
-              }
-            }
+            dispatchObjectRecordEventsFromSseToBrowserEvents(
+              objectRecordEventsWithQueryIds,
+            );
           } catch (error) {
             const errorProcessingSSEMessage = new Error(
               'Error while processing SSE message',
@@ -227,6 +167,13 @@ export const useTriggerEventStreamCreation = () => {
 
             captureException(errorProcessingSSEMessage);
           }
+        },
+        error: (error) => {
+          captureException(error);
+          store.set(shouldDestroyEventStreamState.atom, true);
+        },
+        complete: () => {
+          store.set(shouldDestroyEventStreamState.atom, true);
         },
       },
     );

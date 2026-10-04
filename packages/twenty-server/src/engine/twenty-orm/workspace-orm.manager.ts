@@ -1,8 +1,15 @@
+import {
+  PermissionsException,
+  PermissionsExceptionCode,
+  PermissionsExceptionMessage,
+} from 'src/engine/metadata-modules/permissions/permissions.exception';
+import { resolveRolePermissionConfig } from 'src/engine/twenty-orm/utils/resolve-role-permission-config.util';
 import { Injectable, type Type } from '@nestjs/common';
 
 import { type ObjectLiteral } from 'typeorm';
 
-import { type ObjectRecord } from 'twenty-shared/types';
+import { FeatureFlagKey, type ObjectRecord } from 'twenty-shared/types';
+import { isDefined } from 'twenty-shared/utils';
 
 import { getWorkspaceAuthContext } from 'src/engine/core-modules/auth/storage/workspace-auth-context.storage';
 import { type WorkspaceAuthContext } from 'src/engine/core-modules/auth/types/workspace-auth-context.type';
@@ -12,8 +19,9 @@ import { type WorkspaceTransactionScope } from 'src/engine/twenty-orm/types/work
 import {
   type ORMWorkspaceContext,
   withWorkspaceContext,
+  getWorkspaceContext,
 } from 'src/engine/twenty-orm/storage/orm-workspace-context.storage';
-import type { RolePermissionConfig } from 'src/engine/twenty-orm/types/role-permission-config';
+import type { RolePermissionConfig } from 'src/engine/twenty-orm/types/role-permission-config.type';
 import { WorkspaceDataSourceService } from 'src/engine/twenty-orm/datasource/workspace-data-source.service';
 import { type WorkspaceRepository } from 'src/engine/twenty-orm/repository/workspace-repository';
 import { WorkspaceCacheService } from 'src/engine/workspace-cache/services/workspace-cache.service';
@@ -64,6 +72,29 @@ export class WorkspaceOrmManager {
       });
   }
 
+  // Domain APIs must evaluate the same role intersection as ordinary record APIs.
+  getRepositoryWithContextPermissions<
+    TData extends ObjectLiteral = ObjectRecord,
+  >(
+    objectMetadataName: string,
+    transactionScope?: WorkspaceTransactionScope,
+  ): WorkspaceRepository<TData> {
+    const context = getWorkspaceContext();
+    const permissionConfig = resolveRolePermissionConfig(context);
+    if (!isDefined(permissionConfig)) {
+      throw new PermissionsException(
+        PermissionsExceptionMessage.PERMISSION_DENIED,
+        PermissionsExceptionCode.PERMISSION_DENIED,
+      );
+    }
+    return isDefined(transactionScope)
+      ? transactionScope.getRepository<TData>(
+          objectMetadataName,
+          permissionConfig,
+        )
+      : this.getRepository<TData>(objectMetadataName, permissionConfig);
+  }
+
   private resolveObjectMetadataName<T extends ObjectLiteral>(
     workspaceEntityOrObjectMetadataName: Type<T> | string,
   ): string {
@@ -107,6 +138,7 @@ export class WorkspaceOrmManager {
       flatFieldMetadataMapsOrm,
       flatIndexMaps,
       featureFlagsMap,
+      billingEntitlements,
       rolesPermissions: permissionsPerRoleId,
       userWorkspaceRoleMap,
       apiKeyRoleMap,
@@ -117,6 +149,7 @@ export class WorkspaceOrmManager {
       'flatFieldMetadataMapsOrm',
       'flatIndexMaps',
       'featureFlagsMap',
+      'billingEntitlements',
       'rolesPermissions',
       'userWorkspaceRoleMap',
       'apiKeyRoleMap',
@@ -127,6 +160,16 @@ export class WorkspaceOrmManager {
     const { idByNameSingular: objectIdByNameSingular } =
       buildObjectIdByNameMaps(flatObjectMetadataMaps);
 
+    const flatValidationRuleMaps = featureFlagsMap[
+      FeatureFlagKey.IS_VALIDATION_RULES_ENABLED
+    ]
+      ? (
+          await this.workspaceCacheService.getOrRecompute(workspaceId, [
+            'flatValidationRuleMaps',
+          ])
+        ).flatValidationRuleMaps
+      : undefined;
+
     return {
       authContext,
       flatObjectMetadataMaps,
@@ -134,8 +177,10 @@ export class WorkspaceOrmManager {
       flatIndexMaps,
       flatRowLevelPermissionPredicateMaps,
       flatRowLevelPermissionPredicateGroupMaps,
+      flatValidationRuleMaps,
       objectIdByNameSingular,
       featureFlagsMap,
+      billingEntitlements,
       permissionsPerRoleId,
       userWorkspaceRoleMap,
       apiKeyRoleMap,
@@ -147,11 +192,15 @@ export class WorkspaceOrmManager {
   ): Promise<ORMWorkspaceContext> {
     const workspaceId = authContext.workspace.id;
 
-    const { flatObjectMetadataMaps, flatFieldMetadataMapsOrm } =
-      await this.workspaceCacheService.getOrRecompute(workspaceId, [
-        'flatObjectMetadataMaps',
-        'flatFieldMetadataMapsOrm',
-      ]);
+    const {
+      flatObjectMetadataMaps,
+      flatFieldMetadataMapsOrm,
+      billingEntitlements,
+    } = await this.workspaceCacheService.getOrRecompute(workspaceId, [
+      'flatObjectMetadataMaps',
+      'flatFieldMetadataMapsOrm',
+      'billingEntitlements',
+    ]);
 
     const { idByNameSingular: objectIdByNameSingular } =
       buildObjectIdByNameMaps(flatObjectMetadataMaps);
@@ -177,6 +226,7 @@ export class WorkspaceOrmManager {
       },
       objectIdByNameSingular,
       featureFlagsMap: {} as ORMWorkspaceContext['featureFlagsMap'],
+      billingEntitlements,
       permissionsPerRoleId: {},
       userWorkspaceRoleMap: {},
       apiKeyRoleMap: {},

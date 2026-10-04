@@ -1,3 +1,5 @@
+import { type CollisionDetector } from '@dnd-kit/abstract';
+import { defaultCollisionDetection } from '@dnd-kit/collision';
 import {
   RestrictToHorizontalAxis,
   RestrictToVerticalAxis,
@@ -6,7 +8,7 @@ import { type UseSortableInput, useSortable } from '@dnd-kit/react/sortable';
 import { styled } from '@linaria/react';
 import { type ReactNode } from 'react';
 import { isDefined } from 'twenty-shared/utils';
-import { themeCssVariables } from 'twenty-ui/theme-constants';
+import { themeCssVariables } from 'twenty-ui/theme';
 
 import { DND_KIT_PLUGINS_WITHOUT_OPTIMISTIC } from '@/ui/utilities/drag-and-drop/constants/DndKitPluginsWithoutOptimistic';
 import { DRAG_SOURCE_OPACITY } from '@/ui/utilities/drag-and-drop/constants/DragSourceOpacity';
@@ -54,10 +56,15 @@ const StyledSortableRoot = styled.div<{
   }
 `;
 
+const StyledSortableContent = styled.div`
+  display: contents;
+`;
+
 type DragDropItemSortableCellProps = {
   accept?: UseSortableInput['accept'];
   allowNativeDragWhenDisabled?: boolean;
   children: ReactNode;
+  collisionDetector?: CollisionDetector;
   data?: Record<string, unknown>;
   disabled?: boolean;
   fadeSourceWhileDragging?: boolean;
@@ -78,6 +85,7 @@ export const DragDropItemSortableCell = ({
   accept,
   allowNativeDragWhenDisabled = false,
   children,
+  collisionDetector = defaultCollisionDetection,
   data,
   disabled = false,
   fadeSourceWhileDragging = false,
@@ -98,6 +106,7 @@ export const DragDropItemSortableCell = ({
     type,
     accept,
     collisionPriority: SORTABLE_COLLISION_PRIORITY,
+    collisionDetector,
     // Sortable metadata stays authoritative over consumer data so drag
     // handlers always resolve the cell's real group and position.
     data: {
@@ -136,7 +145,12 @@ export const DragDropItemSortableCell = ({
             : preventNativeDragStart
         }
       >
-        {children}
+        {/* dnd-kit disables its drag activator, not the widget's controls.
+            Keep that inherited ARIA state out of the content; controls still
+            enforce their own permissions and disabled states. */}
+        <StyledSortableContent aria-disabled={false}>
+          {children}
+        </StyledSortableContent>
       </StyledSortableRoot>
     </DragDropItemSortableHandleRefContext.Provider>
   );

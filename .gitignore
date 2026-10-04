@@ -6,7 +6,6 @@ deploy/.devdata/
 .claude/*
 !.claude/settings.json
 !.claude/skills/
-.cursor/debug-*.log
 **/**/node_modules/
 .cache
 

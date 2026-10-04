@@ -1,5 +1,7 @@
 import { styled } from '@linaria/react';
-import { type MouseEvent, useContext } from 'react';
+import { type MouseEvent } from 'react';
+
+import { FieldDescriptionTooltip } from '@/object-record/record-field/ui/components/FieldDescriptionTooltip';
 
 import { fieldMetadataItemByIdSelector } from '@/object-metadata/states/fieldMetadataItemByIdSelector';
 import { type RecordField } from '@/object-record/record-field/types/RecordField';
@@ -7,7 +9,7 @@ import { LinkedFieldSourceIndicator } from '@/object-record/record-field/ui/comp
 import { RECORD_TABLE_CELL_CONTENT_CLASS_NAME } from '@/object-record/record-table/constants/RecordTableCellContentClassName';
 import { useAtomFamilySelectorValue } from '@/ui/utilities/state/jotai/hooks/useAtomFamilySelectorValue';
 import { useIcons } from 'twenty-ui/icon';
-import { ThemeContext, themeCssVariables } from 'twenty-ui/theme-constants';
+import { useTheme, themeCssVariables } from 'twenty-ui/theme';
 
 const StyledTitle = styled.div`
   align-items: center;
@@ -30,12 +32,6 @@ const StyledIcon = styled.div`
   }
 `;
 
-const StyledText = styled.span`
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-`;
-
 type RecordTableColumnHeadProps = {
   recordField: RecordField;
   onContextMenu?: (event: MouseEvent<HTMLDivElement>) => void;
@@ -45,7 +41,7 @@ export const RecordTableColumnHead = ({
   recordField,
   onContextMenu,
 }: RecordTableColumnHeadProps) => {
-  const { theme } = useContext(ThemeContext);
+  const theme = useTheme();
 
   const correspondingFieldMetadataItem = useAtomFamilySelectorValue(
     fieldMetadataItemByIdSelector,
@@ -56,6 +52,8 @@ export const RecordTableColumnHead = ({
   const Icon = getIcon(
     correspondingFieldMetadataItem.foundFieldMetadataItem?.icon,
   );
+  const fieldMetadataItem =
+    correspondingFieldMetadataItem.foundFieldMetadataItem;
 
   return (
     <StyledTitle
@@ -65,9 +63,10 @@ export const RecordTableColumnHead = ({
       <StyledIcon>
         <Icon size={theme.icon.size.md} />
       </StyledIcon>
-      <StyledText>
-        {correspondingFieldMetadataItem.foundFieldMetadataItem?.label}
-      </StyledText>
+      <FieldDescriptionTooltip
+        label={fieldMetadataItem?.label}
+        description={fieldMetadataItem?.description}
+      />
       <LinkedFieldSourceIndicator
         fieldMetadataId={recordField.fieldMetadataItemId}
       />

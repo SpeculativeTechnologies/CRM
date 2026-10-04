@@ -24,6 +24,7 @@ import { LayoutRenderingProvider } from '@/ui/layout/contexts/LayoutRenderingCon
 import { WorkspaceSurfaceContext } from '@/ui/layout/contexts/WorkspaceSurfaceContext';
 import { jotaiStore } from '@/ui/utilities/state/jotai/jotaiStore';
 import { CoreObjectNameSingular } from 'twenty-shared/types';
+import { Button } from 'twenty-ui/primitives/input';
 import { ComponentDecorator } from 'twenty-ui/testing';
 import {
   FieldDisplayMode,
@@ -699,20 +700,22 @@ export const BooleanFieldWidget: Story = {
   },
 };
 
-export const CurrencyFieldWidget: Story = {
-  render: () =>
-    renderFieldWidgetStory({
-      widget: buildFieldWidget({
-        id: 'widget-currency-field',
-        title: 'Annual Recurring Revenue',
-        objectMetadataId: companyObjectMetadataItem.id,
-        fieldMetadataId: annualRecurringRevenueField.id,
-        fieldDisplayMode: FieldDisplayMode.FIELD,
-      }),
+const renderCurrencyFieldWidgetStory = () =>
+  renderFieldWidgetStory({
+    widget: buildFieldWidget({
+      id: 'widget-currency-field',
+      title: 'Annual Recurring Revenue',
       objectMetadataId: companyObjectMetadataItem.id,
-      targetRecord: companyTargetRecord,
-      records: companyRecords,
+      fieldMetadataId: annualRecurringRevenueField.id,
+      fieldDisplayMode: FieldDisplayMode.FIELD,
     }),
+    objectMetadataId: companyObjectMetadataItem.id,
+    targetRecord: companyTargetRecord,
+    records: companyRecords,
+  });
+
+export const CurrencyFieldWidget: Story = {
+  render: renderCurrencyFieldWidgetStory,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
 
@@ -1092,5 +1095,47 @@ export const OneToManyRelationCardWidgetWithProgressiveLoading: Story = {
     expect(
       canvas.queryByTestId('field-widget-show-more-button'),
     ).not.toBeInTheDocument();
+  },
+};
+
+export const NestedCurrencyPickerKeepsFieldOpen: Story = {
+  render: () => (
+    <>
+      {renderCurrencyFieldWidgetStory()}
+      <Button>Outside field</Button>
+    </>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const body = within(canvasElement.ownerDocument.body);
+    const outsideButton = canvas.getByRole('button', { name: 'Outside field' });
+
+    await userEvent.click(await canvas.findByText('5m'));
+    const amountInput = await body.findByPlaceholderText('Currency');
+    await userEvent.clear(amountInput);
+    await userEvent.type(amountInput, '6000000');
+    await userEvent.click(await body.findByRole('button', { name: 'USD' }));
+    await body.findByRole('dialog', { name: 'Currency' });
+
+    await userEvent.click(outsideButton);
+
+    await waitFor(() => {
+      expect(
+        body.queryByRole('dialog', { name: 'Currency' }),
+      ).not.toBeInTheDocument();
+    });
+    await expect(body.getByRole('button', { name: 'USD' })).toBeVisible();
+    await expect(amountInput).toHaveValue('6,000,000');
+
+    await userEvent.clear(amountInput);
+    await userEvent.type(amountInput, '5000000');
+    await userEvent.click(outsideButton);
+
+    await waitFor(() => {
+      expect(
+        body.queryByRole('button', { name: 'USD' }),
+      ).not.toBeInTheDocument();
+    });
+    await expect(canvas.getByText('5m')).toBeVisible();
   },
 };

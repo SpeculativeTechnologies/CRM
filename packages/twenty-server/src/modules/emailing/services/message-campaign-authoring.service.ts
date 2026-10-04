@@ -18,7 +18,6 @@ import { v4 } from 'uuid';
 
 import { buildCreatedByFromFullNameMetadata } from 'src/engine/core-modules/actor/utils/build-created-by-from-full-name-metadata.util';
 import { compileOutboundEmailContent } from 'src/engine/core-modules/email/utils/compile-outbound-email-content.util';
-import { CampaignDeliveryEntity } from 'src/engine/core-modules/emailing-domain/campaign-delivery.entity';
 import { CAMPAIGN_DELIVERY_STATE } from 'src/engine/core-modules/emailing-domain/constants/campaign-delivery-state.constant';
 import { CAMPAIGN_FAILURE_REASON } from 'src/engine/core-modules/emailing-domain/constants/campaign-failure-reason.constant';
 import { EmailingDomainStatus } from 'src/engine/core-modules/emailing-domain/drivers/types/emailing-domain-status.type';
@@ -30,6 +29,7 @@ import { WorkspaceOrmManager } from 'src/engine/twenty-orm/workspace-orm.manager
 import { InjectWorkspaceScopedRepository } from 'src/engine/twenty-orm/workspace-scoped-repository/inject-workspace-scoped-repository.decorator';
 import { WorkspaceScopedRepository } from 'src/engine/twenty-orm/workspace-scoped-repository/workspace-scoped-repository';
 import { MessageCampaignStatisticsService } from 'src/modules/emailing/services/message-campaign-statistics.service';
+import { CampaignDeliveryWorkspaceEntity } from 'src/modules/emailing/standard-objects/campaign-delivery.workspace-entity';
 import { MessageCampaignWorkspaceEntity } from 'src/modules/emailing/standard-objects/message-campaign.workspace-entity';
 import { MessageListMemberWorkspaceEntity } from 'src/modules/emailing/standard-objects/message-list-member.workspace-entity';
 import { MessageListWorkspaceEntity } from 'src/modules/emailing/standard-objects/message-list.workspace-entity';
@@ -78,8 +78,6 @@ export class MessageCampaignAuthoringService {
   constructor(
     @InjectWorkspaceScopedRepository(EmailingDomainEntity)
     private readonly emailingDomainRepository: WorkspaceScopedRepository<EmailingDomainEntity>,
-    @InjectWorkspaceScopedRepository(CampaignDeliveryEntity)
-    private readonly campaignDeliveryRepository: WorkspaceScopedRepository<CampaignDeliveryEntity>,
     private readonly workspaceOrmManager: WorkspaceOrmManager,
     private readonly userRoleService: UserRoleService,
     private readonly messageCampaignStatisticsService: MessageCampaignStatisticsService,
@@ -570,7 +568,6 @@ export class MessageCampaignAuthoringService {
       }
 
       await this.upsertMassEmailDelivery({
-        workspaceId,
         campaignId,
         deliveryId: persistedMessage.id,
         outcome,
@@ -636,7 +633,6 @@ export class MessageCampaignAuthoringService {
     }
 
     await this.upsertMassEmailDelivery({
-      workspaceId,
       campaignId,
       deliveryId: messageId,
       outcome,
@@ -647,18 +643,15 @@ export class MessageCampaignAuthoringService {
   // delivery row is written already settled instead of going through the
   // queued/claimed states of the emailing-domain pipeline.
   private async upsertMassEmailDelivery({
-    workspaceId,
     campaignId,
     deliveryId,
     outcome,
   }: {
-    workspaceId: string;
     campaignId: string;
     deliveryId: string;
     outcome: MassEmailCampaignSendOutcome;
   }): Promise<void> {
-    await this.campaignDeliveryRepository.upsert(
-      workspaceId,
+    await this.getSystemRepository(CampaignDeliveryWorkspaceEntity).upsert(
       [
         {
           id: deliveryId,

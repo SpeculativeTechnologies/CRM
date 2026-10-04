@@ -8,7 +8,8 @@ import {
   pickPersonLastContact,
 } from 'src/utils/person-last-contact-aggregation';
 import { recomputePersonLastContact } from 'src/utils/recompute-person-last-contact';
-import { updatePersonForInteraction } from 'src/utils/update-person-last-contact';
+import { backfillPeopleLastContact } from 'src/utils/backfill-people-last-contact';
+import { applyPersonInteractions } from 'src/utils/apply-person-interactions';
 
 const EARLIER = '2026-06-01T12:00:00.000Z';
 const LATER = '2026-06-05T12:00:00.000Z';
@@ -45,12 +46,24 @@ const createClient = ({
     if (request.person) {
       return { person: { ...state.person } };
     }
+    if (request.companies) {
+      return {
+        companies: {
+          edges: [{ node: { id: 'company-1' } }],
+          pageInfo: { hasNextPage: false },
+        },
+      };
+    }
+    if (request.opportunities) {
+      return { opportunities: { edges: [], pageInfo: { hasNextPage: false } } };
+    }
     if (request.people) {
       return {
         people: {
           edges: [
             {
               node: {
+                ...state.person,
                 lastContactAt: state.person.lastContactAt,
                 lastContactItemContactLog: state.person
                   .lastContactItemContactLogId
@@ -66,6 +79,7 @@ const createClient = ({
               },
             },
           ],
+          pageInfo: { hasNextPage: false },
         },
       };
     }
@@ -160,8 +174,8 @@ describe('manually logged contact', () => {
       lastMeetingId: null,
     });
     expect(
-      mutation.mock.calls.find(([request]) => request.updateCompany)?.[0]
-        .updateCompany.__args.data,
+      mutation.mock.calls.find(([request]) => request.createCompanies)?.[0]
+        .createCompanies.__args.data[0],
     ).toMatchObject({
       lastContactAt: LATER,
       lastContactItemContactLogId: 'log-1',
@@ -310,14 +324,23 @@ describe('manually logged contact', () => {
   it('should retain a manual contact source when an older synced email arrives', async () => {
     const { client, state } = createClient({ logs: [log()] });
     await recomputePersonLastContact(client, PERSON_ID);
-    await updatePersonForInteraction(client, {
-      personId: PERSON_ID,
-      occurredAt: EARLIER,
-      itemId: 'email-2',
-      kind: 'email',
-      direction: 'outbound',
-      workspaceMemberId: 'member-1',
-    });
+    await applyPersonInteractions(
+      client,
+      new Map([
+        [
+          PERSON_ID,
+          [
+            {
+              occurredAt: EARLIER,
+              itemId: 'email-2',
+              kind: 'email',
+              direction: 'outbound',
+              workspaceMemberId: 'member-1',
+            },
+          ],
+        ],
+      ]),
+    );
     expect(state.person).toMatchObject({
       lastContactAt: LATER,
       lastContactItemContactLogId: 'log-1',
@@ -328,18 +351,96 @@ describe('manually logged contact', () => {
   it('should clear the manual contact source when a newer synced email wins', async () => {
     const { client, state } = createClient({ logs: [log()] });
     await recomputePersonLastContact(client, PERSON_ID);
-    await updatePersonForInteraction(client, {
-      personId: PERSON_ID,
-      occurredAt: NOW,
-      itemId: 'email-2',
-      kind: 'email',
-      direction: 'outbound',
-      workspaceMemberId: 'member-1',
-    });
+    await applyPersonInteractions(
+      client,
+      new Map([
+        [
+          PERSON_ID,
+          [
+            {
+              occurredAt: NOW,
+              itemId: 'email-2',
+              kind: 'email',
+              direction: 'outbound',
+              workspaceMemberId: 'member-1',
+            },
+          ],
+        ],
+      ]),
+    );
     expect(state.person).toMatchObject({
       lastContactAt: NOW,
       lastContactItemContactLogId: null,
       lastContactItemMessageId: 'email-2',
+    });
+  });
+
+  it.each(['email', 'meeting'] as const)(
+    'should retain a concurrent manual contact when a stale %s batch saves',
+    async (kind) => {
+      const { client, state, mutation } = createClient({
+        emailAt: kind === 'email' ? EARLIER : undefined,
+        meetingAt: kind === 'meeting' ? EARLIER : undefined,
+      });
+      mutation.mockImplementationOnce(async () => {
+        state.person.lastContactAt = LATER;
+        state.person.lastContactItemContactLogId = 'log-1';
+        state.logs = [log()];
+        return { updatePeople: [] };
+      });
+
+      await applyPersonInteractions(
+        client,
+        new Map([
+          [
+            PERSON_ID,
+            [
+              {
+                kind,
+                direction: 'outbound',
+                occurredAt: EARLIER,
+                itemId: kind === 'email' ? 'email-1' : 'meeting-1',
+                workspaceMemberId: 'member-1',
+              },
+            ],
+          ],
+        ]),
+      );
+
+      expect(state.person).toMatchObject({
+        lastContactAt: LATER,
+        lastContactItemContactLogId: 'log-1',
+        lastOutboundAt: LATER,
+        [kind === 'email' ? 'lastEmailId' : 'lastMeetingId']:
+          kind === 'email' ? 'email-1' : 'meeting-1',
+      });
+      const writes = mutation.mock.calls.filter(
+        ([request]) => request.updatePeople,
+      );
+      expect(writes).toHaveLength(2);
+      expect(writes[0][0].updatePeople.__args.filter.and).toContainEqual({
+        lastContactItemContactLogId: { is: 'NULL' },
+      });
+      expect(writes[1][0].updatePeople.__args.filter.and).toContainEqual({
+        lastContactItemContactLogId: { eq: 'log-1' },
+      });
+    },
+  );
+
+  it('should retain a concurrent manual contact when a stale backfill saves', async () => {
+    const { client, state, mutation } = createClient({ emailAt: EARLIER });
+    mutation.mockImplementationOnce(async () => {
+      state.person.lastContactAt = LATER;
+      state.logs = [log()];
+      return { updatePeople: [] };
+    });
+
+    await backfillPeopleLastContact(client, [PERSON_ID]);
+
+    expect(state.person).toMatchObject({
+      lastContactAt: LATER,
+      lastContactItemContactLogId: 'log-1',
+      lastEmailId: 'email-1',
     });
   });
 });

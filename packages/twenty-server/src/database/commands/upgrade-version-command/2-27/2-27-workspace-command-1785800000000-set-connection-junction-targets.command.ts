@@ -39,6 +39,7 @@ export class SetConnectionJunctionTargetsCommand extends ProvisionedWorkspaceCom
     protected readonly workspaceIteratorService: WorkspaceIteratorService,
     private readonly workspaceCacheService: WorkspaceCacheService,
     private readonly workspaceMigrationRunnerService: WorkspaceMigrationRunnerService,
+    // eslint-disable-next-line twenty/prefer-workspace-scoped-repository
     @InjectRepository(FieldMetadataEntity)
     private readonly fieldMetadataRepository: Repository<FieldMetadataEntity>,
   ) {

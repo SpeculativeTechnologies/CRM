@@ -152,7 +152,10 @@ describe('unified built-in contact widgets', () => {
       if (customization === 'ownership')
         primary.applicationId = 'custom-application';
       if (customization === 'overrides')
-        primary.overrides = { title: 'Our contacts' };
+        // Legacy flat-blob override shape.
+        primary.overrides = {
+          title: 'Our contacts',
+        } as unknown as typeof primary.overrides;
       if (customization === 'layout') {
         const layout =
           maps.flatPageLayoutMaps.byUniversalIdentifier[

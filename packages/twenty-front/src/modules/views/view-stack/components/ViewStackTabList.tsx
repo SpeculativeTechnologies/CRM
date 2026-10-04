@@ -1,5 +1,4 @@
 import { styled } from '@linaria/react';
-import { useContext } from 'react';
 
 import { StyledDropdownButtonContainer } from '@/ui/layout/dropdown/components/StyledDropdownButtonContainer';
 import { useChangeView } from '@/views/hooks/useChangeView';
@@ -9,7 +8,7 @@ import { ViewStackTabButton } from '@/views/view-stack/components/ViewStackTabBu
 import { useViewStacks } from '@/views/view-stack/hooks/useViewStacks';
 import { useLingui } from '@lingui/react/macro';
 import { IconPlus } from 'twenty-ui/icon';
-import { ThemeContext, themeCssVariables } from 'twenty-ui/theme-constants';
+import { themeCssVariables, useTheme } from 'twenty-ui/theme';
 
 const StyledTabList = styled.div`
   align-items: center;
@@ -26,7 +25,7 @@ const StyledTabList = styled.div`
 
 export const ViewStackTabList = () => {
   const { t } = useLingui();
-  const { theme } = useContext(ThemeContext);
+  const theme = useTheme();
 
   const { viewStacks, activeViewStack, currentView } = useViewStacks();
 

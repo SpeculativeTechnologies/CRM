@@ -7,12 +7,10 @@ import {
 } from 'twenty-shared/types';
 import { isDefined } from 'twenty-shared/utils';
 
-import { CampaignDeliveryEntity } from 'src/engine/core-modules/emailing-domain/campaign-delivery.entity';
 import { MessageCampaignDetailsDTO } from 'src/engine/core-modules/emailing-domain/dtos/message-campaign-details.dto';
 import { MessageCampaignSummaryDTO } from 'src/engine/core-modules/emailing-domain/dtos/message-campaign-summary.dto';
 import { WorkspaceOrmManager } from 'src/engine/twenty-orm/workspace-orm.manager';
-import { InjectWorkspaceScopedRepository } from 'src/engine/twenty-orm/workspace-scoped-repository/inject-workspace-scoped-repository.decorator';
-import { WorkspaceScopedRepository } from 'src/engine/twenty-orm/workspace-scoped-repository/workspace-scoped-repository';
+import { CampaignDeliveryWorkspaceEntity } from 'src/modules/emailing/standard-objects/campaign-delivery.workspace-entity';
 import { MessageCampaignWorkspaceEntity } from 'src/modules/emailing/standard-objects/message-campaign.workspace-entity';
 import { MessageListMemberWorkspaceEntity } from 'src/modules/emailing/standard-objects/message-list-member.workspace-entity';
 import { renderCampaignTemplate } from 'src/modules/emailing/utils/render-campaign-template.util';
@@ -22,11 +20,7 @@ import { PersonWorkspaceEntity } from 'src/modules/person/standard-objects/perso
 
 @Injectable()
 export class MessageCampaignQueryService {
-  constructor(
-    @InjectWorkspaceScopedRepository(CampaignDeliveryEntity)
-    private readonly campaignDeliveryRepository: WorkspaceScopedRepository<CampaignDeliveryEntity>,
-    private readonly workspaceOrmManager: WorkspaceOrmManager,
-  ) {}
+  constructor(private readonly workspaceOrmManager: WorkspaceOrmManager) {}
 
   private getSystemRepository<T extends ObjectLiteral>(entity: Type<T>) {
     return this.workspaceOrmManager.getRepository(entity, {
@@ -125,7 +119,7 @@ export class MessageCampaignQueryService {
             }),
         messageIds.length === 0
           ? []
-          : this.campaignDeliveryRepository.find(workspaceId, {
+          : this.getSystemRepository(CampaignDeliveryWorkspaceEntity).find({
               where: { campaignId, id: In(messageIds) },
             }),
         personIds.length === 0
@@ -210,7 +204,9 @@ export class MessageCampaignQueryService {
   // Per-recipient state lives on the core campaignDelivery row since upstream's
   // delivery refactor. Provider feedback is folded in so the recipient list
   // keeps showing bounces and complaints as it did before.
-  private toDeliveryStatus(delivery: CampaignDeliveryEntity | undefined) {
+  private toDeliveryStatus(
+    delivery: CampaignDeliveryWorkspaceEntity | undefined,
+  ) {
     if (!isDefined(delivery)) {
       return 'QUEUED';
     }

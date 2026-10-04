@@ -7,6 +7,7 @@ import { PageLayoutTabLayoutMode } from 'twenty-shared/types';
 import { type WorkspaceIteratorService } from 'src/database/commands/command-runners/workspace-iterator.service';
 import { AddOpportunityContactsCommand } from 'src/database/commands/upgrade-version-command/2-38/2-38-workspace-command-1788714704750-add-opportunity-contacts.command';
 import { type ApplicationService } from 'src/engine/core-modules/application/application.service';
+import { resolveEffectiveFlatEntity } from 'src/engine/metadata-modules/overrides/utils/resolve-effective-flat-entity.util';
 import { type WorkspaceCacheService } from 'src/engine/workspace-cache/services/workspace-cache.service';
 import { computeTwentyStandardApplicationAllFlatEntityMaps } from 'src/engine/workspace-manager/twenty-standard-application/utils/twenty-standard-application-all-flat-entity-maps.constant';
 import { type WorkspaceMigrationValidateBuildAndRunService } from 'src/engine/workspace-manager/workspace-migration/services/workspace-migration-validate-build-and-run-service';
@@ -238,12 +239,14 @@ describe('AddOpportunityContactsCommand', () => {
         HOME_WIDGETS.pointOfContact.universalIdentifier
       ];
     if (!widget) throw new Error('Missing contact picker');
+    // Legacy flat-blob override shape, lifted as the owner entry by
+    // resolveEffectiveFlatEntity.
     widget.overrides = {
       position: {
         layoutMode: PageLayoutTabLayoutMode.VERTICAL_LIST,
         index: 100,
       },
-    };
+    } as unknown as typeof widget.overrides;
     const { migrate, run } = createCommand(existing);
     await run();
     expect(
@@ -253,7 +256,11 @@ describe('AddOpportunityContactsCommand', () => {
       layoutMode: PageLayoutTabLayoutMode.VERTICAL_LIST,
       index: 101,
     });
-    expect(widget.overrides.position?.layoutMode).toBe(
+    const effectivePosition = resolveEffectiveFlatEntity({
+      metadataName: 'pageLayoutWidget',
+      flatEntity: widget,
+    }).position;
+    expect(effectivePosition?.layoutMode).toBe(
       PageLayoutTabLayoutMode.VERTICAL_LIST,
     );
   });

@@ -14,8 +14,8 @@ import { Select } from '@/ui/input/components/Select';
 import { t } from '@lingui/core/macro';
 import { MessageChannelType } from 'twenty-shared/types';
 import { isDefined } from 'twenty-shared/utils';
-import { type SelectOption } from 'twenty-ui/input';
-import { themeCssVariables } from 'twenty-ui/theme-constants';
+import { type SelectOption } from 'twenty-ui/primitives/input';
+import { themeCssVariables } from 'twenty-ui/theme';
 
 const StyledFieldsContainer = styled.div`
   display: flex;
@@ -31,7 +31,7 @@ const StyledHint = styled.div`
 `;
 
 type CampaignAudiencePreview = NonNullable<
-  ReturnType<typeof useCampaignAudiencePreview>
+  ReturnType<typeof useCampaignAudiencePreview>['audiencePreview']
 >;
 
 const buildAudienceHint = (preview: CampaignAudiencePreview): string => {
@@ -118,8 +118,10 @@ export const CampaignComposerFields = ({
         onChange={campaignState.setListId}
         onCreate={handleCreateList}
       />
-      {isDefined(audiencePreview) && (
-        <StyledHint>{buildAudienceHint(audiencePreview)}</StyledHint>
+      {isDefined(audiencePreview.audiencePreview) && (
+        <StyledHint>
+          {buildAudienceHint(audiencePreview.audiencePreview)}
+        </StyledHint>
       )}
       <Select
         dropdownId="campaign-composer-unsubscribe-topic"

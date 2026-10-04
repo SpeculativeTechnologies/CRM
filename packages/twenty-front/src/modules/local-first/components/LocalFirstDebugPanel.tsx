@@ -1,7 +1,7 @@
 import { styled } from '@linaria/react';
 import { useAtom } from 'jotai';
 import { useEffect, useState } from 'react';
-import { themeCssVariables } from 'twenty-ui/theme-constants';
+import { themeCssVariables } from 'twenty-ui/theme';
 
 import { startLocalFirstSync } from '@/local-first/services/startLocalFirstSync';
 import { localFirstShadowReportState } from '@/local-first/states/localFirstShadowReportState';

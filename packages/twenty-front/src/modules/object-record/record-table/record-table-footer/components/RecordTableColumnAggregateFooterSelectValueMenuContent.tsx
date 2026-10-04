@@ -2,20 +2,15 @@ import { useRecordTableContextOrThrow } from '@/object-record/record-table/conte
 import { RecordTableColumnAggregateFooterDropdownContext } from '@/object-record/record-table/record-table-footer/components/RecordTableColumnAggregateFooterDropdownContext';
 import { useViewFieldAggregateOperation } from '@/object-record/record-table/record-table-footer/hooks/useViewFieldAggregateOperation';
 import { AggregateOperations } from '@/object-record/record-table/constants/AggregateOperations';
-import { DropdownContent } from '@/ui/layout/dropdown/components/DropdownContent';
-import { DropdownMenuHeader } from '@/ui/layout/dropdown/components/DropdownMenuHeader/DropdownMenuHeader';
-import { DropdownMenuHeaderLeftComponent } from '@/ui/layout/dropdown/components/DropdownMenuHeader/internal/DropdownMenuHeaderLeftComponent';
-import { DropdownMenuItemsContainer } from '@/ui/layout/dropdown/components/DropdownMenuItemsContainer';
 import { useCloseDropdown } from '@/ui/layout/dropdown/hooks/useCloseDropdown';
 import { useLingui } from '@lingui/react/macro';
 import { useContext } from 'react';
-import { IconCheck, IconChevronLeft } from 'twenty-ui/icon';
-import { MenuItem } from 'twenty-ui/navigation';
+import { Dropdown } from 'twenty-ui/components';
 
 export const RecordTableColumnAggregateFooterSelectValueMenuContent = () => {
   const { t } = useLingui();
   const { objectMetadataItem } = useRecordTableContextOrThrow();
-  const { fieldMetadataId, dropdownId, onContentChange } = useContext(
+  const { fieldMetadataId, dropdownId } = useContext(
     RecordTableColumnAggregateFooterDropdownContext,
   );
   const { closeDropdown } = useCloseDropdown();
@@ -30,20 +25,13 @@ export const RecordTableColumnAggregateFooterSelectValueMenuContent = () => {
       ?.options ?? [];
 
   return (
-    <DropdownContent>
-      <DropdownMenuHeader
-        StartComponent={
-          <DropdownMenuHeaderLeftComponent
-            onClick={() => onContentChange('countAggregateOperationsOptions')}
-            Icon={IconChevronLeft}
-          />
-        }
-      >
-        {t`Count by value`}
-      </DropdownMenuHeader>
-      <DropdownMenuItemsContainer>
+    <>
+      <Dropdown.Back>{t`Count by value`}</Dropdown.Back>
+      <Dropdown.Section>
         {options.length === 0 ? (
-          <MenuItem disabled text={t`No options`} accent="placeholder" />
+          <Dropdown.OptionItem disabled selected={false}>
+            {t`No options`}
+          </Dropdown.OptionItem>
         ) : (
           options.map((option) => {
             const isSelected =
@@ -52,23 +40,24 @@ export const RecordTableColumnAggregateFooterSelectValueMenuContent = () => {
               currentViewFieldAggregateValue === option.value;
 
             return (
-              <MenuItem
+              <Dropdown.OptionItem
                 key={option.id}
-                onClick={async () => {
+                closeOnSelect={false}
+                onSelect={async () => {
                   await updateViewFieldAggregateOperation(
                     AggregateOperations.COUNT,
                     option.value,
                   );
                   closeDropdown(dropdownId);
                 }}
-                text={option.label}
-                RightIcon={isSelected ? IconCheck : undefined}
-                aria-selected={isSelected}
-              />
+                selected={isSelected}
+              >
+                {option.label}
+              </Dropdown.OptionItem>
             );
           })
         )}
-      </DropdownMenuItemsContainer>
-    </DropdownContent>
+      </Dropdown.Section>
+    </>
   );
 };

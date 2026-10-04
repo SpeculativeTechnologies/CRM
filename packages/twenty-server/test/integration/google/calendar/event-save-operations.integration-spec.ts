@@ -8,7 +8,7 @@ import { getWorkspaceSchemaName } from 'src/engine/workspace-datasource/utils/ge
 import { SEED_APPLE_WORKSPACE_ID } from 'src/engine/workspace-manager/dev-seeder/core/constants/seeder-workspaces.constant';
 
 import { createOneOperationFactory } from 'test/integration/graphql/utils/create-one-operation-factory.util';
-import { makeGraphqlAPIRequest } from 'test/integration/graphql/utils/make-graphql-api-request.util';
+import { makeGraphqlApiRequest } from 'test/integration/graphql/utils/make-graphql-api-request.util';
 import { googleCalendarEvent } from 'test/integration/google/mocks/google-calendar-event.util';
 import { setupGoogleMock } from 'test/integration/google/mocks/setup-google-mock.util';
 import { connectMessagingAccount } from 'test/integration/utils/connect-messaging-account.util';
@@ -105,6 +105,23 @@ describe('Calendar event save operations (integration)', () => {
           SEED_APPLE_WORKSPACE_ID,
         )}"."calendarEventParticipant" WHERE handle LIKE $1`,
         [`%${handleSuffix}`],
+      );
+
+    return Number(rows[0].count);
+  };
+
+  const countParticipantsByHandleSuffixAndDisplayName = async (
+    handleSuffix: string,
+    displayName: string,
+  ): Promise<number> => {
+    const rows: { count: string }[] =
+      await getCoreRepository<CalendarChannelEntity>(
+        CalendarChannelEntity,
+      ).manager.query(
+        `SELECT count(*) AS count FROM "${getWorkspaceSchemaName(
+          SEED_APPLE_WORKSPACE_ID,
+        )}"."calendarEventParticipant" WHERE handle LIKE $1 AND "displayName" = $2`,
+        [`%${handleSuffix}`, displayName],
       );
 
     return Number(rows[0].count);
@@ -328,6 +345,44 @@ describe('Calendar event save operations (integration)', () => {
     expect(await countParticipantsByHandleSuffix(attendeeSuffix)).toBe(300);
   }, 300000);
 
+  it('should update every participant when a re-import spans more than one update chunk', async () => {
+    const titlePrefix = `Calendar event ${randomUUID()}`;
+    const eventIdSuffix = randomUUID();
+    const attendeeSuffix = `rechunked-${randomUUID()}@acme.com`;
+
+    const buildEvents = (displayName: string): calendar_v3.Schema$Event[] =>
+      Array.from({ length: 100 }, (_unused, eventIndex) =>
+        googleCalendarEvent({
+          id: `google-calendar-event-${eventIndex}-${eventIdSuffix}`,
+          summary: `${titlePrefix} ${eventIndex}`,
+          attendees: [
+            { email: `a-${eventIndex}-${attendeeSuffix}`, displayName },
+            { email: `b-${eventIndex}-${attendeeSuffix}`, displayName },
+            { email: `c-${eventIndex}-${attendeeSuffix}`, displayName },
+          ],
+        }),
+      );
+
+    await importEvents(buildEvents('Before'));
+
+    expect(
+      await countParticipantsByHandleSuffixAndDisplayName(
+        attendeeSuffix,
+        'Before',
+      ),
+    ).toBe(300);
+
+    await importEvents(buildEvents('After'));
+
+    expect(await countParticipantsByHandleSuffix(attendeeSuffix)).toBe(300);
+    expect(
+      await countParticipantsByHandleSuffixAndDisplayName(
+        attendeeSuffix,
+        'After',
+      ),
+    ).toBe(300);
+  }, 300000);
+
   it('should update exactly one row and leave the other untouched when two participants share a handle on the same event', async () => {
     const eventExternalId = `google-calendar-event-${randomUUID()}`;
     const title = `Calendar event ${randomUUID()}`;
@@ -343,7 +398,7 @@ describe('Calendar event save operations (integration)', () => {
 
     const [event] = await findEventsByTitle(title);
 
-    const duplicateResponse = await makeGraphqlAPIRequest(
+    const duplicateResponse = await makeGraphqlApiRequest(
       createOneOperationFactory({
         objectMetadataSingularName: 'calendarEventParticipant',
         gqlFields: 'id',

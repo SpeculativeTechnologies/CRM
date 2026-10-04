@@ -15,7 +15,7 @@ import {
   FieldMetadataType,
 } from 'twenty-shared/types';
 import { isDefined } from 'twenty-shared/utils';
-import { themeCssVariables } from 'twenty-ui/theme-constants';
+import { themeCssVariables } from 'twenty-ui/theme';
 
 const StyledContainer = styled.div`
   display: flex;

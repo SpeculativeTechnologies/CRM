@@ -13,7 +13,7 @@ import { getRecordTableCellRangeBoxShadow } from '@/object-record/record-table/r
 import { RECORD_TABLE_CELL_RANGE_INSIDE } from '@/object-record/record-table/record-table-cell-range/utils/getRecordTableCellRangeEdges';
 import { getRecordTableCellId } from '@/object-record/record-table/utils/getRecordTableCellId';
 import { useAtomComponentFamilySelectorValue } from '@/ui/utilities/state/jotai/hooks/useAtomComponentFamilySelectorValue';
-import { ThemeContext } from 'twenty-ui/theme-constants';
+import { useTheme } from 'twenty-ui/theme';
 
 const StyledBaseContainer = styled.div<{
   fontColorMedium: string;
@@ -70,7 +70,7 @@ export const RecordTableCellBaseContainer = ({
     isLabelIdentifier,
   } = useContext(FieldContext);
   const { openTableCell } = useOpenRecordTableCellFromCell();
-  const { theme } = useContext(ThemeContext);
+  const theme = useTheme();
 
   const { cellPosition } = useContext(RecordTableCellContext);
   const { recordTableId } = useRecordTableContextOrThrow();

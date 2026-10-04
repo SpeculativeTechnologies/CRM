@@ -12,6 +12,7 @@ import { WorkspaceEntity } from 'src/engine/core-modules/workspace/workspace.ent
 import { ApplicationTranslationCatalogModule } from 'src/engine/metadata-modules/application-translation-catalog/application-translation-catalog.module';
 import { WorkspaceManyOrAllFlatEntityMapsCacheModule } from 'src/engine/metadata-modules/flat-entity/services/workspace-many-or-all-flat-entity-maps-cache.module';
 import { NavigationMenuItemModule } from 'src/engine/metadata-modules/navigation-menu-item/navigation-menu-item.module';
+import { RecordShareModule } from 'src/engine/core-modules/record-share/record-share.module';
 import { EventStreamResolver } from 'src/engine/subscriptions/event-stream.resolver';
 import { EventStreamService } from 'src/engine/subscriptions/event-stream.service';
 import { MetadataEventEmitter } from 'src/engine/subscriptions/metadata-event/metadata-event-emitter';
@@ -19,6 +20,7 @@ import { MetadataEventPublisher } from 'src/engine/subscriptions/metadata-event/
 import { MetadataEventResolutionService } from 'src/engine/subscriptions/metadata-event/services/metadata-event-resolution.service';
 import { MetadataEventsToDbListener } from 'src/engine/subscriptions/metadata-event/metadata-events-to-db.listener';
 import { ObjectRecordEventPublisher } from 'src/engine/subscriptions/object-record-event/object-record-event-publisher';
+import { QueueJobEventListener } from 'src/engine/subscriptions/queue-job-event/queue-job-event.listener';
 import { SubscriptionService } from 'src/engine/subscriptions/subscription.service';
 import { WorkspaceEventBroadcaster } from 'src/engine/subscriptions/workspace-event-broadcaster/workspace-event-broadcaster.service';
 import { WorkspaceQueryHookModule } from 'src/engine/api/graphql/workspace-query-runner/workspace-query-hook/workspace-query-hook.module';
@@ -40,6 +42,7 @@ import { WorkspaceCacheModule } from 'src/engine/workspace-cache/workspace-cache
     // forwardRef: the hook module pulls in the feature query hook modules, which
     // transitively reach this global module.
     forwardRef(() => WorkspaceQueryHookModule),
+    RecordShareModule,
   ],
   providers: [
     SubscriptionService,
@@ -51,6 +54,7 @@ import { WorkspaceCacheModule } from 'src/engine/workspace-cache/workspace-cache
     MetadataEventEmitter,
     MetadataEventsToDbListener,
     WorkspaceEventBroadcaster,
+    QueueJobEventListener,
     ProcessNestedRelationsHelper,
     CommonSelectFieldsHelper,
   ],

@@ -82,8 +82,10 @@ export class ApplicationManifestMigrationService {
       navigationMenuItems: [],
       pageLayouts: [],
       pageLayoutTabs: [],
+      pageLayoutWidgets: [],
       commandMenuItems: [],
       timelineActivityTypes: [],
+      settingsMenuItems: [],
     };
 
     const now = new Date().toISOString();
@@ -170,11 +172,13 @@ export class ApplicationManifestMigrationService {
     workspaceId,
     ownerFlatApplication,
     dryRun = false,
+    inferDeletionFromMissingEntities = true,
   }: {
     manifest: Manifest;
     workspaceId: string;
     ownerFlatApplication: FlatApplication;
     dryRun?: boolean;
+    inferDeletionFromMissingEntities?: boolean;
   }): Promise<{
     workspaceMigration: WorkspaceMigration;
     hasSchemaMetadataChanged: boolean;
@@ -222,7 +226,9 @@ export class ApplicationManifestMigrationService {
         toAllUniversalFlatEntityMaps,
         buildOptions: {
           isSystemBuild: false,
-          inferDeletionFromMissingEntities: true,
+          inferDeletionFromMissingEntities: inferDeletionFromMissingEntities
+            ? true
+            : undefined,
           applicationUniversalIdentifier:
             ownerFlatApplication.universalIdentifier,
         },
@@ -264,6 +270,7 @@ export class ApplicationManifestMigrationService {
         manifest,
         workspaceId,
         ownerFlatApplication,
+        inferDeletionFromMissingEntities,
       });
     }
 
@@ -277,10 +284,12 @@ export class ApplicationManifestMigrationService {
     manifest,
     workspaceId,
     ownerFlatApplication,
+    inferDeletionFromMissingEntities,
   }: {
     manifest: Manifest;
     workspaceId: string;
     ownerFlatApplication: FlatApplication;
+    inferDeletionFromMissingEntities: boolean;
   }) {
     const {
       flatRoleMaps: refreshedFlatRoleMaps,
@@ -324,6 +333,21 @@ export class ApplicationManifestMigrationService {
         })
       : null;
 
+    const healthCheckLogicFunctionUniversalIdentifier =
+      manifest.application.healthCheckLogicFunction?.universalIdentifier;
+
+    const healthCheckLogicFunctionId = isDefined(
+      healthCheckLogicFunctionUniversalIdentifier,
+    )
+      ? resolveApplicationReferenceIdOrThrow({
+          flatEntityMaps: refreshedFlatLogicFunctionMaps,
+          universalIdentifier: healthCheckLogicFunctionUniversalIdentifier,
+          referenceLabel: 'health check logic function',
+          exceptionCode: ApplicationExceptionCode.LOGIC_FUNCTION_NOT_FOUND,
+          ownerApplicationId: ownerFlatApplication.id,
+        })
+      : null;
+
     const uninstallLogicFunctionUniversalIdentifier =
       manifest.application.uninstallLogicFunction?.universalIdentifier;
 
@@ -341,8 +365,18 @@ export class ApplicationManifestMigrationService {
 
     await this.applicationService.update(ownerFlatApplication.id, {
       workspaceId,
-      settingsCustomTabFrontComponentId,
-      uninstallLogicFunctionId,
+      ...(isDefined(settingsCustomTabFrontComponentId) ||
+      inferDeletionFromMissingEntities
+        ? { settingsCustomTabFrontComponentId }
+        : {}),
+      ...(isDefined(uninstallLogicFunctionId) ||
+      inferDeletionFromMissingEntities
+        ? { uninstallLogicFunctionId }
+        : {}),
+      ...(isDefined(healthCheckLogicFunctionId) ||
+      inferDeletionFromMissingEntities
+        ? { healthCheckLogicFunctionId }
+        : {}),
       ...(isDefined(defaultRoleId) ? { defaultRoleId } : {}),
     });
   }

@@ -2,8 +2,9 @@ import { t } from '@lingui/core/macro';
 import { isNonEmptyString } from '@sniptt/guards';
 import { useState } from 'react';
 import { isDefined } from 'twenty-shared/utils';
+import { OverflowingTextWithTooltip } from 'twenty-ui/primitives/typography';
 import { IconPlus } from 'twenty-ui/icon';
-import { MenuItem } from 'twenty-ui/navigation';
+import { ListItem } from 'twenty-ui/primitives/navigation';
 
 type AddSelectOptionMenuItemProps = {
   name: string;
@@ -39,15 +40,18 @@ export const AddSelectOptionMenuItem = ({
   }
 
   return (
-    <MenuItem
+    <ListItem
       onClick={handleClick}
       disabled={isAddingSelectOption}
-      LeftIcon={IconPlus}
-      text={
-        isAddingSelectOption
-          ? t`Adding "${trimmedName}"...`
-          : t`Add "${trimmedName}" to options`
-      }
-    />
+      startIcon={<IconPlus />}
+    >
+      <OverflowingTextWithTooltip
+        text={
+          isAddingSelectOption
+            ? t`Adding "${trimmedName}"...`
+            : t`Add "${trimmedName}" to options`
+        }
+      />
+    </ListItem>
   );
 };

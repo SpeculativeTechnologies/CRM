@@ -9,7 +9,6 @@ import { type EnrichedObjectMetadataItem } from '@/object-metadata/types/Enriche
 import { type FieldMetadataItem } from '@/object-metadata/types/FieldMetadataItem';
 import { useLazyFindOneRecord } from '@/object-record/hooks/useLazyFindOneRecord';
 import { useOpenComposeEmailInSidePanel } from '@/side-panel/hooks/useOpenComposeEmailInSidePanel';
-import { useSnackBar } from '@/ui/feedback/snack-bar-manager/hooks/useSnackBar';
 import { t } from '@lingui/core/macro';
 import { useStore } from 'jotai';
 import {
@@ -19,6 +18,7 @@ import {
   type RecordGqlOperationFilter,
 } from 'twenty-shared/types';
 import { isDefined } from 'twenty-shared/utils';
+import { useToast } from 'twenty-ui/components';
 import { useNavigateApp } from '~/hooks/useNavigateApp';
 import { useNavigateSettings } from '~/hooks/useNavigateSettings';
 
@@ -31,7 +31,7 @@ export const useComposeEmailToRelatedPeople = ({
 }) => {
   const { connectedAccountId } = useFirstConnectedAccount();
   const { openComposeEmailInSidePanel } = useOpenComposeEmailInSidePanel();
-  const { enqueueErrorSnackBar, enqueueWarningSnackBar } = useSnackBar();
+  const { enqueueToast } = useToast();
   const store = useStore();
   const navigateApp = useNavigateApp();
   const navigateSettings = useNavigateSettings();
@@ -60,8 +60,9 @@ export const useComposeEmailToRelatedPeople = ({
       } = await resolveRelatedPeople(relatedPersonFieldMetadataItem);
 
       if (personIds.length === 0) {
-        enqueueErrorSnackBar({
-          message: t`None of the selected ${objectMetadataItem.labelPlural} have a linked ${relatedPersonFieldMetadataItem.label}.`,
+        enqueueToast({
+          variant: 'error',
+          children: t`None of the selected ${objectMetadataItem.labelPlural} have a linked ${relatedPersonFieldMetadataItem.label}.`,
         });
 
         return;
@@ -76,16 +77,18 @@ export const useComposeEmailToRelatedPeople = ({
             const primaryEmail = getPrimaryEmailFromRecord(person);
 
             if (!isDefined(primaryEmail)) {
-              enqueueErrorSnackBar({
-                message: t`The linked ${relatedPersonFieldMetadataItem.label} has no email address.`,
+              enqueueToast({
+                variant: 'error',
+                children: t`The linked ${relatedPersonFieldMetadataItem.label} has no email address.`,
               });
 
               return;
             }
 
             if (sourceRecordLabelsWithoutRelatedPerson.length > 0) {
-              enqueueWarningSnackBar({
-                message: t`Skipped without a linked ${relatedPersonFieldMetadataItem.label}: ${sourceRecordLabelsWithoutRelatedPerson.join(', ')}`,
+              enqueueToast({
+                variant: 'warning',
+                children: t`Skipped without a linked ${relatedPersonFieldMetadataItem.label}: ${sourceRecordLabelsWithoutRelatedPerson.join(', ')}`,
               });
             }
 
@@ -117,8 +120,7 @@ export const useComposeEmailToRelatedPeople = ({
     },
     [
       connectedAccountId,
-      enqueueErrorSnackBar,
-      enqueueWarningSnackBar,
+      enqueueToast,
       findOnePerson,
       navigateApp,
       navigateSettings,

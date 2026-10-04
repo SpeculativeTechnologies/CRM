@@ -1,13 +1,12 @@
 import { styled } from '@linaria/react';
-import { useContext } from 'react';
 
 import { useNumberFormat } from '@/localization/hooks/useNumberFormat';
 import { StyledDropdownButtonContainer } from '@/ui/layout/dropdown/components/StyledDropdownButtonContainer';
 import { type View } from '@/views/types/View';
 import { isDefined } from 'twenty-shared/utils';
 import { IconChevronDown, IconList, useIcons } from 'twenty-ui/icon';
-import { OverflowingTextWithTooltip } from 'twenty-ui/surfaces';
-import { ThemeContext, themeCssVariables } from 'twenty-ui/theme-constants';
+import { OverflowingTextWithTooltip } from 'twenty-ui/primitives/typography';
+import { themeCssVariables, useTheme } from 'twenty-ui/theme';
 
 const StyledIconContainer = styled.span`
   display: flex;
@@ -55,7 +54,7 @@ export const ViewStackTabButton = ({
   totalCount,
   onClick,
 }: ViewStackTabButtonProps) => {
-  const { theme } = useContext(ThemeContext);
+  const theme = useTheme();
   const { getIcon } = useIcons();
   const { formatNumber } = useNumberFormat();
 

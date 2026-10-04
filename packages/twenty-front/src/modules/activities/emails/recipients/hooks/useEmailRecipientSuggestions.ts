@@ -1,3 +1,4 @@
+import { type EmailRecipientSuggestion } from '@/activities/emails/recipients/types/EmailRecipientSuggestion';
 import { t } from '@lingui/core/macro';
 import { isNonEmptyString } from '@sniptt/guards';
 import { CoreObjectNameSingular } from 'twenty-shared/types';
@@ -6,7 +7,6 @@ import { isDefined } from 'twenty-shared/utils';
 import { EMAIL_RECIPIENT_MEMBER_SUGGESTIONS_LIMIT } from '@/activities/emails/recipients/constants/EmailRecipientMemberSuggestionsLimit';
 import { EMAIL_RECIPIENT_PEOPLE_SUGGESTIONS_LIMIT } from '@/activities/emails/recipients/constants/EmailRecipientPeopleSuggestionsLimit';
 import { type EmailComposerContextRecord } from '@/activities/emails/recipients/types/EmailComposerContextRecord';
-import { type EmailRecipient } from '@/activities/emails/recipients/types/EmailRecipient';
 import { type EmailRecipientPerson } from '@/activities/emails/recipients/types/EmailRecipientPerson';
 import { getEmailRecipientKey } from '@/activities/emails/recipients/utils/getEmailRecipientKey';
 import { getEmailRecipientPersonFromRecord } from '@/activities/emails/recipients/utils/getEmailRecipientPersonFromRecord';
@@ -18,15 +18,6 @@ import { useObjectRecordSearchRecords } from '@/object-record/hooks/useObjectRec
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
 import { useObjectMetadataItem } from '@/object-metadata/hooks/useObjectMetadataItem';
 import { buildIdentifierGqlFields } from '@/object-record/graphql/record-gql-fields/utils/buildIdentifierGqlFields';
-
-export type EmailRecipientSuggestion = {
-  suggestionId: string;
-  recipient: EmailRecipient;
-  label: string;
-  secondaryText: string;
-  avatarUrl: string | null;
-  avatarColorSeed: string;
-};
 
 type UseEmailRecipientSuggestionsArgs = {
   searchInput: string;
@@ -130,7 +121,7 @@ export const useEmailRecipientSuggestions = ({
     skip: !isDefined(contextCompanyId),
   });
 
-  const { searchRecords } = useObjectRecordSearchRecords({
+  const { searchRecords, error } = useObjectRecordSearchRecords({
     objectNameSingulars: [
       CoreObjectNameSingular.Person,
       CoreObjectNameSingular.WorkspaceMember,
@@ -246,7 +237,7 @@ export const useEmailRecipientSuggestions = ({
     !excludedKeySet.has(literalKey);
 
   if (!bufferIsAddableAddress) {
-    return { suggestions: dedupedRecordSuggestions };
+    return { suggestions: dedupedRecordSuggestions, error };
   }
 
   const exactMatchSuggestion = dedupedRecordSuggestions.find(
@@ -264,6 +255,7 @@ export const useEmailRecipientSuggestions = ({
   };
 
   return {
+    error,
     suggestions: [
       firstSuggestion,
       ...dedupedRecordSuggestions.filter(

@@ -5,6 +5,8 @@ import { HeadlessOpenSidePanelPageEngineCommand } from '@/command-menu-item/engi
 import { NavigationEngineCommand } from '@/command-menu-item/engine-command/components/NavigationEngineCommand';
 import { ComposeCampaignCommand } from '@/command-menu-item/engine-command/global/components/ComposeCampaignCommand';
 import { SendMessageCampaignSingleRecordCommand } from '@/command-menu-item/engine-command/record/single-record/message-campaign/components/SendMessageCampaignSingleRecordCommand';
+import { CancelMessageCampaignSingleRecordCommand } from '@/command-menu-item/engine-command/record/single-record/message-campaign/components/CancelMessageCampaignSingleRecordCommand';
+import { DuplicateMessageCampaignSingleRecordCommand } from '@/command-menu-item/engine-command/record/single-record/message-campaign/components/DuplicateMessageCampaignSingleRecordCommand';
 import { SendMessageCampaignTestSingleRecordCommand } from '@/command-menu-item/engine-command/record/single-record/message-campaign/components/SendMessageCampaignTestSingleRecordCommand';
 import { OpenEmailBlockSettingsSingleRecordCommand } from '@/command-menu-item/engine-command/record/components/OpenEmailBlockSettingsSingleRecordCommand';
 import { ComposeEmailCommand } from '@/command-menu-item/engine-command/global/components/ComposeEmailCommand';
@@ -17,7 +19,7 @@ import { RestoreRecordsCommand } from '@/command-menu-item/engine-command/record
 import { TriggerWorkflowVersionEngineCommand } from '@/command-menu-item/engine-command/record/components/TriggerWorkflowVersionEngineCommand';
 import { MergeMultipleRecordsCommand } from '@/command-menu-item/engine-command/record/multiple-records/components/MergeMultipleRecordsCommand';
 import { UpdateMultipleRecordsCommand } from '@/command-menu-item/engine-command/record/multiple-records/components/UpdateMultipleRecordsCommand';
-import { CreateNewIndexRecordNoSelectionRecordCommand } from '@/command-menu-item/engine-command/record/no-selection/components/CreateNewIndexRecordNoSelectionRecordCommand';
+import { CreateNewRecordCommand } from '@/command-menu-item/engine-command/record/no-selection/components/CreateNewRecordCommand';
 import { CreateNewViewNoSelectionRecordCommand } from '@/command-menu-item/engine-command/record/no-selection/components/CreateNewViewNoSelectionRecordCommand';
 import { HideDeletedRecordsNoSelectionRecordCommand } from '@/command-menu-item/engine-command/record/no-selection/components/HideDeletedRecordsNoSelectionRecordCommand';
 import { ImportRecordsNoSelectionRecordCommand } from '@/command-menu-item/engine-command/record/no-selection/components/ImportRecordsNoSelectionRecordCommand';
@@ -29,9 +31,12 @@ import { NavigateToPreviousRecordSingleRecordCommand } from '@/command-menu-item
 import { RemoveFromFavoritesSingleRecordCommand } from '@/command-menu-item/engine-command/record/single-record/components/RemoveFromFavoritesSingleRecordCommand';
 import { CancelDashboardSingleRecordCommand } from '@/command-menu-item/engine-command/record/single-record/dashboard/components/CancelDashboardSingleRecordCommand';
 import { DuplicateDashboardSingleRecordCommand } from '@/command-menu-item/engine-command/record/single-record/dashboard/components/DuplicateDashboardSingleRecordCommand';
+import { DuplicateMessageListSingleRecordCommand } from '@/command-menu-item/engine-command/record/single-record/message-list/components/DuplicateMessageListSingleRecordCommand';
 import { EditDashboardSingleRecordCommand } from '@/command-menu-item/engine-command/record/single-record/dashboard/components/EditDashboardSingleRecordCommand';
 import { SaveDashboardSingleRecordCommand } from '@/command-menu-item/engine-command/record/single-record/dashboard/components/SaveDashboardSingleRecordCommand';
 import { ReplyToEmailThreadCommand } from '@/command-menu-item/engine-command/record/single-record/message-thread/components/ReplyToEmailThreadCommand';
+import { NewAiChatSingleRecordCommand } from '@/command-menu-item/engine-command/record/single-record/agent-chat-thread/components/NewAiChatSingleRecordCommand';
+import { ShareRecordCommand } from '@/command-menu-item/engine-command/record/components/ShareRecordCommand';
 import { SeeVersionWorkflowRunSingleRecordCommand } from '@/command-menu-item/engine-command/record/single-record/workflow-runs/components/SeeVersionWorkflowRunSingleRecordCommand';
 import { SeeWorkflowWorkflowRunSingleRecordCommand } from '@/command-menu-item/engine-command/record/single-record/workflow-runs/components/SeeWorkflowWorkflowRunSingleRecordCommand';
 import { RetryWorkflowRunSingleRecordCommand } from '@/command-menu-item/engine-command/record/single-record/workflow-runs/components/RetryWorkflowRunSingleRecordCommand';
@@ -45,6 +50,7 @@ import { AddNodeWorkflowSingleRecordCommand } from '@/command-menu-item/engine-c
 import { DeactivateWorkflowSingleRecordCommand } from '@/command-menu-item/engine-command/record/single-record/workflow/components/DeactivateWorkflowSingleRecordCommand';
 import { DiscardDraftWorkflowSingleRecordCommand } from '@/command-menu-item/engine-command/record/single-record/workflow/components/DiscardDraftWorkflowSingleRecordCommand';
 import { DuplicateWorkflowSingleRecordCommand } from '@/command-menu-item/engine-command/record/single-record/workflow/components/DuplicateWorkflowSingleRecordCommand';
+import { ToggleWorkflowVisibilitySingleRecordCommand } from '@/command-menu-item/engine-command/record/single-record/workflow/components/ToggleWorkflowVisibilitySingleRecordCommand';
 import { SeeActiveVersionWorkflowSingleRecordCommand } from '@/command-menu-item/engine-command/record/single-record/workflow/components/SeeActiveVersionWorkflowSingleRecordCommand';
 import { SeeRunsWorkflowSingleRecordCommand } from '@/command-menu-item/engine-command/record/single-record/workflow/components/SeeRunsWorkflowSingleRecordCommand';
 import { SeeVersionsWorkflowSingleRecordCommand } from '@/command-menu-item/engine-command/record/single-record/workflow/components/SeeVersionsWorkflowSingleRecordCommand';
@@ -60,9 +66,7 @@ export const ENGINE_COMPONENT_KEY_COMPONENT_MAP: Record<
   EngineComponentKey,
   React.ReactNode
 > = {
-  [EngineComponentKey.CREATE_NEW_RECORD]: (
-    <CreateNewIndexRecordNoSelectionRecordCommand />
-  ),
+  [EngineComponentKey.CREATE_NEW_RECORD]: <CreateNewRecordCommand />,
   [EngineComponentKey.DELETE_RECORDS]: <DeleteRecordsCommand />,
   [EngineComponentKey.RESTORE_RECORDS]: <RestoreRecordsCommand />,
   [EngineComponentKey.DESTROY_RECORDS]: <DestroyRecordsCommand />,
@@ -74,8 +78,14 @@ export const ENGINE_COMPONENT_KEY_COMPONENT_MAP: Record<
   [EngineComponentKey.DUPLICATE_DASHBOARD]: (
     <DuplicateDashboardSingleRecordCommand />
   ),
+  [EngineComponentKey.DUPLICATE_MESSAGE_LIST]: (
+    <DuplicateMessageListSingleRecordCommand />
+  ),
   [EngineComponentKey.DUPLICATE_WORKFLOW]: (
     <DuplicateWorkflowSingleRecordCommand />
+  ),
+  [EngineComponentKey.TOGGLE_WORKFLOW_VISIBILITY]: (
+    <ToggleWorkflowVisibilitySingleRecordCommand />
   ),
   [EngineComponentKey.ACTIVATE_WORKFLOW]: (
     <ActivateWorkflowSingleRecordCommand />
@@ -251,6 +261,8 @@ export const ENGINE_COMPONENT_KEY_COMPONENT_MAP: Record<
     <HeadlessFrontComponentRendererEngineCommand />
   ),
   [EngineComponentKey.REPLY_TO_EMAIL_THREAD]: <ReplyToEmailThreadCommand />,
+  [EngineComponentKey.NEW_AI_CHAT]: <NewAiChatSingleRecordCommand />,
+  [EngineComponentKey.SHARE_RECORD]: <ShareRecordCommand />,
   [EngineComponentKey.COMPOSE_EMAIL]: <ComposeEmailCommand />,
   [EngineComponentKey.COMPOSE_EMAIL_TO_RELATED_PEOPLE]: (
     <ComposeEmailToRelatedPeopleCommand />
@@ -261,6 +273,12 @@ export const ENGINE_COMPONENT_KEY_COMPONENT_MAP: Record<
   ),
   [EngineComponentKey.SEND_MESSAGE_CAMPAIGN_TEST]: (
     <SendMessageCampaignTestSingleRecordCommand />
+  ),
+  [EngineComponentKey.CANCEL_MESSAGE_CAMPAIGN]: (
+    <CancelMessageCampaignSingleRecordCommand />
+  ),
+  [EngineComponentKey.DUPLICATE_MESSAGE_CAMPAIGN]: (
+    <DuplicateMessageCampaignSingleRecordCommand />
   ),
   [EngineComponentKey.EMAIL_BLOCK_SETTINGS]: (
     <OpenEmailBlockSettingsSingleRecordCommand />

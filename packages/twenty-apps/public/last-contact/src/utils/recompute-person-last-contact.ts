@@ -9,7 +9,7 @@ import {
   PERSON_CONTACT_SELECTION,
   buildPersonContactSnapshotFilter,
 } from 'src/utils/person-contact-snapshot';
-import { recomputeCompanyLastContact } from 'src/utils/recompute-company-last-contact';
+import { recomputeCompaniesLastContact } from 'src/utils/recompute-company-last-contact';
 
 const EMPTY_PERSON_CONTACT: PersonUpdateData = {
   lastContactAt: null,
@@ -102,9 +102,7 @@ export const recomputePersonLastContact = async (
         Boolean(id),
       ),
     );
-    for (const companyId of companyIds) {
-      await recomputeCompanyLastContact(client, companyId);
-    }
+    await recomputeCompaniesLastContact(client, [...companyIds]);
     return;
   }
   throw new Error(

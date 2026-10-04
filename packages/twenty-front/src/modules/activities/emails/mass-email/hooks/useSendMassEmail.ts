@@ -2,8 +2,8 @@ import { useMutation } from '@apollo/client/react';
 import { useCallback, useState } from 'react';
 
 import { SEND_MASS_EMAIL_CAMPAIGN } from '@/activities/emails/mass-email/graphql/massEmailCampaign';
-import { useSnackBar } from '@/ui/feedback/snack-bar-manager/hooks/useSnackBar';
 import { t } from '@lingui/core/macro';
+import { useToast } from 'twenty-ui/components';
 type MassEmailToSend = {
   personId: string;
   to: string;
@@ -37,7 +37,7 @@ export const useSendMassEmail = () => {
     { input: SendMassEmailParams }
   >(SEND_MASS_EMAIL_CAMPAIGN);
 
-  const { enqueueSuccessSnackBar, enqueueErrorSnackBar } = useSnackBar();
+  const { enqueueToast } = useToast();
 
   const [sending, setSending] = useState(false);
   const [sentCount, setSentCount] = useState(0);
@@ -68,19 +68,22 @@ export const useSendMassEmail = () => {
         const { sentCount: successCount, failedRecipients } = sentCampaign;
 
         if (failedRecipients.length === 0) {
-          enqueueSuccessSnackBar({
-            message: t`${successCount} emails sent`,
+          enqueueToast({
+            variant: 'success',
+            children: t`${successCount} emails sent`,
           });
         } else {
-          enqueueErrorSnackBar({
-            message: t`Sent ${successCount} of ${emails.length} emails. Failed: ${failedRecipients.join(', ')}`,
+          enqueueToast({
+            variant: 'error',
+            children: t`Sent ${successCount} of ${emails.length} emails. Failed: ${failedRecipients.join(', ')}`,
           });
         }
 
         return { sentCount: successCount, failedRecipients };
       } catch (error) {
-        enqueueErrorSnackBar({
-          message:
+        enqueueToast({
+          variant: 'error',
+          children:
             error instanceof Error ? error.message : t`Failed to send emails`,
         });
 
@@ -92,11 +95,7 @@ export const useSendMassEmail = () => {
         setSending(false);
       }
     },
-    [
-      sendMassEmailCampaignMutation,
-      enqueueSuccessSnackBar,
-      enqueueErrorSnackBar,
-    ],
+    [sendMassEmailCampaignMutation, enqueueToast],
   );
 
   return { sendMassEmail, sending, sentCount };

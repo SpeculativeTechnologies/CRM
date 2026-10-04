@@ -1,14 +1,13 @@
 import { CommandMenuItem } from '@/command-menu/components/CommandMenuItem';
 import { CommandMenuItemDropdown } from '@/command-menu/components/CommandMenuItemDropdown';
-import { useMovePageLayoutWidgetDown } from '@/page-layout/hooks/useMovePageLayoutWidgetDown';
-import { useMovePageLayoutWidgetUp } from '@/page-layout/hooks/useMovePageLayoutWidgetUp';
+import { useMovePageLayoutWidget } from '@/page-layout/hooks/useMovePageLayoutWidget';
 import { widgetInsertionContextComponentState } from '@/page-layout/states/widgetInsertionContextComponentState';
 import { SidePanelGroup } from '@/side-panel/components/SidePanelGroup';
 import { MoveToTabDropdownContent } from '@/side-panel/pages/page-layout/components/dropdown-content/MoveToTabDropdownContent';
 import { WIDGET_SETTINGS_SELECTABLE_ITEM_IDS } from '@/side-panel/pages/page-layout/constants/settings/WidgetSettingsSelectableItemIds';
 import { useNavigatePageLayoutSidePanel } from '@/side-panel/pages/page-layout/hooks/useNavigatePageLayoutSidePanel';
 import { type WidgetSettingsPlacement } from '@/side-panel/pages/page-layout/hooks/useWidgetSettingsPlacement';
-import { DropdownContent } from '@/ui/layout/dropdown/components/DropdownContent';
+import { LegacyDropdownContent } from '@/ui/layout/dropdown/components/LegacyDropdownContent';
 import { SelectableListItem } from '@/ui/layout/selectable-list/components/SelectableListItem';
 import { useAtomComponentStateCallbackState } from '@/ui/utilities/state/jotai/hooks/useAtomComponentStateCallbackState';
 import { useLingui } from '@lingui/react/macro';
@@ -44,9 +43,7 @@ export const WidgetSettingsPlacementSection = ({
 
   const store = useStore();
 
-  const { movePageLayoutWidgetUp } = useMovePageLayoutWidgetUp(pageLayoutId);
-  const { movePageLayoutWidgetDown } =
-    useMovePageLayoutWidgetDown(pageLayoutId);
+  const { movePageLayoutWidget } = useMovePageLayoutWidget(pageLayoutId);
   const { navigatePageLayoutSidePanel } = useNavigatePageLayoutSidePanel();
 
   if (!isPlacementSectionVisible || !isDefined(pageLayoutEditingWidgetId)) {
@@ -54,11 +51,11 @@ export const WidgetSettingsPlacementSection = ({
   }
 
   const handleMoveUp = () => {
-    movePageLayoutWidgetUp(pageLayoutEditingWidgetId);
+    movePageLayoutWidget(pageLayoutEditingWidgetId, 'up');
   };
 
   const handleMoveDown = () => {
-    movePageLayoutWidgetDown(pageLayoutEditingWidgetId);
+    movePageLayoutWidget(pageLayoutEditingWidgetId, 'down');
   };
 
   const handleAddWidgetAbove = () => {
@@ -120,9 +117,9 @@ export const WidgetSettingsPlacementSection = ({
           Icon={IconArrowsVertical}
           dropdownId={WIDGET_SETTINGS_SELECTABLE_ITEM_IDS.MOVE_TO_TAB}
           dropdownComponents={
-            <DropdownContent>
+            <LegacyDropdownContent>
               <MoveToTabDropdownContent />
-            </DropdownContent>
+            </LegacyDropdownContent>
           }
           dropdownPlacement="bottom-end"
         />

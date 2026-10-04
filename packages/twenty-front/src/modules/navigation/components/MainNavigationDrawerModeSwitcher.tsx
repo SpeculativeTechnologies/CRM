@@ -1,38 +1,47 @@
+import { NAVIGATION_DRAWER_COLLAPSED_BUTTON_SIZE } from '@/ui/navigation/navigation-drawer/constants/NavigationDrawerCollapsedButtonSize';
 import { styled } from '@linaria/react';
 import { useLingui } from '@lingui/react/macro';
-import { useContext } from 'react';
-import {
-  type IconComponent,
-  IconComment,
-  IconHome,
-  IconSettings,
-} from 'twenty-ui/icon';
-import { ThemeContext, themeCssVariables } from 'twenty-ui/theme-constants';
+import { motion, useReducedMotion } from 'framer-motion';
+import { Tooltip } from 'twenty-ui/primitives/surfaces';
+import { useTheme, themeCssVariables } from 'twenty-ui/theme';
 
+import { isLayoutCustomizationModeEnabledState } from '@/layout-customization/states/isLayoutCustomizationModeEnabledState';
 import { useActiveNavigationDrawerMode } from '@/navigation/hooks/useActiveNavigationDrawerMode';
+import { useIsNavigationDrawerContentExpanded } from '@/navigation/hooks/useIsNavigationDrawerContentExpanded';
+import { useNavigationDrawerModes } from '@/navigation/hooks/useNavigationDrawerModes';
 import { useSwitchNavigationDrawerMode } from '@/navigation/hooks/useSwitchNavigationDrawerMode';
-import { useHasPermissionFlag } from '@/settings/roles/hooks/useHasPermissionFlag';
-import { useIsWorkspaceActivationStatusEqualsTo } from '@/workspace/hooks/useIsWorkspaceActivationStatusEqualsTo';
-import { NavigationDrawerAnimatedCollapseWrapper } from '@/ui/navigation/navigation-drawer/components/NavigationDrawerAnimatedCollapseWrapper';
-import {
-  type NavigationDrawerActiveTab,
-  NAVIGATION_DRAWER_TABS,
-} from '@/ui/navigation/states/navigationDrawerTabs';
-import { WorkspaceActivationStatus } from 'twenty-shared/workspace';
-import { PermissionFlagType } from '~/generated-metadata/graphql';
+import { TooltipDelay } from '@/ui/layout/tooltip/constants/TooltipDelay';
+import { NAVIGATION_DRAWER_TABS } from '@/ui/navigation/states/navigationDrawerTabs';
+import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
+import { useIsMobile } from 'twenty-ui/utilities';
 
-const StyledSwitcher = styled.div`
-  align-items: center;
+// Expanded, the row is sized off the page card header beside it so the rules
+// read as one line across both columns.
+const StyledSwitcher = styled.div<{ isExpanded: boolean }>`
+  align-items: ${({ isExpanded }) => (isExpanded ? 'center' : 'flex-start')};
+  border-bottom: ${({ isExpanded }) =>
+    isExpanded ? `1px solid ${themeCssVariables.border.color.light}` : 'none'};
+  box-sizing: border-box;
   display: flex;
-  gap: ${themeCssVariables.spacing['0.5']};
+  flex-direction: ${({ isExpanded }) => (isExpanded ? 'row' : 'column')};
+  gap: ${({ isExpanded }) =>
+    isExpanded
+      ? themeCssVariables.spacing['0.5']
+      : themeCssVariables.betweenSiblingsGap};
+  height: ${({ isExpanded }) =>
+    isExpanded ? themeCssVariables.spacing[10] : 'auto'};
+  min-width: 0;
 `;
 
-const StyledMode = styled.button<{ isActive: boolean }>`
+const StyledMode = styled.button<{ isActive: boolean; isExpanded: boolean }>`
   align-items: center;
   background: ${({ isActive }) =>
     isActive ? themeCssVariables.background.transparent.light : 'transparent'};
   border: none;
-  border-radius: ${themeCssVariables.border.radius.smRound};
+  border-radius: ${({ isExpanded }) =>
+    isExpanded
+      ? themeCssVariables.border.radius.smRound
+      : themeCssVariables.border.radius.mdRound};
   color: ${({ isActive }) =>
     isActive
       ? themeCssVariables.font.color.primary
@@ -40,19 +49,40 @@ const StyledMode = styled.button<{ isActive: boolean }>`
   corner-shape: round;
   cursor: pointer;
   display: flex;
-  flex-shrink: 0;
+  // Only the mode showing a label may give ground. "AI" is two characters in
+  // English and eighteen in Hebrew, and with every mode refusing to shrink the
+  // row overflowed and pushed the last one - Settings - off the drawer.
+  flex-shrink: ${({ isActive, isExpanded }) =>
+    isActive && isExpanded ? 1 : 0};
   font-family: inherit;
   font-size: ${themeCssVariables.font.size.md};
   font-weight: ${themeCssVariables.font.weight.medium};
-  gap: ${({ isActive }) => (isActive ? themeCssVariables.spacing[1] : '0')};
-  height: ${themeCssVariables.spacing[7]};
-  padding: 0 ${themeCssVariables.spacing['1.5']};
+  gap: ${({ isActive, isExpanded }) =>
+    isActive && isExpanded ? themeCssVariables.spacing[1] : '0'};
+  height: ${({ isExpanded }) =>
+    isExpanded
+      ? themeCssVariables.spacing[7]
+      : `${NAVIGATION_DRAWER_COLLAPSED_BUTTON_SIZE}px`};
+  justify-content: ${({ isExpanded }) =>
+    isExpanded ? 'flex-start' : 'center'};
+  // A flex item will not shrink past its content without this, so flex-shrink
+  // above would have nothing to act on.
+  min-width: 0;
+  padding: ${({ isExpanded }) =>
+    isExpanded ? `0 ${themeCssVariables.spacing['1.5']}` : '0'};
   transition:
     background calc(${themeCssVariables.animation.duration.fast} * 1s) ease,
     color calc(${themeCssVariables.animation.duration.fast} * 1s) ease,
     gap calc(${themeCssVariables.animation.duration.normal} * 1s) ease;
+  width: ${({ isExpanded }) =>
+    isExpanded ? 'auto' : `${NAVIGATION_DRAWER_COLLAPSED_BUTTON_SIZE}px`};
 
-  &:hover {
+  &[aria-disabled='true'] {
+    color: ${themeCssVariables.font.color.light};
+    cursor: not-allowed;
+  }
+
+  &:hover:not([aria-disabled='true']) {
     background: ${({ isActive }) =>
       isActive
         ? themeCssVariables.background.transparent.light
@@ -70,92 +100,97 @@ const StyledModeIcon = styled.span`
   width: ${themeCssVariables.spacing[4]};
 `;
 
-// The label of an inactive mode stays in the tree so the button keeps an
-// accessible name, and the collapsed track wipes it open on activation.
-const StyledModeLabel = styled.span<{ isActive: boolean }>`
-  display: grid;
-  grid-template-columns: ${({ isActive }) => (isActive ? '1fr' : '0fr')};
-  transition: grid-template-columns
-    calc(${themeCssVariables.animation.duration.normal} * 1s) ease;
-`;
-
-const StyledModeLabelText = styled.span`
+const StyledModeLabelBase = styled.span`
+  display: block;
   min-width: 0;
   overflow: hidden;
+  text-overflow: ellipsis;
   white-space: nowrap;
 `;
 
-type NavigationDrawerMode = {
-  Icon: IconComponent;
-  label: string;
-  mode: NavigationDrawerActiveTab;
-};
+const StyledModeLabel = motion.create(StyledModeLabelBase);
 
 export const MainNavigationDrawerModeSwitcher = () => {
   const { t } = useLingui();
-  const { theme } = useContext(ThemeContext);
+  const theme = useTheme();
 
-  const hasAiPermission = useHasPermissionFlag(PermissionFlagType.AI);
+  const isLayoutCustomizationModeEnabled = useAtomStateValue(
+    isLayoutCustomizationModeEnabledState,
+  );
+  const isMobile = useIsMobile();
+  const isExpanded = useIsNavigationDrawerContentExpanded();
+  const modes = useNavigationDrawerModes();
   const activeNavigationDrawerMode = useActiveNavigationDrawerMode();
   const { switchNavigationDrawerMode } = useSwitchNavigationDrawerMode();
+  const shouldReduceMotion = useReducedMotion();
 
-  const isWorkspaceSuspended = useIsWorkspaceActivationStatusEqualsTo(
-    WorkspaceActivationStatus.SUSPENDED,
-  );
-
-  // A suspended workspace is held on the billing settings by the route guard,
-  // so offering the modes it would bounce back from only flashes the user out
-  // and in again.
-  if (isWorkspaceSuspended) {
+  if (modes.length === 0) {
     return null;
   }
 
-  const modes: NavigationDrawerMode[] = [
-    {
-      Icon: IconHome,
-      label: t`Home`,
-      mode: NAVIGATION_DRAWER_TABS.NAVIGATION_MENU,
-    },
-    ...(hasAiPermission
-      ? [
-          {
-            Icon: IconComment,
-            label: t`AI`,
-            mode: NAVIGATION_DRAWER_TABS.AI_CHAT_HISTORY,
-          },
-        ]
-      : []),
-    {
-      Icon: IconSettings,
-      label: t`Settings`,
-      mode: NAVIGATION_DRAWER_TABS.SETTINGS,
-    },
-  ];
+  const shouldShowTooltips = !isExpanded && !isMobile;
 
   return (
-    <NavigationDrawerAnimatedCollapseWrapper>
-      <StyledSwitcher role="group" aria-label={t`Navigation modes`}>
-        {modes.map(({ Icon, label, mode }) => {
-          const isActive = mode === activeNavigationDrawerMode;
+    <StyledSwitcher
+      isExpanded={isExpanded}
+      role="group"
+      aria-label={t`Navigation modes`}
+    >
+      {modes.map(({ Icon, label, mode }) => {
+        const isActive = mode === activeNavigationDrawerMode;
+        const isDisabled =
+          mode !== NAVIGATION_DRAWER_TABS.NAVIGATION_MENU &&
+          isLayoutCustomizationModeEnabled;
 
-          return (
+        return (
+          <Tooltip
+            key={mode}
+            content={
+              isDisabled
+                ? mode === NAVIGATION_DRAWER_TABS.SETTINGS
+                  ? t`Finish editing the layout to open Settings`
+                  : t`Finish editing the layout to open AI`
+                : label
+            }
+            disabled={!shouldShowTooltips && !isDisabled}
+            delay={TooltipDelay.noDelay}
+            side={isExpanded ? 'bottom' : 'right'}
+            positionMethod="fixed"
+          >
             <StyledMode
-              key={mode}
               type="button"
               isActive={isActive}
+              isExpanded={isExpanded}
+              aria-label={label}
               aria-current={isActive}
-              onClick={() => switchNavigationDrawerMode(mode)}
+              aria-disabled={isDisabled}
+              onClick={() => {
+                if (isDisabled) {
+                  return;
+                }
+
+                switchNavigationDrawerMode(mode);
+              }}
             >
               <StyledModeIcon>
                 <Icon size={theme.icon.size.md} />
               </StyledModeIcon>
-              <StyledModeLabel isActive={isActive}>
-                <StyledModeLabelText>{label}</StyledModeLabelText>
+              <StyledModeLabel
+                initial={false}
+                animate={{ width: isExpanded && isActive ? 'auto' : 0 }}
+                transition={{
+                  duration: shouldReduceMotion
+                    ? 0
+                    : theme.animation.duration.normal,
+                  ease: 'easeInOut',
+                }}
+              >
+                {label}
               </StyledModeLabel>
             </StyledMode>
-          );
-        })}
-      </StyledSwitcher>
-    </NavigationDrawerAnimatedCollapseWrapper>
+          </Tooltip>
+        );
+      })}
+    </StyledSwitcher>
   );
 };

@@ -14,6 +14,7 @@ import { WorkspaceManyOrAllFlatEntityMapsCacheService } from 'src/engine/metadat
 import { FlatObjectMetadata } from 'src/engine/metadata-modules/flat-object-metadata/types/flat-object-metadata.type';
 import { ObjectMetadataService } from 'src/engine/metadata-modules/object-metadata/object-metadata.service';
 import { computeObjectTargetTable } from 'src/engine/utils/compute-object-target-table.util';
+import { seedMessageSuppressions } from 'src/engine/workspace-manager/dev-seeder/data/utils/seed-message-suppressions.util';
 import {
   ATTACHMENT_DATA_SEED_COLUMNS,
   ATTACHMENT_SAMPLE_FILES,
@@ -49,9 +50,17 @@ import {
   MESSAGE_CHANNEL_MESSAGE_ASSOCIATION_DATA_SEEDS,
 } from 'src/engine/workspace-manager/dev-seeder/data/constants/message-channel-message-association-data-seeds.constant';
 import {
+  getMessageCampaignDataSeeds,
   MESSAGE_CAMPAIGN_DATA_SEED_COLUMNS,
-  MESSAGE_CAMPAIGN_DATA_SEEDS,
 } from 'src/engine/workspace-manager/dev-seeder/data/constants/message-campaign-data-seeds.constant';
+import {
+  MESSAGE_LIST_DATA_SEED_COLUMNS,
+  MESSAGE_LIST_DATA_SEEDS,
+} from 'src/engine/workspace-manager/dev-seeder/data/constants/message-list-data-seeds.constant';
+import {
+  MESSAGE_LIST_MEMBER_DATA_SEED_COLUMNS,
+  MESSAGE_LIST_MEMBER_DATA_SEEDS,
+} from 'src/engine/workspace-manager/dev-seeder/data/constants/message-list-member-data-seeds.constant';
 import {
   CALENDAR_EVENT_TARGET_DATA_SEED_COLUMNS,
   getCalendarEventTargetDataSeeds,
@@ -147,6 +156,11 @@ const getRecordSeedsBatches = (
       recordSeeds: getWorkspaceMemberDataSeeds(workspaceId),
     },
     {
+      tableName: 'messageList',
+      pgColumns: MESSAGE_LIST_DATA_SEED_COLUMNS,
+      recordSeeds: MESSAGE_LIST_DATA_SEEDS,
+    },
+    {
       tableName: '_surveyResult',
       pgColumns: SURVEY_RESULT_DATA_SEED_COLUMNS,
       recordSeeds: SURVEY_RESULT_DATA_SEEDS,
@@ -186,7 +200,7 @@ const getRecordSeedsBatches = (
     },
   ];
 
-  // Batch 4: Depends on person/company/messageChannel or independent
+  // Batch 4: Depends on person/company/messageList or independent
   const batch4: RecordSeedConfig[] = [
     {
       tableName: 'opportunity',
@@ -214,9 +228,14 @@ const getRecordSeedsBatches = (
       recordSeeds: MESSAGE_THREAD_DATA_SEEDS,
     },
     {
+      tableName: 'messageListMember',
+      pgColumns: MESSAGE_LIST_MEMBER_DATA_SEED_COLUMNS,
+      recordSeeds: MESSAGE_LIST_MEMBER_DATA_SEEDS,
+    },
+    {
       tableName: 'messageCampaign',
       pgColumns: MESSAGE_CAMPAIGN_DATA_SEED_COLUMNS,
-      recordSeeds: MESSAGE_CAMPAIGN_DATA_SEEDS,
+      recordSeeds: getMessageCampaignDataSeeds(workspaceId),
     },
     {
       tableName: '_employmentHistory',
@@ -341,6 +360,12 @@ export class DevSeederDataService {
           featureFlags,
           objectMetadataItems,
           light,
+        });
+
+        await seedMessageSuppressions({
+          entityManager,
+          schemaName,
+          workspaceId,
         });
 
         if (!light) {

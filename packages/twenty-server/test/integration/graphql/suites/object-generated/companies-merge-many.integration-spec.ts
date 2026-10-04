@@ -3,7 +3,7 @@ import { createManyOperationFactory } from 'test/integration/graphql/utils/creat
 import { createOneOperationFactory } from 'test/integration/graphql/utils/create-one-operation-factory.util';
 import { findManyOperationFactory } from 'test/integration/graphql/utils/find-many-operation-factory.util';
 import { findOneOperationFactory } from 'test/integration/graphql/utils/find-one-operation-factory.util';
-import { makeGraphqlAPIRequest } from 'test/integration/graphql/utils/make-graphql-api-request.util';
+import { makeGraphqlApiRequest } from 'test/integration/graphql/utils/make-graphql-api-request.util';
 import { mergeManyOperationFactory } from 'test/integration/graphql/utils/merge-many-operation-factory.util';
 import { deleteRecordsByIds } from 'test/integration/utils/delete-records-by-ids';
 import { waitForTimelineActivities } from 'test/integration/utils/wait-for-timeline-activities.util';
@@ -62,7 +62,7 @@ describe('companies merge resolvers (integration)', () => {
         ],
       });
 
-      const createResponse = await makeGraphqlAPIRequest(
+      const createResponse = await makeGraphqlApiRequest(
         createCompaniesOperation,
       );
 
@@ -85,7 +85,7 @@ describe('companies merge resolvers (integration)', () => {
         conflictPriorityIndex: 0,
       });
 
-      const mergeResponse = await makeGraphqlAPIRequest(mergeOperation);
+      const mergeResponse = await makeGraphqlApiRequest(mergeOperation);
 
       expect(mergeResponse.body.errors).toBeUndefined();
 
@@ -160,7 +160,7 @@ describe('companies merge resolvers (integration)', () => {
         ],
       });
 
-      const createResponse = await makeGraphqlAPIRequest(
+      const createResponse = await makeGraphqlApiRequest(
         createCompaniesOperation,
       );
       const company1Id = createResponse.body.data.createCompanies[0].id;
@@ -180,7 +180,7 @@ describe('companies merge resolvers (integration)', () => {
         conflictPriorityIndex: 0,
       });
 
-      const mergeResponse = await makeGraphqlAPIRequest(mergeOperation);
+      const mergeResponse = await makeGraphqlApiRequest(mergeOperation);
       const mergedCompany = mergeResponse.body.data.mergeCompanies;
 
       expect(mergedCompany.linkedinLink.primaryLinkUrl).toBe(
@@ -237,7 +237,7 @@ describe('companies merge resolvers (integration)', () => {
         ],
       });
 
-      const createResponse = await makeGraphqlAPIRequest(
+      const createResponse = await makeGraphqlApiRequest(
         createCompaniesOperation,
       );
       const company1Id = createResponse.body.data.createCompanies[0].id;
@@ -257,7 +257,7 @@ describe('companies merge resolvers (integration)', () => {
         conflictPriorityIndex: 1,
       });
 
-      const mergeResponse = await makeGraphqlAPIRequest(mergeWithPriority1);
+      const mergeResponse = await makeGraphqlApiRequest(mergeWithPriority1);
       const mergedCompany = mergeResponse.body.data.mergeCompanies;
 
       expect(mergedCompany.linkedinLink.primaryLinkUrl).toBe(
@@ -298,7 +298,7 @@ describe('companies merge resolvers (integration)', () => {
         data: [{ name: 'Thread Survivor' }, { name: 'Thread Duplicate' }],
       });
 
-      const createResponse = await makeGraphqlAPIRequest(
+      const createResponse = await makeGraphqlApiRequest(
         createCompaniesOperation,
       );
       const survivorCompanyId = createResponse.body.data.createCompanies[0].id;
@@ -311,7 +311,7 @@ describe('companies merge resolvers (integration)', () => {
         absorbedCompanyId,
       ]);
 
-      const createThreadResponse = await makeGraphqlAPIRequest(
+      const createThreadResponse = await makeGraphqlApiRequest(
         createOneOperationFactory({
           objectMetadataSingularName: 'messageThread',
           gqlFields: 'id',
@@ -324,7 +324,7 @@ describe('companies merge resolvers (integration)', () => {
       createdMessageThreadIds.push(messageThreadId);
 
       for (const companyId of [survivorCompanyId, absorbedCompanyId]) {
-        const createTargetResponse = await makeGraphqlAPIRequest(
+        const createTargetResponse = await makeGraphqlApiRequest(
           createOneOperationFactory({
             objectMetadataSingularName: 'messageThreadTarget',
             gqlFields: 'id',
@@ -341,7 +341,7 @@ describe('companies merge resolvers (integration)', () => {
       // Both companies target the same thread, and messageThreadTarget is unique
       // per (thread, company): repointing the duplicate's row onto the survivor
       // without cleanup raises a unique violation.
-      const mergeResponse = await makeGraphqlAPIRequest(
+      const mergeResponse = await makeGraphqlApiRequest(
         mergeManyOperationFactory({
           objectMetadataPluralName: 'companies',
           gqlFields: COMPANY_GQL_FIELDS,
@@ -353,7 +353,7 @@ describe('companies merge resolvers (integration)', () => {
       expect(mergeResponse.body.errors).toBeUndefined();
       expect(mergeResponse.body.data.mergeCompanies.id).toBe(survivorCompanyId);
 
-      const findTargetsResponse = await makeGraphqlAPIRequest(
+      const findTargetsResponse = await makeGraphqlApiRequest(
         findManyOperationFactory({
           objectMetadataSingularName: 'messageThreadTarget',
           objectMetadataPluralName: 'messageThreadTargets',
@@ -390,7 +390,7 @@ describe('companies merge resolvers (integration)', () => {
         data: [{ name: 'Survivor Inc' }, { name: 'Duplicate Inc' }],
       });
 
-      const createCompaniesResponse = await makeGraphqlAPIRequest(
+      const createCompaniesResponse = await makeGraphqlApiRequest(
         createCompaniesOperation,
       );
 
@@ -418,7 +418,7 @@ describe('companies merge resolvers (integration)', () => {
         ],
       });
 
-      const createPeopleResponse = await makeGraphqlAPIRequest(
+      const createPeopleResponse = await makeGraphqlApiRequest(
         createPeopleOperation,
       );
 
@@ -441,7 +441,7 @@ describe('companies merge resolvers (integration)', () => {
         conflictPriorityIndex: 0,
       });
 
-      const mergeResponse = await makeGraphqlAPIRequest(mergeOperation);
+      const mergeResponse = await makeGraphqlApiRequest(mergeOperation);
 
       expect(mergeResponse.body.errors).toBeUndefined();
       expect(mergeResponse.body.data.mergeCompanies.id).toBe(survivorCompanyId);
@@ -458,7 +458,7 @@ describe('companies merge resolvers (integration)', () => {
       });
 
       const findPersonResponse =
-        await makeGraphqlAPIRequest(findPersonOperation);
+        await makeGraphqlApiRequest(findPersonOperation);
 
       expect(findPersonResponse.body.data.person).not.toBeNull();
       expect(findPersonResponse.body.data.person.company.id).toBe(
@@ -473,7 +473,7 @@ describe('companies merge resolvers (integration)', () => {
         filter: { id: { eq: duplicateCompanyId } },
       });
 
-      const findDuplicateResponse = await makeGraphqlAPIRequest(
+      const findDuplicateResponse = await makeGraphqlApiRequest(
         findDuplicateOperation,
       );
 
@@ -492,7 +492,7 @@ describe('companies merge resolvers (integration)', () => {
         ],
       });
 
-      const createCompaniesResponse = await makeGraphqlAPIRequest(
+      const createCompaniesResponse = await makeGraphqlApiRequest(
         createCompaniesOperation,
       );
 
@@ -530,7 +530,7 @@ describe('companies merge resolvers (integration)', () => {
         ],
       });
 
-      const createPeopleResponse = await makeGraphqlAPIRequest(
+      const createPeopleResponse = await makeGraphqlApiRequest(
         createPeopleOperation,
       );
 
@@ -554,7 +554,7 @@ describe('companies merge resolvers (integration)', () => {
         conflictPriorityIndex: 0,
       });
 
-      const mergeResponse = await makeGraphqlAPIRequest(mergeOperation);
+      const mergeResponse = await makeGraphqlApiRequest(mergeOperation);
 
       expect(mergeResponse.body.errors).toBeUndefined();
       expect(mergeResponse.body.data.mergeCompanies.id).toBe(survivorCompanyId);
@@ -572,7 +572,7 @@ describe('companies merge resolvers (integration)', () => {
       });
 
       const findPeopleResponse =
-        await makeGraphqlAPIRequest(findPeopleOperation);
+        await makeGraphqlApiRequest(findPeopleOperation);
 
       const peopleAfterMerge = findPeopleResponse.body.data.people.edges;
 
@@ -592,7 +592,7 @@ describe('companies merge resolvers (integration)', () => {
         },
       });
 
-      const findCompaniesResponse = await makeGraphqlAPIRequest(
+      const findCompaniesResponse = await makeGraphqlApiRequest(
         findCompaniesOperation,
       );
 

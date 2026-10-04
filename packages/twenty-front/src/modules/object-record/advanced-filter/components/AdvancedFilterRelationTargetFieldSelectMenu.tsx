@@ -1,3 +1,5 @@
+import { ListItem } from 'twenty-ui/primitives/navigation';
+import { SelectOptionIcon } from '@/ui/input/components/SelectOptionIcon';
 import { useObjectMetadataItem } from '@/object-metadata/hooks/useObjectMetadataItem';
 import { type FieldMetadataItem } from '@/object-metadata/types/FieldMetadataItem';
 import { isManyToOneRelationField } from '@/object-metadata/utils/isManyToOneRelationField';
@@ -9,23 +11,22 @@ import { usePushFocusForLeafFieldValuePicker } from '@/object-record/advanced-fi
 import { fieldMetadataItemUsedInDropdownComponentSelector } from '@/object-record/object-filter-dropdown/states/fieldMetadataItemUsedInDropdownComponentSelector';
 import { objectFilterDropdownIsSelectingRelationTargetFieldComponentState } from '@/object-record/object-filter-dropdown/states/objectFilterDropdownIsSelectingRelationTargetFieldComponentState';
 import { useFilterableFieldMetadataItems } from '@/object-record/record-filter/hooks/useFilterableFieldMetadataItems';
-import { DropdownContent } from '@/ui/layout/dropdown/components/DropdownContent';
+import { LegacyDropdownContent } from '@/ui/layout/dropdown/components/LegacyDropdownContent';
 import { DropdownMenuHeader } from '@/ui/layout/dropdown/components/DropdownMenuHeader/DropdownMenuHeader';
 import { DropdownMenuHeaderLeftComponent } from '@/ui/layout/dropdown/components/DropdownMenuHeader/internal/DropdownMenuHeaderLeftComponent';
 import { DropdownMenuItemsContainer } from '@/ui/layout/dropdown/components/DropdownMenuItemsContainer';
 import { DropdownMenuSeparator } from '@/ui/layout/dropdown/components/DropdownMenuSeparator';
 import { GenericDropdownContentWidth } from '@/ui/layout/dropdown/constants/GenericDropdownContentWidth';
+import { useWorkspaceSurfaceScopedComponentInstanceId } from '@/ui/layout/hooks/useWorkspaceSurfaceScopedComponentInstanceId';
 import { SelectableList } from '@/ui/layout/selectable-list/components/SelectableList';
 import { SelectableListItem } from '@/ui/layout/selectable-list/components/SelectableListItem';
 import { selectedItemIdComponentState } from '@/ui/layout/selectable-list/states/selectedItemIdComponentState';
 import { useAtomComponentSelectorValue } from '@/ui/utilities/state/jotai/hooks/useAtomComponentSelectorValue';
 import { useAtomComponentStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomComponentStateValue';
 import { useSetAtomComponentState } from '@/ui/utilities/state/jotai/hooks/useSetAtomComponentState';
-import { useWorkspaceSurfaceScopedComponentInstanceId } from '@/ui/layout/hooks/useWorkspaceSurfaceScopedComponentInstanceId';
 import { CoreObjectNameSingular, FieldMetadataType } from 'twenty-shared/types';
 import { isDefined } from 'twenty-shared/utils';
 import { IconChevronLeft, useIcons } from 'twenty-ui/icon';
-import { MenuItem } from 'twenty-ui/navigation';
 
 const RELATION_RECORD_SELECTABLE_ITEM_ID = 'relation-record-select';
 
@@ -72,6 +73,7 @@ export const AdvancedFilterRelationTargetFieldSelectMenu = ({
     scopedAdvancedFilterFieldSelectDropdownId,
   );
 
+  // Traversing works for both sides of a relation, not only many-to-one
   const isTraversableRelation =
     isDefined(sourceFieldMetadataItem) &&
     (isManyToOneRelationField(sourceFieldMetadataItem) ||
@@ -139,7 +141,9 @@ export const AdvancedFilterRelationTargetFieldSelectMenu = ({
   ];
 
   return (
-    <DropdownContent widthInPixels={GenericDropdownContentWidth.ExtraLarge}>
+    <LegacyDropdownContent
+      widthInPixels={GenericDropdownContentWidth.ExtraLarge}
+    >
       <DropdownMenuHeader
         StartComponent={
           <DropdownMenuHeaderLeftComponent
@@ -156,17 +160,23 @@ export const AdvancedFilterRelationTargetFieldSelectMenu = ({
           selectableItemIdArray={selectableItemIdArray}
           selectableListInstanceId={advancedFilterFieldSelectDropdownId}
         >
+          {/* Selecting the related record itself is valid for any relation target */}
           <SelectableListItem
             itemId={RELATION_RECORD_SELECTABLE_ITEM_ID}
             onEnter={handleSelectRelationRecord}
           >
-            <MenuItem
+            <ListItem
               focused={selectedItemId === RELATION_RECORD_SELECTABLE_ITEM_ID}
-              testId="select-filter-relation-record"
+              data-testid={'select-filter-relation-record'}
               onClick={handleSelectRelationRecord}
-              text={targetObjectMetadataItem.labelSingular}
-              LeftIcon={getIcon(targetObjectMetadataItem.icon)}
-            />
+              startIcon={
+                <SelectOptionIcon
+                  Icon={getIcon(targetObjectMetadataItem.icon)}
+                />
+              }
+            >
+              {targetObjectMetadataItem.labelSingular}
+            </ListItem>
           </SelectableListItem>
           <DropdownMenuSeparator />
           {relationTargetFields.map((targetField, index) => (
@@ -177,20 +187,23 @@ export const AdvancedFilterRelationTargetFieldSelectMenu = ({
                 handleSelectTargetField(targetField);
               }}
             >
-              <MenuItem
+              <ListItem
                 focused={selectedItemId === targetField.id}
                 key={`select-filter-relation-${index}`}
-                testId={`select-filter-relation-${index}`}
+                data-testid={`select-filter-relation-${index}`}
                 onClick={() => {
                   handleSelectTargetField(targetField);
                 }}
-                text={targetField.label}
-                LeftIcon={getIcon(targetField.icon)}
-              />
+                startIcon={
+                  <SelectOptionIcon Icon={getIcon(targetField.icon)} />
+                }
+              >
+                {targetField.label}
+              </ListItem>
             </SelectableListItem>
           ))}
         </SelectableList>
       </DropdownMenuItemsContainer>
-    </DropdownContent>
+    </LegacyDropdownContent>
   );
 };

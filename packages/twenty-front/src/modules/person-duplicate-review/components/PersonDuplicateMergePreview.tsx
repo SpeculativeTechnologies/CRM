@@ -1,8 +1,8 @@
 import { styled } from '@linaria/react';
 import { t } from '@lingui/core/macro';
 import { IconStar } from 'twenty-ui/icon';
-import { Checkbox } from 'twenty-ui/input';
-import { themeCssVariables } from 'twenty-ui/theme-constants';
+import { Checkbox } from 'twenty-ui/primitives/input';
+import { themeCssVariables } from 'twenty-ui/theme';
 
 import {
   type PersonDuplicateLink,
@@ -158,7 +158,7 @@ export const PersonDuplicateMergePreview = ({
             <StyledValueRow key={key}>
               <Checkbox
                 checked={included}
-                onChange={() => onToggleEmail(key)}
+                onCheckedChange={() => onToggleEmail(key)}
                 aria-label={t`Keep ${email}`}
               />
               <StyledValueText>{email}</StyledValueText>
@@ -193,7 +193,7 @@ export const PersonDuplicateMergePreview = ({
             <StyledValueRow key={key}>
               <Checkbox
                 checked={included}
-                onChange={() => onTogglePhone(key)}
+                onCheckedChange={() => onTogglePhone(key)}
                 aria-label={t`Keep ${displayValue}`}
               />
               <StyledValueText>{displayValue}</StyledValueText>
@@ -225,7 +225,7 @@ export const PersonDuplicateMergePreview = ({
             <StyledValueRow key={key}>
               <Checkbox
                 checked={included}
-                onChange={() => onToggleLink(key)}
+                onCheckedChange={() => onToggleLink(key)}
                 aria-label={t`Keep ${link.url}`}
               />
               <StyledValueText>{link.url}</StyledValueText>
