@@ -177,8 +177,8 @@ export const CommandMenuItemRenderer = ({
     EngineComponentKey.COMPOSE_EMAIL_TO_RELATED_PEOPLE;
 
   if (displayType === 'button') {
-    // Picking which relation to email through happens in a dropdown anchored to
-    // the button, so this item never goes through the mount-and-execute path.
+    // The button opens the related-person picker directly, so this item never
+    // goes through the mount-and-execute path.
     if (isComposeEmailToRelatedPeople) {
       return (
         <CommandMenuItemRelatedPeopleButtonRenderer
