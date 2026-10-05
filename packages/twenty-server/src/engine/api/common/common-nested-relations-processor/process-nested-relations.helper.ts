@@ -16,6 +16,8 @@ import {
   type ConcurrencyLimiter,
   createConcurrencyLimiter,
 } from 'src/engine/api/common/common-nested-relations-processor/utils/create-concurrency-limiter.util';
+import { assignManyToOneRelationRecords } from 'src/engine/api/common/common-nested-relations-processor/utils/assign-many-to-one-relation-records.util';
+import { assignOneToManyRelationRecords } from 'src/engine/api/common/common-nested-relations-processor/utils/assign-one-to-many-relation-records.util';
 import { getUniqueRelationIds } from 'src/engine/api/common/common-nested-relations-processor/utils/get-unique-relation-ids.util';
 import { STANDARD_ERROR_MESSAGE } from 'src/engine/api/common/common-query-runners/errors/standard-error-message.constant';
 import {
@@ -221,8 +223,7 @@ export class ProcessNestedRelationsHelper {
 
     const targetObjectNameSingular = targetObjectMetadata.nameSingular;
 
-    // A joined relation to such records reads as empty, so a nested one does
-    // too rather than failing the parent's read
+    // A joined relation to such records reads as empty, so a nested one does too instead of failing the parent
     if (targetObjectRepository.isReadDeniedByReadability()) {
       this.assignRelationResults({
         parentRecords: parentObjectRecords,
@@ -230,8 +231,8 @@ export class ProcessNestedRelationsHelper {
         relationResults: [],
         relationAggregatedFieldsResult: {},
         sourceFieldName,
-        joinField: 'id',
-        joinColumnName: computeMorphOrRelationFieldJoinColumnName({
+        relatedRecordJoinColumnName: 'id',
+        parentRecordJoinColumnName: computeMorphOrRelationFieldJoinColumnName({
           name: sourceFieldName,
         }),
         parentIdFieldName: isLinkedRelation
@@ -331,11 +332,11 @@ export class ProcessNestedRelationsHelper {
       relationResults,
       relationAggregatedFieldsResult,
       sourceFieldName,
-      joinField:
+      relatedRecordJoinColumnName:
         relationType === RelationType.ONE_TO_MANY
           ? `${fieldMetadataTargetRelationColumnName}`
           : 'id',
-      joinColumnName,
+      parentRecordJoinColumnName: joinColumnName,
       parentIdFieldName: isLinkedRelation ? joinColumnName : 'id',
       relationType,
       selectedFields,
@@ -595,8 +596,8 @@ export class ProcessNestedRelationsHelper {
     relationResults,
     relationAggregatedFieldsResult,
     sourceFieldName,
-    joinField,
-    joinColumnName,
+    relatedRecordJoinColumnName,
+    parentRecordJoinColumnName,
     parentIdFieldName,
     relationType,
     selectedFields,
@@ -609,38 +610,31 @@ export class ProcessNestedRelationsHelper {
     // oxlint-disable-next-line typescript/no-explicit-any
     relationAggregatedFieldsResult: Record<string, any>;
     sourceFieldName: string;
-    joinField: string;
-    joinColumnName: string;
+    relatedRecordJoinColumnName: string;
+    parentRecordJoinColumnName: string;
+    // Linked relations correlate on the relation's join column rather than the
+    // parent id, so the one-to-many grouping keys off this field instead.
     parentIdFieldName: string;
     relationType: RelationType;
     selectedFields: Record<string, unknown>;
   }): void {
-    parentRecords.forEach((item) => {
-      if (relationType === RelationType.ONE_TO_MANY) {
-        item[sourceFieldName] = relationResults.filter(
-          (rel) => rel[joinField] === item[parentIdFieldName],
-        );
-      } else {
-        const matchedRelation = relationResults.find(
-          (rel) => rel.id === item[joinColumnName],
-        );
-
-        if (isDefined(matchedRelation?.deletedAt)) {
-          item[sourceFieldName] = null;
-          item[joinColumnName] = null;
-        } else if (isDefined(matchedRelation)) {
-          if (selectedFields?.deletedAt !== true) {
-            const { deletedAt: _, ...rest } = matchedRelation;
-
-            item[sourceFieldName] = rest;
-          } else {
-            item[sourceFieldName] = matchedRelation;
-          }
-        } else {
-          item[sourceFieldName] = null;
-        }
-      }
-    });
+    if (relationType === RelationType.ONE_TO_MANY) {
+      assignOneToManyRelationRecords({
+        parentRecords,
+        relationRecords: relationResults,
+        sourceFieldName,
+        relatedRecordJoinColumnName,
+        parentRecordIdColumnName: parentIdFieldName,
+      });
+    } else {
+      assignManyToOneRelationRecords({
+        parentRecords,
+        relationRecords: relationResults,
+        sourceFieldName,
+        parentRecordJoinColumnName,
+        selectedFields,
+      });
+    }
 
     parentObjectRecordsAggregatedValues[sourceFieldName] =
       relationAggregatedFieldsResult;

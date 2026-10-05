@@ -142,13 +142,11 @@ const getRecordSeedsBatches = (
   attachmentSeeds: RecordSeedConfig['recordSeeds'],
   _featureFlags?: Record<FeatureFlagKey, boolean>,
 ): RecordSeedConfig[][] => {
-  // Participants are generated randomly, so they are built once and the
-  // derived target junction seeds are computed from the same arrays.
+  // Participants are random, so the derived target seeds must come from the same arrays
   const messageParticipantSeeds = getMessageParticipantDataSeeds(workspaceId);
   const calendarEventParticipantSeeds =
     getCalendarEventParticipantDataSeeds(workspaceId);
 
-  // Batch 1: No dependencies
   const batch1: RecordSeedConfig[] = [
     {
       tableName: 'workspaceMember',
@@ -172,7 +170,6 @@ const getRecordSeedsBatches = (
     },
   ];
 
-  // Batch 2: Depends on workspaceMember
   const batch2: RecordSeedConfig[] = [
     {
       tableName: 'company',
@@ -186,7 +183,6 @@ const getRecordSeedsBatches = (
     },
   ];
 
-  // Batch 3: Depends on company
   const batch3: RecordSeedConfig[] = [
     {
       tableName: 'person',
@@ -200,7 +196,6 @@ const getRecordSeedsBatches = (
     },
   ];
 
-  // Batch 4: Depends on person/company/messageList or independent
   const batch4: RecordSeedConfig[] = [
     {
       tableName: 'opportunity',
@@ -249,7 +244,6 @@ const getRecordSeedsBatches = (
     },
   ];
 
-  // Batch 5: Depends on batch 4 entities
   const batch5: RecordSeedConfig[] = [
     {
       tableName: 'noteTarget',
@@ -278,7 +272,6 @@ const getRecordSeedsBatches = (
     },
   ];
 
-  // Batch 6: Depends on batch 5 entities
   const batch6: RecordSeedConfig[] = [
     {
       tableName: 'messageChannelMessageAssociation',
@@ -432,8 +425,6 @@ export class DevSeederDataService {
       featureFlags,
     );
 
-    // Process batches sequentially (respecting dependencies)
-    // but entities within each batch in parallel
     for (const batch of batches) {
       await Promise.all(
         batch.map(async (recordSeedsConfig) => {

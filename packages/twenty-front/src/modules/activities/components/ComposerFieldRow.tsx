@@ -70,8 +70,7 @@ type ComposerFieldRowProps = {
   children: ReactNode;
   trailing?: ReactNode;
   onClick?: MouseEventHandler<HTMLDivElement>;
-  // A floor, not a fixed width: mixed-length labels line up without a long
-  // translation running underneath its control.
+  // A floor, not a fixed width, so a long translation doesn't run under its control.
   labelMinWidth?: string;
   // Id of the input the row wraps. Rows around a single text input pass it so
   // the label names that input and clicking the label focuses it.

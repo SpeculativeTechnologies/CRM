@@ -1,7 +1,18 @@
+import { createPhoneCountryPickerSandboxFailureTest } from '@/__stories__/twenty-ui-gallery/utils/createPhoneCountryPickerSandboxFailureTest';
+import { currencyPickerSandboxFailureTest } from '@/__stories__/twenty-ui-gallery/utils/currencyPickerSandboxFailureTest';
+import { phoneCountryPickerTriggerTest } from '@/__stories__/twenty-ui-gallery/utils/phoneCountryPickerTriggerTest';
+import { breadcrumbTest } from '@/__stories__/twenty-ui-gallery/utils/breadcrumbTest';
+import { imageInputTest } from '@/__stories__/twenty-ui-gallery/utils/imageInputTest';
+import { overflowingListEventIsolationFailureTest } from '@/__stories__/twenty-ui-gallery/utils/overflowingListEventIsolationFailureTest';
+import { overflowingListGeometryTest } from '@/__stories__/twenty-ui-gallery/utils/overflowingListGeometryTest';
+import { overflowingListSandboxFailureTest } from '@/__stories__/twenty-ui-gallery/utils/overflowingListSandboxFailureTest';
 import { jsonTreeTest } from '@/__stories__/twenty-ui-gallery/utils/jsonTreeTest';
 import { inlineBannerSandboxTest } from '@/__stories__/twenty-ui-gallery/utils/inlineBannerSandboxTest';
 import { themeTokenTest } from '@/__stories__/twenty-ui-gallery/utils/themeTokenTest';
+import { progressTest } from '@/__stories__/twenty-ui-gallery/utils/progressTest';
 import { inputTest } from '@/__stories__/twenty-ui-gallery/utils/inputTest';
+import { numberStepperTest } from '@/__stories__/twenty-ui-gallery/utils/numberStepperTest';
+import { numberStepperSandboxFailureTest } from '@/__stories__/twenty-ui-gallery/utils/numberStepperSandboxFailureTest';
 import { settingsRowTest } from '@/__stories__/twenty-ui-gallery/utils/settingsRowTest';
 import { resizeHandleTest } from '@/__stories__/twenty-ui-gallery/utils/resizeHandleTest';
 import { createListItemSandboxFailureTest } from '@/__stories__/twenty-ui-gallery/utils/createListItemSandboxFailureTest';
@@ -55,6 +66,7 @@ import { radioGroupTest } from '@/__stories__/twenty-ui-gallery/utils/radioGroup
 import { sliderRangeTest } from '@/__stories__/twenty-ui-gallery/utils/sliderRangeTest';
 import { sliderTest } from '@/__stories__/twenty-ui-gallery/utils/sliderTest';
 import { toastTest } from '@/__stories__/twenty-ui-gallery/utils/toastTest';
+import { avatarImageTest } from '@/__stories__/twenty-ui-gallery/utils/avatarImageTest';
 
 const meta: Meta<typeof FrontComponentRenderer> = {
   title: 'FrontComponent/Twenty UI Gallery',
@@ -90,6 +102,18 @@ export const FeedbackPreact: Story = createGalleryStory({
   play: galleryRenderTest,
 });
 
+export const ProgressReact: Story = createGalleryStory({
+  frontComponentBundleName: 'twenty-ui-progress',
+  runtime: 'react',
+  play: progressTest,
+});
+
+export const ProgressPreact: Story = createGalleryStory({
+  frontComponentBundleName: 'twenty-ui-progress',
+  runtime: 'preact',
+  play: progressTest,
+});
+
 export const IconReact: Story = createGalleryStory({
   frontComponentBundleName: 'twenty-ui-icon-gallery',
   runtime: 'react',
@@ -110,6 +134,30 @@ export const InputPreact: Story = createGalleryStory({
   frontComponentBundleName: 'twenty-ui-input-gallery',
   runtime: 'preact',
   play: inputTest,
+});
+
+export const NumberStepperReact: Story = createGalleryStory({
+  frontComponentBundleName: 'twenty-ui-number-stepper',
+  runtime: 'react',
+  play: numberStepperTest,
+});
+
+export const NumberStepperPreact: Story = createGalleryStory({
+  frontComponentBundleName: 'twenty-ui-number-stepper',
+  runtime: 'preact',
+  play: numberStepperTest,
+});
+
+export const NumberStepperInteractionGapsReact: Story = createGalleryStory({
+  frontComponentBundleName: 'twenty-ui-number-stepper',
+  runtime: 'react',
+  play: numberStepperSandboxFailureTest,
+});
+
+export const NumberStepperInteractionGapsPreact: Story = createGalleryStory({
+  frontComponentBundleName: 'twenty-ui-number-stepper',
+  runtime: 'preact',
+  play: numberStepperSandboxFailureTest,
 });
 
 export const JsonVisualizerReact: Story = createGalleryStory({
@@ -226,6 +274,18 @@ export const DisplayHelpersPreact: Story = createGalleryStory({
   play: displayHelpersTest,
 });
 
+export const BreadcrumbReact: Story = createGalleryStory({
+  frontComponentBundleName: 'twenty-ui-breadcrumb',
+  runtime: 'react',
+  play: breadcrumbTest,
+});
+
+export const BreadcrumbPreact: Story = createGalleryStory({
+  frontComponentBundleName: 'twenty-ui-breadcrumb',
+  runtime: 'preact',
+  play: breadcrumbTest,
+});
+
 export const ListItemReact: Story = createGalleryStory({
   frontComponentBundleName: 'twenty-ui-list-item',
   runtime: 'react',
@@ -317,6 +377,32 @@ export const DropdownPreact: Story = createGalleryStory({
   runtime: 'preact',
   play: dropdownSandboxFailureTest,
 });
+
+export const PhoneCountryPickerTriggersReact: Story = createGalleryStory({
+  frontComponentBundleName: 'twenty-ui-phone-country-picker',
+  runtime: 'react',
+  play: phoneCountryPickerTriggerTest,
+});
+
+export const PhoneCountryPickerTriggersPreact: Story = createGalleryStory({
+  frontComponentBundleName: 'twenty-ui-phone-country-picker',
+  runtime: 'preact',
+  play: phoneCountryPickerTriggerTest,
+});
+
+export const PhoneCountryPickerSandboxFailureReact: Story = createGalleryStory({
+  frontComponentBundleName: 'twenty-ui-phone-country-picker',
+  runtime: 'react',
+  play: createPhoneCountryPickerSandboxFailureTest('react'),
+});
+
+export const PhoneCountryPickerSandboxFailurePreact: Story = createGalleryStory(
+  {
+    frontComponentBundleName: 'twenty-ui-phone-country-picker',
+    runtime: 'preact',
+    play: createPhoneCountryPickerSandboxFailureTest('preact'),
+  },
+);
 
 export const SelectReact: Story = createGalleryStory({
   frontComponentBundleName: 'twenty-ui-select',
@@ -502,6 +588,18 @@ export const AvatarControlsPreact: Story = createGalleryStory({
   play: avatarControlsTest,
 });
 
+export const AvatarImageReact: Story = createGalleryStory({
+  frontComponentBundleName: 'twenty-ui-avatar-image',
+  runtime: 'react',
+  play: avatarImageTest,
+});
+
+export const AvatarImagePreact: Story = createGalleryStory({
+  frontComponentBundleName: 'twenty-ui-avatar-image',
+  runtime: 'preact',
+  play: avatarImageTest,
+});
+
 export const ChipControlsReact: Story = createGalleryStory({
   frontComponentBundleName: 'twenty-ui-chip-controls',
   runtime: 'react',
@@ -536,4 +634,66 @@ export const InlineBannerPreactFocusFailure: Story = createGalleryStory({
   frontComponentBundleName: 'twenty-ui-inline-banner',
   runtime: 'preact',
   play: inlineBannerSandboxTest,
+});
+
+export const OverflowingListReactPopupFailure: Story = createGalleryStory({
+  frontComponentBundleName: 'twenty-ui-overflowing-list',
+  runtime: 'react',
+  play: overflowingListSandboxFailureTest,
+});
+
+export const OverflowingListPreactPopupFailure: Story = createGalleryStory({
+  frontComponentBundleName: 'twenty-ui-overflowing-list',
+  runtime: 'preact',
+  play: overflowingListSandboxFailureTest,
+});
+
+export const OverflowingListGeometryReact: Story = createGalleryStory({
+  frontComponentBundleName: 'twenty-ui-overflowing-list',
+  runtime: 'react',
+  play: overflowingListGeometryTest,
+});
+
+export const OverflowingListGeometryPreact: Story = createGalleryStory({
+  frontComponentBundleName: 'twenty-ui-overflowing-list',
+  runtime: 'preact',
+  play: overflowingListGeometryTest,
+});
+
+export const OverflowingListEventIsolationReactFailure: Story =
+  createGalleryStory({
+    frontComponentBundleName: 'twenty-ui-overflowing-list',
+    runtime: 'react',
+    play: overflowingListEventIsolationFailureTest,
+  });
+
+export const OverflowingListEventIsolationPreactFailure: Story =
+  createGalleryStory({
+    frontComponentBundleName: 'twenty-ui-overflowing-list',
+    runtime: 'preact',
+    play: overflowingListEventIsolationFailureTest,
+  });
+
+export const ImageInputReact: Story = createGalleryStory({
+  frontComponentBundleName: 'twenty-ui-image-input',
+  runtime: 'react',
+  play: imageInputTest,
+});
+
+export const ImageInputPreact: Story = createGalleryStory({
+  frontComponentBundleName: 'twenty-ui-image-input',
+  runtime: 'preact',
+  play: imageInputTest,
+});
+
+export const CurrencyPickerReactPopupFailure: Story = createGalleryStory({
+  frontComponentBundleName: 'twenty-ui-currency-picker',
+  runtime: 'react',
+  play: currencyPickerSandboxFailureTest,
+});
+
+export const CurrencyPickerPreactPopupFailure: Story = createGalleryStory({
+  frontComponentBundleName: 'twenty-ui-currency-picker',
+  runtime: 'preact',
+  play: currencyPickerSandboxFailureTest,
 });

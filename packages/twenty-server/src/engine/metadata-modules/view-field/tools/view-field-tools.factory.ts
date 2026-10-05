@@ -271,22 +271,15 @@ export class ViewFieldToolsFactory {
 
         inputSchema: DeleteViewFieldInputSchema,
         execute: async (parameters: { id: string }) => {
-          try {
-            const viewField = await this.viewFieldService.deleteOne({
-              deleteViewFieldInput: { id: parameters.id },
-              workspaceId,
-            });
+          const viewField = await this.viewFieldService.deleteOne({
+            deleteViewFieldInput: { id: parameters.id },
+            workspaceId,
+          });
 
-            return {
-              id: viewField.id,
-              deleted: true,
-            };
-          } catch (error) {
-            if (error instanceof WorkspaceMigrationBuilderException) {
-              throw new Error(formatValidationErrors(error));
-            }
-            throw error;
-          }
+          return {
+            id: viewField.id,
+            deleted: true,
+          };
         },
       },
       create_many_view_fields: {
