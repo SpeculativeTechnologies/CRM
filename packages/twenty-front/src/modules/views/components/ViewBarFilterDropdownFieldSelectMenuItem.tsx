@@ -9,7 +9,6 @@ import { isSelectedItemIdComponentFamilyState } from '@/ui/layout/selectable-lis
 import { useAtomComponentFamilyStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomComponentFamilyStateValue';
 import { useInitializeFilterOnFieldMetadataItemFromViewBarFilterDropdown } from '@/views/hooks/useInitializeFilterOnFieldMetadataItemFromViewBarFilterDropdown';
 import { fieldMetadataItemIdUsedInDropdownComponentState } from '@/object-record/object-filter-dropdown/states/fieldMetadataItemIdUsedInDropdownComponentState';
-import { objectFilterDropdownIsSelectingRelationTargetFieldComponentState } from '@/object-record/object-filter-dropdown/states/objectFilterDropdownIsSelectingRelationTargetFieldComponentState';
 import { objectFilterDropdownSearchInputComponentState } from '@/object-record/object-filter-dropdown/states/objectFilterDropdownSearchInputComponentState';
 import { useSetAtomComponentState } from '@/ui/utilities/state/jotai/hooks/useSetAtomComponentState';
 import { useIcons } from 'twenty-ui/icon';
@@ -38,10 +37,6 @@ export const ViewBarFilterDropdownFieldSelectMenuItem = ({
   const setFieldMetadataItemIdUsedInDropdown = useSetAtomComponentState(
     fieldMetadataItemIdUsedInDropdownComponentState,
   );
-  const setObjectFilterDropdownIsSelectingRelationTargetField =
-    useSetAtomComponentState(
-      objectFilterDropdownIsSelectingRelationTargetFieldComponentState,
-    );
   const setObjectFilterDropdownSearchInput = useSetAtomComponentState(
     objectFilterDropdownSearchInputComponentState,
   );
@@ -53,9 +48,12 @@ export const ViewBarFilterDropdownFieldSelectMenuItem = ({
       isManyToOneRelationField(fieldMetadataItemToSelect) ||
       isOneToManyRelationField(fieldMetadataItemToSelect)
     ) {
+      // Fork: selecting a traversable relation field picks it in the dropdown
+      // without selecting a concrete filter yet. The view-bar content then
+      // derives the relation-target field list from these states (replacing the
+      // deleted isSelectingRelationTargetField boolean).
       setFieldMetadataItemIdUsedInDropdown(fieldMetadataItemToSelect.id);
       setObjectFilterDropdownSearchInput('');
-      setObjectFilterDropdownIsSelectingRelationTargetField(true);
       return;
     }
 

@@ -3,8 +3,8 @@ import { type FieldMetadataItem } from '@/object-metadata/types/FieldMetadataIte
 import { isManyToOneRelationField } from '@/object-metadata/utils/isManyToOneRelationField';
 import { isOneToManyRelationField } from '@/object-metadata/utils/isOneToManyRelationField';
 import { FILTER_FIELD_LIST_ID } from '@/object-record/object-filter-dropdown/constants/FilterFieldListId';
+import { fieldMetadataItemIdUsedInDropdownComponentState } from '@/object-record/object-filter-dropdown/states/fieldMetadataItemIdUsedInDropdownComponentState';
 import { fieldMetadataItemUsedInDropdownComponentSelector } from '@/object-record/object-filter-dropdown/states/fieldMetadataItemUsedInDropdownComponentSelector';
-import { objectFilterDropdownIsSelectingRelationTargetFieldComponentState } from '@/object-record/object-filter-dropdown/states/objectFilterDropdownIsSelectingRelationTargetFieldComponentState';
 import { useFilterableFieldMetadataItems } from '@/object-record/record-filter/hooks/useFilterableFieldMetadataItems';
 import { DropdownContent } from '@/ui/layout/dropdown/components/DropdownContent';
 import { DropdownMenuHeader } from '@/ui/layout/dropdown/components/DropdownMenuHeader/DropdownMenuHeader';
@@ -31,10 +31,13 @@ export const ViewBarFilterDropdownRelationTargetFieldSelectMenu = () => {
   const sourceFieldMetadataItem = useAtomComponentSelectorValue(
     fieldMetadataItemUsedInDropdownComponentSelector,
   );
-  const setObjectFilterDropdownIsSelectingRelationTargetField =
-    useSetAtomComponentState(
-      objectFilterDropdownIsSelectingRelationTargetFieldComponentState,
-    );
+  // Fork: upstream replaced the deleted isSelectingRelationTargetField boolean
+  // with Dropdown.Page navigation. The legacy view-bar dropdown instead derives
+  // the relation-target view from the picked field, so going back is clearing
+  // the field used in the dropdown.
+  const setFieldMetadataItemIdUsedInDropdown = useSetAtomComponentState(
+    fieldMetadataItemIdUsedInDropdownComponentState,
+  );
   const selectedItemId = useAtomComponentStateValue(
     selectedItemIdComponentState,
     FILTER_FIELD_LIST_ID,
@@ -71,10 +74,11 @@ export const ViewBarFilterDropdownRelationTargetFieldSelectMenu = () => {
   }
 
   const handleSelectRelationRecord = () => {
+    // initializeFilter... sets objectFilterDropdownFilterIsSelected to true,
+    // which moves the view-bar content off the relation-target field list.
     initializeFilterOnFieldMetataItemFromViewBarFilterDropdown(
       sourceFieldMetadataItem,
     );
-    setObjectFilterDropdownIsSelectingRelationTargetField(false);
   };
 
   const handleSelectTargetField = (targetField: FieldMetadataItem) => {
@@ -82,7 +86,6 @@ export const ViewBarFilterDropdownRelationTargetFieldSelectMenu = () => {
       sourceFieldMetadataItem,
       targetField,
     );
-    setObjectFilterDropdownIsSelectingRelationTargetField(false);
   };
 
   const selectableItemIdArray = [
@@ -95,9 +98,7 @@ export const ViewBarFilterDropdownRelationTargetFieldSelectMenu = () => {
       <DropdownMenuHeader
         StartComponent={
           <DropdownMenuHeaderLeftComponent
-            onClick={() =>
-              setObjectFilterDropdownIsSelectingRelationTargetField(false)
-            }
+            onClick={() => setFieldMetadataItemIdUsedInDropdown(null)}
             Icon={IconChevronLeft}
           />
         }

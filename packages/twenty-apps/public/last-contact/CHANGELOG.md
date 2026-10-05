@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.7.0
+
+- Keep the app's fields off the record timeline. The app's fields are frequently rewritten during email and meeting syncs, and each write used to add an `updated Last contact` entry to the person, company or opportunity timeline, burying everything else. All 23 fields now declare `isAuditLogged: false`, so their values still update but no timeline activity is recorded for them. Entries written before this version stay on the timeline.
+
 ## 1.6.0 (fork)
 
 - Add a Log contact action on People for LinkedIn, text, phone, WhatsApp, Signal, in-person, and other contact, with date, direction, and optional notes.

@@ -16,7 +16,6 @@ import { FieldWidgetInlineCell } from '@/page-layout/widgets/field/components/Fi
 import { fieldWidgetHoverComponentState } from '@/page-layout/widgets/field/states/fieldWidgetHoverComponentState';
 import { generateFieldWidgetInstanceId } from '@/page-layout/widgets/field/utils/generateFieldWidgetInstanceId';
 import { useCurrentWidget } from '@/page-layout/widgets/hooks/useCurrentWidget';
-import { getObjectPermissionsFromMapByObjectMetadataId } from '@/settings/roles/role-permissions/objects-permissions/utils/getObjectPermissionsFromMapByObjectMetadataId';
 import { SidePanelProvider } from '@/ui/layout/side-panel/contexts/SidePanelContext';
 import { useAtomComponentState } from '@/ui/utilities/state/jotai/hooks/useAtomComponentState';
 import { styled } from '@linaria/react';
@@ -93,12 +92,8 @@ export const FieldWidgetDisplay = ({
                 isInSidePanel,
                 isRecordFieldReadOnly: isRecordFieldReadOnly({
                   isRecordReadOnly,
+                  objectMetadataId: objectMetadataItem.id,
                   isSystemObject: objectMetadataItem.isSystem,
-                  objectPermissions:
-                    getObjectPermissionsFromMapByObjectMetadataId({
-                      objectPermissionsByObjectMetadataId,
-                      objectMetadataId: objectMetadataItem.id,
-                    }),
                   isFieldFromStandardApplication:
                     getIsMetadataItemFromStandardApplication(fieldMetadataItem),
                   fieldMetadataItem,

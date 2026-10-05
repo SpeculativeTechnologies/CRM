@@ -1,5 +1,7 @@
 import { type FieldMetadataItem } from '@/object-metadata/types/FieldMetadataItem';
-import { isFieldMetadataReadOnlyByPermissions } from '@/object-record/read-only/utils/internal/isFieldMetadataReadOnlyByPermissions';
+import { type ObjectPermissionsByObjectMetadataId } from '@/object-metadata/types/ObjectPermissionsByObjectMetadataId';
+import { getFieldPermissions } from '@/object-metadata/utils/getFieldPermissions';
+import { getObjectPermissionsForObject } from '@/object-metadata/utils/getObjectPermissionsForObject';
 import { isMetadataWritabilityRestricted } from '@/object-record/read-only/utils/internal/isMetadataWritabilityRestricted';
 import { isOneToManyRelationFieldReadOnlyDueToTargetUpdatePermission } from '@/object-record/read-only/utils/isOneToManyRelationFieldReadOnlyDueToTargetUpdatePermission';
 import { isConfiguredJunctionRelationField } from '@/object-record/record-field/ui/utils/junction/isConfiguredJunctionRelationField';
@@ -8,60 +10,38 @@ import {
   type FieldMetadata,
   type FieldTextMetadata,
 } from '@/object-record/record-field/ui/types/FieldMetadata';
-import {
-  FieldMetadataType,
-  type ObjectPermission,
-} from '~/generated-metadata/graphql';
-import { type ObjectPermissions } from 'twenty-shared/types';
+import { FieldMetadataType } from '~/generated-metadata/graphql';
 import { getLinkedFieldReference, isDefined } from 'twenty-shared/utils';
-
-type ObjectPermissionsByObjectMetadataId = Record<
-  string,
-  ObjectPermissions & { objectMetadataId: string }
->;
 
 type IsRecordFieldReadOnlyParams = {
   isRecordReadOnly: boolean;
+  objectMetadataId: string;
   isSystemObject?: boolean;
   isFieldFromStandardApplication?: boolean;
-  fieldMetadataItem: Pick<
-    FieldMetadataItem,
-    'id' | 'isUIEditable' | 'writability' | 'type' | 'settings'
-  >;
-  objectPermissions: ObjectPermission;
+  fieldMetadataItem: Pick<FieldMetadataItem, 'id' | 'isUIEditable' | 'writability'> &
+    Partial<Pick<FieldMetadataItem, 'type' | 'settings'>>;
+  objectPermissionsByObjectMetadataId: ObjectPermissionsByObjectMetadataId;
   fieldDefinition?: FieldDefinition<FieldMetadata>;
-  objectPermissionsByObjectMetadataId?: ObjectPermissionsByObjectMetadataId;
 };
 
 export const isRecordFieldReadOnly = ({
-  objectPermissions,
   isRecordReadOnly,
+  objectMetadataId,
   isSystemObject,
   isFieldFromStandardApplication,
   fieldMetadataItem,
-  fieldDefinition,
   objectPermissionsByObjectMetadataId,
+  fieldDefinition,
 }: IsRecordFieldReadOnlyParams) => {
-  const fieldReadOnlyByPermissions = isFieldMetadataReadOnlyByPermissions({
-    objectPermissions,
-    fieldMetadataId: fieldMetadataItem.id,
-  });
-
-  const oneToManyTargetReadOnly =
-    isDefined(fieldDefinition) &&
-    isDefined(objectPermissionsByObjectMetadataId) &&
-    isOneToManyRelationFieldReadOnlyDueToTargetUpdatePermission({
-      fieldDefinition,
-      objectPermissionsByObjectMetadataId,
-    });
-
   // A junction target field carries links the workspace owns, not data synced
   // from the provider, so it is exempt from the system-object lock below.
   // Record-level read-only still wins.
-  const isJunctionTargetField = isConfiguredJunctionRelationField({
-    type: fieldMetadataItem.type,
-    settings: fieldMetadataItem.settings,
-  });
+  const isJunctionTargetField =
+    isDefined(fieldMetadataItem.type) &&
+    isConfiguredJunctionRelationField({
+      type: fieldMetadataItem.type,
+      settings: fieldMetadataItem.settings,
+    });
 
   // Keep system-object standard fields read-only. If the application origin
   // cannot be resolved yet, fail closed until metadata finishes loading.
@@ -77,14 +57,37 @@ export const isRecordFieldReadOnly = ({
         ?.labelIdentifierFormula,
     );
 
-  return (
-    isDefined(getLinkedFieldReference(fieldMetadataItem.settings)) ||
+  if (
     isRecordReadOnly ||
+    isDefined(getLinkedFieldReference(fieldMetadataItem.settings)) ||
     isLabelIdentifierComputedByFormula ||
     isReadOnlyStandardFieldOnSystemObject ||
     !(fieldMetadataItem.isUIEditable ?? true) ||
-    isMetadataWritabilityRestricted(fieldMetadataItem.writability) ||
-    fieldReadOnlyByPermissions ||
-    oneToManyTargetReadOnly
+    isMetadataWritabilityRestricted(fieldMetadataItem.writability)
+  ) {
+    return true;
+  }
+
+  const objectPermissions = getObjectPermissionsForObject(
+    objectPermissionsByObjectMetadataId,
+    objectMetadataId,
+  );
+
+  if (
+    !objectPermissions.canUpdateObjectRecords ||
+    !getFieldPermissions({
+      objectPermissions,
+      fieldMetadataId: fieldMetadataItem.id,
+    }).canUpdateField
+  ) {
+    return true;
+  }
+
+  return (
+    isDefined(fieldDefinition) &&
+    isOneToManyRelationFieldReadOnlyDueToTargetUpdatePermission({
+      fieldDefinition,
+      objectPermissionsByObjectMetadataId,
+    })
   );
 };

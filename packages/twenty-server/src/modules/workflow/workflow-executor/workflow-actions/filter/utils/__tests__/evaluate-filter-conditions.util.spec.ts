@@ -1579,7 +1579,6 @@ describe('evaluateFilterConditions', () => {
           'UNSUPPORTED_TYPE',
         );
 
-        // Unsupported types fall through to default filter logic
         expect(evaluateFilterConditions({ filters: [filter] })).toBe(true);
       });
     });

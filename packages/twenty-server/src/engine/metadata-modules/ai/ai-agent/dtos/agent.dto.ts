@@ -54,6 +54,10 @@ export class AgentDTO {
   @Field()
   isCustom: boolean;
 
+  @IsBoolean()
+  @Field()
+  isSystem: boolean;
+
   @HideField()
   workspaceId: string;
 
@@ -70,7 +74,4 @@ export class AgentDTO {
 
   @Field(() => GraphQLJSON, { nullable: true })
   modelConfiguration?: ModelConfiguration;
-
-  @Field(() => [String])
-  evaluationInputs: string[];
 }

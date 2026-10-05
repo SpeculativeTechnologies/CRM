@@ -45,4 +45,5 @@ export enum SidePanelPages {
   RoutedPage = 'routed-page',
   WorkflowCoreFilters = 'workflow-core-filters',
   ShareRecord = 'share-record',
+  SnoozeAiChat = 'snooze-ai-chat',
 }
