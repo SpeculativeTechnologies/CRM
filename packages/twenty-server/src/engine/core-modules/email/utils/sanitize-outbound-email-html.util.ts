@@ -1,5 +1,7 @@
 import DOMPurify from 'dompurify';
 
+import { sanitizeOutboundEmailStyle } from 'src/engine/core-modules/email/utils/sanitize-outbound-email-style.util';
+
 let purifierPromise: Promise<ReturnType<typeof DOMPurify>> | undefined;
 
 const MAX_DOCTYPE_LENGTH = 512;
@@ -107,6 +109,11 @@ const getPurifier = (): Promise<ReturnType<typeof DOMPurify>> => {
     const purifier = DOMPurify(new JSDOM('').window);
 
     purifier.addHook('uponSanitizeAttribute', (node, attribute) => {
+      if (attribute.attrName === 'style') {
+        attribute.attrValue = sanitizeOutboundEmailStyle(attribute.attrValue);
+        attribute.keepAttr = attribute.attrValue.length > 0;
+      }
+
       if (
         node.nodeName === 'META' &&
         attribute.attrName === 'http-equiv' &&
