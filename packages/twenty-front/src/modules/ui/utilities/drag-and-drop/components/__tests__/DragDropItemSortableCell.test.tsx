@@ -73,7 +73,8 @@ const renderContent = ({
   </DragDropProvider>
 );
 
-const getSortableRoot = () => screen.getByRole('textbox').parentElement;
+const getSortableRoot = () =>
+  screen.getByRole('textbox').parentElement?.parentElement;
 
 const expectAccessibleContent = () => {
   for (const element of [
