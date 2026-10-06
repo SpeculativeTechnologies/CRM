@@ -421,6 +421,7 @@ export const PinnedMultiSelectPills: Story = {
 
       for (const list of visibleLists) {
         expect(within(list).getAllByRole('listitem')).toHaveLength(2);
+        expect(window.getComputedStyle(list).flexDirection).toBe('column');
       }
     });
   },
