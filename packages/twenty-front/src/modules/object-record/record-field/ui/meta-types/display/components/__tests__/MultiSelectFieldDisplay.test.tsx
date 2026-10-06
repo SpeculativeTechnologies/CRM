@@ -14,13 +14,17 @@ const mockedUseMultiSelectFieldDisplay = jest.mocked(
   useMultiSelectFieldDisplay,
 );
 
-const renderMultiSelectFieldDisplay = (isInSidePanel: boolean) =>
+const renderMultiSelectFieldDisplay = (
+  isInSidePanel: boolean,
+  isInPinnedTab = false,
+) =>
   render(
     <FieldContext.Provider
       value={{
         recordId: 'record-id',
         isLabelIdentifier: false,
         isInSidePanel,
+        isInPinnedTab,
         isRecordFieldReadOnly: false,
         fieldDefinition: {
           fieldMetadataId: 'field-metadata-id',
@@ -71,12 +75,19 @@ describe('MultiSelectFieldDisplay', () => {
     expect(screen.getByText('Brains Mentors')).toBeVisible();
   });
 
-  it('keeps the compact inline display outside the side panel', () => {
+  it('keeps the compact inline display outside the side panel and pinned column', () => {
     renderMultiSelectFieldDisplay(false);
 
     expect(screen.queryByRole('list')).not.toBeInTheDocument();
     expect(screen.getByText('Brains Prospects')).toBeVisible();
     expect(screen.getByText('All People')).toBeVisible();
     expect(screen.getByText('Brains Mentors')).toBeVisible();
+  });
+
+  it('stacks selected options in the pinned fields column of a full record page', () => {
+    renderMultiSelectFieldDisplay(false, true);
+
+    expect(screen.getByRole('list')).toBeVisible();
+    expect(screen.getAllByRole('listitem')).toHaveLength(3);
   });
 });

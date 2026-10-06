@@ -29,6 +29,7 @@ type FieldsWidgetFieldItemProps = {
   useUpdateRecord: RecordUpdateHook;
   recordLoading: boolean;
   instanceId: string;
+  isInPinnedTab: boolean;
   onMouseEnter: () => void;
 };
 
@@ -43,6 +44,7 @@ export const FieldsWidgetFieldItem = ({
   useUpdateRecord,
   recordLoading,
   instanceId,
+  isInPinnedTab,
   onMouseEnter,
 }: FieldsWidgetFieldItemProps) => {
   const isInSidePanel = useWorkspaceSurface().type === 'side-panel';
@@ -69,6 +71,7 @@ export const FieldsWidgetFieldItem = ({
         useUpdateRecord,
         isDisplayModeFixHeight: true,
         isInSidePanel,
+        isInPinnedTab,
         isRecordFieldReadOnly: isRecordFieldReadOnly({
           isRecordReadOnly,
           isSystemObject: objectMetadataItem.isSystem,

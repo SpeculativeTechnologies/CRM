@@ -13,12 +13,14 @@ type FieldsWidgetCellHoveredPortalProps = {
   objectMetadataItem: EnrichedObjectMetadataItem;
   recordId: string;
   flattenedFieldMetadataItems: FieldMetadataItem[];
+  isInPinnedTab: boolean;
 };
 
 export const FieldsWidgetCellHoveredPortal = ({
   objectMetadataItem,
   recordId,
   flattenedFieldMetadataItems,
+  isInPinnedTab,
 }: FieldsWidgetCellHoveredPortalProps) => {
   const instanceId = useAvailableComponentInstanceIdOrThrow(
     RecordFieldListComponentInstanceContext,
@@ -45,6 +47,7 @@ export const FieldsWidgetCellHoveredPortal = ({
       objectMetadataItem={objectMetadataItem}
       recordId={recordId}
       instanceIdPrefix={instanceId}
+      isInPinnedTab={isInPinnedTab}
     >
       <RecordFieldListInputContextProvider
         fieldMetadataItem={hoveredFieldMetadataItem}

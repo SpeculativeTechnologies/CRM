@@ -77,9 +77,15 @@ const idealCustomerProfileField = getMockFieldMetadataItemOrThrow({
   fieldName: 'idealCustomerProfile',
 });
 
+const workPolicyField = getMockFieldMetadataItemOrThrow({
+  objectMetadataItem: companyObjectMetadataItem,
+  fieldName: 'workPolicy',
+});
+
 const TEST_RECORD_ID = 'test-fields-widget-record-123';
 const FIELDS_VIEW_ID = 'test-fields-view-001';
 const TAB_ID_OVERVIEW = 'tab-overview';
+const TAB_ID_DETAILS = 'tab-details';
 
 const mockCompanyRecord: ObjectRecord = {
   __typename: 'Company',
@@ -102,6 +108,7 @@ const mockCompanyRecord: ObjectRecord = {
     secondaryLinks: null,
   },
   idealCustomerProfile: true,
+  workPolicy: ['ON_SITE', 'HYBRID'],
   annualRecurringRevenue: {
     __typename: 'Currency',
     amountMicros: 5000000000000,
@@ -134,6 +141,7 @@ const CoreClientProviderWrapper = ({
 const createPageLayoutWithWidget = (
   widget: PageLayoutWidget,
   objectMetadataId: string,
+  includeSecondTab = false,
 ): PageLayout => ({
   applicationId: 'application-id-mock',
   id: PAGE_LAYOUT_TEST_INSTANCE_ID,
@@ -159,6 +167,31 @@ const createPageLayoutWithWidget = (
       updatedAt: '2024-01-01T00:00:00Z',
       deletedAt: null,
     },
+    ...(includeSecondTab
+      ? [
+          {
+            isSystemSideEffect: false,
+            universalIdentifier: 'universal-identifier-details-mock',
+            __typename: 'PageLayoutTab' as const,
+            isActive: true,
+            applicationId: '',
+            id: TAB_ID_DETAILS,
+            title: 'Details',
+            position: 1,
+            pageLayoutId: PAGE_LAYOUT_TEST_INSTANCE_ID,
+            widgets: [
+              {
+                ...widget,
+                id: 'widget-fields-details',
+                pageLayoutTabId: TAB_ID_DETAILS,
+              },
+            ],
+            createdAt: '2024-01-01T00:00:00Z',
+            updatedAt: '2024-01-01T00:00:00Z',
+            deletedAt: null,
+          },
+        ]
+      : []),
   ],
   createdAt: '2024-01-01T00:00:00Z',
   updatedAt: '2024-01-01T00:00:00Z',
@@ -254,15 +287,18 @@ const SIDE_PANEL_SURFACE_INSTANCE_ID = 'fields-widget-story-side-panel';
 const FieldsWidgetStoryRenderer = ({
   view,
   surfaceType = 'main',
+  includeSecondTab = false,
 }: {
   view: ViewWithRelations;
   surfaceType?: 'main' | 'side-panel';
+  includeSecondTab?: boolean;
 }) => {
   const widget = createFieldsWidget(FIELDS_VIEW_ID);
 
   const pageLayoutData = createPageLayoutWithWidget(
     widget,
     companyObjectMetadataItem.id,
+    includeSecondTab,
   );
 
   setTestObjectMetadataItemsInMetadataStore(
@@ -352,6 +388,44 @@ const meta: Meta<typeof FieldsWidget> = {
 
 export default meta;
 type Story = StoryObj<typeof FieldsWidget>;
+
+export const PinnedMultiSelectPills: Story = {
+  render: () => (
+    <FieldsWidgetStoryRenderer
+      includeSecondTab
+      view={createView({
+        viewFields: [createViewField('vf-work-policy', workPolicyField.id, 0)],
+      })}
+    />
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    const list = await canvas.findByRole('list');
+    expect(list).toBeVisible();
+    expect(window.getComputedStyle(list).flexDirection).toBe('column');
+
+    const listItems = await canvas.findAllByRole('listitem');
+    expect(listItems).toHaveLength(2);
+    expect(listItems[1].getBoundingClientRect().top).toBeGreaterThan(
+      listItems[0].getBoundingClientRect().top,
+    );
+
+    const onSiteChip = await canvas.findByText('On-Site');
+    await userEvent.hover(onSiteChip);
+
+    await waitFor(() => {
+      const visibleLists = canvas
+        .getAllByRole('list')
+        .filter((list) => list.getAttribute('aria-hidden') !== 'true');
+
+      for (const list of visibleLists) {
+        expect(within(list).getAllByRole('listitem')).toHaveLength(2);
+        expect(window.getComputedStyle(list).flexDirection).toBe('column');
+      }
+    });
+  },
+};
 
 export const WithViewFieldGroups: Story = {
   render: () => {

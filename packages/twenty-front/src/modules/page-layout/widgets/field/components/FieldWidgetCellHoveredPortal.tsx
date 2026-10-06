@@ -10,6 +10,7 @@ type FieldWidgetCellHoveredPortalProps = {
   recordId: string;
   instanceId: string;
   isHovered: boolean;
+  isInPinnedTab: boolean;
   onMouseLeave: () => void;
 };
 
@@ -19,6 +20,7 @@ export const FieldWidgetCellHoveredPortal = ({
   recordId,
   instanceId,
   isHovered,
+  isInPinnedTab,
   onMouseLeave,
 }: FieldWidgetCellHoveredPortalProps) => {
   const { isEditing } = useIsFieldWidgetEditing();
@@ -33,6 +35,7 @@ export const FieldWidgetCellHoveredPortal = ({
       objectMetadataItem={objectMetadataItem}
       recordId={recordId}
       instanceIdPrefix={instanceId}
+      isInPinnedTab={isInPinnedTab}
     >
       <FieldWidgetCellHoveredContent onMouseLeave={onMouseLeave} />
     </RecordInlineCellAnchoredPortal>
