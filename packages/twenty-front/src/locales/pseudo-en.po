@@ -18567,6 +18567,11 @@ msgstr ""
 msgid "Read changelog"
 msgstr ""
 
+#. js-lingui-id: owzpHU
+#: src/pages/auth/Authorize.tsx
+msgid "Read CRM records without changing them"
+msgstr ""
+
 #. js-lingui-id: ibPuCP
 #: src/pages/settings/applications/components/SettingsClaimApplicationSection.tsx
 #: src/pages/settings/applications/tabs/SettingsApplicationsDeveloperTab.tsx
