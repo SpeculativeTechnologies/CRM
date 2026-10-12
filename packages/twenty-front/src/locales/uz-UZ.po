@@ -5851,6 +5851,11 @@ msgstr "Administrator bilan bog‘lanish"
 msgid "Contact auto-creation"
 msgstr "Kontaktlarni avtomatik yaratish"
 
+#. js-lingui-id: OBRLoG
+#: src/modules/command-menu-item/components/RecordContextMenuFieldItems.tsx
+msgid "Contact info"
+msgstr ""
+
 #. js-lingui-id: cByGGA
 #: src/modules/information-banner/components/billing/InformationBannerEndTrialPeriod.tsx
 msgid "Contact your admin to continue using Workflow or AI features."
@@ -8650,6 +8655,8 @@ msgid "Edit email"
 msgstr "Elektron pochtani tahrirlash"
 
 #. js-lingui-id: QjNcml
+#: src/modules/command-menu-item/components/RecordContextMenuEditFieldPage.tsx
+#: src/modules/command-menu-item/components/RecordContextMenuFieldItems.tsx
 #: src/modules/object-record/record-inline-cell/components/RecordInlineCellEditButton.tsx
 #: src/modules/object-record/record-table/record-table-cell/components/RecordTableCellEditButton.tsx
 #: src/modules/object-record/record-table/record-table-header/components/RecordTableColumnHeadDropdownMenu.tsx
@@ -16176,6 +16183,7 @@ msgstr "Javob tanasi yo‘q"
 
 #. js-lingui-id: Ev2r9A
 #: src/modules/activities/emails/recipients/components/EmailRecipientSuggestionsDropdownContent.tsx
+#: src/modules/command-menu-item/components/RecordContextMenuEditFieldPage.tsx
 #: src/modules/log-console/components/LogConsoleToolbar.tsx
 #: src/modules/log-console/components/LogConsoleToolbar.tsx
 #: src/modules/object-record/object-filter-dropdown/components/ObjectFilterDropdownCountrySelect.tsx
@@ -20319,6 +20327,8 @@ msgid "search field metadata"
 msgstr "qidiruv maydoni metamaʼlumotlari"
 
 #. js-lingui-id: 7taA9j
+#: src/modules/command-menu-item/components/RecordContextMenuEditFieldPage.tsx
+#: src/modules/command-menu-item/components/RecordContextMenuEditFieldPage.tsx
 #: src/modules/log-console/components/LogConsoleToolbar.tsx
 #: src/modules/object-record/advanced-filter/components/AdvancedFilterFieldSelectSearchInput.tsx
 #: src/modules/object-record/object-options-dropdown/components/ObjectOptionsDropdownCalendarFieldsContent.tsx

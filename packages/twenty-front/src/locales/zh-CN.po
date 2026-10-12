@@ -5851,6 +5851,11 @@ msgstr "联系管理员"
 msgid "Contact auto-creation"
 msgstr "联系人自动创建"
 
+#. js-lingui-id: OBRLoG
+#: src/modules/command-menu-item/components/RecordContextMenuFieldItems.tsx
+msgid "Contact info"
+msgstr ""
+
 #. js-lingui-id: cByGGA
 #: src/modules/information-banner/components/billing/InformationBannerEndTrialPeriod.tsx
 msgid "Contact your admin to continue using Workflow or AI features."
@@ -8650,6 +8655,8 @@ msgid "Edit email"
 msgstr "编辑电子邮件"
 
 #. js-lingui-id: QjNcml
+#: src/modules/command-menu-item/components/RecordContextMenuEditFieldPage.tsx
+#: src/modules/command-menu-item/components/RecordContextMenuFieldItems.tsx
 #: src/modules/object-record/record-inline-cell/components/RecordInlineCellEditButton.tsx
 #: src/modules/object-record/record-table/record-table-cell/components/RecordTableCellEditButton.tsx
 #: src/modules/object-record/record-table/record-table-header/components/RecordTableColumnHeadDropdownMenu.tsx
@@ -16153,6 +16160,7 @@ msgstr "没有响应正文"
 
 #. js-lingui-id: Ev2r9A
 #: src/modules/activities/emails/recipients/components/EmailRecipientSuggestionsDropdownContent.tsx
+#: src/modules/command-menu-item/components/RecordContextMenuEditFieldPage.tsx
 #: src/modules/log-console/components/LogConsoleToolbar.tsx
 #: src/modules/log-console/components/LogConsoleToolbar.tsx
 #: src/modules/object-record/object-filter-dropdown/components/ObjectFilterDropdownCountrySelect.tsx
@@ -20296,6 +20304,8 @@ msgid "search field metadata"
 msgstr "搜索字段元数据"
 
 #. js-lingui-id: 7taA9j
+#: src/modules/command-menu-item/components/RecordContextMenuEditFieldPage.tsx
+#: src/modules/command-menu-item/components/RecordContextMenuEditFieldPage.tsx
 #: src/modules/log-console/components/LogConsoleToolbar.tsx
 #: src/modules/object-record/advanced-filter/components/AdvancedFilterFieldSelectSearchInput.tsx
 #: src/modules/object-record/object-options-dropdown/components/ObjectOptionsDropdownCalendarFieldsContent.tsx
