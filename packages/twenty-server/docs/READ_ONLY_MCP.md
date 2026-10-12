@@ -12,6 +12,8 @@ Connect a private ChatGPT plugin to `https://<crm-api-host>/mcp/read-only` using
 
 OpenAI's current [connection guide](https://developers.openai.com/plugins/deploy/connect-chatgpt) and [OAuth guide](https://developers.openai.com/plugins/build/auth) describe the client-side flow.
 
+![Read-only consent with synthetic Storybook data](images/read-only-mcp-consent.png)
+
 ## Tool contract
 
 The endpoint exposes three tools regardless of the number of custom objects:
