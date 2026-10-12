@@ -17,6 +17,7 @@ import {
   type AuthContextUser,
 } from 'src/engine/core-modules/auth/types/auth-context.type';
 import { type JwtPayload } from 'src/engine/core-modules/auth/types/jwt-payload.type';
+import { assertMcpReadOnlyResource } from 'src/engine/core-modules/auth/utils/assert-mcp-read-only-resource.util';
 import { JwtTokenTypeEnum } from 'src/engine/core-modules/auth/types/jwt-token-type.enum';
 import { type PlaygroundTokenJwtPayload } from 'src/engine/core-modules/auth/types/playground-token-jwt-payload.type';
 import { type WorkspaceAgnosticTokenJwtPayload } from 'src/engine/core-modules/auth/types/workspace-agnostic-token-jwt-payload.type';
@@ -460,11 +461,18 @@ export class JwtAuthStrategy extends PassportStrategy(Strategy, 'jwt') {
     return !payload.type && !('workspaceId' in payload);
   }
 
-  async validate(payload: JwtPayload): Promise<AuthContext> {
+  async validate(
+    payload: JwtPayload,
+    mcpReadOnlyResource?: string,
+  ): Promise<AuthContext> {
+    assertMcpReadOnlyResource(payload, mcpReadOnlyResource);
     const context = await this.dispatch(payload);
 
     return {
       ...context,
+      ...('mcpReadOnlyResource' in payload
+        ? { mcpReadOnlyResource: payload.mcpReadOnlyResource }
+        : {}),
       tokenType: this.isLegacyApiKeyPayload(payload)
         ? JwtTokenTypeEnum.API_KEY
         : payload.type,
@@ -491,7 +499,10 @@ export class JwtAuthStrategy extends PassportStrategy(Strategy, 'jwt') {
       return await this.validateAccessToken(payload);
     }
 
-    if (payload.type === JwtTokenTypeEnum.APPLICATION_ACCESS) {
+    if (
+      payload.type === JwtTokenTypeEnum.APPLICATION_ACCESS ||
+      payload.type === JwtTokenTypeEnum.MCP_READ_ONLY_ACCESS
+    ) {
       return await this.validateApplicationToken(payload);
     }
 

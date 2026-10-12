@@ -148,6 +148,7 @@ export const Authorize = () => {
   const oauthScopeLabels: { [scope: string]: string | undefined } = {
     api: t`Access your workspace data`,
     profile: t`Read your profile`,
+    'mcp:read': t`Read CRM records without changing them`,
   };
 
   // Support both camelCase (legacy) and standard OAuth snake_case params
@@ -206,6 +207,8 @@ export const Authorize = () => {
           redirectUrl,
           state: state ?? undefined,
           issuer: issuer ?? undefined,
+          scope: searchParam.get('scope') ?? undefined,
+          resource: searchParam.get('resource') ?? undefined,
         },
         onCompleted: (responseData) => {
           redirect(appendThemeToUrl(responseData.authorizeApp.redirectUrl));
@@ -272,7 +275,12 @@ export const Authorize = () => {
 
   const appName = applicationRegistration.name;
   const appLogoUrl = applicationRegistration.logoUrl;
-  const requestedScopes: string[] = applicationRegistration.oAuthScopes ?? [];
+  const parsedScopes =
+    searchParam.get('scope')?.split(' ').filter(Boolean) ?? [];
+  const requestedScopes =
+    parsedScopes.length > 0
+      ? parsedScopes
+      : (applicationRegistration.oAuthScopes ?? []);
 
   return (
     <StyledAuthContent>

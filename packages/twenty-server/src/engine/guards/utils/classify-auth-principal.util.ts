@@ -39,6 +39,7 @@ export const classifyAuthPrincipal = (
         !isDefined(request.impersonationContext)
         ? { kind: 'apiKey' }
         : undefined;
+    case JwtTokenTypeEnum.MCP_READ_ONLY_ACCESS:
     case JwtTokenTypeEnum.APPLICATION_ACCESS:
       if (
         !isDefined(request.application) ||

@@ -58,6 +58,7 @@ export class OAuthTokenController {
           clientSecret: body.client_secret,
           codeVerifier: body.code_verifier,
           redirectUri: body.redirect_uri ?? '',
+          resource: body.resource,
         });
         break;
 
@@ -71,6 +72,7 @@ export class OAuthTokenController {
       case 'refresh_token':
         result = await this.oauthService.refreshTokenGrant({
           refreshToken: body.refresh_token ?? '',
+          resource: body.resource,
           clientId: body.client_id ?? '',
           clientSecret: body.client_secret,
         });

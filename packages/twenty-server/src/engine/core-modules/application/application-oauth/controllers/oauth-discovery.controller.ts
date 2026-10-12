@@ -3,7 +3,12 @@ import { Controller, Get, Req, UseGuards } from '@nestjs/common';
 import { type Request } from 'express';
 import { ApiPath } from 'twenty-shared/types';
 
-import { ALL_OAUTH_SCOPES } from 'src/engine/core-modules/application/application-oauth/constants/oauth-scopes';
+import {
+  ALL_OAUTH_SCOPES,
+  DEFAULT_OAUTH_SCOPES,
+  OAUTH_SCOPES,
+} from 'src/engine/core-modules/application/application-oauth/constants/oauth-scopes';
+import { MCP_READ_ONLY_PATH } from 'src/engine/api/mcp/constants/mcp-read-only-path.const';
 import { ApplicationRegistrationService } from 'src/engine/core-modules/application/application-registration/application-registration.service';
 import { DomainServerConfigService } from 'src/engine/core-modules/domain/domain-server-config/services/domain-server-config.service';
 import { TwentyConfigService } from 'src/engine/core-modules/twenty-config/twenty-config.service';
@@ -80,6 +85,44 @@ export class OAuthDiscoveryController {
     return this.buildProtectedResourceMetadata(base, base);
   }
 
+  @Get('oauth-authorization-server/mcp/read-only')
+  @UseGuards(PublicEndpointGuard, NoPermissionGuard)
+  async getReadOnlyAuthorizationServerMetadata(@Req() request: Request) {
+    const metadata = await this.getAuthorizationServerMetadata(request);
+    const base = getRequestBaseUrl(request);
+    const issuer = `${base}${MCP_READ_ONLY_PATH}`;
+    const authorizationUrl = new URL(metadata.authorization_endpoint);
+
+    authorizationUrl.searchParams.set('iss', issuer);
+
+    return {
+      issuer,
+      authorization_endpoint: authorizationUrl.toString(),
+      token_endpoint: metadata.token_endpoint,
+      registration_endpoint: `${base}/${ApiPath.OAuth}/register-read-only`,
+      revocation_endpoint: metadata.revocation_endpoint,
+      scopes_supported: [OAUTH_SCOPES.MCP_READ_ONLY],
+      response_types_supported: ['code'],
+      grant_types_supported: ['authorization_code', 'refresh_token'],
+      code_challenge_methods_supported: ['S256'],
+      token_endpoint_auth_methods_supported: ['none'],
+      authorization_response_iss_parameter_supported: true,
+    };
+  }
+
+  @Get('oauth-protected-resource/mcp/read-only')
+  @UseGuards(PublicEndpointGuard, NoPermissionGuard)
+  getReadOnlyProtectedResourceMetadata(@Req() request: Request) {
+    const resource = `${getRequestBaseUrl(request)}${MCP_READ_ONLY_PATH}`;
+
+    return {
+      resource,
+      authorization_servers: [resource],
+      scopes_supported: [OAUTH_SCOPES.MCP_READ_ONLY],
+      bearer_methods_supported: ['header'],
+    };
+  }
+
   @Get('oauth-protected-resource/mcp')
   @UseGuards(PublicEndpointGuard, NoPermissionGuard)
   getProtectedResourceMetadataMcp(@Req() request: Request) {
@@ -92,7 +135,7 @@ export class OAuthDiscoveryController {
     return {
       resource,
       authorization_servers: [base],
-      scopes_supported: ALL_OAUTH_SCOPES,
+      scopes_supported: DEFAULT_OAUTH_SCOPES,
       bearer_methods_supported: ['header'],
     };
   }

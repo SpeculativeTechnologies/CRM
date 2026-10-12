@@ -320,6 +320,21 @@ const canActivateOverHttp = (
 };
 
 describe('AuthPrincipalGuard', () => {
+  it('should classify an authenticated read-only MCP credential as an OAuth principal', () => {
+    const request = {
+      ...REQUEST_BY_PRINCIPAL_VARIANT['oauthClient.withUser'],
+      tokenType: JwtTokenTypeEnum.MCP_READ_ONLY_ACCESS,
+    };
+
+    expect(
+      canActivateOverHttp(
+        { ...REFUSE_EVERY_PRINCIPAL, oauthClient: true },
+        request,
+      ),
+    ).toBe(true);
+    expect(canActivateOverHttp(REFUSE_EVERY_PRINCIPAL, request)).toBe(false);
+  });
+
   describe.each(CONFIG_CASES)(
     'with $name',
     ({ authPrincipalGuardConfig, acceptedPrincipalVariantNames }) => {

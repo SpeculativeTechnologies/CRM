@@ -7,6 +7,7 @@ import { MCP_SERVER_INFO } from 'src/engine/api/mcp/constants/mcp-server-info.co
 import { McpCoreController } from 'src/engine/api/mcp/controllers/mcp-core.controller';
 import { type JsonRpc } from 'src/engine/api/mcp/dtos/json-rpc';
 import { McpAuthGuard } from 'src/engine/api/mcp/guards/mcp-auth.guard';
+import { ApplicationAuthorizationService } from 'src/engine/core-modules/application/application-authorization/services/application-authorization.service';
 import { McpProtocolService } from 'src/engine/api/mcp/services/mcp-protocol.service';
 import { type FlatApiKey } from 'src/engine/core-modules/api-key/types/flat-api-key.type';
 import { type FlatWorkspace } from 'src/engine/core-modules/workspace/types/flat-workspace.type';
@@ -29,6 +30,10 @@ describe('McpCoreController', () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [McpCoreController],
       providers: [
+        {
+          provide: ApplicationAuthorizationService,
+          useValue: { findByUserAndApplication: jest.fn() },
+        },
         {
           provide: McpProtocolService,
           useValue: mockMcpProtocolService,

@@ -1,4 +1,7 @@
 import { Module } from '@nestjs/common';
+import { McpReadOnlyToolsService } from 'src/engine/api/mcp/services/mcp-read-only-tools.service';
+import { ApplicationAuthorizationModule } from 'src/engine/core-modules/application/application-authorization/application-authorization.module';
+import { WorkspaceDomainsModule } from 'src/engine/core-modules/domain/workspace-domains/workspace-domains.module';
 
 import { McpCoreController } from 'src/engine/api/mcp/controllers/mcp-core.controller';
 import { McpAuthGuard } from 'src/engine/api/mcp/guards/mcp-auth.guard';
@@ -20,6 +23,8 @@ import { WorkspaceCacheModule } from 'src/engine/workspace-cache/workspace-cache
 
 @Module({
   imports: [
+    ApplicationAuthorizationModule,
+    WorkspaceDomainsModule,
     ApiKeyModule,
     MetricsModule,
     TokenModule,
@@ -39,6 +44,7 @@ import { WorkspaceCacheModule } from 'src/engine/workspace-cache/workspace-cache
     McpInstructionBuilderService,
     McpProtocolService,
     McpToolExecutorService,
+    McpReadOnlyToolsService,
   ],
 })
 export class McpModule {}

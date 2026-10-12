@@ -6,6 +6,7 @@ import {
   HttpStatus,
   Post,
   Query,
+  Req,
   Res,
   UseFilters,
   UseGuards,
@@ -13,8 +14,9 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 
-import { type Response } from 'express';
+import { type Request, type Response } from 'express';
 import { ApiPath } from 'twenty-shared/types';
+import { MCP_READ_ONLY_PATH } from 'src/engine/api/mcp/constants/mcp-read-only-path.const';
 import { isDefined } from 'twenty-shared/utils';
 
 import { JsonRpc } from 'src/engine/api/mcp/dtos/json-rpc';
@@ -57,7 +59,7 @@ import { WorkspaceNotSuspendedGuard } from 'src/engine/guards/workspace-not-susp
 export class McpCoreController {
   constructor(private readonly mcpProtocolService: McpProtocolService) {}
 
-  @Post()
+  @Post(['', 'read-only'])
   @HttpCode(HttpStatus.OK)
   @UsePipes(
     new ValidationPipe({
@@ -78,6 +80,7 @@ export class McpCoreController {
     @Headers('accept') acceptHeader: string | undefined,
     @Res({ passthrough: true }) res: Response,
     @Query('mode') mode?: string,
+    @Req() request?: Request,
   ) {
     const authContext = {
       workspace,
@@ -86,6 +89,9 @@ export class McpCoreController {
       apiKey,
       application,
       isDirectMode: mode === 'direct',
+      ...(request?.path.toLowerCase().replace(/\/$/, '') === MCP_READ_ONLY_PATH
+        ? { isReadOnlyMode: true }
+        : {}),
     };
 
     // JSON-RPC notifications (no id) expect no response body regardless of Accept

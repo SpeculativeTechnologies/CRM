@@ -20,6 +20,8 @@ import { v4 } from 'uuid';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
   ALL_OAUTH_SCOPES,
+  DEFAULT_OAUTH_SCOPES,
+  OAUTH_SCOPES,
   type OAuthScope,
 } from 'src/engine/core-modules/application/application-oauth/constants/oauth-scopes';
 import { OAuthRegisterInput } from 'src/engine/core-modules/application/application-oauth/dtos/oauth-register.input';
@@ -51,7 +53,7 @@ export class OAuthRegistrationController {
     private readonly throttlerService: ThrottlerService,
   ) {}
 
-  @Post('register')
+  @Post(['register', 'register-read-only'])
   @HttpCode(201)
   @UseGuards(PublicEndpointGuard, NoPermissionGuard)
   @UsePipes(new ValidationPipe())
@@ -139,7 +141,24 @@ export class OAuthRegistrationController {
     const validScopes: readonly string[] = ALL_OAUTH_SCOPES;
     const requestedScopes = body.scope
       ? body.scope.split(' ').filter((s) => validScopes.includes(s))
-      : [...ALL_OAUTH_SCOPES];
+      : [...DEFAULT_OAUTH_SCOPES];
+
+    const scopes = req.path.replace(/\/$/, '').endsWith('/register-read-only')
+      ? [OAUTH_SCOPES.MCP_READ_ONLY]
+      : requestedScopes;
+
+    if (
+      scopes.includes(OAUTH_SCOPES.MCP_READ_ONLY) &&
+      scopes.includes(OAUTH_SCOPES.API)
+    ) {
+      res.status(400);
+
+      return {
+        error: 'invalid_client_metadata',
+        error_description:
+          'Read-only MCP access cannot be combined with API access',
+      };
+    }
 
     const clientId = v4();
 
@@ -149,7 +168,7 @@ export class OAuthRegistrationController {
       oAuthClientId: clientId,
       oAuthClientSecretHash: null,
       oAuthRedirectUris: body.redirect_uris,
-      oAuthScopes: requestedScopes as OAuthScope[],
+      oAuthScopes: scopes as OAuthScope[],
       createdByUserId: null,
       ownerWorkspaceId: null,
       sourceType: ApplicationRegistrationSourceType.OAUTH_ONLY,
@@ -170,7 +189,7 @@ export class OAuthRegistrationController {
       grant_types: grantTypes,
       response_types: responseTypes,
       token_endpoint_auth_method: tokenEndpointAuthMethod,
-      scope: requestedScopes.join(' '),
+      scope: scopes.join(' '),
       client_id_issued_at: Math.floor(Date.now() / 1000),
       registration_client_uri: `${issuer}/${ApiPath.OAuth}/register/${clientId}`,
     };

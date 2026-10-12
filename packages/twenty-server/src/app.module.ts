@@ -143,7 +143,10 @@ export class AppModule {
 
     consumer
       .apply(ApiRequestContextMiddleware, McpMethodGuardMiddleware)
-      .forRoutes({ path: ApiPath.Mcp, method: RequestMethod.ALL });
+      .forRoutes(
+        { path: ApiPath.Mcp, method: RequestMethod.ALL },
+        { path: `${ApiPath.Mcp}/read-only`, method: RequestMethod.ALL },
+      );
 
     for (const method of MIGRATED_REST_METHODS) {
       consumer
