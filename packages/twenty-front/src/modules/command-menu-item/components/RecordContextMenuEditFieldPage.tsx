@@ -1,3 +1,4 @@
+import { RecordContextMenuClickOutsideExclusion } from '@/command-menu-item/components/RecordContextMenuClickOutsideExclusion';
 import { useRecordContextMenuFields } from '@/command-menu-item/hooks/useRecordContextMenuFields';
 import { type RecordContextMenuTarget } from '@/command-menu-item/types/RecordContextMenuTarget';
 import { useLingui } from '@lingui/react/macro';
@@ -28,7 +29,7 @@ export const RecordContextMenuEditFieldPage = ({
   );
 
   return (
-    <>
+    <RecordContextMenuClickOutsideExclusion>
       <Dropdown.Back>{t`Edit field`}</Dropdown.Back>
       <Dropdown.Search
         value={searchInput}
@@ -56,6 +57,6 @@ export const RecordContextMenuEditFieldPage = ({
           })
         )}
       </Dropdown.Section>
-    </>
+    </RecordContextMenuClickOutsideExclusion>
   );
 };

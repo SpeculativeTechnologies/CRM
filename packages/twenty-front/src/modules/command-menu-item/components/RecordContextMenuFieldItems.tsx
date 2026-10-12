@@ -1,3 +1,4 @@
+import { RecordContextMenuClickOutsideExclusion } from '@/command-menu-item/components/RecordContextMenuClickOutsideExclusion';
 import { RECORD_CONTEXT_MENU_EDIT_FIELD_PAGE_ID } from '@/command-menu-item/constants/RecordContextMenuEditFieldPageId';
 import { useRecordContextMenuFields } from '@/command-menu-item/hooks/useRecordContextMenuFields';
 import { type RecordContextMenuTarget } from '@/command-menu-item/types/RecordContextMenuTarget';
@@ -18,7 +19,7 @@ export const RecordContextMenuFieldItems = ({
   const { getIcon } = useIcons();
 
   return (
-    <>
+    <RecordContextMenuClickOutsideExclusion>
       <Dropdown.Section>
         <Dropdown.ActionItem
           page={RECORD_CONTEXT_MENU_EDIT_FIELD_PAGE_ID}
@@ -47,6 +48,6 @@ export const RecordContextMenuFieldItems = ({
         </Dropdown.Section>
       )}
       <Dropdown.Separator />
-    </>
+    </RecordContextMenuClickOutsideExclusion>
   );
 };
