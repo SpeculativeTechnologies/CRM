@@ -9,6 +9,9 @@ import { assertIsDefinedOrThrow } from 'twenty-shared/utils';
 import { isWorkspaceProvisioned } from 'twenty-shared/workspace';
 import { Repository } from 'typeorm';
 
+import { MCP_READ_ONLY_PATH } from 'src/engine/api/mcp/constants/mcp-read-only-path.const';
+import { getRequestBaseUrl } from 'src/utils/get-request-base-url.util';
+import { type JwtPayload } from 'src/engine/core-modules/auth/types/jwt-payload.type';
 import {
   AuthException,
   AuthExceptionCode,
@@ -182,12 +185,18 @@ export class AccessTokenService {
     return { token, expiresAt };
   }
 
-  async validateToken(token: string): Promise<AuthContext> {
+  async validateToken(
+    token: string,
+    mcpReadOnlyResource?: string,
+  ): Promise<AuthContext> {
     await this.jwtWrapperService.verifyJwtToken(token);
 
-    const decoded = this.jwtWrapperService.decode<AccessTokenJwtPayload>(token);
+    const decoded = this.jwtWrapperService.decode<JwtPayload>(token);
 
-    const context = await this.jwtStrategy.validate(decoded);
+    const context = await this.jwtStrategy.validate(
+      decoded,
+      mcpReadOnlyResource,
+    );
 
     return context;
   }
@@ -205,7 +214,16 @@ export class AccessTokenService {
         );
       }
 
-      return this.validateToken(token);
+      const isReadOnlyMcpRequest =
+        request.method === 'POST' &&
+        request.path.toLowerCase().replace(/\/$/, '') === MCP_READ_ONLY_PATH;
+
+      return this.validateToken(
+        token,
+        isReadOnlyMcpRequest
+          ? `${getRequestBaseUrl(request)}${MCP_READ_ONLY_PATH}`
+          : undefined,
+      );
     }
 
     const sessionToken =

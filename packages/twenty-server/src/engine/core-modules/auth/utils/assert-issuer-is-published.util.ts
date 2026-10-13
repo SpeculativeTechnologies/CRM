@@ -1,4 +1,5 @@
 import { isDefined } from 'twenty-shared/utils';
+import { MCP_READ_ONLY_PATH } from 'src/engine/api/mcp/constants/mcp-read-only-path.const';
 
 import {
   AuthException,
@@ -15,9 +16,9 @@ export const assertIssuerIsPublishedOrThrow = ({
   requestBaseUrl: string;
   serverUrl?: string;
 }): void => {
-  const publishedIssuers = [requestBaseUrl, cleanServerUrl(serverUrl)].filter(
-    isDefined,
-  );
+  const publishedIssuers = [requestBaseUrl, cleanServerUrl(serverUrl)]
+    .filter(isDefined)
+    .flatMap((base) => [base, `${base}${MCP_READ_ONLY_PATH}`]);
 
   if (!publishedIssuers.includes(issuer)) {
     throw new AuthException(

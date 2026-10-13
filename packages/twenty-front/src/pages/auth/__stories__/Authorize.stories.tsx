@@ -159,3 +159,35 @@ export const WithLongAppName: Story = {
     );
   },
 };
+
+export const ReadOnlyCrm: Story = {
+  args: {
+    searchParams: {
+      client_id: 'read-only-client-id',
+      redirect_uri: MOCKED_REDIRECT_URL,
+      scope: 'mcp:read',
+      resource: 'https://crm.example.com/mcp/read-only',
+    },
+  },
+  parameters: {
+    msw: {
+      handlers: buildHandlers({
+        id: 'application-id-read-only',
+        name: 'ChatGPT',
+        logoUrl: null,
+        oAuthScopes: ['mcp:read'],
+        websiteUrl: null,
+      }),
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await canvas.findByText(
+      'Read CRM records without changing them',
+      undefined,
+      {
+        timeout: 5000,
+      },
+    );
+  },
+};

@@ -53,6 +53,7 @@ import {
   type SignInUpNewUserPayload,
 } from 'src/engine/core-modules/auth/types/sign-in-up.type';
 import { assertIssuerIsPublishedOrThrow } from 'src/engine/core-modules/auth/utils/assert-issuer-is-published.util';
+import { getReadOnlyMcpAuthorizationContext } from 'src/engine/core-modules/auth/utils/get-read-only-mcp-authorization-context.util';
 import { validateRedirectUri } from 'src/engine/core-modules/auth/utils/validate-redirect-uri.util';
 import { DomainServerConfigService } from 'src/engine/core-modules/domain/domain-server-config/services/domain-server-config.service';
 import { WorkspaceDomainsService } from 'src/engine/core-modules/domain/workspace-domains/services/workspace-domains.service';
@@ -631,6 +632,12 @@ export class AuthService {
     const expiresAt = addMilliseconds(new Date().getTime(), ms('5m'));
 
     const authCodeContext = {
+      ...getReadOnlyMcpAuthorizationContext({
+        scopes: requestedScopes,
+        resource: authorizeAppInput.resource,
+        requestBaseUrl,
+        serverUrl: this.twentyConfigService.get('SERVER_URL'),
+      }),
       redirectUri: authorizeAppInput.redirectUrl,
       clientId: applicationRegistration.oAuthClientId,
       scope: requestedScopes.join(' '),

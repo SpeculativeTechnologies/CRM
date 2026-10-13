@@ -2,9 +2,12 @@ import { type CommonPropertiesJwtPayload } from 'src/engine/core-modules/auth/ty
 import { JwtTokenTypeEnum } from 'src/engine/core-modules/auth/types/jwt-token-type.enum';
 
 export type ApplicationRefreshTokenJwtPayload = CommonPropertiesJwtPayload & {
-  type: JwtTokenTypeEnum.APPLICATION_REFRESH;
+  type:
+    | JwtTokenTypeEnum.APPLICATION_REFRESH
+    | JwtTokenTypeEnum.MCP_READ_ONLY_REFRESH;
   workspaceId: string;
   applicationId: string;
   userWorkspaceId?: string;
   userId?: string;
+  mcpReadOnlyResource?: string;
 };

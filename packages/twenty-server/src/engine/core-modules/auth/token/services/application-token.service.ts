@@ -125,11 +125,13 @@ export class ApplicationTokenService {
     applicationId,
     userWorkspaceId,
     userId,
+    mcpReadOnlyResource,
   }: {
     workspaceId: string;
     applicationId: string;
     userWorkspaceId?: string;
     userId?: string;
+    mcpReadOnlyResource?: string;
   }): Promise<{
     applicationAccessToken: AuthToken;
     applicationRefreshToken: AuthToken;
@@ -150,16 +152,22 @@ export class ApplicationTokenService {
           applicationId,
           userWorkspaceId,
           userId,
-          tokenType: JwtTokenTypeEnum.APPLICATION_ACCESS,
+          tokenType: mcpReadOnlyResource
+            ? JwtTokenTypeEnum.MCP_READ_ONLY_ACCESS
+            : JwtTokenTypeEnum.APPLICATION_ACCESS,
           expiresIn: accessTokenExpiresIn,
+          mcpReadOnlyResource,
         }),
         this.signApplicationToken({
           workspaceId,
           applicationId,
           userWorkspaceId,
           userId,
-          tokenType: JwtTokenTypeEnum.APPLICATION_REFRESH,
+          tokenType: mcpReadOnlyResource
+            ? JwtTokenTypeEnum.MCP_READ_ONLY_REFRESH
+            : JwtTokenTypeEnum.APPLICATION_REFRESH,
           expiresIn: refreshTokenExpiresIn,
+          mcpReadOnlyResource,
         }),
       ],
     );
@@ -179,7 +187,14 @@ export class ApplicationTokenService {
           { json: true },
         );
 
-      if (payload.type !== JwtTokenTypeEnum.APPLICATION_REFRESH) {
+      if (
+        (payload.type !== JwtTokenTypeEnum.APPLICATION_REFRESH &&
+          payload.type !== JwtTokenTypeEnum.MCP_READ_ONLY_REFRESH) ||
+        (payload.type === JwtTokenTypeEnum.MCP_READ_ONLY_REFRESH &&
+          (!payload.mcpReadOnlyResource ||
+            !payload.userId ||
+            !payload.userWorkspaceId))
+      ) {
         throw new AuthException(
           'Expected an application refresh token',
           AuthExceptionCode.INVALID_JWT_TOKEN_TYPE,
@@ -284,6 +299,7 @@ export class ApplicationTokenService {
     applicationId: string;
     userWorkspaceId?: string;
     userId?: string;
+    mcpReadOnlyResource?: string;
   }): Promise<{
     applicationAccessToken: AuthToken;
     applicationRefreshToken: AuthToken;
@@ -293,6 +309,7 @@ export class ApplicationTokenService {
       applicationId: payload.applicationId,
       userWorkspaceId: payload.userWorkspaceId,
       userId: payload.userId,
+      mcpReadOnlyResource: payload.mcpReadOnlyResource,
     });
   }
 
@@ -327,6 +344,7 @@ export class ApplicationTokenService {
     tokenType,
     expiresIn,
     workspaceDeletionRequestTimestamp,
+    mcpReadOnlyResource,
   }: {
     workspaceId: string;
     applicationId: string;
@@ -334,9 +352,12 @@ export class ApplicationTokenService {
     userId?: string;
     tokenType:
       | JwtTokenTypeEnum.APPLICATION_ACCESS
-      | JwtTokenTypeEnum.APPLICATION_REFRESH;
+      | JwtTokenTypeEnum.APPLICATION_REFRESH
+      | JwtTokenTypeEnum.MCP_READ_ONLY_ACCESS
+      | JwtTokenTypeEnum.MCP_READ_ONLY_REFRESH;
     expiresIn: string;
     workspaceDeletionRequestTimestamp?: string;
+    mcpReadOnlyResource?: string;
   }): Promise<AuthToken> {
     const expiresAt = addMilliseconds(new Date().getTime(), ms(expiresIn));
 
@@ -347,6 +368,7 @@ export class ApplicationTokenService {
       applicationId,
       workspaceId,
       type: tokenType,
+      ...(mcpReadOnlyResource ? { mcpReadOnlyResource } : {}),
       ...(workspaceDeletionRequestTimestamp
         ? { workspaceDeletionRequestTimestamp }
         : {}),

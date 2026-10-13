@@ -8,6 +8,7 @@ import ms from 'ms';
 import { IsNull, Repository } from 'typeorm';
 import { base64UrlEncode, isDefined } from 'twenty-shared/utils';
 
+import { OAUTH_SCOPES } from 'src/engine/core-modules/application/application-oauth/constants/oauth-scopes';
 import {
   AppTokenEntity,
   AppTokenType,
@@ -58,6 +59,7 @@ export class OAuthService {
     clientSecret?: string;
     codeVerifier?: string;
     redirectUri: string;
+    resource?: string;
   }): Promise<OAuthTokenResponse | OAuthErrorResponse> {
     const {
       authorizationCode,
@@ -204,6 +206,25 @@ export class OAuthService {
       );
     }
 
+    const mcpReadOnlyResource =
+      authCodeToken.context && 'mcpReadOnlyResource' in authCodeToken.context
+        ? authCodeToken.context.mcpReadOnlyResource
+        : undefined;
+    const isReadOnlyMcp = this.parseScopes(
+      authCodeToken.context?.scope ?? '',
+    ).includes(OAUTH_SCOPES.MCP_READ_ONLY);
+
+    if (
+      isReadOnlyMcp &&
+      (typeof mcpReadOnlyResource !== 'string' ||
+        params.resource !== mcpReadOnlyResource)
+    ) {
+      return this.errorResponse(
+        'invalid_target',
+        'The read-only MCP resource must match the authorization',
+      );
+    }
+
     // Atomic single-use consume: only the request that flips revokedAt from null proceeds, closing the check-then-use race.
     const consumeResult = await this.appTokenRepository.update(
       { id: authCodeToken.id, revokedAt: IsNull() },
@@ -267,6 +288,9 @@ export class OAuthService {
         applicationId: application.id,
         userId: authCodeToken.userId,
         userWorkspaceId: userWorkspace.id,
+        ...(isReadOnlyMcp && typeof mcpReadOnlyResource === 'string'
+          ? { mcpReadOnlyResource }
+          : {}),
       });
 
     this.logger.log(
@@ -295,6 +319,15 @@ export class OAuthService {
     }
 
     const applicationRegistration = clientValidation;
+
+    if (
+      applicationRegistration.oAuthScopes.includes(OAUTH_SCOPES.MCP_READ_ONLY)
+    ) {
+      return this.errorResponse(
+        'unauthorized_client',
+        'Read-only MCP clients require user authorization with PKCE',
+      );
+    }
 
     const secretError = await this.validateClientSecret(
       applicationRegistration,
@@ -347,6 +380,7 @@ export class OAuthService {
     refreshToken: string;
     clientId: string;
     clientSecret?: string;
+    resource?: string;
   }): Promise<OAuthTokenResponse | OAuthErrorResponse> {
     const { refreshToken, clientId, clientSecret } = params;
 
@@ -385,6 +419,16 @@ export class OAuthService {
         await this.applicationTokenService.validateApplicationRefreshToken(
           refreshToken,
         );
+
+      if (
+        payload.mcpReadOnlyResource &&
+        params.resource !== payload.mcpReadOnlyResource
+      ) {
+        return this.errorResponse(
+          'invalid_target',
+          'The read-only MCP resource must match the original authorization',
+        );
+      }
 
       // Verify the refresh token belongs to this client
       const application = await this.applicationRepository.findOne(
@@ -428,7 +472,9 @@ export class OAuthService {
         token_type: 'Bearer',
         expires_in: this.getAccessTokenExpiresInSeconds(),
         refresh_token: applicationRefreshToken.token,
-        scope: applicationRegistration.oAuthScopes.join(' '),
+        scope: payload.mcpReadOnlyResource
+          ? OAUTH_SCOPES.MCP_READ_ONLY
+          : applicationRegistration.oAuthScopes.join(' '),
       };
     } catch (error) {
       this.logger.warn(`Refresh token grant failed: client=${clientId}`, error);

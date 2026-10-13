@@ -137,6 +137,6 @@ import { ToolRegistryService } from './services/tool-registry.service';
     },
     ToolRegistryService,
   ],
-  exports: [ToolRegistryService],
+  exports: [ToolRegistryService, ToolExecutorService],
 })
 export class ToolProviderModule {}

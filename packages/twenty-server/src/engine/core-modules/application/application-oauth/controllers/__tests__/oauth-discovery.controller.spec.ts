@@ -55,6 +55,24 @@ describe('OAuthDiscoveryController', () => {
   // which the well-known path suffix was inserted — so the root maps to the
   // origin itself and the /mcp variant maps to <origin>/mcp.
   describe('getProtectedResourceMetadata', () => {
+    it('should advertise a dedicated read-only OAuth issuer and scope', async () => {
+      const request = buildMockRequest('workspace.twenty.com');
+      expect(controller.getReadOnlyProtectedResourceMetadata(request)).toEqual({
+        resource: 'https://workspace.twenty.com/mcp/read-only',
+        authorization_servers: ['https://workspace.twenty.com/mcp/read-only'],
+        scopes_supported: ['mcp:read'],
+        bearer_methods_supported: ['header'],
+      });
+      expect(
+        await controller.getReadOnlyAuthorizationServerMetadata(request),
+      ).toMatchObject({
+        issuer: 'https://workspace.twenty.com/mcp/read-only',
+        registration_endpoint:
+          'https://workspace.twenty.com/oauth/register-read-only',
+        scopes_supported: ['mcp:read'],
+        grant_types_supported: ['authorization_code', 'refresh_token'],
+      });
+    });
     it('root form returns the origin as the resource', () => {
       const request = buildMockRequest('workspace.twenty.com');
 

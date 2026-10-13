@@ -8,7 +8,8 @@ describe('OAuth Scopes', () => {
   it('should have all scopes defined', () => {
     expect(ALL_OAUTH_SCOPES).toContain('api');
     expect(ALL_OAUTH_SCOPES).toContain('profile');
-    expect(ALL_OAUTH_SCOPES).toHaveLength(2);
+    expect(ALL_OAUTH_SCOPES).toContain('mcp:read');
+    expect(ALL_OAUTH_SCOPES).toHaveLength(3);
   });
 
   it('should have descriptions for all scopes', () => {
