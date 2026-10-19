@@ -58,10 +58,19 @@ export const MultipleSelectDropdown = ({
     );
   };
 
+  // Selected and unselected items come from separate lists, so concatenating
+  // them would pin the checked ones to the top. Merge them alphabetically so
+  // checking an item never moves it.
   const itemsInDropdown = [
     ...(filteredSelectedItems ?? []),
     ...(itemsToSelect ?? []),
-  ];
+  ].sort(
+    (a, b) =>
+      a.name.localeCompare(b.name, undefined, {
+        sensitivity: 'base',
+        numeric: true,
+      }) || a.id.localeCompare(b.id),
+  );
 
   useHotkeysOnFocusedElement({
     keys: [Key.Escape],
