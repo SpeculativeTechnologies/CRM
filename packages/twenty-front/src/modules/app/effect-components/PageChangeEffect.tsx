@@ -185,6 +185,13 @@ export const PageChangeEffect = () => {
   ]);
 
   useEffect(() => {
+    // Only a pathname change leaves the page. The side panel mirrors its
+    // routed path into the query string, so a search-only change must not
+    // clear the selection of the index view still on screen.
+    if (location.pathname === previousLocation) {
+      return;
+    }
+
     const isLeavingRecordIndexPage = !!matchPath(
       AppPath.RecordIndexPage,
       previousLocation,
@@ -201,10 +208,6 @@ export const PageChangeEffect = () => {
         deactivateBoardCard();
         unfocusBoardCard();
       }
-    }
-
-    if (location.pathname === previousLocation) {
-      return;
     }
 
     switch (true) {
