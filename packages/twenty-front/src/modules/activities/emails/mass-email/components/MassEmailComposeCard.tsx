@@ -2,6 +2,7 @@ import { useQuery } from '@apollo/client/react';
 import { DragDropProvider } from '@dnd-kit/react';
 import { styled } from '@linaria/react';
 import { useState } from 'react';
+import { EmailTemplatesButton } from '@/activities/emails/templates/components/EmailTemplatesButton';
 
 import { INLINE_EMAIL_BODY_EDITOR_PROFILE } from '@/activities/emails/editor/constants/InlineEmailBodyEditorProfile';
 import { type MassEmailComposerState } from '@/activities/emails/mass-email/hooks/useMassEmailComposerState';
@@ -262,6 +263,16 @@ export const MassEmailComposeCard = ({
   return (
     <StyledMain>
       <StyledCard>
+        {!isDefined(selectedRecipient) && (
+          <EmailTemplatesButton
+            subject={composerState.subjectTemplate}
+            body={composerState.bodyTemplate}
+            onApply={async (content) => {
+              await composerState.applyTemplate(content);
+              setResetNonce((nonce) => nonce + 1);
+            }}
+          />
+        )}
         <StyledFieldRow>
           <StyledFieldLabel>{t`From`}</StyledFieldLabel>
           <StyledFieldValue>

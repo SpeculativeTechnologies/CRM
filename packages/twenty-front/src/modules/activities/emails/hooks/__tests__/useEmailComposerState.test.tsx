@@ -67,6 +67,31 @@ const renderComposerState = (
   );
 
 describe('useEmailComposerState', () => {
+  it('should replace template content while preserving recipients, sender and attachments', () => {
+    const { result } = renderComposerState([], jest.fn());
+
+    act(() => result.current.setCc([{ address: 'copy@example.com' }]));
+    act(() =>
+      result.current.applyTemplate({
+        subject: 'Welcome Ada',
+        body: JSON.stringify({
+          type: 'doc',
+          content: [
+            {
+              type: 'paragraph',
+              content: [{ type: 'text', text: 'Hello Ada' }],
+            },
+          ],
+        }),
+      }),
+    );
+
+    expect(result.current.subject).toBe('Welcome Ada');
+    expect(result.current.body).toContain('Hello Ada');
+    expect(result.current.to[0].address).toBe('ada@lovelace.com');
+    expect(result.current.cc[0].address).toBe('copy@example.com');
+    expect(result.current.connectedAccountId).toBe('account-1');
+  });
   beforeEach(() => {
     jest.clearAllMocks();
   });

@@ -51,6 +51,29 @@ const wrapper = ({ children }: { children: ReactNode }) => (
 );
 
 describe('useEmailSignatureComposer', () => {
+  it('should prepare a template for persistence without remounting the current editor', () => {
+    setCurrentWorkspaceMember({
+      emailSignature: SIGNATURE,
+      isEmailSignatureIncludedByDefault: true,
+    });
+    const { result } = renderHook(
+      () => useEmailSignatureComposer({ isEnabled: true, initialBody: '' }),
+      { wrapper },
+    );
+    const before = result.current.signatureResyncKey;
+    const prepared = result.current.getBodyWithSignatureInclusion(
+      serializeDocument([paragraph('Welcome')]),
+      true,
+    );
+
+    expect(prepared).toContain('Welcome');
+    expect(prepared).toContain('Ada Lovelace');
+    expect(result.current.signatureResyncKey).toBe(before);
+    act(() => {
+      result.current.applySignatureInclusion(prepared, true);
+    });
+    expect(result.current.signatureResyncKey).not.toBe(before);
+  });
   it('should hide the toggle when the member has no signature', () => {
     setCurrentWorkspaceMember({
       emailSignature: null,

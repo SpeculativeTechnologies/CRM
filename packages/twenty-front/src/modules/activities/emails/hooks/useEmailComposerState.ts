@@ -10,6 +10,7 @@ import { parseEmailRecipients } from '@/activities/emails/recipients/utils/parse
 import { serializeEmailRecipients } from '@/activities/emails/recipients/utils/serializeEmailRecipients';
 import { type ConnectedAccountSender } from '@/accounts/types/ConnectedAccountSender';
 import { type EmailDraftPrefill } from '@/activities/emails/types/EmailDraftPrefill';
+import { type EmailTemplateContent } from '@/activities/emails/templates/types/EmailTemplate';
 
 type UseEmailComposerStateArgs = {
   connectedAccountId: string;
@@ -81,6 +82,16 @@ export const useEmailComposerState = ({
 
   const setSignatureIncluded = (isIncluded: boolean) => {
     setBody(signatureState.applySignatureInclusion(body, isIncluded));
+  };
+
+  const applyTemplate = (content: EmailTemplateContent) => {
+    setSubject(content.subject);
+    setBody(
+      signatureState.applySignatureInclusion(
+        content.body,
+        signatureState.isSignatureIncludedIn(body),
+      ),
+    );
   };
 
   const { sendEmail, loading } = useSendEmail();
@@ -158,6 +169,7 @@ export const useEmailComposerState = ({
     setSubject,
     body,
     setBody,
+    applyTemplate,
     showCcBcc,
     setShowCcBcc,
     files,

@@ -36,6 +36,7 @@ import { DND_KIT_PROVIDER_PLUGINS_WITHOUT_DROP_ANIMATION } from '@/ui/utilities/
 import { DND_KIT_SENSORS } from '@/ui/utilities/drag-and-drop/constants/DndKitSensors';
 import { DragDropItemDndContext } from '@/ui/utilities/drag-and-drop/context/DragDropItemDndContext';
 import { GET_MY_CONNECTED_ACCOUNTS } from '@/settings/accounts/graphql/queries/getMyConnectedAccounts';
+import { EmailTemplatesButton } from '@/activities/emails/templates/components/EmailTemplatesButton';
 
 const StyledFieldsContainer = styled.div`
   display: flex;
@@ -210,6 +211,20 @@ export const EmailComposerFields = ({
 
   return (
     <StyledFieldsContainer>
+      <EmailTemplatesButton
+        subject={composerState.subject}
+        body={composerState.body}
+        onApply={composerState.applyTemplate}
+        personalize
+        defaultPersonId={
+          composerState.to.length === 1
+            ? (composerState.to[0].personId ??
+              (contextRecord?.objectNameSingular === 'person'
+                ? contextRecord.recordId
+                : undefined))
+            : undefined
+        }
+      />
       <DragDropItemDndContext.Provider value={contextValues}>
         <DragDropProvider<EmailRecipientDragData>
           sensors={DND_KIT_SENSORS}
@@ -290,7 +305,7 @@ export const EmailComposerFields = ({
                 id={subjectInputId}
                 type="text"
                 placeholder={t`Add a subject`}
-                defaultValue={composerState.initialSubject}
+                value={composerState.subject}
                 onChange={(event) =>
                   composerState.setSubject(event.target.value)
                 }

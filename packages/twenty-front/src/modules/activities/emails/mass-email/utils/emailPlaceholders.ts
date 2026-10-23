@@ -1,3 +1,9 @@
+import {
+  parseEmailDocument,
+  parseJson,
+  transformEmailDocumentStrings,
+} from 'twenty-shared/utils';
+
 export const EMAIL_PLACEHOLDER_KEYS = [
   'first_name',
   'last_name',
@@ -37,9 +43,8 @@ export const resolveEmailPlaceholders = (
 ): ResolveEmailPlaceholdersResult => {
   const missingPlaceholderKeys = new Set<EmailPlaceholderKey>();
 
-  const resolved = template.replace(
-    EMAIL_PLACEHOLDER_PATTERN,
-    (match, key: string) => {
+  const resolveString = (valueToResolve: string, shouldEscape: boolean) =>
+    valueToResolve.replace(EMAIL_PLACEHOLDER_PATTERN, (match, key: string) => {
       if (!isKnownPlaceholderKey(key)) {
         return match;
       }
@@ -52,9 +57,17 @@ export const resolveEmailPlaceholders = (
         return '';
       }
 
-      return escapeValues ? escapeHtml(value) : value;
-    },
-  );
+      return shouldEscape ? escapeHtml(value) : value;
+    });
+
+  const parsed = parseEmailDocument(parseJson<unknown>(template));
+  const resolved = parsed.success
+    ? JSON.stringify(
+        transformEmailDocumentStrings(parsed.document, (value, context) =>
+          resolveString(value, context === 'html'),
+        ),
+      )
+    : resolveString(template, escapeValues);
 
   return { resolved, missingPlaceholderKeys: [...missingPlaceholderKeys] };
 };
