@@ -4014,6 +4014,7 @@ msgid "Blue"
 msgstr "藍色"
 
 #. js-lingui-id: bGQplw
+#: src/modules/activities/emails/templates/components/EmailTemplateEditor.tsx
 #: src/modules/side-panel/pages/email-block-settings/components/EmailPageStyleSection.tsx
 #: src/modules/workflow/workflow-steps/workflow-actions/components/WorkflowEditActionEmailBase.tsx
 #: src/modules/workflow/workflow-steps/workflow-actions/components/WorkflowRunStepLogsEmailDetail.tsx
@@ -4833,6 +4834,11 @@ msgstr ""
 msgid "Choose a model mode"
 msgstr "選擇模型模式"
 
+#. js-lingui-id: 9JhkKR
+#: src/modules/activities/emails/templates/components/EmailTemplatePreview.tsx
+msgid "Choose a person to preview and fill personalized fields."
+msgstr ""
+
 #. js-lingui-id: 3Nyb8y
 #: src/pages/settings/data-model/new-field/SettingsObjectNewLinkedFieldConfigure.tsx
 msgid "Choose a relation"
@@ -4954,6 +4960,7 @@ msgid "Choose which profile fields users with the Edit Profile permission can mo
 msgstr ""
 
 #. js-lingui-id: 3wV73y
+#: src/modules/activities/emails/templates/components/EmailTemplateEditor.tsx
 #: src/modules/object-metadata/hooks/useSortSubFieldChoicesForField.ts
 #: src/modules/object-record/record-field/ui/form-types/components/FormAddressFieldInput.tsx
 #: src/modules/object-record/record-field/ui/form-types/components/FormAddressFieldInput.tsx
@@ -5133,6 +5140,7 @@ msgid "Clipboard requires a secure connection (HTTPS). Please access this app ov
 msgstr "剪貼簿需要安全連線 (HTTPS)。請透過 HTTPS 存取此應用程式以啟用複製功能。"
 
 #. js-lingui-id: yz7wBu
+#: src/modules/activities/emails/templates/components/EmailTemplateLibrary.tsx
 #: src/modules/ai/components/AiChatCloseButton.tsx
 #: src/modules/front-components/media-session/components/FrontComponentMediaPermissionModal.tsx
 #: src/modules/log-console/components/LogConsole.tsx
@@ -5677,6 +5685,11 @@ msgstr "確認將方案變更為每 {intervalLabel} {selectedCreditAmountDisplay
 msgid "Confirm changing your current resource credit allocation."
 msgstr "確認更改您目前的資源點數配額。"
 
+#. js-lingui-id: mgJ1oe
+#: src/modules/activities/emails/templates/components/EmailTemplateLibrary.tsx
+msgid "Confirm delete"
+msgstr ""
+
 #. js-lingui-id: SU6Tym
 #: src/modules/settings/roles/role-settings/components/SettingsRoleSettingsDeleteRoleConfirmationModalSubtitle.tsx
 msgid "Confirm deletion of {roleName} role? This cannot be undone."
@@ -6218,6 +6231,11 @@ msgstr "無法完成認領。請再試一次。"
 msgid "Could not delete approved access domain"
 msgstr "無法刪除核准訪問域名"
 
+#. js-lingui-id: BiXtZw
+#: src/modules/activities/emails/templates/components/EmailTemplateLibrary.tsx
+msgid "Could not delete template"
+msgstr ""
+
 #. js-lingui-id: E5v5TK
 #: src/modules/settings/legal/components/SettingsDpaAgreementsTable.tsx
 msgid "Could not download the document."
@@ -6233,6 +6251,16 @@ msgstr "無法產生已簽署的 DPA。請再試一次。"
 #: src/modules/front-components/media-session/components/FrontComponentMediaPermissionModal.tsx
 msgid "Could not grant media access. Please try again."
 msgstr "無法授予媒體存取權。請再試一次。"
+
+#. js-lingui-id: zYIlbR
+#: src/modules/activities/emails/templates/components/EmailTemplateLibrary.tsx
+msgid "Could not insert template"
+msgstr ""
+
+#. js-lingui-id: zaX/Hq
+#: src/modules/activities/emails/templates/components/EmailTemplateLibrary.tsx
+msgid "Could not load templates. Close and try again."
+msgstr ""
 
 #. js-lingui-id: Tr0DHk
 #: src/modules/object-core/workflows/components/CoreWorkflowEditor.tsx
@@ -6289,6 +6317,21 @@ msgstr "無法將此版本還原為草稿。"
 #: src/pages/settings/applications/components/SettingsClaimApplicationSection.tsx
 msgid "Could not run the lookup"
 msgstr "無法執行查詢"
+
+#. js-lingui-id: bxJJGv
+#: src/modules/activities/emails/templates/components/EmailTemplateLibrary.tsx
+msgid "Could not save template"
+msgstr ""
+
+#. js-lingui-id: uhOU8c
+#: src/modules/activities/emails/hooks/useCampaignComposerState.ts
+msgid "Could not save the template to this campaign. Please try again."
+msgstr ""
+
+#. js-lingui-id: Z9/U17
+#: src/modules/activities/emails/mass-email/hooks/useMassEmailComposerState.ts
+msgid "Could not save the template to this draft. Please try again."
+msgstr ""
 
 #. js-lingui-id: 82UkUj
 #: src/modules/object-core/workflows/hooks/useRenameCoreWorkflow.ts
@@ -7783,6 +7826,11 @@ msgstr "永久刪除角色"
 msgid "Delete Skill"
 msgstr ""
 
+#. js-lingui-id: DFjdv0
+#: src/modules/activities/emails/templates/components/EmailTemplateLibrary.tsx
+msgid "Delete template"
+msgstr ""
+
 #. js-lingui-id: DgHnjS
 #: src/pages/settings/ai/components/SettingsAgentSettingsTab.tsx
 msgid "Delete this agent"
@@ -8139,6 +8187,22 @@ msgstr "禁用"
 #: src/modules/side-panel/pages/compose-email/components/SidePanelComposeEmailPage.tsx
 msgid "Discard"
 msgstr "捨棄"
+
+#. js-lingui-id: DPmiFg
+#: src/modules/activities/emails/templates/components/EmailTemplateLibrary.tsx
+msgid "Discard and close"
+msgstr ""
+
+#. js-lingui-id: noFL0T
+#: src/modules/activities/emails/templates/components/EmailTemplateLibrary.tsx
+msgid "Discard and switch"
+msgstr ""
+
+#. js-lingui-id: XkeQtf
+#: src/modules/activities/emails/templates/components/EmailTemplateLibrary.tsx
+#: src/modules/activities/emails/templates/components/EmailTemplateLibrary.tsx
+msgid "Discard unsaved changes?"
+msgstr ""
 
 #. js-lingui-id: +K0AvT
 #: src/pages/settings/applications/SettingsApplicationConnectionDetail.tsx
@@ -8573,6 +8637,11 @@ msgstr "例如，摘要、狀態、數量"
 msgid "Each index speeds up reads on the fields it covers, but slows down every insert and update, and uses disk space. Only add an index when you know which queries it serves."
 msgstr "每個索引都會加快其所涵蓋欄位的讀取速度，但會減慢每次插入與更新，並佔用磁碟空間。只有在明確知道它要服務哪些查詢時才新增索引。"
 
+#. js-lingui-id: ptLq1U
+#: src/modules/activities/emails/templates/components/EmailTemplateEditor.tsx
+msgid "Each placeholder is filled from the recipient's record. Missing values become blank."
+msgstr ""
+
 #. js-lingui-id: 79hamt
 #: src/modules/side-panel/pages/page-layout/constants/settings/ChartConfigurationSettingLabels.ts
 msgid "Each slice represents"
@@ -8818,6 +8887,7 @@ msgid "else if"
 msgstr "否則如果"
 
 #. js-lingui-id: O3oNi5
+#: src/modules/activities/emails/templates/components/EmailTemplateEditor.tsx
 #: src/modules/auth/sign-in-up/components/internal/SignInUpEmailField.tsx
 #: src/modules/object-record/record-field/ui/meta-types/input/components/EmailsFieldInput.tsx
 #: src/modules/settings/admin-panel/components/SettingsAdminGeneral.tsx
@@ -8964,6 +9034,12 @@ msgstr ""
 #: src/modules/settings/applications/components/SettingsApplicationAboutSidebar.tsx
 msgid "Email support"
 msgstr "透過電子郵件聯絡支援"
+
+#. js-lingui-id: J3sJl0
+#: src/modules/activities/emails/templates/components/EmailTemplateLibrary.tsx
+#: src/modules/activities/emails/templates/components/EmailTemplatesButton.tsx
+msgid "Email templates"
+msgstr ""
 
 #. js-lingui-id: LLTYL6
 #: src/modules/workflow/workflow-steps/workflow-actions/components/WorkflowEditActionCreateCalendarEvent.tsx
@@ -10989,6 +11065,7 @@ msgid "First 5 lines"
 msgstr "前5行"
 
 #. js-lingui-id: V1EGGU
+#: src/modules/activities/emails/templates/components/EmailTemplateEditor.tsx
 #: src/modules/object-metadata/hooks/useSortSubFieldChoicesForField.ts
 msgid "First name"
 msgstr "名字"
@@ -11270,6 +11347,7 @@ msgstr "完整管理面板存取權"
 
 #. js-lingui-id: 0W0FHK
 #: src/modules/activities/emails/hooks/useCampaignEmailEditorVariables.ts
+#: src/modules/activities/emails/templates/components/EmailTemplateEditor.tsx
 msgid "Full name"
 msgstr "全名"
 
@@ -13019,6 +13097,11 @@ msgstr "工作數據"
 msgid "Job Name"
 msgstr "工作名稱"
 
+#. js-lingui-id: qMgKul
+#: src/modules/activities/emails/templates/components/EmailTemplateEditor.tsx
+msgid "Job title"
+msgstr ""
+
 #. js-lingui-id: 27z+FV
 #: src/pages/onboarding/CreateProfile.tsx
 msgid "Job Title"
@@ -13113,6 +13196,12 @@ msgstr ""
 #. js-lingui-id: w7Wygd
 #: src/modules/person-duplicate-review/components/PersonDuplicateMergePreview.tsx
 msgid "Keep {email}"
+msgstr ""
+
+#. js-lingui-id: 4OjqAQ
+#: src/modules/activities/emails/templates/components/EmailTemplateLibrary.tsx
+#: src/modules/activities/emails/templates/components/EmailTemplateLibrary.tsx
+msgid "Keep editing"
 msgstr ""
 
 #. js-lingui-id: IwceEs
@@ -13371,6 +13460,7 @@ msgid "Last message"
 msgstr "最後一則訊息"
 
 #. js-lingui-id: 1ZaQUH
+#: src/modules/activities/emails/templates/components/EmailTemplateEditor.tsx
 #: src/modules/object-metadata/hooks/useSortSubFieldChoicesForField.ts
 #: src/modules/settings/members/components/MemberNameFields.tsx
 #: src/pages/onboarding/CreateProfile.tsx
@@ -13979,6 +14069,11 @@ msgstr "正在載入技能"
 #: src/modules/ai/utils/tool-display/get-tool-display-message.ts
 msgid "Loading skills..."
 msgstr "正在載入技能..."
+
+#. js-lingui-id: 4nAm+5
+#: src/modules/activities/emails/templates/components/EmailTemplateLibrary.tsx
+msgid "Loading templates…"
+msgstr ""
 
 #. js-lingui-id: 7YK6ap
 #: src/modules/page-layout/widgets/email-thread/components/EmailThreadWidget.tsx
@@ -15434,6 +15529,11 @@ msgstr "新分頁"
 msgid "New task"
 msgstr "新任務"
 
+#. js-lingui-id: G1Gw0v
+#: src/modules/activities/emails/templates/components/EmailTemplateList.tsx
+msgid "New template"
+msgstr ""
+
 #. js-lingui-id: IQ+GEj
 #: src/pages/settings/ai/SettingsAI.tsx
 msgid "New Tool"
@@ -16196,6 +16296,11 @@ msgstr "沒有錯誤的行"
 #. js-lingui-id: aJlCCf
 #: src/modules/settings/data-model/object-details/components/tabs/SettingsObjectValidationRulesSection.tsx
 msgid "No rules yet."
+msgstr ""
+
+#. js-lingui-id: Hqc1lB
+#: src/modules/activities/emails/templates/components/EmailTemplateLibrary.tsx
+msgid "No saved templates yet. Choose New template to create one."
 msgstr ""
 
 #. js-lingui-id: Hsl+kr
@@ -17866,9 +17971,29 @@ msgstr "人員 ID"
 msgid "Person relation"
 msgstr ""
 
+#. js-lingui-id: l8YRPU
+#: src/modules/activities/emails/templates/components/EmailTemplateEditor.tsx
+msgid "Personalization fields"
+msgstr ""
+
+#. js-lingui-id: JRi7Ka
+#: src/modules/activities/emails/templates/components/EmailTemplatePreview.tsx
+msgid "Personalize for"
+msgstr ""
+
 #. js-lingui-id: FaMom6
 #: src/modules/activities/emails/mass-email/components/MassEmailComposeCard.tsx
 msgid "Personalize for each recipient with placeholders:"
+msgstr ""
+
+#. js-lingui-id: DO3lMi
+#: src/modules/activities/emails/templates/components/EmailTemplateEditor.tsx
+msgid "Personalize the subject or body"
+msgstr ""
+
+#. js-lingui-id: ej6R72
+#: src/modules/activities/emails/templates/components/EmailTemplatePreview.tsx
+msgid "Personalized fields will be filled separately for each recipient."
 msgstr ""
 
 #. js-lingui-id: zmwvG2
@@ -18194,6 +18319,7 @@ msgid "Prevent from assigning the same value to different records"
 msgstr "防止用戶將相同的數值指定給不同的記錄"
 
 #. js-lingui-id: rdUucN
+#: src/modules/activities/emails/templates/components/EmailTemplatePreview.tsx
 #: src/modules/settings/data-model/components/SettingsDataModelPreviewFormCard.tsx
 #: src/modules/settings/data-model/objects/forms/components/SettingsDataModelObjectSettingsFormCard.tsx
 #: src/pages/settings/ai/components/SettingsAiModelTiersPreview.tsx
@@ -18201,6 +18327,11 @@ msgstr "防止用戶將相同的數值指定給不同的記錄"
 #: src/pages/settings/legal/SettingsLegalDpaNew.tsx
 msgid "Preview"
 msgstr "預覽"
+
+#. js-lingui-id: KY9ir4
+#: src/modules/activities/emails/templates/components/EmailTemplatePreview.tsx
+msgid "Preview for"
+msgstr ""
 
 #. js-lingui-id: Fe5cbB
 #: src/modules/activities/files/components/UnavailableFilePreview.tsx
@@ -19303,6 +19434,11 @@ msgstr "重新排序欄位"
 msgid "Reorder options"
 msgstr "重新排序選項"
 
+#. js-lingui-id: 6JWIPA
+#: src/modules/activities/emails/templates/components/EmailTemplatePreview.tsx
+msgid "Replace email content"
+msgstr ""
+
 #. js-lingui-id: q8Id6J
 #: src/modules/side-panel/pages/page-layout/components/WidgetSettingsManageSection.tsx
 msgid "Replace widget"
@@ -20008,15 +20144,31 @@ msgstr "在編輯版面配置之前，請先儲存或取消儀表板的變更。
 msgid "Save settings"
 msgstr "儲存設定"
 
+#. js-lingui-id: 5dVjYt
+#: src/modules/activities/emails/templates/components/EmailTemplateLibrary.tsx
+msgid "Save template"
+msgstr ""
+
 #. js-lingui-id: bL2pm9
 #: src/modules/object-record/record-field/ui/form-types/components/FormRecordRichTextFieldInput.tsx
 msgid "Save the record before attaching a file"
 msgstr "附加檔案前請先儲存記錄"
 
+#. js-lingui-id: aUNBBU
+#: src/modules/activities/emails/templates/components/EmailTemplateLibrary.tsx
+msgid "Save your changes before using this template."
+msgstr ""
+
 #. js-lingui-id: kv9Dnn
 #: src/modules/settings/translations/components/SettingsTranslationsCard.tsx
 msgid "Save your changes first"
 msgstr "請先儲存您的變更"
+
+#. js-lingui-id: alAG1g
+#: src/modules/activities/emails/templates/components/EmailTemplateList.tsx
+#: src/modules/activities/emails/templates/components/EmailTemplateList.tsx
+msgid "Saved templates"
+msgstr ""
 
 #. js-lingui-id: K/F6pa
 #: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
@@ -22194,6 +22346,7 @@ msgstr ""
 #: src/modules/activities/emails/components/CampaignSentEnvelope.tsx
 #: src/modules/activities/emails/components/EmailComposerFields.tsx
 #: src/modules/activities/emails/mass-email/components/MassEmailComposeCard.tsx
+#: src/modules/activities/emails/templates/components/EmailTemplateEditor.tsx
 #: src/modules/ai/components/AiChatEmailApprovalCard.tsx
 #: src/modules/ai/components/AiChatEmailApprovalCard.tsx
 #: src/modules/side-panel/pages/send-campaign/components/SendCampaignForm.tsx
@@ -22640,6 +22793,31 @@ msgstr "團隊"
 #: src/modules/activities/emails/recipients/hooks/useEmailRecipientSuggestions.ts
 msgid "Team member"
 msgstr "團隊成員"
+
+#. js-lingui-id: ZTgE3k
+#: src/modules/activities/emails/templates/components/EmailTemplateLibrary.tsx
+msgid "Template deleted"
+msgstr ""
+
+#. js-lingui-id: 5OwALL
+#: src/modules/activities/emails/templates/components/EmailTemplateEditor.tsx
+msgid "Template name"
+msgstr ""
+
+#. js-lingui-id: GamjcN
+#: src/modules/activities/emails/templates/components/EmailTemplateLibrary.tsx
+msgid "Template saved"
+msgstr ""
+
+#. js-lingui-id: iTylMl
+#: src/modules/activities/emails/templates/components/EmailTemplatesButton.tsx
+msgid "Templates"
+msgstr ""
+
+#. js-lingui-id: RmVKuz
+#: src/modules/activities/emails/templates/components/EmailTemplateLibrary.tsx
+msgid "Templates are shared with everyone who can send email in this workspace."
+msgstr ""
 
 #. js-lingui-id: lKXcJz
 #: src/pages/settings/emailing-domains/utils/getEmailingDomainStatusText.ts
@@ -23098,6 +23276,11 @@ msgstr "此記錄沒有相關的活動。"
 msgid "There was an error while updating password."
 msgstr "更新密碼時出現錯誤。"
 
+#. js-lingui-id: huEvM1
+#: src/modules/activities/emails/templates/components/EmailTemplatePreview.tsx
+msgid "These fields are blank for this person:"
+msgstr ""
+
 #. js-lingui-id: RuO91P
 #: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
 msgid "These people will remain separate unless their identity details change."
@@ -23404,6 +23587,11 @@ msgstr "此頁面無法使用。"
 #: src/modules/settings/accounts/components/SettingsAccountsRowDropdownMenu.tsx
 msgid "This permanently deletes {accountHandle} and all of its synced emails and events. This action cannot be undone."
 msgstr "這會永久刪除 {accountHandle} 及其所有已同步的電子郵件和活動。此動作無法復原。"
+
+#. js-lingui-id: Kcj+LO
+#: src/modules/activities/emails/templates/components/EmailTemplatePreview.tsx
+msgid "This person could not be loaded. Choose another person."
+msgstr ""
 
 #. js-lingui-id: R/PuIn
 #: src/pages/settings/admin-panel/SettingsAdminNewAiProvider.tsx
@@ -24271,6 +24459,11 @@ msgstr ""
 #: src/modules/workflow/workflow-steps/workflow-actions/ai-agent-action/components/WorkflowAiAgentPermissionsTab.tsx
 msgid "Type anything..."
 msgstr "輸入任何內容..."
+
+#. js-lingui-id: 90vHys
+#: src/modules/activities/emails/templates/components/EmailTemplateEditor.tsx
+msgid "Type or copy these placeholders into your email:"
+msgstr ""
 
 #. js-lingui-id: LaEX5I
 #: src/modules/activities/emails/components/CampaignBodyField.tsx
@@ -25176,6 +25369,11 @@ msgstr "僅可使用字母、數字、底線、點或連字號（最多 64 個�
 msgid "Use our API or add your first {objectLabel} manually"
 msgstr "使用我們的 API 或手動添加您的第一個 {objectLabel}"
 
+#. js-lingui-id: QNtP5M
+#: src/modules/activities/emails/templates/components/EmailTemplatePreview.tsx
+msgid "Use template"
+msgstr ""
+
 #. js-lingui-id: 40bRe+
 #: src/modules/settings/admin-panel/constants/SettingsAdminFeatureFlagMetadata.ts
 msgid "Use the dedicated workflow index page to browse workflows and their versions."
@@ -25752,6 +25950,16 @@ msgstr "相較於平衡模式"
 #: src/modules/settings/mcp-and-apis/utils/buildMcpSetupCategories.tsx
 msgid "VS Code"
 msgstr "VS Code"
+
+#. js-lingui-id: v0NOxE
+#: src/modules/activities/emails/hooks/useCampaignComposerState.ts
+msgid "Wait for the campaign draft to finish saving, then try again."
+msgstr ""
+
+#. js-lingui-id: gVhfzO
+#: src/modules/activities/emails/mass-email/hooks/useMassEmailComposerState.ts
+msgid "Wait for the email draft and recipients to finish loading, then try again."
+msgstr ""
 
 #. js-lingui-id: uUehLT
 #: src/modules/settings/admin-panel/health-status/components/SettingsAdminQueueJobsTable.tsx

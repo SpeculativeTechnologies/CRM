@@ -75,6 +75,7 @@ export type FormSingleRecordPickerProps = {
     selectedMorphItem: RecordPickerPickableMorphItem,
   ) => void;
   disabled?: boolean;
+  isDropdownInModal?: boolean;
   testId?: string;
   VariablePicker?: VariablePickerComponent;
   shouldDisplayRecordFieldsInVariablePicker?: boolean;
@@ -90,6 +91,7 @@ export const FormSingleRecordPicker = ({
   onMorphItemSelected,
   onCreate,
   disabled,
+  isDropdownInModal = false,
   testId,
   VariablePicker,
   shouldDisplayRecordFieldsInVariablePicker = false,
@@ -217,6 +219,7 @@ export const FormSingleRecordPicker = ({
         ) : (
           <StyledDropdownContainer>
             <Dropdown
+              isDropdownInModal={isDropdownInModal}
               dropdownId={dropdownId}
               dropdownPlacement="bottom-start"
               clickableComponentWidth="100%"

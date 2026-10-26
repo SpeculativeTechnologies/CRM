@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { t } from '@lingui/core/macro';
 import { MAX_EMAIL_RECIPIENTS } from 'twenty-shared/constants';
 import { isDefined } from 'twenty-shared/utils';
 
@@ -15,6 +16,8 @@ import { type EmailRecipient } from '@/activities/emails/recipients/types/EmailR
 import { isValidEmailRecipientAddress } from '@/activities/emails/recipients/utils/isValidEmailRecipientAddress';
 import { parseEmailRecipients } from '@/activities/emails/recipients/utils/parseEmailRecipients';
 import { serializeEmailRecipients } from '@/activities/emails/recipients/utils/serializeEmailRecipients';
+import { type EmailTemplateContent } from '@/activities/emails/templates/types/EmailTemplate';
+import { toMassEmailTemplate } from '@/activities/emails/templates/utils/emailTemplatePersonalization';
 
 type MassEmailOverride = {
   subject?: string;
@@ -278,42 +281,51 @@ export const useMassEmailComposerState = ({
     !exceedsRecipientLimit &&
     !hasInvalidCcRecipients;
 
-  const saveCurrentDraft = useCallback(async () => {
-    if (includedRecipients.length === 0 || recipientsLoading) {
-      return draftCampaignId;
-    }
+  const saveCurrentDraft = useCallback(
+    async (content?: EmailTemplateContent) => {
+      if (includedRecipients.length === 0 || recipientsLoading) {
+        return draftCampaignId;
+      }
 
-    setDraftSaveStatus('saving');
-    const savedDraft = await saveDraft({
-      campaignId: draftCampaignId,
+      setDraftSaveStatus('saving');
+      const savedDraft = await saveDraft({
+        campaignId: draftCampaignId,
+        connectedAccountId,
+        personIds: includedRecipients.map(({ personId }) => personId),
+        subject: content?.subject ?? subjectTemplate,
+        body: content?.body ?? bodyTemplate,
+        // Only the shared list is persisted, matching subject and body: the
+        // per-recipient overrides have never been part of the saved draft.
+        cc: ccTemplate.map((ccRecipient) => ccRecipient.address.trim()),
+      });
+
+      setDraftSaveStatus(savedDraft === null ? 'error' : 'saved');
+
+      if (savedDraft === null && content) {
+        throw new Error(
+          t`Could not save the template to this draft. Please try again.`,
+        );
+      }
+
+      if (savedDraft !== null && draftCampaignId === undefined) {
+        setDraftCampaignId(savedDraft.campaignId);
+        onDraftCreated?.(savedDraft.campaignId);
+      }
+
+      return savedDraft?.campaignId ?? draftCampaignId;
+    },
+    [
+      bodyTemplate,
+      ccTemplate,
       connectedAccountId,
-      personIds: includedRecipients.map(({ personId }) => personId),
-      subject: subjectTemplate,
-      body: bodyTemplate,
-      // Only the shared list is persisted, matching subject and body: the
-      // per-recipient overrides have never been part of the saved draft.
-      cc: ccTemplate.map((ccRecipient) => ccRecipient.address.trim()),
-    });
-
-    setDraftSaveStatus(savedDraft === null ? 'error' : 'saved');
-
-    if (savedDraft !== null && draftCampaignId === undefined) {
-      setDraftCampaignId(savedDraft.campaignId);
-      onDraftCreated?.(savedDraft.campaignId);
-    }
-
-    return savedDraft?.campaignId ?? draftCampaignId;
-  }, [
-    bodyTemplate,
-    ccTemplate,
-    connectedAccountId,
-    draftCampaignId,
-    includedRecipients,
-    onDraftCreated,
-    recipientsLoading,
-    saveDraft,
-    subjectTemplate,
-  ]);
+      draftCampaignId,
+      includedRecipients,
+      onDraftCreated,
+      recipientsLoading,
+      saveDraft,
+      subjectTemplate,
+    ],
+  );
 
   useEffect(() => {
     if (
@@ -393,6 +405,34 @@ export const useMassEmailComposerState = ({
 
   return {
     connectedAccountId,
+    applyTemplate: async (content: EmailTemplateContent) => {
+      if (
+        draftCampaignId === undefined ||
+        recipientsLoading ||
+        includedRecipients.length === 0
+      ) {
+        throw new Error(
+          t`Wait for the email draft and recipients to finish loading, then try again.`,
+        );
+      }
+      const converted = toMassEmailTemplate(content);
+      const nextBody = signatureState.applySignatureInclusion(
+        converted.body,
+        signatureState.isSignatureIncludedIn(bodyTemplate),
+      );
+
+      setSubjectTemplate(converted.subject);
+      setBodyTemplate(nextBody);
+      setOverrides((previous) =>
+        Object.fromEntries(
+          Object.entries(previous).map(([id, override]) => [
+            id,
+            { cc: override.cc },
+          ]),
+        ),
+      );
+      await saveCurrentDraft({ subject: converted.subject, body: nextBody });
+    },
     setConnectedAccountId,
     subjectTemplate,
     setSubjectTemplate,

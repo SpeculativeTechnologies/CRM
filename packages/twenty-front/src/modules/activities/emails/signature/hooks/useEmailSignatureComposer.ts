@@ -48,6 +48,16 @@ export const useEmailSignatureComposer = ({
   const isSignatureIncludedIn = (serializedBody: string): boolean =>
     hasEmailSignature({ serializedBody, serializedSignature });
 
+  const getBodyWithSignatureInclusion = (
+    serializedBody: string,
+    isIncluded: boolean,
+  ): string =>
+    setEmailSignatureIncluded({
+      serializedBody,
+      serializedSignature,
+      isIncluded,
+    });
+
   // Returns the next body instead of writing it, because each composer owns
   // its body differently (local state, a debounced draft, a template).
   const applySignatureInclusion = (
@@ -58,17 +68,14 @@ export const useEmailSignatureComposer = ({
     // body the toggle rewrote reaches them through a key change.
     setSignatureResyncNonce((previousNonce) => previousNonce + 1);
 
-    return setEmailSignatureIncluded({
-      serializedBody,
-      serializedSignature,
-      isIncluded,
-    });
+    return getBodyWithSignatureInclusion(serializedBody, isIncluded);
   };
 
   return {
     isSignatureToggleVisible: isSignatureAvailable,
     initialBody,
     isSignatureIncludedIn,
+    getBodyWithSignatureInclusion,
     applySignatureInclusion,
     signatureResyncKey: `signature-${signatureResyncNonce}`,
   };

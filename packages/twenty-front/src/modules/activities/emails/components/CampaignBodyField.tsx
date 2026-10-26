@@ -17,6 +17,9 @@ import { FormAdvancedTextFieldInput } from '@/advanced-text-editor/components/Fo
 import { AdvancedTextEditorInsertRail } from '@/advanced-text-editor/components/AdvancedTextEditorInsertRail';
 import { useSetAtomState } from '@/ui/utilities/state/jotai/hooks/useSetAtomState';
 import { themeCssVariables } from 'twenty-ui/theme';
+import { CoreObjectNameSingular } from 'twenty-shared/types';
+import { EmailTemplatesButton } from '@/activities/emails/templates/components/EmailTemplatesButton';
+import { useUpdateOneRecord } from '@/object-record/hooks/useUpdateOneRecord';
 
 const StyledSignatureRow = styled.div`
   display: flex;
@@ -54,6 +57,7 @@ export const CampaignBodyField = ({
   const setActiveEmailEditor = useSetAtomState(activeEmailEditorState);
   const { uploadEmailImage } = useUploadEmailImage();
   const { variables } = useCampaignEmailEditorVariables();
+  const { updateOneRecord } = useUpdateOneRecord();
 
   const [bodyEditor, setBodyEditor] = useState<Editor | null>(null);
 
@@ -88,6 +92,35 @@ export const CampaignBodyField = ({
           />
         </StyledSignatureRow>
       )}
+      <StyledSignatureRow>
+        <EmailTemplatesButton
+          subject={campaign.subject ?? ''}
+          body={body}
+          onApply={async (content) => {
+            const isSignatureIncluded =
+              signatureState.isSignatureIncludedIn(body);
+            const nextBody = signatureState.getBodyWithSignatureInclusion(
+              content.body,
+              isSignatureIncluded,
+            );
+
+            await updateOneRecord({
+              objectNameSingular: CoreObjectNameSingular.MessageCampaign,
+              idToUpdate: campaign.id,
+              updateOneRecordInput: {
+                subject: content.subject,
+                bodyTemplate: nextBody,
+              },
+            });
+            setBody(
+              signatureState.applySignatureInclusion(
+                nextBody,
+                isSignatureIncluded,
+              ),
+            );
+          }}
+        />
+      </StyledSignatureRow>
       {isDefined(bodyEditor) && (
         <AdvancedTextEditorInsertRail
           editor={bodyEditor}

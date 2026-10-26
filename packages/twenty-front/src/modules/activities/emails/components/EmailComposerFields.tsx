@@ -36,6 +36,15 @@ import { DND_KIT_PROVIDER_PLUGINS_WITHOUT_DROP_ANIMATION } from '@/ui/utilities/
 import { DND_KIT_SENSORS } from '@/ui/utilities/drag-and-drop/constants/DndKitSensors';
 import { DragDropItemDndContext } from '@/ui/utilities/drag-and-drop/context/DragDropItemDndContext';
 import { GET_MY_CONNECTED_ACCOUNTS } from '@/settings/accounts/graphql/queries/getMyConnectedAccounts';
+import { EmailTemplatesButton } from '@/activities/emails/templates/components/EmailTemplatesButton';
+
+const StyledTools = styled.div`
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: ${themeCssVariables.spacing[2]};
+  padding: ${themeCssVariables.spacing[2]} ${themeCssVariables.spacing[3]};
+`;
 
 const StyledFieldsContainer = styled.div`
   display: flex;
@@ -290,7 +299,7 @@ export const EmailComposerFields = ({
                 id={subjectInputId}
                 type="text"
                 placeholder={t`Add a subject`}
-                defaultValue={composerState.initialSubject}
+                value={composerState.subject}
                 onChange={(event) =>
                   composerState.setSubject(event.target.value)
                 }
@@ -324,20 +333,34 @@ export const EmailComposerFields = ({
           />
         </StyledSignature>
       )}
-      {(composerState.files.length > 0 || isDefined(onAttachFiles)) && (
+      <StyledTools>
+        <EmailTemplatesButton
+          subject={composerState.subject}
+          body={composerState.body}
+          onApply={composerState.applyTemplate}
+          personalize
+          defaultPersonId={
+            composerState.to.length === 1
+              ? (composerState.to[0].personId ??
+                (contextRecord?.objectNameSingular === 'person'
+                  ? contextRecord.recordId
+                  : undefined))
+              : undefined
+          }
+        />
+        {isDefined(onAttachFiles) && (
+          <StyledAttachAction type="button" onClick={onAttachFiles}>
+            <IconPaperclip size={theme.icon.size.sm} />
+            {t`Attach files`}
+          </StyledAttachAction>
+        )}
+      </StyledTools>
+      {composerState.files.length > 0 && (
         <StyledAttachments>
-          {isDefined(onAttachFiles) && (
-            <StyledAttachAction type="button" onClick={onAttachFiles}>
-              <IconPaperclip size={theme.icon.size.sm} />
-              {t`Attach files`}
-            </StyledAttachAction>
-          )}
-          {composerState.files.length > 0 && (
-            <EmailAttachmentsField
-              files={composerState.files}
-              onChange={composerState.setFiles}
-            />
-          )}
+          <EmailAttachmentsField
+            files={composerState.files}
+            onChange={composerState.setFiles}
+          />
         </StyledAttachments>
       )}
     </StyledFieldsContainer>

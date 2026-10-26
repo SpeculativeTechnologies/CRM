@@ -28,6 +28,63 @@ const fillSendableFields = (result: {
 };
 
 describe('useCampaignComposerState', () => {
+  it('should retain personalization in both campaign fields when a template is applied', async () => {
+    const { result } = renderHook(() =>
+      useCampaignComposerState({ autoSaveDraft: false }),
+    );
+
+    act(() => result.current.setListId('list-1'));
+    await act(async () =>
+      result.current.applyTemplate({
+        subject: 'Hi {{firstName}}',
+        body: JSON.stringify({
+          type: 'doc',
+          content: [
+            {
+              type: 'paragraph',
+              content: [{ type: 'text', text: 'Hello {{fullName}}' }],
+            },
+          ],
+        }),
+      }),
+    );
+
+    expect(result.current.subject).toBe('Hi {{firstName}}');
+    expect(result.current.body).toContain('{{fullName}}');
+    expect(result.current.listId).toBe('list-1');
+    expect(sendMessageCampaignMock).not.toHaveBeenCalled();
+  });
+
+  it('should persist template content before the insertion action resolves', async () => {
+    const { result } = renderHook(() =>
+      useCampaignComposerState({ campaignId: 'campaign-1' }),
+    );
+    const body = JSON.stringify({
+      type: 'doc',
+      content: [
+        {
+          type: 'paragraph',
+          content: [{ type: 'text', text: 'Hi {{firstName}}' }],
+        },
+      ],
+    });
+
+    await act(async () => {
+      await result.current.applyTemplate({
+        subject: 'Hello {{firstName}}',
+        body,
+      });
+    });
+
+    expect(saveDraftMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        campaignId: 'campaign-1',
+        subject: 'Hello {{firstName}}',
+        body: expect.stringContaining('{{firstName}}'),
+      }),
+    );
+    expect(result.current.draftSaveStatus).toBe('saved');
+  });
   beforeEach(() => {
     jest.clearAllMocks();
     mockedUseSendMessageCampaign.mockReturnValue({

@@ -63,6 +63,9 @@ import { MessageListDuplicationService } from 'src/modules/emailing/services/mes
 import { MessageSuppressionService } from 'src/modules/emailing/services/message-suppression.service';
 import { UnsubscribeTopicService } from 'src/modules/emailing/services/unsubscribe-topic.service';
 import { SaveCampaignTool } from 'src/modules/emailing/tools/save-campaign-tool';
+import { KeyValuePairEntity } from 'src/engine/core-modules/key-value-pair/key-value-pair.entity';
+import { EmailTemplateResolver } from 'src/modules/emailing/resolvers/email-template.resolver';
+import { EmailTemplateService } from 'src/modules/emailing/services/email-template.service';
 
 @Module({
   imports: [
@@ -84,6 +87,7 @@ import { SaveCampaignTool } from 'src/modules/emailing/tools/save-campaign-tool'
     MetricsModule,
     ShortLinkModule,
     TypeOrmModule.forFeature([
+      KeyValuePairEntity,
       MessageChannelEntity,
       EmailingDomainEntity,
       UnsubscribeTopicEntity,
@@ -96,6 +100,8 @@ import { SaveCampaignTool } from 'src/modules/emailing/tools/save-campaign-tool'
     CampaignTrackingController,
   ],
   providers: [
+    EmailTemplateResolver,
+    EmailTemplateService,
     BackfillCampaignRepliesCommand,
     CampaignVariableService,
     EmailBillingService,

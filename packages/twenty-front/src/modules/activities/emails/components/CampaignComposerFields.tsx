@@ -8,7 +8,7 @@ import { EmailSignatureToggleRow } from '@/activities/emails/signature/component
 import { useCreateOneRecord } from '@/object-record/hooks/useCreateOneRecord';
 import { FormAdvancedTextFieldInput } from '@/advanced-text-editor/components/FormAdvancedTextFieldInput';
 import { FormSingleRecordPicker } from '@/object-record/record-field/ui/form-types/components/FormSingleRecordPicker';
-import { FormTextFieldInput } from '@/object-record/record-field/ui/form-types/components/FormTextFieldInput';
+import { useTextInputFocusStack } from '@/ui/input/hooks/useTextInputFocusStack';
 import { useMyMessageChannels } from '@/settings/accounts/hooks/useMyMessageChannels';
 import { Select } from '@/ui/input/components/Select';
 import { t } from '@lingui/core/macro';
@@ -16,6 +16,15 @@ import { MessageChannelType } from 'twenty-shared/types';
 import { isDefined } from 'twenty-shared/utils';
 import { type SelectOption } from 'twenty-ui/primitives/input';
 import { themeCssVariables } from 'twenty-ui/theme';
+import { EmailTemplatesButton } from '@/activities/emails/templates/components/EmailTemplatesButton';
+
+const StyledTools = styled.div`
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: ${themeCssVariables.spacing[2]};
+  padding: ${themeCssVariables.spacing[2]} ${themeCssVariables.spacing[3]};
+`;
 
 const StyledFieldsContainer = styled.div`
   display: flex;
@@ -28,6 +37,21 @@ const StyledHint = styled.div`
   color: ${themeCssVariables.font.color.tertiary};
   font-size: ${themeCssVariables.font.size.xs};
   padding: ${themeCssVariables.spacing[1]} 0;
+`;
+
+const StyledSubjectLabel = styled.label`
+  display: flex;
+  flex-direction: column;
+  gap: ${themeCssVariables.spacing[2]};
+`;
+
+const StyledSubjectInput = styled.input`
+  background: ${themeCssVariables.background.primary};
+  border: 1px solid ${themeCssVariables.border.color.medium};
+  border-radius: ${themeCssVariables.border.radius.sm};
+  color: ${themeCssVariables.font.color.primary};
+  font: inherit;
+  padding: ${themeCssVariables.spacing[2]};
 `;
 
 type CampaignAudiencePreview = NonNullable<
@@ -65,6 +89,8 @@ type CampaignComposerFieldsProps = {
 export const CampaignComposerFields = ({
   campaignState,
 }: CampaignComposerFieldsProps) => {
+  const { handleFocus: handleSubjectFocus, handleBlur: handleSubjectBlur } =
+    useTextInputFocusStack({ focusId: 'campaign-template-subject' });
   const { channels } = useMyMessageChannels();
   const { unsubscribeTopics } = useUnsubscribeTopics();
   const { createOneRecord: createMessageList } = useCreateOneRecord({
@@ -137,12 +163,16 @@ export const CampaignComposerFields = ({
       <StyledHint>
         {t`The unsubscribe topic this email belongs to. Recipients who opted out of it are skipped, and the unsubscribe link is scoped to it.`}
       </StyledHint>
-      <FormTextFieldInput
-        label={t`Subject`}
-        defaultValue={campaignState.subject}
-        onChange={campaignState.setSubject}
-        placeholder={t`Subject`}
-      />
+      <StyledSubjectLabel>
+        {t`Subject`}
+        <StyledSubjectInput
+          value={campaignState.subject}
+          onChange={(event) => campaignState.setSubject(event.target.value)}
+          onFocus={handleSubjectFocus}
+          onBlur={handleSubjectBlur}
+          placeholder={t`Subject`}
+        />
+      </StyledSubjectLabel>
       <FormAdvancedTextFieldInput
         key={campaignState.signatureResyncKey}
         defaultValue={campaignState.body}
@@ -156,6 +186,13 @@ export const CampaignComposerFields = ({
           onChange={campaignState.setSignatureIncluded}
         />
       )}
+      <StyledTools>
+        <EmailTemplatesButton
+          subject={campaignState.subject}
+          body={campaignState.body}
+          onApply={campaignState.applyTemplate}
+        />
+      </StyledTools>
     </StyledFieldsContainer>
   );
 };

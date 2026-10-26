@@ -49,6 +49,46 @@ const sendMassEmailMock = jest.fn(() =>
 );
 
 describe('useMassEmailComposerState', () => {
+  it('persists an applied template before resolving and personalizes it for each recipient', async () => {
+    const { result } = renderHook(() =>
+      useMassEmailComposerState({
+        connectedAccountId: 'account-1',
+        personIds: ['person-1', 'person-2'],
+        initialDraft: { campaignId: 'campaign-1', subject: '', body: '' },
+      }),
+    );
+    const body = JSON.stringify({
+      type: 'doc',
+      content: [
+        {
+          type: 'paragraph',
+          content: [{ type: 'text', text: 'Hi {{firstName}}' }],
+        },
+      ],
+    });
+
+    await act(async () => {
+      await result.current.applyTemplate({
+        subject: 'Hello {{firstName}}',
+        body,
+      });
+    });
+
+    expect(saveDraftMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        campaignId: 'campaign-1',
+        subject: 'Hello {first_name}',
+        body: expect.stringContaining('{first_name}'),
+      }),
+    );
+    expect(result.current.resolveForRecipient(recipients[0]).subject).toBe(
+      'Hello Ada',
+    );
+    expect(result.current.resolveForRecipient(recipients[1]).subject).toBe(
+      'Hello Grace',
+    );
+    expect(result.current.draftSaveStatus).toBe('saved');
+  });
   beforeEach(() => {
     jest.clearAllMocks();
     jest.mocked(useMassEmailRecipients).mockImplementation((personIds) => ({

@@ -2,6 +2,7 @@ import { useQuery } from '@apollo/client/react';
 import { DragDropProvider } from '@dnd-kit/react';
 import { styled } from '@linaria/react';
 import { useState } from 'react';
+import { EmailTemplatesButton } from '@/activities/emails/templates/components/EmailTemplatesButton';
 
 import { INLINE_EMAIL_BODY_EDITOR_PROFILE } from '@/activities/emails/editor/constants/InlineEmailBodyEditorProfile';
 import { type MassEmailComposerState } from '@/activities/emails/mass-email/hooks/useMassEmailComposerState';
@@ -165,7 +166,7 @@ const StyledFooter = styled.div`
   align-items: center;
   border-top: 1px solid ${themeCssVariables.border.color.medium};
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   padding: ${themeCssVariables.spacing[3]} ${themeCssVariables.spacing[4]};
 `;
 
@@ -429,6 +430,18 @@ export const MassEmailComposeCard = ({
           </StyledCustomizedRow>
         )}
         <StyledFooter>
+          <div>
+            {!isDefined(selectedRecipient) && (
+              <EmailTemplatesButton
+                subject={composerState.subjectTemplate}
+                body={composerState.bodyTemplate}
+                onApply={async (content) => {
+                  await composerState.applyTemplate(content);
+                  setResetNonce((nonce) => nonce + 1);
+                }}
+              />
+            )}
+          </div>
           <Button
             size="sm"
             variant="solid"

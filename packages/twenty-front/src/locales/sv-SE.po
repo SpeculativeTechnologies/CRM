@@ -4014,6 +4014,7 @@ msgid "Blue"
 msgstr "Blå"
 
 #. js-lingui-id: bGQplw
+#: src/modules/activities/emails/templates/components/EmailTemplateEditor.tsx
 #: src/modules/side-panel/pages/email-block-settings/components/EmailPageStyleSection.tsx
 #: src/modules/workflow/workflow-steps/workflow-actions/components/WorkflowEditActionEmailBase.tsx
 #: src/modules/workflow/workflow-steps/workflow-actions/components/WorkflowRunStepLogsEmailDetail.tsx
@@ -4833,6 +4834,11 @@ msgstr ""
 msgid "Choose a model mode"
 msgstr "Välj ett modelläge"
 
+#. js-lingui-id: 9JhkKR
+#: src/modules/activities/emails/templates/components/EmailTemplatePreview.tsx
+msgid "Choose a person to preview and fill personalized fields."
+msgstr ""
+
 #. js-lingui-id: 3Nyb8y
 #: src/pages/settings/data-model/new-field/SettingsObjectNewLinkedFieldConfigure.tsx
 msgid "Choose a relation"
@@ -4954,6 +4960,7 @@ msgid "Choose which profile fields users with the Edit Profile permission can mo
 msgstr ""
 
 #. js-lingui-id: 3wV73y
+#: src/modules/activities/emails/templates/components/EmailTemplateEditor.tsx
 #: src/modules/object-metadata/hooks/useSortSubFieldChoicesForField.ts
 #: src/modules/object-record/record-field/ui/form-types/components/FormAddressFieldInput.tsx
 #: src/modules/object-record/record-field/ui/form-types/components/FormAddressFieldInput.tsx
@@ -5133,6 +5140,7 @@ msgid "Clipboard requires a secure connection (HTTPS). Please access this app ov
 msgstr "Urklipp kräver en säker anslutning (HTTPS). Öppna den här appen via HTTPS för att aktivera kopiering."
 
 #. js-lingui-id: yz7wBu
+#: src/modules/activities/emails/templates/components/EmailTemplateLibrary.tsx
 #: src/modules/ai/components/AiChatCloseButton.tsx
 #: src/modules/front-components/media-session/components/FrontComponentMediaPermissionModal.tsx
 #: src/modules/log-console/components/LogConsole.tsx
@@ -5677,6 +5685,11 @@ msgstr "Bekräfta att du vill ändra till {selectedCreditAmountDisplay} krediter
 msgid "Confirm changing your current resource credit allocation."
 msgstr "Bekräfta att du ändrar din nuvarande tilldelning av resurskrediter."
 
+#. js-lingui-id: mgJ1oe
+#: src/modules/activities/emails/templates/components/EmailTemplateLibrary.tsx
+msgid "Confirm delete"
+msgstr ""
+
 #. js-lingui-id: SU6Tym
 #: src/modules/settings/roles/role-settings/components/SettingsRoleSettingsDeleteRoleConfirmationModalSubtitle.tsx
 msgid "Confirm deletion of {roleName} role? This cannot be undone."
@@ -6218,6 +6231,11 @@ msgstr "Det gick inte att slutföra anspråket. Försök igen."
 msgid "Could not delete approved access domain"
 msgstr "Kunde inte ta bort godkänd åtkomstdomän"
 
+#. js-lingui-id: BiXtZw
+#: src/modules/activities/emails/templates/components/EmailTemplateLibrary.tsx
+msgid "Could not delete template"
+msgstr ""
+
 #. js-lingui-id: E5v5TK
 #: src/modules/settings/legal/components/SettingsDpaAgreementsTable.tsx
 msgid "Could not download the document."
@@ -6233,6 +6251,16 @@ msgstr "Det gick inte att generera den signerade PUB:en. Försök igen."
 #: src/modules/front-components/media-session/components/FrontComponentMediaPermissionModal.tsx
 msgid "Could not grant media access. Please try again."
 msgstr "Det gick inte att bevilja medieåtkomst. Försök igen."
+
+#. js-lingui-id: zYIlbR
+#: src/modules/activities/emails/templates/components/EmailTemplateLibrary.tsx
+msgid "Could not insert template"
+msgstr ""
+
+#. js-lingui-id: zaX/Hq
+#: src/modules/activities/emails/templates/components/EmailTemplateLibrary.tsx
+msgid "Could not load templates. Close and try again."
+msgstr ""
 
 #. js-lingui-id: Tr0DHk
 #: src/modules/object-core/workflows/components/CoreWorkflowEditor.tsx
@@ -6289,6 +6317,21 @@ msgstr "Det gick inte att återställa den här versionen som utkast."
 #: src/pages/settings/applications/components/SettingsClaimApplicationSection.tsx
 msgid "Could not run the lookup"
 msgstr "Det gick inte att köra sökningen."
+
+#. js-lingui-id: bxJJGv
+#: src/modules/activities/emails/templates/components/EmailTemplateLibrary.tsx
+msgid "Could not save template"
+msgstr ""
+
+#. js-lingui-id: uhOU8c
+#: src/modules/activities/emails/hooks/useCampaignComposerState.ts
+msgid "Could not save the template to this campaign. Please try again."
+msgstr ""
+
+#. js-lingui-id: Z9/U17
+#: src/modules/activities/emails/mass-email/hooks/useMassEmailComposerState.ts
+msgid "Could not save the template to this draft. Please try again."
+msgstr ""
 
 #. js-lingui-id: 82UkUj
 #: src/modules/object-core/workflows/hooks/useRenameCoreWorkflow.ts
@@ -7783,6 +7826,11 @@ msgstr "Radera rollen permanent"
 msgid "Delete Skill"
 msgstr "Ta bort färdighet"
 
+#. js-lingui-id: DFjdv0
+#: src/modules/activities/emails/templates/components/EmailTemplateLibrary.tsx
+msgid "Delete template"
+msgstr ""
+
 #. js-lingui-id: DgHnjS
 #: src/pages/settings/ai/components/SettingsAgentSettingsTab.tsx
 msgid "Delete this agent"
@@ -8139,6 +8187,22 @@ msgstr "Inaktiverad"
 #: src/modules/side-panel/pages/compose-email/components/SidePanelComposeEmailPage.tsx
 msgid "Discard"
 msgstr "Förkasta"
+
+#. js-lingui-id: DPmiFg
+#: src/modules/activities/emails/templates/components/EmailTemplateLibrary.tsx
+msgid "Discard and close"
+msgstr ""
+
+#. js-lingui-id: noFL0T
+#: src/modules/activities/emails/templates/components/EmailTemplateLibrary.tsx
+msgid "Discard and switch"
+msgstr ""
+
+#. js-lingui-id: XkeQtf
+#: src/modules/activities/emails/templates/components/EmailTemplateLibrary.tsx
+#: src/modules/activities/emails/templates/components/EmailTemplateLibrary.tsx
+msgid "Discard unsaved changes?"
+msgstr ""
 
 #. js-lingui-id: +K0AvT
 #: src/pages/settings/applications/SettingsApplicationConnectionDetail.tsx
@@ -8573,6 +8637,11 @@ msgstr "t.ex., sammanfattning, status, antal"
 msgid "Each index speeds up reads on the fields it covers, but slows down every insert and update, and uses disk space. Only add an index when you know which queries it serves."
 msgstr "Varje index snabbar upp läsningar på fälten det omfattar, men saktar ned varje infogning och uppdatering och använder diskutrymme. Lägg bara till ett index när du vet vilka frågor det ska användas för."
 
+#. js-lingui-id: ptLq1U
+#: src/modules/activities/emails/templates/components/EmailTemplateEditor.tsx
+msgid "Each placeholder is filled from the recipient's record. Missing values become blank."
+msgstr ""
+
 #. js-lingui-id: 79hamt
 #: src/modules/side-panel/pages/page-layout/constants/settings/ChartConfigurationSettingLabels.ts
 msgid "Each slice represents"
@@ -8818,6 +8887,7 @@ msgid "else if"
 msgstr "annars om"
 
 #. js-lingui-id: O3oNi5
+#: src/modules/activities/emails/templates/components/EmailTemplateEditor.tsx
 #: src/modules/auth/sign-in-up/components/internal/SignInUpEmailField.tsx
 #: src/modules/object-record/record-field/ui/meta-types/input/components/EmailsFieldInput.tsx
 #: src/modules/settings/admin-panel/components/SettingsAdminGeneral.tsx
@@ -8964,6 +9034,12 @@ msgstr ""
 #: src/modules/settings/applications/components/SettingsApplicationAboutSidebar.tsx
 msgid "Email support"
 msgstr "Skicka e-post till supporten"
+
+#. js-lingui-id: J3sJl0
+#: src/modules/activities/emails/templates/components/EmailTemplateLibrary.tsx
+#: src/modules/activities/emails/templates/components/EmailTemplatesButton.tsx
+msgid "Email templates"
+msgstr ""
 
 #. js-lingui-id: LLTYL6
 #: src/modules/workflow/workflow-steps/workflow-actions/components/WorkflowEditActionCreateCalendarEvent.tsx
@@ -10989,6 +11065,7 @@ msgid "First 5 lines"
 msgstr "Första 5 raderna"
 
 #. js-lingui-id: V1EGGU
+#: src/modules/activities/emails/templates/components/EmailTemplateEditor.tsx
 #: src/modules/object-metadata/hooks/useSortSubFieldChoicesForField.ts
 msgid "First name"
 msgstr "Förnamn"
@@ -11270,6 +11347,7 @@ msgstr "full åtkomst till adminpanelen"
 
 #. js-lingui-id: 0W0FHK
 #: src/modules/activities/emails/hooks/useCampaignEmailEditorVariables.ts
+#: src/modules/activities/emails/templates/components/EmailTemplateEditor.tsx
 msgid "Full name"
 msgstr "Fullständigt namn"
 
@@ -13042,6 +13120,11 @@ msgstr "Jobbdata"
 msgid "Job Name"
 msgstr "Jobbnamn"
 
+#. js-lingui-id: qMgKul
+#: src/modules/activities/emails/templates/components/EmailTemplateEditor.tsx
+msgid "Job title"
+msgstr ""
+
 #. js-lingui-id: 27z+FV
 #: src/pages/onboarding/CreateProfile.tsx
 msgid "Job Title"
@@ -13136,6 +13219,12 @@ msgstr ""
 #. js-lingui-id: w7Wygd
 #: src/modules/person-duplicate-review/components/PersonDuplicateMergePreview.tsx
 msgid "Keep {email}"
+msgstr ""
+
+#. js-lingui-id: 4OjqAQ
+#: src/modules/activities/emails/templates/components/EmailTemplateLibrary.tsx
+#: src/modules/activities/emails/templates/components/EmailTemplateLibrary.tsx
+msgid "Keep editing"
 msgstr ""
 
 #. js-lingui-id: IwceEs
@@ -13394,6 +13483,7 @@ msgid "Last message"
 msgstr "Senaste meddelande"
 
 #. js-lingui-id: 1ZaQUH
+#: src/modules/activities/emails/templates/components/EmailTemplateEditor.tsx
 #: src/modules/object-metadata/hooks/useSortSubFieldChoicesForField.ts
 #: src/modules/settings/members/components/MemberNameFields.tsx
 #: src/pages/onboarding/CreateProfile.tsx
@@ -14002,6 +14092,11 @@ msgstr "Laddar färdigheter"
 #: src/modules/ai/utils/tool-display/get-tool-display-message.ts
 msgid "Loading skills..."
 msgstr "Laddar färdigheter..."
+
+#. js-lingui-id: 4nAm+5
+#: src/modules/activities/emails/templates/components/EmailTemplateLibrary.tsx
+msgid "Loading templates…"
+msgstr ""
 
 #. js-lingui-id: 7YK6ap
 #: src/modules/page-layout/widgets/email-thread/components/EmailThreadWidget.tsx
@@ -15459,6 +15554,11 @@ msgstr "Ny flik"
 msgid "New task"
 msgstr "Ny uppgift"
 
+#. js-lingui-id: G1Gw0v
+#: src/modules/activities/emails/templates/components/EmailTemplateList.tsx
+msgid "New template"
+msgstr ""
+
 #. js-lingui-id: IQ+GEj
 #: src/pages/settings/ai/SettingsAI.tsx
 msgid "New Tool"
@@ -16221,6 +16321,11 @@ msgstr "Inga rader med fel"
 #. js-lingui-id: aJlCCf
 #: src/modules/settings/data-model/object-details/components/tabs/SettingsObjectValidationRulesSection.tsx
 msgid "No rules yet."
+msgstr ""
+
+#. js-lingui-id: Hqc1lB
+#: src/modules/activities/emails/templates/components/EmailTemplateLibrary.tsx
+msgid "No saved templates yet. Choose New template to create one."
 msgstr ""
 
 #. js-lingui-id: Hsl+kr
@@ -17891,9 +17996,29 @@ msgstr "Person-ID"
 msgid "Person relation"
 msgstr ""
 
+#. js-lingui-id: l8YRPU
+#: src/modules/activities/emails/templates/components/EmailTemplateEditor.tsx
+msgid "Personalization fields"
+msgstr ""
+
+#. js-lingui-id: JRi7Ka
+#: src/modules/activities/emails/templates/components/EmailTemplatePreview.tsx
+msgid "Personalize for"
+msgstr ""
+
 #. js-lingui-id: FaMom6
 #: src/modules/activities/emails/mass-email/components/MassEmailComposeCard.tsx
 msgid "Personalize for each recipient with placeholders:"
+msgstr ""
+
+#. js-lingui-id: DO3lMi
+#: src/modules/activities/emails/templates/components/EmailTemplateEditor.tsx
+msgid "Personalize the subject or body"
+msgstr ""
+
+#. js-lingui-id: ej6R72
+#: src/modules/activities/emails/templates/components/EmailTemplatePreview.tsx
+msgid "Personalized fields will be filled separately for each recipient."
 msgstr ""
 
 #. js-lingui-id: zmwvG2
@@ -18219,6 +18344,7 @@ msgid "Prevent from assigning the same value to different records"
 msgstr "Förhindra användare från att tilldela samma värde till olika poster"
 
 #. js-lingui-id: rdUucN
+#: src/modules/activities/emails/templates/components/EmailTemplatePreview.tsx
 #: src/modules/settings/data-model/components/SettingsDataModelPreviewFormCard.tsx
 #: src/modules/settings/data-model/objects/forms/components/SettingsDataModelObjectSettingsFormCard.tsx
 #: src/pages/settings/ai/components/SettingsAiModelTiersPreview.tsx
@@ -18226,6 +18352,11 @@ msgstr "Förhindra användare från att tilldela samma värde till olika poster"
 #: src/pages/settings/legal/SettingsLegalDpaNew.tsx
 msgid "Preview"
 msgstr "Förhandsgranskning"
+
+#. js-lingui-id: KY9ir4
+#: src/modules/activities/emails/templates/components/EmailTemplatePreview.tsx
+msgid "Preview for"
+msgstr ""
 
 #. js-lingui-id: Fe5cbB
 #: src/modules/activities/files/components/UnavailableFilePreview.tsx
@@ -19328,6 +19459,11 @@ msgstr "Omorganisera fält"
 msgid "Reorder options"
 msgstr "Ändra ordning på alternativen"
 
+#. js-lingui-id: 6JWIPA
+#: src/modules/activities/emails/templates/components/EmailTemplatePreview.tsx
+msgid "Replace email content"
+msgstr ""
+
 #. js-lingui-id: q8Id6J
 #: src/modules/side-panel/pages/page-layout/components/WidgetSettingsManageSection.tsx
 msgid "Replace widget"
@@ -20035,15 +20171,31 @@ msgstr "Spara eller avbryt ändringar i instrumentpanelen innan du redigerar lay
 msgid "Save settings"
 msgstr "Spara inställningar"
 
+#. js-lingui-id: 5dVjYt
+#: src/modules/activities/emails/templates/components/EmailTemplateLibrary.tsx
+msgid "Save template"
+msgstr ""
+
 #. js-lingui-id: bL2pm9
 #: src/modules/object-record/record-field/ui/form-types/components/FormRecordRichTextFieldInput.tsx
 msgid "Save the record before attaching a file"
 msgstr "Spara posten innan du bifogar en fil"
 
+#. js-lingui-id: aUNBBU
+#: src/modules/activities/emails/templates/components/EmailTemplateLibrary.tsx
+msgid "Save your changes before using this template."
+msgstr ""
+
 #. js-lingui-id: kv9Dnn
 #: src/modules/settings/translations/components/SettingsTranslationsCard.tsx
 msgid "Save your changes first"
 msgstr "Spara dina ändringar först"
+
+#. js-lingui-id: alAG1g
+#: src/modules/activities/emails/templates/components/EmailTemplateList.tsx
+#: src/modules/activities/emails/templates/components/EmailTemplateList.tsx
+msgid "Saved templates"
+msgstr ""
 
 #. js-lingui-id: K/F6pa
 #: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
@@ -22221,6 +22373,7 @@ msgstr ""
 #: src/modules/activities/emails/components/CampaignSentEnvelope.tsx
 #: src/modules/activities/emails/components/EmailComposerFields.tsx
 #: src/modules/activities/emails/mass-email/components/MassEmailComposeCard.tsx
+#: src/modules/activities/emails/templates/components/EmailTemplateEditor.tsx
 #: src/modules/ai/components/AiChatEmailApprovalCard.tsx
 #: src/modules/ai/components/AiChatEmailApprovalCard.tsx
 #: src/modules/side-panel/pages/send-campaign/components/SendCampaignForm.tsx
@@ -22669,6 +22822,31 @@ msgstr "Team"
 #: src/modules/activities/emails/recipients/hooks/useEmailRecipientSuggestions.ts
 msgid "Team member"
 msgstr "Teammedlem"
+
+#. js-lingui-id: ZTgE3k
+#: src/modules/activities/emails/templates/components/EmailTemplateLibrary.tsx
+msgid "Template deleted"
+msgstr ""
+
+#. js-lingui-id: 5OwALL
+#: src/modules/activities/emails/templates/components/EmailTemplateEditor.tsx
+msgid "Template name"
+msgstr ""
+
+#. js-lingui-id: GamjcN
+#: src/modules/activities/emails/templates/components/EmailTemplateLibrary.tsx
+msgid "Template saved"
+msgstr ""
+
+#. js-lingui-id: iTylMl
+#: src/modules/activities/emails/templates/components/EmailTemplatesButton.tsx
+msgid "Templates"
+msgstr ""
+
+#. js-lingui-id: RmVKuz
+#: src/modules/activities/emails/templates/components/EmailTemplateLibrary.tsx
+msgid "Templates are shared with everyone who can send email in this workspace."
+msgstr ""
 
 #. js-lingui-id: lKXcJz
 #: src/pages/settings/emailing-domains/utils/getEmailingDomainStatusText.ts
@@ -23157,6 +23335,11 @@ msgstr "Det finns ingen aktivitet kopplad till den här posten."
 msgid "There was an error while updating password."
 msgstr "Det uppstod ett fel vid uppdatering av lösenordet."
 
+#. js-lingui-id: huEvM1
+#: src/modules/activities/emails/templates/components/EmailTemplatePreview.tsx
+msgid "These fields are blank for this person:"
+msgstr ""
+
 #. js-lingui-id: RuO91P
 #: src/pages/person-duplicate-review/PersonDuplicatesPage.tsx
 msgid "These people will remain separate unless their identity details change."
@@ -23465,6 +23648,11 @@ msgstr "Den här sidan är inte tillgänglig."
 #: src/modules/settings/accounts/components/SettingsAccountsRowDropdownMenu.tsx
 msgid "This permanently deletes {accountHandle} and all of its synced emails and events. This action cannot be undone."
 msgstr "Detta tar permanent bort {accountHandle} och alla dess synkroniserade e-postmeddelanden och händelser. Åtgärden kan inte ångras."
+
+#. js-lingui-id: Kcj+LO
+#: src/modules/activities/emails/templates/components/EmailTemplatePreview.tsx
+msgid "This person could not be loaded. Choose another person."
+msgstr ""
 
 #. js-lingui-id: R/PuIn
 #: src/pages/settings/admin-panel/SettingsAdminNewAiProvider.tsx
@@ -24332,6 +24520,11 @@ msgstr ""
 #: src/modules/workflow/workflow-steps/workflow-actions/ai-agent-action/components/WorkflowAiAgentPermissionsTab.tsx
 msgid "Type anything..."
 msgstr "Skriv något..."
+
+#. js-lingui-id: 90vHys
+#: src/modules/activities/emails/templates/components/EmailTemplateEditor.tsx
+msgid "Type or copy these placeholders into your email:"
+msgstr ""
 
 #. js-lingui-id: LaEX5I
 #: src/modules/activities/emails/components/CampaignBodyField.tsx
@@ -25237,6 +25430,11 @@ msgstr "Använd endast bokstäver, siffror, understreck, punkter eller bindestre
 msgid "Use our API or add your first {objectLabel} manually"
 msgstr "Använd vår API eller lägg till ditt första {objectLabel} manuellt"
 
+#. js-lingui-id: QNtP5M
+#: src/modules/activities/emails/templates/components/EmailTemplatePreview.tsx
+msgid "Use template"
+msgstr ""
+
 #. js-lingui-id: 40bRe+
 #: src/modules/settings/admin-panel/constants/SettingsAdminFeatureFlagMetadata.ts
 msgid "Use the dedicated workflow index page to browse workflows and their versions."
@@ -25813,6 +26011,16 @@ msgstr "Jämfört med balanserat läge"
 #: src/modules/settings/mcp-and-apis/utils/buildMcpSetupCategories.tsx
 msgid "VS Code"
 msgstr "VS Code"
+
+#. js-lingui-id: v0NOxE
+#: src/modules/activities/emails/hooks/useCampaignComposerState.ts
+msgid "Wait for the campaign draft to finish saving, then try again."
+msgstr ""
+
+#. js-lingui-id: gVhfzO
+#: src/modules/activities/emails/mass-email/hooks/useMassEmailComposerState.ts
+msgid "Wait for the email draft and recipients to finish loading, then try again."
+msgstr ""
 
 #. js-lingui-id: uUehLT
 #: src/modules/settings/admin-panel/health-status/components/SettingsAdminQueueJobsTable.tsx

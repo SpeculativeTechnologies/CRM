@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { t } from '@lingui/core/macro';
 
 import { useMessageCampaignDraft } from '@/activities/emails/hooks/useMessageCampaignDraft';
 import { useSendMessageCampaign } from '@/activities/emails/hooks/useSendMessageCampaign';
 import { useEmailSignatureComposer } from '@/activities/emails/signature/hooks/useEmailSignatureComposer';
+import { type EmailTemplateContent } from '@/activities/emails/templates/types/EmailTemplate';
 
 type UseCampaignComposerStateArgs = {
   campaignId?: string;
@@ -48,33 +50,43 @@ export const useCampaignComposerState = ({
   const { sendMessageCampaign, loading: isSending } = useSendMessageCampaign();
   const { saveDraft, isSaving } = useMessageCampaignDraft();
 
-  const saveCurrentDraft = useCallback(async () => {
-    setDraftSaveStatus('saving');
-    const savedDraft = await saveDraft({
-      campaignId: draftCampaignId,
-      listId,
-      unsubscribeTopicId,
-      subject,
+  const saveCurrentDraft = useCallback(
+    async (content?: EmailTemplateContent) => {
+      setDraftSaveStatus('saving');
+      const savedDraft = await saveDraft({
+        campaignId: draftCampaignId,
+        listId,
+        unsubscribeTopicId,
+        subject: content?.subject ?? subject,
+        body: content?.body ?? body,
+        fromAddress:
+          fromAddress.trim().length === 0 ? null : fromAddress.trim(),
+      });
+
+      setDraftSaveStatus(savedDraft === null ? 'error' : 'saved');
+
+      if (savedDraft === null && content) {
+        throw new Error(
+          t`Could not save the template to this campaign. Please try again.`,
+        );
+      }
+
+      if (savedDraft !== null && draftCampaignId === undefined) {
+        setDraftCampaignId(savedDraft.campaignId);
+      }
+
+      return savedDraft?.campaignId ?? draftCampaignId;
+    },
+    [
       body,
-      fromAddress: fromAddress.trim().length === 0 ? null : fromAddress.trim(),
-    });
-
-    setDraftSaveStatus(savedDraft === null ? 'error' : 'saved');
-
-    if (savedDraft !== null && draftCampaignId === undefined) {
-      setDraftCampaignId(savedDraft.campaignId);
-    }
-
-    return savedDraft?.campaignId ?? draftCampaignId;
-  }, [
-    body,
-    draftCampaignId,
-    fromAddress,
-    listId,
-    saveDraft,
-    subject,
-    unsubscribeTopicId,
-  ]);
+      draftCampaignId,
+      fromAddress,
+      listId,
+      saveDraft,
+      subject,
+      unsubscribeTopicId,
+    ],
+  );
 
   useEffect(() => {
     if (
@@ -103,6 +115,25 @@ export const useCampaignComposerState = ({
 
   const setSignatureIncluded = (isIncluded: boolean) => {
     setBody(signatureState.applySignatureInclusion(body, isIncluded));
+  };
+
+  const applyTemplate = async (content: EmailTemplateContent) => {
+    if (autoSaveDraft && draftCampaignId === undefined) {
+      throw new Error(
+        t`Wait for the campaign draft to finish saving, then try again.`,
+      );
+    }
+    const nextBody = signatureState.applySignatureInclusion(
+      content.body,
+      signatureState.isSignatureIncludedIn(body),
+    );
+
+    setSubject(content.subject);
+    setBody(nextBody);
+
+    if (autoSaveDraft) {
+      await saveCurrentDraft({ subject: content.subject, body: nextBody });
+    }
   };
 
   const canSend =
@@ -144,6 +175,7 @@ export const useCampaignComposerState = ({
     setSubject,
     body,
     setBody,
+    applyTemplate,
     draftCampaignId,
     saveCurrentDraft,
     handleSend,
