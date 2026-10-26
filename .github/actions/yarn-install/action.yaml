@@ -43,7 +43,12 @@ runs:
     - name: Install Dependencies
       if: ${{ steps.cache-node-modules.outputs.cache-hit != 'true' && steps.cache-node-modules.outputs.cache-matched-key == '' }}
       shell: ${{ steps.globals.outputs.ACTION_SHELL }}
+      env:
+        # New Linux images mount /tmp as a small tmpfs. Yarn's temporary zip
+        # archives need the disk-backed workspace when installing this monorepo.
+        TMPDIR: ${{ runner.temp }}
       run: |
+        node -p '"Yarn temporary directory: " + require("node:os").tmpdir()'
         yarn config set enableHardenedMode true
         yarn config set enableScripts false
         yarn --immutable --check-cache
