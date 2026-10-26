@@ -9,4 +9,6 @@ These screenshots use a separate synthetic fixture, not the CRM mirror.
 - Fixture: `deploy/.migration-tests/baselines/email-templates-fixture` in the private native verification copy.
 - Template and preview person shown are synthetic test examples created for this feature. No mailbox connections or email sends are used.
 
-`library.png` shows template creation and field insertion. `preview.png` shows a personalized subject and body preview while keeping campaign placeholders intact.
+Updated 2026-10-26 from a separate synthetic checkout, preserving the user's mirror and local edits.
+
+`composer.png` shows the compact Templates action below the body. `library.png` shows the visible saved-template list, selected template and literal placeholder reference. `preview.png` shows a personalized subject and body preview while keeping campaign placeholders intact.

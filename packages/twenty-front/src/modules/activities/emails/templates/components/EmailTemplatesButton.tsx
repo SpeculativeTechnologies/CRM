@@ -1,6 +1,7 @@
 import { t } from '@lingui/core/macro';
 import { useId, useState } from 'react';
-import { EmailTemplateActionButton as Button } from '@/activities/emails/templates/components/EmailTemplateActionButton';
+import { Button } from 'twenty-ui/primitives/input';
+import { IconFiles } from 'twenty-ui/icon';
 import { Dialog } from 'twenty-ui/primitives/surfaces';
 
 import { EmailTemplateLibrary } from '@/activities/emails/templates/components/EmailTemplateLibrary';
@@ -34,13 +35,18 @@ export const EmailTemplatesButton = ({
   return (
     <>
       <Button
-        title={t`Templates`}
-        size="small"
+        type="button"
+        size="sm"
+        variant="ghost"
+        color="neutral"
+        startIcon={<IconFiles />}
         onClick={() => {
           setIsOpen(true);
           openDialog(dialogId);
         }}
-      />
+      >
+        {t`Templates`}
+      </Button>
       <DialogInstance dialogId={dialogId} renderInDocumentBody>
         {({ container, backdrop, viewportProps, onKeyDown }) => (
           <Dialog.Popup

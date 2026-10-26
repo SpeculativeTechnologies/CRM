@@ -166,7 +166,7 @@ const StyledFooter = styled.div`
   align-items: center;
   border-top: 1px solid ${themeCssVariables.border.color.medium};
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   padding: ${themeCssVariables.spacing[3]} ${themeCssVariables.spacing[4]};
 `;
 
@@ -263,16 +263,6 @@ export const MassEmailComposeCard = ({
   return (
     <StyledMain>
       <StyledCard>
-        {!isDefined(selectedRecipient) && (
-          <EmailTemplatesButton
-            subject={composerState.subjectTemplate}
-            body={composerState.bodyTemplate}
-            onApply={async (content) => {
-              await composerState.applyTemplate(content);
-              setResetNonce((nonce) => nonce + 1);
-            }}
-          />
-        )}
         <StyledFieldRow>
           <StyledFieldLabel>{t`From`}</StyledFieldLabel>
           <StyledFieldValue>
@@ -440,6 +430,18 @@ export const MassEmailComposeCard = ({
           </StyledCustomizedRow>
         )}
         <StyledFooter>
+          <div>
+            {!isDefined(selectedRecipient) && (
+              <EmailTemplatesButton
+                subject={composerState.subjectTemplate}
+                body={composerState.bodyTemplate}
+                onApply={async (content) => {
+                  await composerState.applyTemplate(content);
+                  setResetNonce((nonce) => nonce + 1);
+                }}
+              />
+            )}
+          </div>
           <Button
             size="sm"
             variant="solid"

@@ -1,12 +1,9 @@
 import { styled } from '@linaria/react';
 import { t } from '@lingui/core/macro';
-import { type Editor } from '@tiptap/core';
-import { useState } from 'react';
 import { themeCssVariables } from 'twenty-ui/theme';
 
 import { INLINE_EMAIL_BODY_EDITOR_PROFILE } from '@/activities/emails/editor/constants/InlineEmailBodyEditorProfile';
 import { FormAdvancedTextFieldInput } from '@/advanced-text-editor/components/FormAdvancedTextFieldInput';
-import { Select } from '@/ui/input/components/Select';
 import { EMAIL_TEMPLATE_FIELDS } from '@/activities/emails/templates/utils/emailTemplatePersonalization';
 import { type EmailTemplateContent } from '@/activities/emails/templates/types/EmailTemplate';
 import { useTextInputFocusStack } from '@/ui/input/hooks/useTextInputFocusStack';
@@ -31,6 +28,32 @@ const StyledInput = styled.input`
   padding: ${themeCssVariables.spacing[2]};
 `;
 
+const StyledFieldReference = styled.div`
+  background: ${themeCssVariables.background.secondary};
+  border: 1px solid ${themeCssVariables.border.color.medium};
+  border-radius: ${themeCssVariables.border.radius.sm};
+  color: ${themeCssVariables.font.color.secondary};
+  font-size: ${themeCssVariables.font.size.sm};
+  padding: ${themeCssVariables.spacing[3]};
+`;
+
+const StyledTokens = styled.dl`
+  display: flex;
+  flex-wrap: wrap;
+  gap: ${themeCssVariables.spacing[2]} ${themeCssVariables.spacing[4]};
+  margin: ${themeCssVariables.spacing[2]} 0;
+
+  > div {
+    display: flex;
+    gap: ${themeCssVariables.spacing[1]};
+  }
+
+  dd {
+    margin: 0;
+    user-select: all;
+  }
+`;
+
 type EmailTemplateEditorProps = {
   content: EmailTemplateContent & { name: string };
   onChange: (content: EmailTemplateContent & { name: string }) => void;
@@ -42,8 +65,6 @@ export const EmailTemplateEditor = ({
   onChange,
   disabled,
 }: EmailTemplateEditorProps) => {
-  const [editor, setEditor] = useState<Editor | null>(null);
-  const exampleField = '{{firstName}}';
   const { handleFocus: handleNameFocus, handleBlur: handleNameBlur } =
     useTextInputFocusStack({ focusId: 'email-template-name' });
   const { handleFocus: handleSubjectFocus, handleBlur: handleSubjectBlur } =
@@ -56,10 +77,6 @@ export const EmailTemplateEditor = ({
     jobTitle: t`Job title`,
     city: t`City`,
   };
-  const fieldOptions = EMAIL_TEMPLATE_FIELDS.map((field) => ({
-    value: `{{${field}}}`,
-    label: labels[field],
-  }));
 
   return (
     <StyledFields>
@@ -89,39 +106,30 @@ export const EmailTemplateEditor = ({
           }
         />
       </StyledLabel>
-      <Select
-        dropdownId="email-template-subject-field"
-        fullWidth
-        value=""
-        options={fieldOptions}
-        emptyOption={{ value: '', label: t`Insert a field in the subject` }}
-        disabled={disabled}
-        onChange={(value) => {
-          if (value) onChange({ ...content, subject: content.subject + value });
-        }}
-      />
-      <Select
-        dropdownId="email-template-body-field"
-        fullWidth
-        value=""
-        options={fieldOptions}
-        emptyOption={{ value: '', label: t`Insert a field in the body` }}
-        disabled={disabled}
-        onChange={(value) => {
-          if (value) editor?.commands.insertVariableTag(value);
-        }}
-      />
       <FormAdvancedTextFieldInput
         label={t`Body`}
         defaultValue={content.body}
         profile={INLINE_EMAIL_BODY_EDITOR_PROFILE}
         readonly={disabled}
         onChange={(body) => onChange({ ...content, body })}
-        onEditorReady={setEditor}
         minHeight={180}
         enableFullScreen={false}
       />
-      <div>{t`Fields such as ${exampleField} are filled from each person's record. Missing values become blank.`}</div>
+      <StyledFieldReference role="note" aria-label={t`Personalization fields`}>
+        <strong>{t`Personalize the subject or body`}</strong>
+        <div>{t`Type or copy these placeholders into your email:`}</div>
+        <StyledTokens>
+          {EMAIL_TEMPLATE_FIELDS.map((field) => (
+            <div key={field}>
+              <dt>{labels[field]}</dt>
+              <dd>
+                <code>{`{{${field}}}`}</code>
+              </dd>
+            </div>
+          ))}
+        </StyledTokens>
+        <div>{t`Each placeholder is filled from the recipient's record. Missing values become blank.`}</div>
+      </StyledFieldReference>
     </StyledFields>
   );
 };

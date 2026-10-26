@@ -5,10 +5,10 @@ import { EmailTemplateActionButton as Button } from '@/activities/emails/templat
 import { themeCssVariables } from 'twenty-ui/theme';
 
 import { EmailTemplateEditor } from '@/activities/emails/templates/components/EmailTemplateEditor';
+import { EmailTemplateList } from '@/activities/emails/templates/components/EmailTemplateList';
 import { EmailTemplatePreview } from '@/activities/emails/templates/components/EmailTemplatePreview';
 import { useEmailTemplates } from '@/activities/emails/templates/hooks/useEmailTemplates';
 import { type EmailTemplateContent } from '@/activities/emails/templates/types/EmailTemplate';
-import { Select } from '@/ui/input/components/Select';
 import { TIPTAP_DOCUMENT_SCHEMA_VERSION } from 'twenty-shared/utils';
 
 const StyledLibrary = styled.div`
@@ -22,6 +22,21 @@ const StyledActions = styled.div`
   display: flex;
   flex-wrap: wrap;
   gap: ${themeCssVariables.spacing[2]};
+`;
+const StyledWorkspace = styled.div`
+  display: grid;
+  gap: ${themeCssVariables.spacing[5]};
+  grid-template-columns: minmax(160px, 1fr) minmax(0, 3fr);
+
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+  }
+`;
+const StyledDetails = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: ${themeCssVariables.spacing[4]};
+  min-width: 0;
 `;
 const EMPTY_CONTENT = {
   name: '',
@@ -57,15 +72,25 @@ export const EmailTemplateLibrary = ({
     saveTemplate,
     deleteTemplate,
   } = useEmailTemplates();
-  const [selectedId, setSelectedId] = useState('');
-  const [content, setContent] = useState(EMPTY_CONTENT);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [draftContent, setContent] = useState<typeof EMPTY_CONTENT | null>(
+    null,
+  );
   const [editorKey, setEditorKey] = useState(0);
   const [message, setMessage] = useState<string | null>(null);
   const [isApplying, setIsApplying] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [pendingSelection, setPendingSelection] = useState<string | null>(null);
   const [confirmClose, setConfirmClose] = useState(false);
-  const selected = templates.find((template) => template.id === selectedId);
+  const selected =
+    selectedId === null
+      ? templates[0]
+      : templates.find((template) => template.id === selectedId);
+  const content = draftContent ?? {
+    name: selected?.name ?? '',
+    subject: selected?.subject ?? '',
+    body: selected?.body ?? EMPTY_CONTENT.body,
+  };
   const savedContent = selected ?? EMPTY_CONTENT;
   const isDirty =
     content.name !== savedContent.name ||
@@ -73,30 +98,21 @@ export const EmailTemplateLibrary = ({
     content.body !== savedContent.body;
   const isBusy = isSaving || isDeleting || isApplying;
 
-  const selectTemplate = (id: string) => {
-    const nextTemplate = templates.find((template) => template.id === id);
-
+  const selectTemplate = (id: string | null) => {
     setSelectedId(id);
-    setContent(
-      nextTemplate
-        ? {
-            name: nextTemplate.name,
-            subject: nextTemplate.subject,
-            body: nextTemplate.body,
-          }
-        : EMPTY_CONTENT,
-    );
+    setContent(null);
     setEditorKey((key) => key + 1);
     setMessage(null);
     setConfirmDelete(false);
     setPendingSelection(null);
+    setConfirmClose(false);
   };
   const handleSave = async () => {
     setMessage(null);
     try {
       const saved = await saveTemplate({
         ...content,
-        ...(selectedId && { id: selectedId }),
+        ...(selected && { id: selected.id }),
       });
 
       if (saved) {
@@ -116,8 +132,9 @@ export const EmailTemplateLibrary = ({
   };
   const handleDelete = async () => {
     try {
-      await deleteTemplate(selectedId);
-      selectTemplate('');
+      if (!selected) return;
+      await deleteTemplate(selected.id);
+      selectTemplate(null);
       setMessage(t`Template deleted`);
     } catch (caught) {
       setMessage(
@@ -147,102 +164,105 @@ export const EmailTemplateLibrary = ({
       {error && (
         <div role="alert">{t`Could not load templates. Close and try again.`}</div>
       )}
-      <Select
-        dropdownId="email-template-library"
-        label={t`Template`}
-        fullWidth
-        value={selectedId}
-        options={[
-          { value: '', label: t`New template` },
-          ...templates.map((template) => ({
-            value: template.id,
-            label: template.name,
-          })),
-        ]}
-        disabled={isBusy || !!error}
-        onChange={(id) => {
-          if (isDirty) setPendingSelection(id);
-          else selectTemplate(id);
-        }}
-      />
-      {pendingSelection !== null && (
-        <StyledActions>
-          <span>{t`Discard unsaved changes?`}</span>
-          <Button
-            title={t`Discard and switch`}
-            onClick={() => selectTemplate(pendingSelection)}
-          />
-          <Button
-            title={t`Keep editing`}
-            onClick={() => setPendingSelection(null)}
-          />
-        </StyledActions>
-      )}
-      <EmailTemplateEditor
-        key={editorKey}
-        content={content}
-        onChange={setContent}
-        disabled={isBusy || !!error}
-      />
-      {message && <div role="status">{message}</div>}
-      <StyledActions>
-        <Button
-          title={t`Save template`}
-          variant="primary"
-          disabled={
-            isBusy ||
-            loading ||
-            !!error ||
-            !content.name.trim() ||
-            !content.subject.trim()
-          }
-          onClick={() => void handleSave()}
-        />
-        {selected && (
-          <Button
-            title={confirmDelete ? t`Confirm delete` : t`Delete template`}
-            disabled={isBusy}
-            onClick={() => {
-              if (confirmDelete) void handleDelete();
-              else setConfirmDelete(true);
-            }}
-          />
-        )}
-        <Button
-          title={t`Close`}
-          disabled={isBusy}
-          onClick={() => {
-            if (isDirty) setConfirmClose(true);
-            else onClose();
+      <StyledWorkspace>
+        <EmailTemplateList
+          templates={templates}
+          selectedId={selected?.id}
+          disabled={isBusy || loading || !!error}
+          onSelect={(id) => {
+            if (id === selected?.id || (id === '' && selectedId === '')) return;
+            if (isDirty) setPendingSelection(id);
+            else selectTemplate(id);
           }}
         />
-      </StyledActions>
-      {confirmClose && (
-        <StyledActions>
-          <span>{t`Discard unsaved changes?`}</span>
-          <Button title={t`Discard and close`} onClick={onClose} />
-          <Button
-            title={t`Keep editing`}
-            onClick={() => setConfirmClose(false)}
-          />
-        </StyledActions>
-      )}
-      {selected && (
-        <EmailTemplatePreview
-          content={selected}
-          personalize={personalize}
-          defaultPersonId={defaultPersonId}
-          disabled={isBusy || isDirty}
-          replacesContent={
-            currentContent.subject.trim().length > 0 ||
-            currentContent.body.trim().length > 0
-          }
-          onApply={handleApply}
-        />
-      )}
-      {selected && isDirty && (
-        <div>{t`Save your changes before using this template.`}</div>
-      )}
+        <StyledDetails>
+          {!loading && !error && !selected && selectedId !== '' && (
+            <div>{t`No saved templates yet. Choose New template to create one.`}</div>
+          )}
+          {pendingSelection !== null && (
+            <StyledActions>
+              <span>{t`Discard unsaved changes?`}</span>
+              <Button
+                title={t`Discard and switch`}
+                onClick={() => selectTemplate(pendingSelection)}
+              />
+              <Button
+                title={t`Keep editing`}
+                onClick={() => setPendingSelection(null)}
+              />
+            </StyledActions>
+          )}
+          {(selected || selectedId === '') && (
+            <EmailTemplateEditor
+              key={`${selected?.id ?? 'new'}:${editorKey}`}
+              content={content}
+              onChange={setContent}
+              disabled={isBusy || !!error}
+            />
+          )}
+          {message && <div role="status">{message}</div>}
+          <StyledActions>
+            {(selected || selectedId === '') && (
+              <Button
+                title={t`Save template`}
+                variant="primary"
+                disabled={
+                  isBusy ||
+                  loading ||
+                  !!error ||
+                  !content.name.trim() ||
+                  !content.subject.trim()
+                }
+                onClick={() => void handleSave()}
+              />
+            )}
+            {selected && (
+              <Button
+                title={confirmDelete ? t`Confirm delete` : t`Delete template`}
+                disabled={isBusy}
+                onClick={() => {
+                  if (confirmDelete) void handleDelete();
+                  else setConfirmDelete(true);
+                }}
+              />
+            )}
+            <Button
+              title={t`Close`}
+              disabled={isBusy}
+              onClick={() => {
+                if (isDirty) setConfirmClose(true);
+                else onClose();
+              }}
+            />
+          </StyledActions>
+          {confirmClose && (
+            <StyledActions>
+              <span>{t`Discard unsaved changes?`}</span>
+              <Button title={t`Discard and close`} onClick={onClose} />
+              <Button
+                title={t`Keep editing`}
+                onClick={() => setConfirmClose(false)}
+              />
+            </StyledActions>
+          )}
+          {selected && (
+            <EmailTemplatePreview
+              content={selected}
+              personalize={personalize}
+              defaultPersonId={defaultPersonId}
+              disabled={isBusy || isDirty}
+              replacesContent={
+                currentContent.subject.trim().length > 0 ||
+                currentContent.body.trim().length > 0
+              }
+              onApply={handleApply}
+            />
+          )}
+          {selected && isDirty && (
+            <div>{t`Save your changes before using this template.`}</div>
+          )}
+        </StyledDetails>
+      </StyledWorkspace>
     </StyledLibrary>
   );
 };

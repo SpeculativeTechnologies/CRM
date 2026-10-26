@@ -18,6 +18,14 @@ import { type SelectOption } from 'twenty-ui/primitives/input';
 import { themeCssVariables } from 'twenty-ui/theme';
 import { EmailTemplatesButton } from '@/activities/emails/templates/components/EmailTemplatesButton';
 
+const StyledTools = styled.div`
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: ${themeCssVariables.spacing[2]};
+  padding: ${themeCssVariables.spacing[2]} ${themeCssVariables.spacing[3]};
+`;
+
 const StyledFieldsContainer = styled.div`
   display: flex;
   flex-direction: column;
@@ -120,11 +128,6 @@ export const CampaignComposerFields = ({
 
   return (
     <StyledFieldsContainer>
-      <EmailTemplatesButton
-        subject={campaignState.subject}
-        body={campaignState.body}
-        onApply={campaignState.applyTemplate}
-      />
       <Select
         dropdownId="campaign-composer-from-account"
         label={t`From`}
@@ -183,6 +186,13 @@ export const CampaignComposerFields = ({
           onChange={campaignState.setSignatureIncluded}
         />
       )}
+      <StyledTools>
+        <EmailTemplatesButton
+          subject={campaignState.subject}
+          body={campaignState.body}
+          onApply={campaignState.applyTemplate}
+        />
+      </StyledTools>
     </StyledFieldsContainer>
   );
 };

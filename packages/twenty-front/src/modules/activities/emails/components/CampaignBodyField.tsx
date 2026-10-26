@@ -72,33 +72,6 @@ export const CampaignBodyField = ({
 
   return (
     <StyledContainer onBlur={() => flush()}>
-      <EmailTemplatesButton
-        subject={campaign.subject ?? ''}
-        body={body}
-        onApply={async (content) => {
-          const isSignatureIncluded =
-            signatureState.isSignatureIncludedIn(body);
-          const nextBody = signatureState.getBodyWithSignatureInclusion(
-            content.body,
-            isSignatureIncluded,
-          );
-
-          await updateOneRecord({
-            objectNameSingular: CoreObjectNameSingular.MessageCampaign,
-            idToUpdate: campaign.id,
-            updateOneRecordInput: {
-              subject: content.subject,
-              bodyTemplate: nextBody,
-            },
-          });
-          setBody(
-            signatureState.applySignatureInclusion(
-              nextBody,
-              isSignatureIncluded,
-            ),
-          );
-        }}
-      />
       <FormAdvancedTextFieldInput
         key={`${draftResyncKey}-${signatureState.signatureResyncKey}`}
         defaultValue={body}
@@ -119,6 +92,35 @@ export const CampaignBodyField = ({
           />
         </StyledSignatureRow>
       )}
+      <StyledSignatureRow>
+        <EmailTemplatesButton
+          subject={campaign.subject ?? ''}
+          body={body}
+          onApply={async (content) => {
+            const isSignatureIncluded =
+              signatureState.isSignatureIncludedIn(body);
+            const nextBody = signatureState.getBodyWithSignatureInclusion(
+              content.body,
+              isSignatureIncluded,
+            );
+
+            await updateOneRecord({
+              objectNameSingular: CoreObjectNameSingular.MessageCampaign,
+              idToUpdate: campaign.id,
+              updateOneRecordInput: {
+                subject: content.subject,
+                bodyTemplate: nextBody,
+              },
+            });
+            setBody(
+              signatureState.applySignatureInclusion(
+                nextBody,
+                isSignatureIncluded,
+              ),
+            );
+          }}
+        />
+      </StyledSignatureRow>
       {isDefined(bodyEditor) && (
         <AdvancedTextEditorInsertRail
           editor={bodyEditor}
