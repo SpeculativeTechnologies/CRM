@@ -11060,7 +11060,6 @@ msgid "First 5 lines"
 msgstr ""
 
 #. js-lingui-id: V1EGGU
-#: src/modules/activities/emails/templates/components/EmailTemplateEditor.tsx
 #: src/modules/object-metadata/hooks/useSortSubFieldChoicesForField.ts
 msgid "First name"
 msgstr ""
@@ -11077,6 +11076,11 @@ msgstr ""
 #. js-lingui-id: cgevMo
 #: src/pages/onboarding/CreateProfile.tsx
 msgid "First name can not be empty"
+msgstr ""
+
+#. js-lingui-id: 91NSnQ
+#: src/modules/activities/emails/mass-email/components/MassEmailComposeCard.tsx
+msgid "First-name placeholders use the preferred name when available, otherwise the first name."
 msgstr ""
 
 #. js-lingui-id: KMpuhP
@@ -18281,6 +18285,12 @@ msgstr ""
 #. js-lingui-id: HslPhm
 #: src/modules/settings/admin-panel/constants/SettingsAdminFeatureFlagMetadata.ts
 msgid "Prebuilt logic functions"
+msgstr ""
+
+#. js-lingui-id: o3OUoQ
+#: src/modules/activities/emails/hooks/useCampaignEmailEditorVariables.ts
+#: src/modules/activities/emails/templates/components/EmailTemplateEditor.tsx
+msgid "Preferred name (or first name)"
 msgstr ""
 
 #. js-lingui-id: 0Lqxjs
