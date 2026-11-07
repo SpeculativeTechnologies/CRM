@@ -4,8 +4,19 @@ import userEvent from '@testing-library/user-event';
 import { EmailTemplatePreview } from '@/activities/emails/templates/components/EmailTemplatePreview';
 import { useFindOneRecord } from '@/object-record/hooks/useFindOneRecord';
 
+let mockPreferredNameFields: {
+  name: string;
+  type: string;
+  isActive: boolean;
+}[] = [];
+
 jest.mock('@/object-metadata/hooks/useObjectMetadataItem', () => ({
-  useObjectMetadataItem: () => ({ objectMetadataItem: { fields: [] } }),
+  useObjectMetadataItem: () => ({
+    objectMetadataItem: {
+      nameSingular: 'person',
+      fields: mockPreferredNameFields,
+    },
+  }),
 }));
 
 jest.mock('@/object-record/hooks/useFindOneRecord', () => ({
@@ -64,6 +75,7 @@ const mockedFindOne = jest.mocked(useFindOneRecord);
 
 describe('EmailTemplatePreview', () => {
   beforeEach(() => {
+    mockPreferredNameFields = [];
     mockedFindOne.mockReturnValue({
       record: {
         __typename: 'Person',
@@ -97,6 +109,66 @@ describe('EmailTemplatePreview', () => {
         body: expect.stringContaining('Hello Ada Lovelace'),
       }),
     );
+  });
+
+  it('should load the optional preferred name and insert it into a single email', async () => {
+    mockPreferredNameFields = [
+      { name: 'preferredName', type: 'TEXT', isActive: true },
+    ];
+    mockedFindOne.mockReturnValue({
+      record: {
+        __typename: 'Person',
+        id: 'person-1',
+        name: { firstName: 'Timothy', lastName: 'McGee' },
+        preferredName: ' Tim ',
+      },
+      loading: false,
+      error: undefined,
+      refetch: jest.fn(),
+    });
+    const onApply = jest.fn().mockResolvedValue(undefined);
+    render(
+      <EmailTemplatePreview
+        content={content}
+        personalize
+        defaultPersonId="person-1"
+        disabled={false}
+        replacesContent={false}
+        onApply={onApply}
+      />,
+    );
+
+    expect(mockedFindOne).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        recordGqlFields: expect.objectContaining({ preferredName: true }),
+      }),
+    );
+    expect(screen.getByText('Welcome Tim')).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: 'Use template' }));
+    expect(onApply).toHaveBeenCalledWith(
+      expect.objectContaining({
+        subject: 'Welcome Tim',
+        body: expect.stringContaining('Hello Timothy McGee'),
+      }),
+    );
+  });
+
+  it('should omit preferred name from the query when the field is unavailable', () => {
+    render(
+      <EmailTemplatePreview
+        content={content}
+        personalize
+        defaultPersonId="person-1"
+        disabled={false}
+        replacesContent={false}
+        onApply={jest.fn()}
+      />,
+    );
+
+    expect(
+      mockedFindOne.mock.calls.at(-1)?.[0].recordGqlFields,
+    ).not.toHaveProperty('preferredName');
+    expect(screen.getByText('Welcome Ada')).toBeInTheDocument();
   });
 
   it('should preview a person but preserve placeholders when inserting into a campaign', async () => {

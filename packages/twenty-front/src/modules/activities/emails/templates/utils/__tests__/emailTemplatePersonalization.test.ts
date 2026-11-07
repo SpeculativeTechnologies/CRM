@@ -26,6 +26,53 @@ const content = {
 };
 
 describe('email template personalization', () => {
+  it.each([
+    [' Tim ', 'Tim'],
+    [null, 'Timothy'],
+    ['', 'Timothy'],
+    ['  ', 'Timothy'],
+    [undefined, 'Timothy'],
+  ])(
+    'should resolve first-name tokens using preferred name %p with a first-name fallback',
+    (preferredName, expectedName) => {
+      const person = {
+        name: { firstName: 'Timothy', lastName: 'McGee' },
+        preferredName,
+      };
+      const template = {
+        subject: 'Hello {{firstName}}',
+        body: JSON.stringify({
+          type: 'doc',
+          content: [
+            {
+              type: 'paragraph',
+              content: [
+                { type: 'variableTag', attrs: { variable: '{{firstName}}' } },
+              ],
+            },
+          ],
+        }),
+      };
+      const resolved = resolveEmailTemplate(
+        template,
+        buildEmailTemplateValues(person),
+      );
+      const converted = toMassEmailTemplate(template);
+      const massValues = buildPersonPlaceholderValues(person);
+
+      expect(resolved.subject).toBe(`Hello ${expectedName}`);
+      expect(JSON.parse(resolved.body).content[0].content[0].text).toBe(
+        expectedName,
+      );
+      expect(
+        resolveEmailPlaceholders(converted.subject, massValues, {
+          escapeValues: false,
+        }).resolved,
+      ).toBe(resolved.subject);
+      expect(buildEmailTemplateValues(person).fullName).toBe('Timothy McGee');
+    },
+  );
+
   it('should personalize both fields and variable chips for each person', () => {
     const ada = resolveEmailTemplate(
       content,

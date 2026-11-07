@@ -407,6 +407,7 @@ export const MassEmailComposeCard = ({
                 {`{${placeholderKey}}`}
               </StyledPlaceholderToken>
             ))}
+            <div>{t`First-name placeholders use the preferred name when available, otherwise the first name.`}</div>
           </StyledTokensRow>
         )}
         {isDefined(resolved) && resolved.missingPlaceholderKeys.length > 0 && (

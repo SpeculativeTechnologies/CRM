@@ -5,7 +5,7 @@ import {
   MessageCampaignStatus,
   MessageParticipantRole,
 } from 'twenty-shared/types';
-import { isDefined } from 'twenty-shared/utils';
+import { getPreferredFirstName, isDefined } from 'twenty-shared/utils';
 
 import { MessageCampaignDetailsDTO } from 'src/engine/core-modules/emailing-domain/dtos/message-campaign-details.dto';
 import { MessageCampaignSummaryDTO } from 'src/engine/core-modules/emailing-domain/dtos/message-campaign-summary.dto';
@@ -76,7 +76,6 @@ export class MessageCampaignQueryService {
   }
 
   async findOne({
-    workspaceId,
     campaignId,
     workspaceMemberId,
   }: {
@@ -144,14 +143,21 @@ export class MessageCampaignQueryService {
       const peopleById = new Map(people.map((person) => [person.id, person]));
       const recipients = participants.map((participant) => {
         const message = messagesById.get(participant.messageId);
-        const person = participant.personId
+        const person:
+          | (PersonWorkspaceEntity & { preferredName?: unknown })
+          | undefined = participant.personId
           ? peopleById.get(participant.personId)
           : undefined;
         const personName = [person?.name?.firstName, person?.name?.lastName]
           .filter(Boolean)
           .join(' ');
+        const firstName = getPreferredFirstName(
+          person?.name?.firstName,
+          person?.preferredName,
+        );
         const variables = {
-          firstName: person?.name?.firstName ?? '',
+          firstName,
+          'name.firstName': firstName,
           lastName: person?.name?.lastName ?? '',
           fullName: personName,
           email: person?.emails?.primaryEmail ?? participant.handle ?? '',

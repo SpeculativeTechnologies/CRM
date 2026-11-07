@@ -1,4 +1,5 @@
 import {
+  getPreferredFirstName,
   type EmailDocumentNode,
   parseEmailDocument,
   parseJson,
@@ -36,7 +37,7 @@ export const buildEmailTemplateValues = (
   const lastName = person.name?.lastName ?? '';
 
   return {
-    firstName,
+    firstName: getPreferredFirstName(firstName, person.preferredName),
     lastName,
     fullName: [firstName, lastName].filter(Boolean).join(' '),
     email: person.emails?.primaryEmail ?? '',
