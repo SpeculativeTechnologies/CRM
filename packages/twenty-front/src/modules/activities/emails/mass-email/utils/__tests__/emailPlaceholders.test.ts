@@ -67,6 +67,48 @@ describe('resolveEmailPlaceholders', () => {
 });
 
 describe('buildPersonPlaceholderValues', () => {
+  it('should use the preferred name for greetings while preserving the full name', () => {
+    const preferredValues = buildPersonPlaceholderValues({
+      name: { firstName: 'Timothy', lastName: 'McGee' },
+      preferredName: ' Tim ',
+    });
+
+    expect(preferredValues.first_name).toBe('Tim');
+    expect(preferredValues.full_name).toBe('Timothy McGee');
+    expect(
+      resolveEmailPlaceholders('Hi {first_name}', preferredValues, {
+        escapeValues: false,
+      }).resolved,
+    ).toBe('Hi Tim');
+  });
+
+  it.each([undefined, null, '', '   '])(
+    'should fall back to first name when preferred name is %p',
+    (preferredName) => {
+      expect(
+        buildPersonPlaceholderValues({
+          name: { firstName: ' Timothy ' },
+          preferredName,
+        }).first_name,
+      ).toBe('Timothy');
+    },
+  );
+
+  it('should use and escape a preferred name even without a first name', () => {
+    const preferredValues = buildPersonPlaceholderValues({
+      preferredName: '<b>Tim & "T"</b>',
+    });
+
+    expect(
+      resolveEmailPlaceholders('<p>Hi {first_name}</p>', preferredValues, {
+        escapeValues: true,
+      }),
+    ).toEqual({
+      resolved: '<p>Hi &lt;b&gt;Tim &amp; &quot;T&quot;&lt;/b&gt;</p>',
+      missingPlaceholderKeys: [],
+    });
+  });
+
   it('should build values from a person record', () => {
     expect(values).toEqual({
       first_name: 'Ada',

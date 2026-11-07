@@ -1,5 +1,6 @@
 import { t } from '@lingui/core/macro';
 import { useState } from 'react';
+import { isDefined } from 'twenty-shared/utils';
 import { EmailTemplateActionButton as Button } from '@/activities/emails/templates/components/EmailTemplateActionButton';
 
 import { INLINE_EMAIL_BODY_EDITOR_PROFILE } from '@/activities/emails/editor/constants/InlineEmailBodyEditorProfile';
@@ -12,6 +13,7 @@ import {
 import { FormAdvancedTextFieldInput } from '@/advanced-text-editor/components/FormAdvancedTextFieldInput';
 import { useFindOneRecord } from '@/object-record/hooks/useFindOneRecord';
 import { useObjectMetadataItem } from '@/object-metadata/hooks/useObjectMetadataItem';
+import { getPersonPreferredNameField } from '@/object-metadata/utils/getPersonPreferredNameField';
 import { FormSingleRecordPicker } from '@/object-record/record-field/ui/form-types/components/FormSingleRecordPicker';
 
 type EmailTemplatePreviewProps = {
@@ -40,12 +42,14 @@ export const EmailTemplatePreview = ({
   const hasCityField = objectMetadataItem.fields.some(
     (field) => field.name === 'city',
   );
+  const preferredNameField = getPersonPreferredNameField(objectMetadataItem);
   const { record, loading, error } = useFindOneRecord({
     objectNameSingular: 'person',
     objectRecordId: personId ?? undefined,
     recordGqlFields: {
       id: true,
       name: true,
+      ...(isDefined(preferredNameField) && { [preferredNameField.name]: true }),
       emails: true,
       jobTitle: true,
       ...(hasCityField && { city: true }),

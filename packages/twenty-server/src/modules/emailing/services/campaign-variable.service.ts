@@ -4,6 +4,7 @@ import { STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS } from 'twenty-shared/metadata';
 import { FieldMetadataType } from 'twenty-shared/types';
 import {
   type CampaignVariableDefinition,
+  getPreferredFirstName,
   isDefined,
   listCampaignVariablesForFields,
 } from 'twenty-shared/utils';
@@ -29,7 +30,7 @@ type PersonVariableSchema = PersonCampaignVariables & {
   fieldsByName: Map<string, FlatFieldMetadata>;
 };
 
-const COMPUTED_VARIABLE_NAMES = ['fullName', 'personId'];
+const COMPUTED_VARIABLE_NAMES = ['firstName', 'fullName', 'personId'];
 
 const MAX_VARIABLES_IN_ERROR_MESSAGE = 40;
 
@@ -144,6 +145,17 @@ export class CampaignVariableService {
         fieldsByName.get(definition.fieldName),
       );
     }
+
+    const firstName = getPreferredFirstName(
+      person?.name?.firstName,
+      this.resolveValue(person, 'preferredName'),
+    );
+
+    if ('name.firstName' in variables) {
+      variables['name.firstName'] = firstName;
+    }
+    // Shared templates use this alias; saved campaign field paths keep working.
+    variables.firstName = firstName;
 
     variables.personId = this.stringify(this.resolveValue(person, 'id'));
     variables.fullName = [

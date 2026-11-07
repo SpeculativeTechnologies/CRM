@@ -1,4 +1,5 @@
 import {
+  getPreferredFirstName,
   parseEmailDocument,
   parseJson,
   transformEmailDocumentStrings,
@@ -74,6 +75,7 @@ export const resolveEmailPlaceholders = (
 
 export type PersonRecordForPlaceholders = {
   name?: { firstName?: string | null; lastName?: string | null } | null;
+  preferredName?: string | null;
   emails?: { primaryEmail?: string | null } | null;
   jobTitle?: string | null;
   city?: string | null;
@@ -87,7 +89,7 @@ export const buildPersonPlaceholderValues = (
   const lastName = person.name?.lastName?.trim() ?? '';
 
   return {
-    first_name: firstName,
+    first_name: getPreferredFirstName(firstName, person.preferredName),
     last_name: lastName,
     full_name: [firstName, lastName].filter(Boolean).join(' '),
     email: person.emails?.primaryEmail?.trim() ?? '',

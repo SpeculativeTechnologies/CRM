@@ -70,7 +70,7 @@ export const EmailTemplateEditor = ({
   const { handleFocus: handleSubjectFocus, handleBlur: handleSubjectBlur } =
     useTextInputFocusStack({ focusId: 'email-template-subject' });
   const labels = {
-    firstName: t`First name`,
+    firstName: t`Preferred name (or first name)`,
     lastName: t`Last name`,
     fullName: t`Full name`,
     email: t`Email`,
